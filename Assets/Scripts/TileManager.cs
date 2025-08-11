@@ -30,6 +30,7 @@ public class TileManager : MonoBehaviour
 					     tile.GetComponent<Tile>().Setup(data);
 					     tile.transform.position = new Vector3(i, 0 - data.compaction / 2, j);
 
+					     tile.GetComponent<Tile>().tileData.Initialize();
 				}
 		          }
 	     }

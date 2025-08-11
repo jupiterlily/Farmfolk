@@ -3,12 +3,47 @@ using UnityEngine;
 [System.Serializable]
 public class TileData
 {
-
-	     public float compaction;  //derived
 	     public Vector2Int tileGridRef;
 	     public float tileWidth;
-	     public Color tileColor;
+	     public SoilComposition composition;
 
+	     [Header("Dynamic States")]
+	     public float compaction;  // 0 (loose) - 1 (concrete)
+	     public float moisture;
+
+	     public void Initialize(TileData neighbor = null)
+	     {
+		          composition = new SoilComposition();
+
+		          if (neighbor == null)
+		          {
+				// World-edge tile: Randomize but keep balanced
+				composition.sand = Random.Range(30f, 70f);
+				composition.silt = Random.Range(10f, 50f);
+				composition.clay = 100f - composition.sand - composition.silt;
+				composition.organicMatter = Random.Range(1f, 5f);
+		          }
+		          else
+		          {
+				// Inherit neighbor's traits with slight variation
+				composition.sand = Mathf.Clamp(neighbor.composition.sand + Random.Range(-5f, 5f), 0, 100);
+				composition.silt = Mathf.Clamp(neighbor.composition.silt + Random.Range(-5f, 5f), 0, 100);
+				composition.clay = 100f - composition.sand - composition.silt;
+				composition.organicMatter = Mathf.Max(0, neighbor.composition.organicMatter + Random.Range(-1f, 1f));
+		          }
+
+		          composition.CalculateDerivedProperties();
+		          UpdateCompaction();
+	     }
+
+	     public void UpdateCompaction()
+	     {
+		          // Clay compacts more, organic matter reduces compaction
+		          compaction = 0.7f * (composition.clay / 100f)
+			      - 0.3f * (composition.organicMatter / 20f)
+			      + 0.1f * Random.Range(-1f, 1f); // Small noise
+		          compaction = Mathf.Clamp01(compaction);
+	     }
 }
 
 //nutrient capacity,  water  erosion  succeptibility, wind erosion succeptibility,  compactability,  water capacity, aeration
@@ -26,7 +61,38 @@ public class SoilComposition
  //gas,
  //organic matter is 250kg/m3
 
+	     [Range(0, 100)] public float sand;      // Gritty, drains fast
+	     [Range(0, 100)] public float silt;      // Smooth, holds moisture
+	     [Range(0, 100)] public float clay;      // Sticky, compacts easily
+	     [Range(0, 20)] public float organicMatter; // Darkens color, lowers density
+
+	     // Derived properties (calculated on initialization)
+	     [HideInInspector] public float porosity;       // Total pore space
+	     [HideInInspector] public float infiltrationRate; // mm/hour
+	     [HideInInspector] public float waterHoldingCapacity;
+
+	     public void CalculateDerivedProperties()
+	     {
+		          // USDA soil texture empirical formulas
+		          porosity = 0.3f + (0.002f * clay) - (0.001f * sand);
+		          infiltrationRate = 25f * Mathf.Pow(sand / 100f, 2f);
+		          waterHoldingCapacity = 0.1f * clay + 0.05f * silt;
+	     }
+
+	     public Color GetSoilColor()
+	     {
+		          // Base color mixing (USDA standards)
+		          Color sandColor = new Color(0.9f, 0.8f, 0.6f); // Tan
+		          Color siltColor = new Color(0.7f, 0.7f, 0.6f); // Brown-gray
+		          Color clayColor = new Color(0.6f, 0.5f, 0.4f); // Reddish-brown
+		          Color organicColor = new Color(0.3f, 0.2f, 0.1f); // Dark brown
+
+		          // Weighted blend
+		          Color baseColor = (sandColor * sand + siltColor * silt + clayColor * clay) / 100f;
+		          return Color.Lerp(baseColor, organicColor, organicMatter / 20f);
+	     }
 }
+
 
 [System.Serializable]
 public class TileGrid
