@@ -1,0 +1,1050 @@
+fileFormatVersion: 2
+guid: a21cf919d6e2c0d459391b505cee5eb1
+TextureImporter:
+  internalIDToNameTable:
+  - first:
+      213: 7059303532858725675
+    second: Terrain Cherry Picked_0
+  - first:
+      213: -2184498718404985578
+    second: Terrain Cherry Picked_1
+  - first:
+      213: 5297042030494397150
+    second: Terrain Cherry Picked_2
+  - first:
+      213: 3634859995236712016
+    second: Terrain Cherry Picked_3
+  - first:
+      213: 8187375125706066095
+    second: Terrain Cherry Picked_4
+  - first:
+      213: 4107716948117599067
+    second: Terrain Cherry Picked_5
+  - first:
+      213: -8193933931434838972
+    second: Terrain Cherry Picked_6
+  - first:
+      213: -3443572671141704196
+    second: Terrain Cherry Picked_7
+  - first:
+      213: -2284444192022979504
+    second: Terrain Cherry Picked_8
+  - first:
+      213: 4849731650283736049
+    second: Terrain Cherry Picked_9
+  - first:
+      213: -8103783677196301522
+    second: Terrain Cherry Picked_10
+  - first:
+      213: 1345865034547348607
+    second: Terrain Cherry Picked_11
+  - first:
+      213: 7056760325511974459
+    second: Terrain Cherry Picked_12
+  - first:
+      213: -2227445603342089199
+    second: Terrain Cherry Picked_13
+  - first:
+      213: -5261538108065610895
+    second: Terrain Cherry Picked_14
+  - first:
+      213: -200425242948435726
+    second: Terrain Cherry Picked_15
+  - first:
+      213: -8880485682932311580
+    second: Terrain Cherry Picked_16
+  - first:
+      213: 8311510791518150940
+    second: Terrain Cherry Picked_17
+  - first:
+      213: 8472402269558226695
+    second: Terrain Cherry Picked_18
+  - first:
+      213: -1664038369443832718
+    second: Terrain Cherry Picked_19
+  - first:
+      213: -7944508962206740974
+    second: Terrain Cherry Picked_20
+  - first:
+      213: 2839060011314362451
+    second: Terrain Cherry Picked_21
+  - first:
+      213: 213122150762952135
+    second: Terrain Cherry Picked_22
+  - first:
+      213: 5086451179911727174
+    second: Terrain Cherry Picked_23
+  - first:
+      213: 174725332350243839
+    second: Terrain Cherry Picked_24
+  - first:
+      213: 7245134469855277794
+    second: Terrain Cherry Picked_25
+  - first:
+      213: -2734108197887065605
+    second: Terrain Cherry Picked_26
+  - first:
+      213: -8148720793820057944
+    second: Terrain Cherry Picked_27
+  - first:
+      213: 9182213015599817364
+    second: Terrain Cherry Picked_28
+  - first:
+      213: -8471825617364769830
+    second: Terrain Cherry Picked_29
+  - first:
+      213: 7654906578363996299
+    second: Terrain Cherry Picked_30
+  - first:
+      213: -5775434972422053081
+    second: Terrain Cherry Picked_31
+  - first:
+      213: -6515592288014484006
+    second: Terrain Cherry Picked_32
+  - first:
+      213: -7352282646715832228
+    second: Terrain Cherry Picked_33
+  - first:
+      213: -4163970248616225093
+    second: Terrain Cherry Picked_34
+  - first:
+      213: 3925744053093394159
+    second: Terrain Cherry Picked_35
+  - first:
+      213: 1677307079261251690
+    second: Terrain Cherry Picked_36
+  - first:
+      213: -447078606435748038
+    second: Terrain Cherry Picked_37
+  - first:
+      213: -1503346028613857274
+    second: Terrain Cherry Picked_38
+  - first:
+      213: -6178047497921135316
+    second: Terrain Cherry Picked_39
+  - first:
+      213: -1772408148801393389
+    second: Terrain Cherry Picked_40
+  - first:
+      213: -2182850452858090265
+    second: Terrain Cherry Picked_41
+  - first:
+      213: -5731959353923138018
+    second: Terrain Cherry Picked_42
+  - first:
+      213: 6961558670121780195
+    second: Terrain Cherry Picked_43
+  - first:
+      213: 1540044243021347706
+    second: Terrain Cherry Picked_44
+  - first:
+      213: -5992810820673323907
+    second: Terrain Cherry Picked_45
+  - first:
+      213: -8597292600322145625
+    second: Terrain Cherry Picked_46
+  - first:
+      213: -3429173212568326841
+    second: Terrain Cherry Picked_47
+  - first:
+      213: -5858952271701921399
+    second: Terrain Cherry Picked_48
+  - first:
+      213: -4909995966495843974
+    second: Terrain Cherry Picked_49
+  - first:
+      213: 1413620765334048511
+    second: Terrain Cherry Picked_50
+  - first:
+      213: -156030085848853996
+    second: Terrain Cherry Picked_51
+  - first:
+      213: 9167838496030503972
+    second: Terrain Cherry Picked_52
+  - first:
+      213: 5616765727895597012
+    second: Terrain Cherry Picked_53
+  - first:
+      213: -7711509201430990457
+    second: Terrain Cherry Picked_54
+  - first:
+      213: -3734619091033916876
+    second: Terrain Cherry Picked_55
+  - first:
+      213: -5196266857515450190
+    second: Terrain Cherry Picked_56
+  - first:
+      213: -7578675911347447075
+    second: Terrain Cherry Picked_57
+  - first:
+      213: 5890572648597896099
+    second: Terrain Cherry Picked_58
+  - first:
+      213: 7897465466742629914
+    second: Terrain Cherry Picked_59
+  - first:
+      213: -3124997281936857807
+    second: Terrain Cherry Picked_60
+  - first:
+      213: 8814932527936235271
+    second: Terrain Cherry Picked_61
+  - first:
+      213: 2816221871035956204
+    second: Terrain Cherry Picked_62
+  - first:
+      213: -8846562480078498988
+    second: Terrain Cherry Picked_63
+  - first:
+      213: -8079899902472759247
+    second: Terrain Cherry Picked_64
+  - first:
+      213: 6596778965756379042
+    second: Terrain Cherry Picked_65
+  - first:
+      213: 454815829667332091
+    second: Terrain Cherry Picked_66
+  - first:
+      213: -4929832790405599787
+    second: Terrain Cherry Picked_67
+  - first:
+      213: -2105997385053184933
+    second: Terrain Cherry Picked_68
+  - first:
+      213: 252325248635977983
+    second: Terrain Cherry Picked_69
+  - first:
+      213: -536800917716218443
+    second: Terrain Cherry Picked_70
+  - first:
+      213: -8182013800718554825
+    second: Terrain Cherry Picked_71
+  - first:
+      213: -7670994630200602133
+    second: Terrain Cherry Picked_72
+  - first:
+      213: 4111090370265303996
+    second: Terrain Cherry Picked_73
+  - first:
+      213: 3228032088860092809
+    second: Terrain Cherry Picked_74
+  - first:
+      213: -5695823786639837142
+    second: Terrain Cherry Picked_75
+  - first:
+      213: 8441518448003196728
+    second: Terrain Cherry Picked_76
+  - first:
+      213: 8908072374797023887
+    second: Terrain Cherry Picked_77
+  - first:
+      213: 8644996562434821029
+    second: Terrain Cherry Picked_78
+  - first:
+      213: -6451875293555991496
+    second: Terrain Cherry Picked_79
+  - first:
+      213: -7340399261574752558
+    second: Terrain Cherry Picked_80
+  - first:
+      213: 7476480760135969018
+    second: Terrain Cherry Picked_81
+  - first:
+      213: -1787688690620228129
+    second: Terrain Cherry Picked_82
+  - first:
+      213: 1585453579614498198
+    second: Terrain Cherry Picked_83
+  - first:
+      213: 1697361101819964765
+    second: Terrain Cherry Picked_84
+  - first:
+      213: -5237676896483343421
+    second: Terrain Cherry Picked_85
+  - first:
+      213: -1789550785838543014
+    second: Terrain Cherry Picked_86
+  - first:
+      213: 200737128439381275
+    second: Terrain Cherry Picked_87
+  - first:
+      213: -3381700065078101463
+    second: Terrain Cherry Picked_88
+  - first:
+      213: 4897850560512277040
+    second: Terrain Cherry Picked_89
+  - first:
+      213: -2286628240005704562
+    second: Terrain Cherry Picked_90
+  - first:
+      213: -8365233270550675623
+    second: Terrain Cherry Picked_91
+  - first:
+      213: 9214356838582520736
+    second: Terrain Cherry Picked_92
+  - first:
+      213: -3772645815212639788
+    second: Terrain Cherry Picked_93
+  - first:
+      213: 6804992033739497591
+    second: Terrain Cherry Picked_94
+  - first:
+      213: 4570795971806926067
+    second: Terrain Cherry Picked_95
+  - first:
+      213: -7576276835859723982
+    second: Terrain Cherry Picked_96
+  - first:
+      213: -9100155331761683810
+    second: Terrain Cherry Picked_97
+  - first:
+      213: 7397856945165675399
+    second: Terrain Cherry Picked_98
+  - first:
+      213: -4389258426420412062
+    second: Terrain Cherry Picked_99
+  - first:
+      213: 9131196084149878753
+    second: Terrain Cherry Picked_100
+  - first:
+      213: 5666185470607281480
+    second: Terrain Cherry Picked_101
+  - first:
+      213: -7995689614789856867
+    second: Terrain Cherry Picked_102
+  - first:
+      213: -6080335896201101077
+    second: Terrain Cherry Picked_103
+  - first:
+      213: -3032951217819898868
+    second: Terrain Cherry Picked_104
+  - first:
+      213: 8935846297155153255
+    second: Terrain Cherry Picked_105
+  - first:
+      213: -3657144511186924497
+    second: Terrain Cherry Picked_106
+  - first:
+      213: 5599277511652146860
+    second: Terrain Cherry Picked_107
+  - first:
+      213: -967463801573114658
+    second: Terrain Cherry Picked_108
+  - first:
+      213: 4232156841000994753
+    second: Terrain Cherry Picked_109
+  - first:
+      213: -7456536237503513338
+    second: Terrain Cherry Picked_110
+  - first:
+      213: -1469184640848714785
+    second: Terrain Cherry Picked_111
+  - first:
+      213: 2039394111703190639
+    second: Terrain Cherry Picked_112
+  - first:
+      213: 6523069511508829370
+    second: Terrain Cherry Picked_113
+  - first:
+      213: 6766588958661087763
+    second: Terrain Cherry Picked_114
+  - first:
+      213: 4110381900354081330
+    second: Terrain Cherry Picked_115
+  - first:
+      213: 139791506732401710
+    second: Terrain Cherry Picked_116
+  - first:
+      213: 3172197580911779662
+    second: Terrain Cherry Picked_117
+  - first:
+      213: -2455041853438680549
+    second: Terrain Cherry Picked_118
+  - first:
+      213: -4491950919510608936
+    second: Terrain Cherry Picked_119
+  - first:
+      213: -129149128704442874
+    second: Terrain Cherry Picked_120
+  - first:
+      213: -4957679586958093820
+    second: Terrain Cherry Picked_121
+  - first:
+      213: 3118373280115820650
+    second: Terrain Cherry Picked_122
+  - first:
+      213: -307298040361425617
+    second: Terrain Cherry Picked_123
+  - first:
+      213: -179158472602736844
+    second: Terrain Cherry Picked_124
+  - first:
+      213: -492477111340527968
+    second: Terrain Cherry Picked_125
+  - first:
+      213: -904643363470185853
+    second: Terrain Cherry Picked_126
+  - first:
+      213: -8052360963465513232
+    second: Terrain Cherry Picked_127
+  - first:
+      213: 1307615053103598957
+    second: Terrain Cherry Picked_128
+  - first:
+      213: 7424837385879753921
+    second: Terrain Cherry Picked_129
+  - first:
+      213: -4278061857852374248
+    second: Terrain Cherry Picked_130
+  - first:
+      213: 4686716399744867108
+    second: Terrain Cherry Picked_131
+  - first:
+      213: -8247851377776863827
+    second: Terrain Cherry Picked_132
+  - first:
+      213: -8880045669789648283
+    second: Terrain Cherry Picked_133
+  - first:
+      213: -7736888833965496871
+    second: Terrain Cherry Picked_134
+  - first:
+      213: 1221607333223950751
+    second: Terrain Cherry Picked_135
+  - first:
+      213: 9086765414487033621
+    second: Terrain Cherry Picked_136
+  - first:
+      213: -7951798355391831038
+    second: Terrain Cherry Picked_137
+  - first:
+      213: -2769663649645832232
+    second: Terrain Cherry Picked_138
+  - first:
+      213: -6680705055770417325
+    second: Terrain Cherry Picked_139
+  - first:
+      213: 4840196066197974649
+    second: Terrain Cherry Picked_140
+  - first:
+      213: -6701616496441257378
+    second: Terrain Cherry Picked_141
+  - first:
+      213: 2729819708319021435
+    second: Terrain Cherry Picked_142
+  - first:
+      213: -935013126997868997
+    second: Terrain Cherry Picked_143
+  - first:
+      213: 8028010941012460594
+    second: Terrain Cherry Picked_144
+  - first:
+      213: -5471773724409887974
+    second: Terrain Cherry Picked_145
+  - first:
+      213: 2904056793363105788
+    second: Terrain Cherry Picked_146
+  - first:
+      213: 586409485547171880
+    second: Terrain Cherry Picked_147
+  - first:
+      213: -2456533345051406830
+    second: Terrain Cherry Picked_148
+  - first:
+      213: -8740668789837933344
+    second: Terrain Cherry Picked_149
+  - first:
+      213: -1240210748155012649
+    second: Terrain Cherry Picked_150
+  - first:
+      213: -7534503318987416462
+    second: Terrain Cherry Picked_151
+  - first:
+      213: 3253748732558603980
+    second: Terrain Cherry Picked_152
+  - first:
+      213: -6326454896510802137
+    second: Terrain Cherry Picked_153
+  - first:
+      213: -3838121153354038834
+    second: Terrain Cherry Picked_154
+  - first:
+      213: -4719617871760057013
+    second: Terrain Cherry Picked_155
+  - first:
+      213: -6262531242057113431
+    second: Terrain Cherry Picked_156
+  - first:
+      213: -9030103923604225935
+    second: Terrain Cherry Picked_157
+  - first:
+      213: 8855823917049138132
+    second: Terrain Cherry Picked_158
+  - first:
+      213: 9064072919178581396
+    second: Terrain Cherry Picked_159
+  - first:
+      213: -7634019449327250615
+    second: Terrain Cherry Picked_160
+  - first:
+      213: -6839858738050670517
+    second: Terrain Cherry Picked_161
+  - first:
+      213: 4992189443741007680
+    second: Terrain Cherry Picked_162
+  - first:
+      213: 106313804350137190
+    second: Terrain Cherry Picked_163
+  - first:
+      213: 3017213392622941200
+    second: Terrain Cherry Picked_164
+  - first:
+      213: 1708117632860893277
+    second: Terrain Cherry Picked_165
+  - first:
+      213: -8801772173905830901
+    second: Terrain Cherry Picked_166
+  - first:
+      213: -508970072758399203
+    second: Terrain Cherry Picked_167
+  - first:
+      213: 3523615461370172534
+    second: Terrain Cherry Picked_168
+  - first:
+      213: -4539017405179236041
+    second: Terrain Cherry Picked_169
+  - first:
+      213: -528576890387935923
+    second: Terrain Cherry Picked_170
+  - first:
+      213: 4475603086666382232
+    second: Terrain Cherry Picked_171
+  - first:
+      213: 3693562354695924539
+    second: Terrain Cherry Picked_172
+  - first:
+      213: -4818581129451637092
+    second: Terrain Cherry Picked_173
+  - first:
+      213: -4041000510649466225
+    second: Terrain Cherry Picked_174
+  - first:
+      213: -4885038985909346401
+    second: Terrain Cherry Picked_175
+  - first:
+      213: 4754034259434366553
+    second: Terrain Cherry Picked_176
+  - first:
+      213: -6300368481834810175
+    second: Terrain Cherry Picked_177
+  - first:
+      213: 6875451902253333301
+    second: Terrain Cherry Picked_178
+  - first:
+      213: 9194795264609448452
+    second: Terrain Cherry Picked_179
+  - first:
+      213: -3797671573813510369
+    second: Terrain Cherry Picked_180
+  - first:
+      213: -721131725580169143
+    second: Terrain Cherry Picked_181
+  - first:
+      213: -5954038756758116506
+    second: Terrain Cherry Picked_182
+  - first:
+      213: -6423547686352265368
+    second: Terrain Cherry Picked_183
+  - first:
+      213: 5603387504234854212
+    second: Terrain Cherry Picked_184
+  - first:
+      213: 22776186849787346
+    second: Terrain Cherry Picked_185
+  - first:
+      213: 7547117844166525127
+    second: Terrain Cherry Picked_186
+  - first:
+      213: 2713883228489663347
+    second: Terrain Cherry Picked_187
+  - first:
+      213: 305747329983629371
+    second: Terrain Cherry Picked_188
+  - first:
+      213: 6439052081935179570
+    second: Terrain Cherry Picked_189
+  - first:
+      213: -8160718906517884888
+    second: Terrain Cherry Picked_190
+  - first:
+      213: 4321404841295339304
+    second: Terrain Cherry Picked_191
+  - first:
+      213: 3769048756000119597
+    second: Terrain Cherry Picked_192
+  - first:
+      213: 8378972097240786842
+    second: Terrain Cherry Picked_193
+  - first:
+      213: -4911449173482809940
+    second: Terrain Cherry Picked_194
+  - first:
+      213: -3034238082266818967
+    second: Terrain Cherry Picked_195
+  - first:
+      213: 5628336392370440818
+    second: Terrain Cherry Picked_196
+  - first:
+      213: 146586787604293987
+    second: Terrain Cherry Picked_197
+  - first:
+      213: -3448157217228492631
+    second: Terrain Cherry Picked_198
+  - first:
+      213: 1373771462294517211
+    second: Terrain Cherry Picked_199
+  - first:
+      213: -4558913585062808421
+    second: Terrain Cherry Picked_200
+  - first:
+      213: -633794281298358148
+    second: Terrain Cherry Picked_201
+  - first:
+      213: 2375786151009310528
+    second: Terrain Cherry Picked_202
+  - first:
+      213: -6318571551882568974
+    second: Terrain Cherry Picked_203
+  - first:
+      213: -5620231654492414293
+    second: Terrain Cherry Picked_204
+  - first:
+      213: -7560213480581845009
+    second: Terrain Cherry Picked_205
+  - first:
+      213: 3784198081672932855
+    second: Terrain Cherry Picked_206
+  - first:
+      213: -2124407065609014440
+    second: Terrain Cherry Picked_207
+  - first:
+      213: -2365600369655802238
+    second: Terrain Cherry Picked_208
+  - first:
+      213: 6140858035156471972
+    second: Terrain Cherry Picked_209
+  - first:
+      213: 6202292925185876332
+    second: Terrain Cherry Picked_210
+  - first:
+      213: 233564737699277295
+    second: Terrain Cherry Picked_211
+  externalObjects: {}
+  serializedVersion: 11
+  mipmaps:
+    mipMapMode: 0
+    enableMipMap: 0
+    sRGBTexture: 0
+    linearTexture: 0
+    fadeOut: 0
+    borderMipMap: 0
+    mipMapsPreserveCoverage: 0
+    alphaTestReferenceValue: 0.5
+    mipMapFadeDistanceStart: 1
+    mipMapFadeDistanceEnd: 3
+  bumpmap:
+    convertToNormalMap: 0
+    externalNormalMap: 0
+    heightScale: 0.25
+    normalMapFilter: 0
+  isReadable: 0
+  streamingMipmaps: 0
+  streamingMipmapsPriority: 0
+  vTOnly: 0
+  grayScaleToAlpha: 0
+  generateCubemap: 6
+  cubemapConvolution: 0
+  seamlessCubemap: 0
+  textureFormat: 1
+  maxTextureSize: 2048
+  textureSettings:
+    serializedVersion: 2
+    filterMode: 0
+    aniso: 1
+    mipBias: 0
+    wrapU: 0
+    wrapV: 0
+    wrapW: 0
+  nPOTScale: 0
+  lightmap: 0
+  compressionQuality: 50
+  spriteMode: 2
+  spriteExtrude: 1
+  spriteMeshType: 1
+  alignment: 0
+  spritePivot: {x: 0.5, y: 0.5}
+  spritePixelsToUnits: 32
+  spriteBorder: {x: 0, y: 0, z: 0, w: 0}
+  spriteGenerateFallbackPhysicsShape: 1
+  alphaUsage: 1
+  alphaIsTransparency: 1
+  spriteTessellationDetail: -1
+  textureType: 8
+  textureShape: 1
+  singleChannelComponent: 0
+  flipbookRows: 1
+  flipbookColumns: 1
+  maxTextureSizeSet: 0
+  compressionQualitySet: 0
+  textureFormatSet: 0
+  ignorePngGamma: 0
+  applyGammaDecoding: 0
+  platformSettings:
+  - serializedVersion: 3
+    buildTarget: DefaultTexturePlatform
+    maxTextureSize: 4096
+    resizeAlgorithm: 1
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: Standalone
+    maxTextureSize: 4096
+    resizeAlgorithm: 1
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  - serializedVersion: 3
+    buildTarget: WebGL
+    maxTextureSize: 4096
+    resizeAlgorithm: 1
+    textureFormat: -1
+    textureCompression: 2
+    compressionQuality: 50
+    crunchedCompression: 0
+    allowsAlphaSplitting: 0
+    overridden: 0
+    androidETC2FallbackOverride: 0
+    forceMaximumCompressionQuality_BC6H_BC7: 0
+  spriteSheet:
+    serializedVersion: 2
+    sprites:
+    - serializedVersion: 2
+      name: Terrain Cherry Picked_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 192
+        width: 96
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b2554bd492fa7f160800000000000000
+      internalID: 7059303532858725675
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Terrain Cherry Picked_1
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 192
+        width: 96
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 61dbc255df91fa1e0800000000000000
+      internalID: -2184498718404985578
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Terrain Cherry Picked_2
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 192
+        width: 96
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ed2beeb69afd28940800000000000000
+      internalID: 5297042030494397150
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Terrain Cherry Picked_3
+      rect:
+        serializedVersion: 2
+        x: 288
+        y: 192
+        width: 96
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 05ebc5848ed917230800000000000000
+      internalID: 3634859995236712016
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Terrain Cherry Picked_4
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 192
+        width: 96
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fa8449a5c466f9170800000000000000
+      internalID: 8187375125706066095
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Terrain Cherry Picked_5
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 192
+        width: 96
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b53b66afcca810930800000000000000
+      internalID: 4107716948117599067
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Terrain Cherry Picked_6
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 192
+        width: 96
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4447ecfa08c494e80800000000000000
+      internalID: -8193933931434838972
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Terrain Cherry Picked_7
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 96
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: cfd0b5286e8f530d0800000000000000
+      internalID: -3443572671141704196
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Terrain Cherry Picked_8
+      rect:
+        serializedVersion: 2
+        x: 96
+        y: 0
+        width: 96
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 05c14416c160c40e0800000000000000
+      internalID: -2284444192022979504
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Terrain Cherry Picked_9
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 0
+        width: 96
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1fb812fad35bd4340800000000000000
+      internalID: 4849731650283736049
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Terrain Cherry Picked_10
+      rect:
+        serializedVersion: 2
+        x: 288
+        y: 0
+        width: 96
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e2b0b186ea3998f80800000000000000
+      internalID: -8103783677196301522
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Terrain Cherry Picked_11
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 0
+        width: 96
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f7440d34e197da210800000000000000
+      internalID: 1345865034547348607
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Terrain Cherry Picked_12
+      rect:
+        serializedVersion: 2
+        x: 480
+        y: 0
+        width: 96
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b3e0633b026aee160800000000000000
+      internalID: 7056760325511974459
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Terrain Cherry Picked_13
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 0
+        width: 96
+        height: 192
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1140a4876068611e0800000000000000
+      internalID: -2227445603342089199
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    outline: []
+    physicsShape: []
+    bones: []
+    spriteID: 5e97eb03825dee720800000000000000
+    internalID: 0
+    vertices: []
+    indices: 
+    edges: []
+    weights: []
+    secondaryTextures: []
+  spritePackingTag: 
+  pSDRemoveMatte: 0
+  pSDShowRemoveMatteOption: 0
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 
