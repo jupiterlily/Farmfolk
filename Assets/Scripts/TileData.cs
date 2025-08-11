@@ -7,6 +7,7 @@ public class TileData
 	     public float compaction;  //derived
 	     public Vector2Int tileGridRef;
 	     public float tileWidth;
+	     public Color tileColor;
 
 }
 
@@ -14,11 +15,12 @@ public class TileData
 
 //infiltration is the rate at which water enters the  soil  from the surface
 //percolation  is  the rate at which  water can  travel through soil particles
-//porosity is the amount of  pore  space
+//porosity is the volume of  pore  space
 
 [System.Serializable]
 public class SoilComposition
 {//sand,  silt, clay, water, gas, organic matter
+
 }
 
 [System.Serializable]
