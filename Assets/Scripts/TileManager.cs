@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class TileManager : MonoBehaviour
 {
-	     public int worldsize;
+	     public Vector2Int worldsize;
 	     public TileGrid grid;
 	     public GameObject tilePrefab;
 	     // Start is called before the first frame update
@@ -14,8 +14,8 @@ public class TileManager : MonoBehaviour
 
 		          grid.tileWidth = 1;
 
-		          grid.XGrid = worldsize;
-		          grid.YGrid = worldsize;
+		          grid.XGrid = worldsize.x;
+		          grid.YGrid = worldsize.y;
 		          //for each row of worlsize, allocate a tile and a position.
 		          for (int i = 0; i < grid.XGrid; i++)
 		          {

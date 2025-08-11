@@ -19,7 +19,12 @@ public class TileData
 
 [System.Serializable]
 public class SoilComposition
-{//sand,  silt, clay, water, gas, organic matter
+{//sand  is  a max of 1550kg/m3 ,
+ //silt  is  a max of 2100kg/m3,
+ //clay is  a max of 2650kg/m3,
+ //water is a max of 1000kg/m3,
+ //gas,
+ //organic matter is 250kg/m3
 
 }
 
