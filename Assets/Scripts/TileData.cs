@@ -102,4 +102,5 @@ public class TileGrid
 	     public float tileWidth;
 	     public int XGrid;
 	     public int YGrid;
+	     public Vector3 originPoint;
 }
