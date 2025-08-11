@@ -31,6 +31,7 @@ public class TileManager : MonoBehaviour
 					     tile.transform.position = new Vector3(i, 0 - data.compaction / 2, j);
 
 					     tile.GetComponent<Tile>().tileData.Initialize();
+					     tile.GetComponent<Renderer>().material.color = tile.GetComponent<Tile>().tileData.composition.GetSoilColor();
 				}
 		          }
 	     }

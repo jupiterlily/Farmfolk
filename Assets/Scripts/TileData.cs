@@ -18,10 +18,10 @@ public class TileData
 		          if (neighbor == null)
 		          {
 				// World-edge tile: Randomize but keep balanced
-				composition.sand = Random.Range(30f, 70f);
-				composition.silt = Random.Range(10f, 50f);
-				composition.clay = 100f - composition.sand - composition.silt;
-				composition.organicMatter = Random.Range(1f, 5f);
+				composition.sand = Random.Range(15.5f, 390f);
+				composition.silt = Random.Range(21f, 525f);
+				composition.clay = Random.Range(26.5f, 662f);
+				composition.organicMatter = Random.Range(2.5f, 12.5f);
 		          }
 		          else
 		          {
@@ -61,15 +61,15 @@ public class SoilComposition
  //gas,
  //organic matter is 250kg/m3
 
-	     [Range(0, 100)] public float sand;      // Gritty, drains fast
-	     [Range(0, 100)] public float silt;      // Smooth, holds moisture
-	     [Range(0, 100)] public float clay;      // Sticky, compacts easily
-	     [Range(0, 20)] public float organicMatter; // Darkens color, lowers density
+	     [Range(0, 1550)] public float sand;      // Gritty, drains fast
+	     [Range(0, 2100)] public float silt;      // Smooth, holds moisture
+	     [Range(0, 2650)] public float clay;      // Sticky, compacts easily
+	     [Range(0, 250)] public float organicMatter; // Darkens color, lowers density
 
 	     // Derived properties (calculated on initialization)
-	     [HideInInspector] public float porosity;       // Total pore space
-	     [HideInInspector] public float infiltrationRate; // mm/hour
-	     [HideInInspector] public float waterHoldingCapacity;
+	     public float porosity;       // Total pore space
+	     public float infiltrationRate; // mm/hour
+	     public float waterHoldingCapacity;
 
 	     public void CalculateDerivedProperties()
 	     {
@@ -88,8 +88,10 @@ public class SoilComposition
 		          Color organicColor = new Color(0.3f, 0.2f, 0.1f); // Dark brown
 
 		          // Weighted blend
-		          Color baseColor = (sandColor * sand + siltColor * silt + clayColor * clay) / 100f;
+		          Color baseColor = (sandColor * (sand / 1550) + siltColor * (silt / 2100) + clayColor * (clay / 2650)) / 100f;
 		          return Color.Lerp(baseColor, organicColor, organicMatter / 20f);
+
+		          // return Color.blue;
 	     }
 }
 
