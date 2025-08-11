@@ -8,31 +8,31 @@ public class TileManager : MonoBehaviour
 	     public TileGrid grid;
 	     public GameObject tilePrefab;
 	     // Start is called before the first frame update
-	     void Start()
-	     {
-		          grid = new TileGrid();
+		void Start()
+		{
+		        grid = new TileGrid();
+		        grid.tileWidth = 1;
+		        grid.XGrid = worldsize.x;
+		        grid.YGrid = worldsize.y;
+				  
 
-		          grid.tileWidth = 1;
-
-		          grid.XGrid = worldsize.x;
-		          grid.YGrid = worldsize.y;
 		          //for each row of worlsize, allocate a tile and a position.
-		          for (int i = 0; i < grid.XGrid; i++)
-		          {
-				for (int j = 0; j < grid.YGrid; j++)
+				for (int i = 0; i < grid.XGrid; i++)
 				{
-					     TileData data = new TileData();
-					     data.tileWidth = grid.tileWidth;
-					     data.tileGridRef = new Vector2Int(i, j);
+					for (int j = 0; j < grid.YGrid; j++)
+					{
+					TileData data = new TileData();
+					data.tileWidth = grid.tileWidth;
+					data.tileGridRef = new Vector2Int(i, j);
 
-					     GameObject tile = Instantiate(tilePrefab, transform);
+					GameObject tile = Instantiate(tilePrefab, transform);
 
-					     tile.GetComponent<Tile>().Setup(data);
-					     tile.transform.position = new Vector3(i, 0 - data.compaction / 2, j);
+					tile.GetComponent<Tile>().Setup(data);
+					tile.transform.position = new Vector3(i, 0 - data.compaction / 2, j);
 
-					     tile.GetComponent<Tile>().tileData.Initialize();
+					tile.GetComponent<Tile>().tileData.Initialize();
+					}
 				}
-		          }
 	     }
 
 }

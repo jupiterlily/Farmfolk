@@ -33,7 +33,7 @@ public class TileClickManager : MonoBehaviour
         grid.XGrid = worldsize;
         grid.YGrid = worldsize;
 
-        tiles = new GameObject[worldsize, worldsize];
+        grid.tiles = new GameObject[worldsize, worldsize];
 
         for (int x = 0; x < worldsize; x++)
         {
@@ -44,7 +44,7 @@ public class TileClickManager : MonoBehaviour
                 data.tileGridRef = new Vector2Int(x, z);
 
                 GameObject tile = Instantiate(tilePrefab, new Vector3(x, 0, z), Quaternion.identity);
-                tiles[x, z] = tile;
+                grid.tiles[x, z] = tile;
 
                 tile.GetComponent<Tile>().Setup(data);
                 tile.transform.position = new Vector3(x, 0 - data.compaction / 2, z);
