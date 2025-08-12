@@ -4,13 +4,14 @@ public class Tile : MonoBehaviour
 {
 	     public TileData tileData;
 	     float tileSize;
-	     public bool isHovered;
+	     public bool isHovered = false;
+	     public bool visible = true;
 
 	     public void Setup(TileData td)
 	     {
 		          tileData = td;
 		          tileSize = tileData.tileWidth;
-		          tileData.compaction = Random.Range(0.99f, 0.75f);
+		          //draw  the  tile based on the volume of  material   in  it
 		          transform.localScale = new Vector3(tileSize, tileSize - tileData.compaction, tileSize);
 	     }
 
@@ -24,8 +25,10 @@ public class Tile : MonoBehaviour
 		          }
 		          else
 		          {
+				SoilUtilities.CalculateDerivedProperties(tileData.composition);
+				transform.localScale = new Vector3(tileSize, tileSize - tileData.compaction, tileSize);
 				// Reset color when not hovered
-				GetComponent<Renderer>().material.color = tileData.composition.GetSoilColor();
+				GetComponent<Renderer>().material.color = TileUtilities.GetSoilColor(tileData.composition);
 
 		          }
 	     }

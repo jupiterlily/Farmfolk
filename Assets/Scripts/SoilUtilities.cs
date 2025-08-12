@@ -1,4 +1,124 @@
-public class SoilUtilities
-{
+using UnityEngine;
 
+public static class SoilUtilities
+{
+	     public static void UpdateSoilOverTime(SoilComposition sc, float deltaTime)
+	     {
+		          // Convert deltaTime from seconds to hours for soil processes
+		          float hours = deltaTime / 3600f;
+
+		          // Update all derived properties first
+		          CalculateDerivedProperties(sc);
+
+		          // Apply gradual changes over time
+		          UpdateMoistureRedistribution(sc, hours);
+		          UpdateOrganicDecay(sc, hours);
+	     }
+
+	     public static SoilComposition CalculateDerivedProperties(SoilComposition sc)
+	     {
+		          // 1. Calculate volume fractions (m³/m³)
+		          float sandVol = sc.sand / Constants.SAND_DENSITY;
+		          float siltVol = sc.silt / Constants.SILT_DENSITY;
+		          float clayVol = sc.clay / Constants.CLAY_DENSITY;
+		          float organicVol = sc.organicMatter / Constants.ORGANIC_DENSITY;
+		          float totalSolidVol = sandVol + siltVol + clayVol + organicVol;
+
+		          // 2. Texture percentages (0-100)
+		          float sandPct = (sandVol / totalSolidVol) * 100f;
+		          float siltPct = (siltVol / totalSolidVol) * 100f;
+		          float clayPct = (clayVol / totalSolidVol) * 100f;
+
+		          // 3. Core properties
+		          sc.porosity = CalculatePorosity(sandPct, clayPct, sc.organicMatter);
+		          sc.bulkDensity = (sc.sand + sc.silt + sc.clay + sc.organicMatter) / totalSolidVol;
+
+		          // 4. Water properties
+		          sc.waterCapacity = CalculateWaterCapacity(sc.porosity, clayPct);
+		          sc.saturation = Mathf.Clamp01(sc.water / (sc.waterCapacity * Constants.WATER_DENSITY));
+
+		          // 5. Flow properties
+		          sc.infiltrationRate = CalculateInfiltrationRate(sandPct, sc.saturation);
+		          sc.percolationRate = CalculatePercolationRate(sc.porosity, sandPct, clayPct);
+		          sc.hydraulicConductivity = CalculateHydraulicConductivity(sc.percolationRate);
+		          sc.horizontalPermeability = CalculateHorizontalPermeability(sandPct, clayPct, sc.porosity);
+		          sc.verticalPermeability = CalculateVerticalPermeability(sandPct, clayPct, sc.porosity);
+
+
+		          // 6. Structural properties
+		          sc.aeration = sc.porosity * (1f - sc.saturation);
+		          sc.erodibility = CalculateErodibility(sandPct, clayPct, sc.organicMatter);
+
+		          return sc;
+	     }
+
+	     static float CalculatePorosity(float sandPct, float clayPct, float organicMatter)
+	     {
+		          // Saxton & Rawls (2006) model with organic matter adjustment
+		          return 0.45f - 0.0012f * sandPct + 0.0021f * clayPct +
+			  0.025f * (organicMatter / Constants.ORGANIC_DENSITY);
+	     }
+
+	     static float CalculateWaterCapacity(float porosity, float clayPct)
+	     {
+		          // Field capacity approximation (m³ water/m³ soil)
+		          return porosity * (0.2f + 0.5f * (clayPct / 100f));
+	     }
+
+	     static float CalculateInfiltrationRate(float sandPct, float saturation)
+	     {
+		          // USDA NRCS model with saturation adjustment
+		          float baseRate = 25f * Mathf.Pow(sandPct / 100f, 1.5f);
+		          return baseRate * (1f - saturation * 0.8f); // Reduces when wet
+	     }
+
+	     static float CalculatePercolationRate(float porosity, float sandPct, float clayPct)
+	     {
+		          // Kozeny-Carman derived percolation (cm/hour)
+		          float k = Mathf.Pow(porosity, 3f) / (1f - porosity);
+		          return 10f * k * (sandPct / 100f) * (1f - clayPct / 200f);
+	     }
+
+	     static float CalculateHydraulicConductivity(float percolationRate)
+	     {
+		          // Convert percolation to conductivity (cm/day)
+		          return percolationRate * 24f;
+	     }
+
+	     static float CalculateErodibility(float sandPct, float clayPct, float organicMatter)
+	     {
+		          // Revised USLE K-factor approximation
+		          float sandFactor = 0.2f + 0.3f * (sandPct / 100f);
+		          float clayFactor = 0.3f * (clayPct / 100f);
+		          float omFactor = 0.2f * (1f - organicMatter / Constants.ORGANIC_DENSITY);
+		          return Mathf.Clamp01(sandFactor + clayFactor + omFactor);
+	     }
+
+
+	     static float CalculateHorizontalPermeability(float sandPct, float clayPct, float porosity)
+	     {
+		          // Lateral water movement (cm/day)
+		          // More influenced by sand and less hindered by clay
+		          return 150f * Mathf.Pow(porosity, 2) * (sandPct / 100f) * (1f - clayPct / 150f);
+	     }
+
+	     static float CalculateVerticalPermeability(float sandPct, float clayPct, float porosity)
+	     {
+		          // Vertical drainage (cm/day)
+		          // More affected by compaction and clay content
+		          return 80f * Mathf.Pow(porosity, 2) * (sandPct / 100f) * (1f - clayPct / 120f);
+	     }
+
+	     static void UpdateMoistureRedistribution(SoilComposition sc, float hours)
+	     {
+		          // This will be called by TileManager for neighboring tiles
+		          // Placeholder for percolation logic
+	     }
+
+	     static void UpdateOrganicDecay(SoilComposition sc, float hours)
+	     {
+		          // Organic matter decays over time
+		          float decayRate = 0.01f * hours; // 1% per hour
+		          sc.organicMatter *= (1f - decayRate);
+	     }
 }
