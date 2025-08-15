@@ -1,19 +1,9 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class SoilUtilities
 {
-	     public static void UpdateSoilOverTime(SoilComposition sc, float deltaTime)
-	     {
-		          // Convert deltaTime from seconds to hours for soil processes
-		          float hours = deltaTime / 3600f;
 
-		          // Update all derived properties first
-		          CalculateDerivedProperties(sc);
-
-		          // Apply gradual changes over time
-		          UpdateMoistureRedistribution(sc, hours);
-		          UpdateOrganicDecay(sc, hours);
-	     }
 
 	     public static SoilComposition CalculateDerivedProperties(SoilComposition sc)
 	     {
@@ -112,13 +102,6 @@ public static class SoilUtilities
 		          // More affected by compaction and clay content
 		          return 80f * Mathf.Pow(porosity, 2) * (sandPct / 100f) * (1f - clayPct / 120f);
 	     }
-
-	     static void UpdateMoistureRedistribution(SoilComposition sc, float hours)
-	     {
-		          // This will be called by TileManager for neighboring tiles
-		          // Placeholder for percolation logic
-	     }
-
 	     static void UpdateOrganicDecay(SoilComposition sc, float hours)
 	     {
 		          // Organic matter decays over time
@@ -142,5 +125,93 @@ public static class SoilUtilities
 
 		          return Mathf.Clamp01(total); // tiles can’t be taller than 1m
 	     }
+
+	     public static void UpdateCompaction(SoilComposition sc, float appliedPressure = 1f)
+	     {
+		          // Saturated soils compact more under pressure
+		          float compactionChange = sc.saturation * appliedPressure * 0.005f;
+		          sc.compaction = Mathf.Clamp01(sc.compaction + compactionChange);
+	     }
+
+	     public static float ApplyEvaporation(SoilComposition sc, float energyWattsPerM2, float hours)
+	     {
+		          float evapCoeff = 0.0001f; // Tuned empirically
+		          float evapRate = energyWattsPerM2 * evapCoeff * hours; // kg/m²
+		          float maxEvaporableWater = Mathf.Min(sc.water, sc.saturation * Constants.WATER_DENSITY); // avoid overdraw
+
+		          float evaporated = Mathf.Min(evapRate, maxEvaporableWater);
+		          sc.water -= evaporated;
+
+		          CalculateDerivedProperties(sc); // Update saturation, aeration, etc.
+
+		          return evaporated;
+	     }
+
+
+	     public static void RedistributeWaterLateral(WorldTile tile, float hours)
+	     {
+		          SoilComposition sc = tile.tileData.composition;
+
+		          // Convert cm/day to m³ water per hour per m²
+		          float rate = sc.horizontalPermeability / 100f / 24f; // m/hour
+
+		          float totalTransfer = 0f;
+		          float waterToMove = sc.water;
+
+		          List<WorldTile> neighbors = tile.GetNeighbors();
+
+		          foreach (WorldTile neighbor in neighbors)
+		          {
+				if (neighbor == null)
+					     continue;
+
+				SoilComposition neighborSC = neighbor.tileData.composition;
+
+				float deltaSaturation = sc.saturation - neighborSC.saturation;
+
+				if (deltaSaturation > 0)
+				{
+					     float transfer = deltaSaturation * rate * hours * Constants.WATER_DENSITY; // kg/m²
+
+					     transfer = Mathf.Min(transfer, waterToMove); // Don't overdraw
+					     sc.water -= transfer;
+					     neighborSC.water += transfer;
+
+					     waterToMove -= transfer;
+					     totalTransfer += transfer;
+
+					     float sedimentFraction = sc.erodibility * Mathf.Clamp01(deltaSaturation); // Adjust based on how erodible the soil is
+					     float sedimentTransfer = sedimentFraction * transfer; // Proportional to water moved
+
+					     // Move fine materials (silt and clay are more mobile)
+					     float siltRatio = sc.silt / (sc.silt + sc.clay + 0.001f);
+					     float clayRatio = sc.clay / (sc.silt + sc.clay + 0.001f);
+
+					     float siltMoved = sedimentTransfer * siltRatio;
+					     float clayMoved = sedimentTransfer * clayRatio;
+
+					     // Update soil compositions
+					     sc.silt -= siltMoved;
+					     neighborSC.silt += siltMoved;
+
+					     sc.clay -= clayMoved;
+					     neighborSC.clay += clayMoved;
+
+					     float organicMoved = sedimentTransfer * 0.1f; // or scale by organic concentration
+
+					     sc.organicMatter -= organicMoved;
+					     neighborSC.organicMatter += organicMoved;
+
+
+					     CalculateDerivedProperties(neighborSC); // Update neighbor after change
+				}
+
+
+
+		          }
+
+		          CalculateDerivedProperties(sc); // Recalculate current tile after redistribution
+	     }
+
 
 }
