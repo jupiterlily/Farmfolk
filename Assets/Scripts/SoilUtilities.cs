@@ -28,22 +28,26 @@ public static class SoilUtilities
 		          float sandPct = (sandVol / totalSolidVol) * 100f;
 		          float siltPct = (siltVol / totalSolidVol) * 100f;
 		          float clayPct = (clayVol / totalSolidVol) * 100f;
-
+		          float rawPorosity = CalculatePorosity(sandPct, clayPct, sc.organicMatter);
 		          // 3. Core properties
-		          sc.porosity = CalculatePorosity(sandPct, clayPct, sc.organicMatter);
+		          sc.porosity = rawPorosity * (1f - sc.compaction * 0.85f); // reduce up to 85% at max compaction
 		          sc.bulkDensity = (sc.sand + sc.silt + sc.clay + sc.organicMatter) / totalSolidVol;
+		          sc.bulkDensity *= 1f + (sc.compaction * 0.2f); // +20% bulk density at full compaction
+
 
 		          // 4. Water properties
 		          sc.waterCapacity = CalculateWaterCapacity(sc.porosity, clayPct);
 		          sc.saturation = Mathf.Clamp01(sc.water / (sc.waterCapacity * Constants.WATER_DENSITY));
 
 		          // 5. Flow properties
-		          sc.infiltrationRate = CalculateInfiltrationRate(sandPct, sc.saturation);
-		          sc.percolationRate = CalculatePercolationRate(sc.porosity, sandPct, clayPct);
-		          sc.hydraulicConductivity = CalculateHydraulicConductivity(sc.percolationRate);
-		          sc.horizontalPermeability = CalculateHorizontalPermeability(sandPct, clayPct, sc.porosity);
-		          sc.verticalPermeability = CalculateVerticalPermeability(sandPct, clayPct, sc.porosity);
+		          sc.infiltrationRate = CalculateInfiltrationRate(sandPct, sc.saturation) * (1f - sc.compaction * 0.9f);
 
+		          sc.percolationRate = CalculatePercolationRate(sc.porosity, sandPct, clayPct) * (1f - sc.compaction * 0.9f);
+
+		          sc.hydraulicConductivity = sc.percolationRate * 24f;
+
+		          sc.horizontalPermeability = CalculateHorizontalPermeability(sandPct, clayPct, sc.porosity) * (1f - sc.compaction);
+		          sc.verticalPermeability = CalculateVerticalPermeability(sandPct, clayPct, sc.porosity) * (1f - sc.compaction);
 
 		          // 6. Structural properties
 		          sc.aeration = sc.porosity * (1f - sc.saturation);
@@ -121,4 +125,22 @@ public static class SoilUtilities
 		          float decayRate = 0.01f * hours; // 1% per hour
 		          sc.organicMatter *= (1f - decayRate);
 	     }
+
+	     public static float CalculateEffectiveVolume(SoilComposition sc)
+	     {
+		          // Volume of each solid component (m³/m³)
+		          float sandVol = sc.sand / Constants.SAND_DENSITY;
+		          float siltVol = sc.silt / Constants.SILT_DENSITY;
+		          float clayVol = sc.clay / Constants.CLAY_DENSITY;
+		          float organicVol = sc.organicMatter / Constants.ORGANIC_DENSITY;
+
+		          float solidVolume = sandVol + siltVol + clayVol + organicVol;
+		          float waterVolume = sc.water / Constants.WATER_DENSITY;
+		          float airVolume = sc.aeration; // already calculated from porosity and saturation
+
+		          float total = solidVolume + waterVolume + airVolume;
+
+		          return Mathf.Clamp01(total); // tiles can’t be taller than 1m
+	     }
+
 }

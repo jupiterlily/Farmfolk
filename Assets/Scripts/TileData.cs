@@ -8,8 +8,8 @@ public class TileData
 	     public SoilComposition composition;
 
 	     [Header("Dynamic States")]
-	     public float compaction;  // 0 (loose) - 1 (concrete)
 	     public float surfaceMoisture;
+	     public float volume;
 
 	     public void Initialize(TileData neighbor = null)
 	     {
@@ -22,16 +22,22 @@ public class TileData
 				composition.silt = Random.Range(21f, 525f);
 				composition.clay = Random.Range(26.5f, 662f);
 				composition.organicMatter = Random.Range(2.5f, 12.5f);
+				composition.compaction = Random.Range(0.5f, 1f);
+
 		          }
 		          else
 		          {
 				// Inherit neighbor's traits with slight variation
-				composition.sand = Mathf.Clamp(neighbor.composition.sand + Random.Range(-5f, 5f), 0, 100);
-				composition.silt = Mathf.Clamp(neighbor.composition.silt + Random.Range(-5f, 5f), 0, 100);
-				composition.clay = 100f - composition.sand - composition.silt;
-				composition.organicMatter = Mathf.Max(0, neighbor.composition.organicMatter + Random.Range(-1f, 1f));
+				composition.sand = Mathf.Clamp(neighbor.composition.sand + Random.Range(-15.5f, 15.5f), 0.001f, 1550f);
+				composition.silt = Mathf.Clamp(neighbor.composition.silt + Random.Range(-21f, 21f), 0.001f, 2100f);
+				composition.clay = Mathf.Clamp(neighbor.composition.clay + Random.Range(-26.5f, 26.5f), 0.001f, 2650f);
+
+				composition.organicMatter = Mathf.Clamp(neighbor.composition.organicMatter + Random.Range(-2.5f, 2.5f), 0, 250f);
+				composition.compaction = Mathf.Clamp01(Random.Range(neighbor.composition.compaction, 1f));
 		          }
 		          SoilUtilities.CalculateDerivedProperties(composition);
+		          float wc = composition.waterCapacity * 1000;
+		          composition.water = Mathf.Clamp(neighbor.composition.water + Random.Range(-wc * 0.1f, wc * 0.1f), 0, wc);
 	     }
 }
 
@@ -51,7 +57,7 @@ public class SoilComposition
 	     [Range(0, 1000)] public float water;
 
 	     // Derived properties
-	     public float porosity;        // 0-1
+	     public float porosity;  //
 	     public float bulkDensity;    // kg/m³
 	     public float waterCapacity;  // m³/m³
 	     public float saturation;     // 0-1
@@ -62,6 +68,7 @@ public class SoilComposition
 	     public float erodibility;    // 0-1
 	     public float horizontalPermeability;  //(cm/day)
 	     public float verticalPermeability; //(cm/day)
+	     public float compaction; //compaction percentage
 }
 
 [System.Serializable]
@@ -75,4 +82,11 @@ public class TileGrid
 	     public TileData[,] Map;
 
 	     //return neighbors.
+	     public TileGrid(int worldX, int worldY)
+	     {
+		          tileWidth = 1;
+		          XGrid = worldX;
+		          YGrid = worldY;
+		          Map = new TileData[worldX, worldY];
+	     }
 }

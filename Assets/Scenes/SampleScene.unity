@@ -123,61 +123,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &195899436
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 195899438}
-  - component: {fileID: 195899437}
-  m_Layer: 0
-  m_Name: Click Dude
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!114 &195899437
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 195899436}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 150647d3d9af14f5cadf2b07184f9686, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  worldsize: 10
-  grid:
-    tileWidth: 0
-    XGrid: 0
-    YGrid: 0
-  tilePrefab: {fileID: 8500652070221592882, guid: 4c855729e2ee7194bb46f66ab099fe45, type: 3}
-  tileSize: 1
-  gridOrigin: {x: 0, y: 0, z: 0}
-  gridNormal: {x: 0, y: 1, z: 0}
-  gridTransform: {fileID: 0}
-  tileInfoText: {fileID: 1936633668}
---- !u!4 &195899438
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 195899436}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &628422710
 GameObject:
   m_ObjectHideFlags: 0
@@ -492,16 +437,17 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1440900996}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: ce010db710ee9f949b8eeb00988dc2e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  worldsize: 150
+  worldsize: {x: 10, y: 19}
   grid:
     tileWidth: 0
     XGrid: 0
     YGrid: 0
+    originPoint: {x: 0, y: 0, z: 0}
   tilePrefab: {fileID: 8500652070221592882, guid: 4c855729e2ee7194bb46f66ab099fe45, type: 3}
 --- !u!4 &1440900998
 Transform:
@@ -846,6 +792,5 @@ SceneRoots:
   - {fileID: 1765547149}
   - {fileID: 1440900998}
   - {fileID: 1091395970}
-  - {fileID: 195899438}
   - {fileID: 628422714}
   - {fileID: 1281192157}
