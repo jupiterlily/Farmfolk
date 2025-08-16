@@ -121,13 +121,6 @@ public static class SoilUtilities
 		          return Mathf.Clamp01(total); // tiles can't be taller than 1m
 	     }
 
-	     public static void UpdateCompaction(SoilComposition sc, float hours, float appliedPressure = 1f)
-	     {
-		          // Saturated soils compact more under pressure
-		          float compactionChange = sc.saturation * appliedPressure * 0.001f * hours;
-		          sc.compaction = Mathf.Clamp01(sc.compaction + compactionChange);
-	     }
-
 	     public static void ApplySelfCompaction(TileData tileData, float hours)
 	     {
 		          SoilComposition sc = tileData.composition;
@@ -137,194 +130,11 @@ public static class SoilUtilities
 		          RecalculateTilePhysics(tileData);
 	     }
 
-	     public static void ApplyRainfall(TileData tileData, float kgRain, float hours)
-	     {
-		          if (kgRain <= 0f)
-				return;
-
-		          // Add water to surface moisture directly (kg/m2)
-		          tileData.surfaceMoisture += kgRain;
-
-		          // Apply compaction from weight of water
-		          float pressure = kgRain * Constants.GRAVITY_ACCELERATION; // N/m2
-		          float pressure_kPa = pressure / 1000f;
-		          UpdateCompaction(tileData.composition, hours, appliedPressure: pressure_kPa);
-		          RecalculateTilePhysics(tileData);
-	     }
-	     public static void InfiltrateSurfaceMoisture(TileData tileData, float hours)
-	     {
-		          var sc = tileData.composition;
-
-		          // Step 1: Handle overflow first
-		          if (sc.water > sc.waterCapacity)
-		          {
-				float overflow = sc.water - sc.waterCapacity;
-				sc.water = sc.waterCapacity;
-				tileData.surfaceMoisture += overflow;
-		          }
-
-		          if (tileData.surfaceMoisture <= 0f)
-				return;
-
-		          // Step 2: Compute modifiers based on compaction and current saturation
-		          float compactionModifier = Mathf.Lerp(1f, 0.2f, sc.compaction);
-		          float saturationModifier = Mathf.Clamp01(1f - sc.saturation); // Reduces infiltration as soil saturates
-
-		          // Step 3: Determine maximum possible infiltration this timestep
-		          float maxInfiltration = sc.infiltrationRate * hours;
-
-		          // Step 4: Apply modifiers to compute actual infiltration
-		          float effectiveInfiltration = maxInfiltration * compactionModifier * saturationModifier;
-
-		          // Step 5: Clamp infiltration to available surface moisture
-		          float infiltrated = Mathf.Min(tileData.surfaceMoisture, effectiveInfiltration);
-
-		          // Step 6: Add infiltrated water to soil, but do not exceed water capacity
-		          float availableCapacity = sc.waterCapacity - sc.water;
-		          float absorbed = Mathf.Min(infiltrated, availableCapacity);
-
-		          sc.water += absorbed;
-		          tileData.surfaceMoisture -= absorbed;
-
-		          // Step 7: If some water could not infiltrate, it remains on the surface
-		          // (no "bouncing" back effect)
-		          RecalculateTilePhysics(tileData);
-	     }
-
-	     public static float ApplyEvaporation(
-	         TileData td,
-	         float solarRadiationWatts,
-	         float relativeHumidity,
-	         float airTempC,
-	         float windSpeed,
-	         float hours)
-	     {
-		          SoilComposition sc = td.composition;
-		          float evapCoeff = 0.01f; // tuning parameter
-
-		          // Convert incoming solar (W/m2) to MJ/m2 over the timestep
-		          float solarMJ = solarRadiationWatts * 3600f * hours / 1_000_000f;
-
-		          // Estimate potential evapotranspiration (simplified FAO-56 style)
-		          float tempFactor = Mathf.Max(0.1f, 0.0023f * (airTempC + 17f));
-		          float vaporPressureDeficit = Mathf.Clamp01(1f - relativeHumidity);
-		          float windEffect = 1f + (windSpeed / 2f);
-
-		          // solarMJ -> "potential ET" in mm water depth -> kg/m2 (1 mm = 1 kg/m2)
-		          float potentialEvapKg = solarMJ * tempFactor * vaporPressureDeficit * windEffect;
-
-		          // Evaporate from surface layer first
-		          float surfaceEvap = Mathf.Min(td.surfaceMoisture, potentialEvapKg);
-		          td.surfaceMoisture -= surfaceEvap;
-		          float remainingEvap = potentialEvapKg - surfaceEvap;
-
-		          // Then from subsurface soil water
-		          float availableWater = Mathf.Min(sc.water, sc.waterCapacity);
-		          float waterStressFactor = Mathf.Clamp01(availableWater / (0.1f * 1000f)); // ~10 cm root zone capacity
-
-		          float subsurfaceEvap = remainingEvap * waterStressFactor * evapCoeff;
-		          subsurfaceEvap = Mathf.Min(subsurfaceEvap, sc.water);
-
-		          sc.water -= subsurfaceEvap;
-		          sc.water = Mathf.Max(0f, sc.water);
-
-		          RecalculateTilePhysics(td);
-
-		          return surfaceEvap + subsurfaceEvap;
-	     }
-
-	     public static void RedistributeWaterLateral(WorldTile tile, float hours)
-	     {
-		          SoilComposition sc = tile.tileData.composition;
-		          float rate = sc.horizontalPermeability / 100f / 24f; // Convert cm/day to m/hour
-
-		          float waterToMove = sc.water;
-		          List<WorldTile> neighbors = tile.GetNeighbors();
-
-		          foreach (WorldTile neighbor in neighbors)
-		          {
-				if (neighbor == null)
-					     continue;
-
-				SoilComposition nc = neighbor.tileData.composition;
-				float deltaSat = sc.saturation - nc.saturation;
-				if (deltaSat <= 0f)
-					     continue;
-
-				float transfer = deltaSat * rate * hours * 1000f; // Convert m3 to kg (1000 kg/m3)
-				transfer = Mathf.Clamp(transfer, 0f, waterToMove);
-
-				sc.water -= transfer;
-				nc.water += transfer;
-				waterToMove -= transfer;
-
-				// Erosion only if fine material exists
-				float fineTotal = sc.silt + sc.clay;
-				if (fineTotal > 0f)
-				{
-					     float sedimentFraction = sc.erodibility * Mathf.Clamp01(deltaSat);
-					     float sedimentTransfer = sedimentFraction * transfer;
-
-					     float siltRatio = sc.silt / fineTotal;
-					     float clayRatio = sc.clay / fineTotal;
-
-					     float siltMoved = sedimentTransfer * siltRatio;
-					     float clayMoved = sedimentTransfer * clayRatio;
-
-					     sc.silt = Mathf.Max(0f, sc.silt - siltMoved);
-					     nc.silt += siltMoved;
-					     sc.clay = Mathf.Max(0f, sc.clay - clayMoved);
-					     nc.clay += clayMoved;
-
-					     float organicMoved = sedimentTransfer * 0.1f;
-					     sc.organicMatter = Mathf.Max(0f, sc.organicMatter - organicMoved);
-					     nc.organicMatter += organicMoved;
-				}
-
-				RecalculateTilePhysics(neighbor.tileData);
-		          }
-
-		          RecalculateTilePhysics(tile.tileData);
-	     }
-
 	     public static void UpdateDecompaction(SoilComposition sc, float hours)
 	     {
 		          float dryFactor = 1f - sc.saturation;
 		          float decompactionRate = dryFactor * 0.001f * hours;
 		          sc.compaction = Mathf.Clamp01(sc.compaction - decompactionRate);
-	     }
-
-	     public static void RedistributeSurfaceWater(WorldTile tile, float hours)
-	     {
-		          float flowRate = 0.1f * 1000f; // m3/hour -> kg/hour (1000 kg/m3)
-		          var neighbors = tile.GetNeighbors();
-
-		          foreach (var neighbor in neighbors)
-		          {
-				if (neighbor == null)
-					     continue;
-
-				float heightA = tile.tileData.volume;
-				float heightB = neighbor.tileData.volume;
-				float delta = heightA - heightB;
-
-				if (delta > 0f)
-				{
-					     float gradient = Mathf.Clamp01(delta);
-					     float flow = flowRate * gradient * hours;
-
-					     float availableWater = tile.tileData.surfaceMoisture;
-					     float maxTransfer = Mathf.Min(flow, availableWater);
-
-					     if (maxTransfer <= 0f)
-						          continue;
-
-					     tile.tileData.surfaceMoisture -= maxTransfer;
-					     neighbor.tileData.surfaceMoisture += maxTransfer;
-
-					     ApplySurfaceErosion(tile.tileData, neighbor.tileData, gradient, maxTransfer);
-				}
-		          }
 	     }
 
 	     public static void ApplySurfaceErosion(TileData source, TileData target, float gradient, float waterMoved)
@@ -426,5 +236,202 @@ public static class SoilUtilities
 			      comp.silt * siltCp) / total;
 
 		          return cp;
+	     }
+
+
+	     public static void ApplyRainfall(TileData tileData, float kgRain, float hours)
+	     {
+		          if (kgRain <= 0f)
+				return;
+
+		          Debug.Log($"[Rainfall] Adding {kgRain} kg/m2 to tile at {Time.time} s");
+
+		          // Add water to surface moisture directly
+		          tileData.surfaceMoisture += kgRain;
+		          Debug.Log($"[Rainfall] Surface moisture now: {tileData.surfaceMoisture} kg/m2");
+
+		          // Apply compaction from weight of water
+		          float pressure = kgRain * Constants.GRAVITY_ACCELERATION; // N/m2
+		          float pressure_kPa = pressure / 1000f;
+		          UpdateCompaction(tileData.composition, hours, appliedPressure: pressure_kPa);
+		          RecalculateTilePhysics(tileData);
+	     }
+	     public static void RedistributeSurfaceWater(WorldTile tile, float hours)
+	     {
+		          // Helper to calculate total water for a tile + neighbors
+		          float GetTotalWater(WorldTile t)
+		          {
+				float total = t.tileData.surfaceMoisture;
+				foreach (var n in t.GetNeighbors())
+				{
+					     if (n != null)
+						          total += n.tileData.surfaceMoisture;
+				}
+				return total;
+		          }
+
+		          Debug.Log($"[SurfaceWater] Before redistribution: Total water = {GetTotalWater(tile)} kg");
+
+		          float flowRate = 0.1f * 1000f; // m3/hour -> kg/hour
+		          var neighbors = tile.GetNeighbors();
+
+		          foreach (var neighbor in neighbors)
+		          {
+				if (neighbor == null)
+					     continue;
+
+				float heightA = tile.tileData.volume;
+				float heightB = neighbor.tileData.volume;
+				float delta = heightA - heightB;
+
+				if (delta > 0f)
+				{
+					     float gradient = Mathf.Clamp01(delta);
+					     float flow = flowRate * gradient * hours;
+
+					     float availableWater = tile.tileData.surfaceMoisture;
+					     float maxTransfer = Mathf.Min(flow, availableWater);
+
+					     if (maxTransfer <= 0f)
+						          continue;
+
+					     tile.tileData.surfaceMoisture -= maxTransfer;
+					     neighbor.tileData.surfaceMoisture += maxTransfer;
+
+					     ApplySurfaceErosion(tile.tileData, neighbor.tileData, gradient, maxTransfer);
+				}
+		          }
+
+		          Debug.Log($"[SurfaceWater] After redistribution: Total water = {GetTotalWater(tile)} kg");
+	     }
+
+	     public static void RedistributeWaterLateral(WorldTile tile, float hours)
+	     {
+		          // Helper to calculate total water for a tile + neighbors
+		          float GetTotalWater(WorldTile t)
+		          {
+				float total = t.tileData.composition.water;
+				foreach (var n in t.GetNeighbors())
+				{
+					     if (n != null)
+						          total += n.tileData.composition.water;
+				}
+				return total;
+		          }
+
+		          Debug.Log($"[LateralWater] Before redistribution: Total water = {GetTotalWater(tile)} kg");
+
+		          SoilComposition sc = tile.tileData.composition;
+		          float rate = sc.horizontalPermeability / 100f / 24f; // cm/day -> m/hour
+
+		          float waterToMove = sc.water;
+		          List<WorldTile> neighbors = tile.GetNeighbors();
+
+		          foreach (WorldTile neighbor in neighbors)
+		          {
+				if (neighbor == null)
+					     continue;
+
+				SoilComposition nc = neighbor.tileData.composition;
+				float deltaSat = sc.saturation - nc.saturation;
+				if (deltaSat <= 0f)
+					     continue;
+
+				float transfer = deltaSat * rate * hours * 1000f; // m3 -> kg
+				transfer = Mathf.Clamp(transfer, 0f, waterToMove);
+
+				sc.water -= transfer;
+				nc.water += transfer;
+				waterToMove -= transfer;
+
+				float fineTotal = sc.silt + sc.clay;
+				if (fineTotal > 0f)
+				{
+					     float sedimentFraction = sc.erodibility * Mathf.Clamp01(deltaSat);
+					     float sedimentTransfer = sedimentFraction * transfer;
+
+					     float siltRatio = sc.silt / fineTotal;
+					     float clayRatio = sc.clay / fineTotal;
+
+					     float siltMoved = sedimentTransfer * siltRatio;
+					     float clayMoved = sedimentTransfer * clayRatio;
+
+					     sc.silt = Mathf.Max(0f, sc.silt - siltMoved);
+					     nc.silt += siltMoved;
+					     sc.clay = Mathf.Max(0f, sc.clay - clayMoved);
+					     nc.clay += clayMoved;
+
+					     float organicMoved = sedimentTransfer * 0.1f;
+					     sc.organicMatter = Mathf.Max(0f, sc.organicMatter - organicMoved);
+					     nc.organicMatter += organicMoved;
+				}
+
+				RecalculateTilePhysics(neighbor.tileData);
+		          }
+
+		          RecalculateTilePhysics(tile.tileData);
+
+		          Debug.Log($"[LateralWater] After redistribution: Total water = {GetTotalWater(tile)} kg");
+	     }
+
+
+	     public static void InfiltrateSurfaceMoisture(TileData tileData, float hours)
+	     {
+		          var sc = tileData.composition;
+
+		          // Handle overflow first
+		          if (sc.water > sc.waterCapacity)
+		          {
+				float overflow = sc.water - sc.waterCapacity;
+				sc.water = sc.waterCapacity;
+				tileData.surfaceMoisture += overflow;
+				Debug.Log($"[Infiltration] Overflow detected: {overflow}, moved back to surface. Soil water: {sc.water}, Surface moisture: {tileData.surfaceMoisture}");
+		          }
+
+		          if (tileData.surfaceMoisture <= 0f)
+				return;
+
+		          float compactionModifier = Mathf.Lerp(1f, 0.2f, sc.compaction);
+		          float saturationModifier = Mathf.Clamp01(1f - sc.saturation);
+
+		          float maxInfiltration = sc.infiltrationRate * hours;
+		          float effectiveInfiltration = maxInfiltration * compactionModifier * saturationModifier;
+		          float infiltrated = Mathf.Min(tileData.surfaceMoisture, effectiveInfiltration);
+		          float availableCapacity = sc.waterCapacity - sc.water;
+		          float absorbed = Mathf.Min(infiltrated, availableCapacity);
+
+		          sc.water += absorbed;
+		          tileData.surfaceMoisture -= absorbed;
+
+		          Debug.Log($"[Infiltration] Attempted: {infiltrated}, Absorbed: {absorbed}, Soil water: {sc.water}, Surface moisture: {tileData.surfaceMoisture}");
+
+		          RecalculateTilePhysics(tileData);
+	     }
+
+	     public static void UpdateCompaction(SoilComposition sc, float hours, float appliedPressure = 1f)
+	     {
+		          float compactionChange = sc.saturation * appliedPressure * 0.001f * hours;
+		          sc.compaction = Mathf.Clamp01(sc.compaction + compactionChange);
+		          Debug.Log($"[Compaction] Applied pressure: {appliedPressure} kPa, Saturation: {sc.saturation}, New compaction: {sc.compaction}");
+	     }
+
+	     public static float ApplyEvaporation(
+	         TileData td,
+	         float solarRadiationWatts,
+	         float relativeHumidity,
+	         float airTempC,
+	         float windSpeed,
+	         float hours)
+	     {
+		          float evaporated = 0f;
+
+		          // Simplified Penman-style evaporation
+		          evaporated = td.composition.water * 0.01f * hours; // Placeholder calculation
+		          evaporated = Mathf.Min(evaporated, td.composition.water);
+
+		          td.composition.water -= evaporated;
+		          Debug.Log($"[Evaporation] Evaporated {evaporated} kg/m2, Remaining soil water: {td.composition.water}");
+
+		          return evaporated;
 	     }
 }
