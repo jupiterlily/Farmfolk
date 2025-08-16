@@ -29,15 +29,15 @@ public class TileManager : MonoBehaviour
 		          grid.YGrid = worldsize.y;
 		          tiles = new WorldTile[worldsize.x, worldsize.y];
 		          //for each row of worlsize, allocate a tile and a position.
-				for (int i = 0; i < grid.XGrid; i++)
+		          for (int i = 0; i < grid.XGrid; i++)
+		          {
+				for (int j = 0; j < grid.YGrid; j++)
 				{
-					for (int j = 0; j < grid.YGrid; j++)
-					{
-					TileData data = new TileData();
-					data.tileWidth = grid.tileWidth;
-					data.tileGridRef = new Vector2Int(i, j);
+					     TileData data = new TileData();
+					     data.tileWidth = grid.tileWidth;
+					     data.tileGridRef = new Vector2Int(i, j);
 
-					GameObject tile = Instantiate(tilePrefab, transform);
+					     GameObject tile = Instantiate(tilePrefab, transform);
 
 					     tile.GetComponent<WorldTile>().Setup(data);
 					     grid.Map.SetValue(data, i, j);
@@ -85,7 +85,7 @@ public class TileManager : MonoBehaviour
 		          // Update soil temperature
 		          SoilUtilities.UpdateSoilTemperature(data, absorbedEnergy, airTemp, hours);
 		          float totalSoilToAirEnergy = 0f;
-		          float energyFromTile = SoilUtilities.PassHeatFromSoil(data, hours);
+		          float energyFromTile = SoilUtilities.PassHeatFromSoil(data, hours, this);
 		          // Now use that energy to warm the atmosphere:
 		          float airMass = (worldsize.x * worldsize.y) * 3000f * Constants.AIR_DENSITY;
 		          float deltaAirTemp = totalSoilToAirEnergy / (airMass * Constants.AIR_HEAT_CAPACITY);

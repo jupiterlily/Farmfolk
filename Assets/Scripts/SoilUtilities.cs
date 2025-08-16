@@ -196,7 +196,7 @@ public static class SoilUtilities
 		          data.soilTemperature += deltaT_solar + deltaT_air;
 	     }
 
-	     public static float PassHeatFromSoil(TileData data, float hours)
+	     public static float PassHeatFromSoil(TileData data, float hours, TileManager mommy)
 	     {
 		          SoilComposition sc = data.composition;
 		          float latentHeat = Constants.LATENT_HEAT_VAPORIZATION;
@@ -209,6 +209,7 @@ public static class SoilUtilities
 		          float evaporatedKg = Mathf.Min(surfaceWater, maxEvaporableKg);
 
 		          data.surfaceMoisture -= evaporatedKg;
+		          mommy.atmosphericMoisture += evaporatedKg; // Add to atmospheric moisture
 		          float usedEnergy = evaporatedKg * latentHeat;
 		          float deltaT = usedEnergy / (soilMass * heatCapacity);
 		          data.soilTemperature = Mathf.Max(0f, data.soilTemperature - deltaT);
@@ -244,11 +245,11 @@ public static class SoilUtilities
 		          if (kgRain <= 0f)
 				return;
 
-		          Debug.Log($"[Rainfall] Adding {kgRain} kg/m2 to tile at {Time.time} s");
+		          //Debug.Log($"[Rainfall] Adding {kgRain} kg/m2 to tile at {Time.time} s");
 
 		          // Add water to surface moisture directly
 		          tileData.surfaceMoisture += kgRain;
-		          Debug.Log($"[Rainfall] Surface moisture now: {tileData.surfaceMoisture} kg/m2");
+		          //Debug.Log($"[Rainfall] Surface moisture now: {tileData.surfaceMoisture} kg/m2");
 
 		          // Apply compaction from weight of water
 		          float pressure = kgRain * Constants.GRAVITY_ACCELERATION; // N/m2
@@ -270,7 +271,7 @@ public static class SoilUtilities
 				return total;
 		          }
 
-		          Debug.Log($"[SurfaceWater] Before redistribution: Total water = {GetTotalWater(tile)} kg");
+		          //  Debug.Log($"[SurfaceWater] Before redistribution: Total water = {GetTotalWater(tile)} kg");
 
 		          float flowRate = 0.1f * 1000f; // m3/hour -> kg/hour
 		          var neighbors = tile.GetNeighbors();
@@ -302,7 +303,7 @@ public static class SoilUtilities
 				}
 		          }
 
-		          Debug.Log($"[SurfaceWater] After redistribution: Total water = {GetTotalWater(tile)} kg");
+		          // Debug.Log($"[SurfaceWater] After redistribution: Total water = {GetTotalWater(tile)} kg");
 	     }
 
 	     public static void RedistributeWaterLateral(WorldTile tile, float hours)
@@ -319,7 +320,7 @@ public static class SoilUtilities
 				return total;
 		          }
 
-		          Debug.Log($"[LateralWater] Before redistribution: Total water = {GetTotalWater(tile)} kg");
+		          // Debug.Log($"[LateralWater] Before redistribution: Total water = {GetTotalWater(tile)} kg");
 
 		          SoilComposition sc = tile.tileData.composition;
 		          float rate = sc.horizontalPermeability / 100f / 24f; // cm/day -> m/hour
@@ -371,7 +372,7 @@ public static class SoilUtilities
 
 		          RecalculateTilePhysics(tile.tileData);
 
-		          Debug.Log($"[LateralWater] After redistribution: Total water = {GetTotalWater(tile)} kg");
+		          //    Debug.Log($"[LateralWater] After redistribution: Total water = {GetTotalWater(tile)} kg");
 	     }
 
 
@@ -385,7 +386,7 @@ public static class SoilUtilities
 				float overflow = sc.water - sc.waterCapacity;
 				sc.water = sc.waterCapacity;
 				tileData.surfaceMoisture += overflow;
-				Debug.Log($"[Infiltration] Overflow detected: {overflow}, moved back to surface. Soil water: {sc.water}, Surface moisture: {tileData.surfaceMoisture}");
+				//Debug.Log($"[Infiltration] Overflow detected: {overflow}, moved back to surface. Soil water: {sc.water}, Surface moisture: {tileData.surfaceMoisture}");
 		          }
 
 		          if (tileData.surfaceMoisture <= 0f)
@@ -403,7 +404,7 @@ public static class SoilUtilities
 		          sc.water += absorbed;
 		          tileData.surfaceMoisture -= absorbed;
 
-		          Debug.Log($"[Infiltration] Attempted: {infiltrated}, Absorbed: {absorbed}, Soil water: {sc.water}, Surface moisture: {tileData.surfaceMoisture}");
+		          //Debug.Log($"[Infiltration] Attempted: {infiltrated}, Absorbed: {absorbed}, Soil water: {sc.water}, Surface moisture: {tileData.surfaceMoisture}");
 
 		          RecalculateTilePhysics(tileData);
 	     }
@@ -412,9 +413,8 @@ public static class SoilUtilities
 	     {
 		          float compactionChange = sc.saturation * appliedPressure * 0.001f * hours;
 		          sc.compaction = Mathf.Clamp01(sc.compaction + compactionChange);
-		          Debug.Log($"[Compaction] Applied pressure: {appliedPressure} kPa, Saturation: {sc.saturation}, New compaction: {sc.compaction}");
+		          // Debug.Log($"[Compaction] Applied pressure: {appliedPressure} kPa, Saturation: {sc.saturation}, New compaction: {sc.compaction}");
 	     }
-
 	     public static float ApplyEvaporation(
 	         TileData td,
 	         float solarRadiationWatts,
@@ -423,15 +423,26 @@ public static class SoilUtilities
 	         float windSpeed,
 	         float hours)
 	     {
-		          float evaporated = 0f;
+		          // Simplified Penman-style placeholder calculation
+		          float evaporated = td.composition.water * 0.01f * hours;
 
-		          // Simplified Penman-style evaporation
-		          evaporated = td.composition.water * 0.01f * hours; // Placeholder calculation
+		          // Clamp to available water
 		          evaporated = Mathf.Min(evaporated, td.composition.water);
 
+		          // Round to 5 decimal places
+		          evaporated = Mathf.Round(evaporated * 100000f) / 100000f;
+
+		          // Ensure tiny non-zero evaporation if water is present
+		          if (evaporated == 0f && td.composition.water > 0f)
+		          {
+				evaporated = Mathf.Min(0.00001f, td.composition.water);
+		          }
+
 		          td.composition.water -= evaporated;
-		          Debug.Log($"[Evaporation] Evaporated {evaporated} kg/m2, Remaining soil water: {td.composition.water}");
+
+		          // Debug.Log($"[Evaporation] Evaporated {evaporated} kg/m2, Remaining soil water: {td.composition.water}");
 
 		          return evaporated;
 	     }
+
 }
