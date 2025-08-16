@@ -423,6 +423,8 @@ GameObject:
   m_Component:
   - component: {fileID: 1440900998}
   - component: {fileID: 1440900997}
+  - component: {fileID: 1440900999}
+  - component: {fileID: 1440901000}
   m_Layer: 0
   m_Name: World
   m_TagString: Untagged
@@ -442,13 +444,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce010db710ee9f949b8eeb00988dc2e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  worldsize: {x: 10, y: 19}
+  worldsize: {x: 40, y: 40}
   grid:
     tileWidth: 0
     XGrid: 0
     YGrid: 0
     originPoint: {x: 0, y: 0, z: 0}
   tilePrefab: {fileID: 8500652070221592882, guid: 4c855729e2ee7194bb46f66ab099fe45, type: 3}
+  atmosphericMoisture: 15000
+  airTemp: 5
+  humidity: 0
+  totalWater: 0
+  totalSoil: 0
+  totalSand: 0
+  totalSilt: 0
+  totalClay: 0
+  totalOrganicMatter: 0
 --- !u!4 &1440900998
 Transform:
   m_ObjectHideFlags: 0
@@ -464,6 +475,37 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1440900999
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1440900996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f31a35078291b3645bd3e98fa3ee1d71, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  readout: {fileID: 1936633668}
+  dayOfYear: 0
+  year: 0
+  currentLatitude: 30
+  tileManager: {fileID: 0}
+  plantSprites: []
+--- !u!114 &1440901000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1440900996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 40b6e123785892e4aaf4a3ddbb61bcd3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  unboundedTime: 600
 --- !u!1 &1765547147
 GameObject:
   m_ObjectHideFlags: 0
