@@ -36,7 +36,7 @@ public class WorldTile : MonoBehaviour
 	     public void TileVisualUpdate()
 	     {
 		          SoilUtilities.CalculateDerivedProperties(tileData.composition);
-		          float height = SoilUtilities.CalculateEffectiveVolume(tileData.composition);
+		          float height = SoilUtilities.CalculateEffectiveVolume(tileData.composition) + (tileData.surfaceMoisture / 1000);
 		          transform.localScale = new Vector3(tileSize, height, tileSize);
 
 		          // Set position so that bottom of tile sits on ground

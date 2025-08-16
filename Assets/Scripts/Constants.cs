@@ -14,4 +14,9 @@ public static class Constants
 	     public const float AIR_HEAT_CAPACITY = 1005f; // J/kg·°C
 				      // Density of air at sea level, 15°C
 	     public const float AIR_DENSITY = 1.225f; // kg/m3
+
+	     // Use a constant literal value for Stefan-Boltzmann constant
+	     public const float STEFAN_BOLTZMANN = 0.00000005670374419f; // W/m2K4
+	     public const float ATMOSPHERIC_EMISSIVITY = 0.8f; // Typical value for Earth's atmosphere
+	     public const float SPACE_TEMPERATURE = 2.7f; // Cosmic microwave background (K)
 }

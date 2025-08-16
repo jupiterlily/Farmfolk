@@ -180,7 +180,7 @@ public static class SoilUtilities
 	     public static void RecalculateTilePhysics(TileData data)
 	     {
 		          CalculateDerivedProperties(data.composition);
-		          data.volume = CalculateEffectiveVolume(data.composition);
+		          data.volume = CalculateEffectiveVolume(data.composition) + data.surfaceMoisture / 1000;
 	     }
 
 	     public static void UpdateSoilTemperature(TileData data, float solarWatts, float airTemp, float hours)
@@ -195,27 +195,58 @@ public static class SoilUtilities
 
 		          data.soilTemperature += deltaT_solar + deltaT_air;
 	     }
-
-	     public static float PassHeatFromSoil(TileData data, float hours, TileManager mommy)
+	     public static float PassHeatFromSoil(TileData data, float hours, TileManager tileManager)
 	     {
 		          SoilComposition sc = data.composition;
 		          float latentHeat = Constants.LATENT_HEAT_VAPORIZATION;
-		          float soilMass = 1500f;
+
+		          // Soil thermal properties
+		          float soilMass = 1500f; // kg/m2 (for top 1m of soil)
 		          float heatCapacity = GetSoilHeatCapacity(sc);
 
-		          float availableEnergy = soilMass * heatCapacity * data.soilTemperature;
-		          float maxEvaporableKg = availableEnergy / latentHeat;
+		          // Air properties (for the entire atmospheric column)
+		          float airMassPerTile = 3000f * Constants.AIR_DENSITY; // 3km column of air per tile
+		          float totalAirMass = airMassPerTile * tileManager.worldsize.x * tileManager.worldsize.y;
+
+		          // 1. Calculate heat transfer between soil and air
+		          float heatTransferCoefficient = 10f; // W/m2·K (typical for soil-air interface)
+		          float temperatureDifference = data.soilTemperature - tileManager.airTemp;
+		          float heatFlowRate = heatTransferCoefficient * temperatureDifference; // Watts per m2
+
+		          // Convert to energy over time period (Joules)
+		          float energyTransferred = heatFlowRate * hours * 3600f;
+
+		          // 2. Calculate maximum possible evaporation
+		          float maxEvaporableKg = energyTransferred / latentHeat;
 		          float surfaceWater = data.surfaceMoisture;
 		          float evaporatedKg = Mathf.Min(surfaceWater, maxEvaporableKg);
 
+		          // 3. Apply evaporation effects
 		          data.surfaceMoisture -= evaporatedKg;
-		          mommy.atmosphericMoisture += evaporatedKg; // Add to atmospheric moisture
-		          float usedEnergy = evaporatedKg * latentHeat;
-		          float deltaT = usedEnergy / (soilMass * heatCapacity);
-		          data.soilTemperature = Mathf.Max(0f, data.soilTemperature - deltaT);
+		          tileManager.atmosphericMoisture += evaporatedKg;
 
-		          float unusedEnergy = Mathf.Max(0f, availableEnergy - usedEnergy);
-		          return unusedEnergy;
+		          // 4. Calculate energy used for evaporation
+		          float energyUsed = evaporatedKg * latentHeat;
+
+		          // 5. Calculate remaining energy for sensible heat transfer
+		          float sensibleHeatEnergy = energyTransferred - energyUsed;
+
+		          // 6. Update temperatures
+		          if (sensibleHeatEnergy > 0)
+		          {
+				// Soil cools and air warms
+				float soilDeltaT = sensibleHeatEnergy / (soilMass * heatCapacity);
+				data.soilTemperature = Mathf.Max(tileManager.airTemp - 5f, data.soilTemperature - soilDeltaT);
+
+				// Only return the portion that should affect the global air temperature
+				// (since this is called per tile, we return the energy and let TileManager handle the aggregation)
+				return sensibleHeatEnergy;
+		          }
+		          else
+		          {
+				// All energy went to evaporation
+				return 0f;
+		          }
 	     }
 
 	     public static float GetSoilHeatCapacity(SoilComposition comp)
