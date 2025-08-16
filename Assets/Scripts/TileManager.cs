@@ -113,7 +113,7 @@ public class TileManager : MonoBehaviour
 
 	     private float CalculateRelativeHumidity()
 	     {
-		          // 1. Calculate volume of atmosphere in m³
+		          // 1. Calculate volume of atmosphere in m3
 		          float tileArea = 1f; // 1m2 per tile
 		          float height = 3000f; // 3 km atmospheric block
 		          float totalVolume = worldsize.x * worldsize.y * tileArea * height;

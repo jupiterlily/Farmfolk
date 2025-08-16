@@ -30,7 +30,7 @@ public static class SoilUtilities
 		          sc.bulkDensity *= 1f + (sc.compaction * 0.2f);
 
 		          // 4. Water properties - now using kg/m2 (equivalent to liters for 1m2 area)
-		          sc.waterCapacity = CalculateWaterCapacity(sc.porosity, clayPct) * 1000f; // Convert m³/m³ to kg/m2
+		          sc.waterCapacity = CalculateWaterCapacity(sc.porosity, clayPct) * 1000f; // Convert m3/m3 to kg/m2
 		          sc.saturation = sc.waterCapacity > 0f ? Mathf.Clamp01(sc.water / sc.waterCapacity) : 0f;
 
 		          // 5. Flow properties
@@ -113,7 +113,7 @@ public static class SoilUtilities
 		          float organicVol = sc.organicMatter / Constants.ORGANIC_DENSITY;
 
 		          float solidVolume = sandVol + siltVol + clayVol + organicVol;
-		          float waterVolume = sc.water / 1000f; // Convert kg/m2 back to m³/m³ for volume calculation
+		          float waterVolume = sc.water / 1000f; // Convert kg/m2 back to m3/m3 for volume calculation
 		          float airVolume = sc.aeration; // already calculated from porosity and saturation
 
 		          float total = solidVolume + waterVolume + airVolume;
@@ -251,7 +251,7 @@ public static class SoilUtilities
 				if (deltaSat <= 0f)
 					     continue;
 
-				float transfer = deltaSat * rate * hours * 1000f; // Convert m³ to kg (1000 kg/m³)
+				float transfer = deltaSat * rate * hours * 1000f; // Convert m3 to kg (1000 kg/m3)
 				transfer = Mathf.Clamp(transfer, 0f, waterToMove);
 
 				sc.water -= transfer;
@@ -296,7 +296,7 @@ public static class SoilUtilities
 
 	     public static void RedistributeSurfaceWater(WorldTile tile, float hours)
 	     {
-		          float flowRate = 0.1f * 1000f; // m³/hour -> kg/hour (1000 kg/m³)
+		          float flowRate = 0.1f * 1000f; // m3/hour -> kg/hour (1000 kg/m3)
 		          var neighbors = tile.GetNeighbors();
 
 		          foreach (var neighbor in neighbors)

@@ -1,6 +1,6 @@
 public static class Constants
 {
-	     // Densities (kg/m³)
+	     // Densities (kg/m3)
 	     public const float SAND_DENSITY = 1550f;
 	     public const float SILT_DENSITY = 2100f;
 	     public const float CLAY_DENSITY = 2650f;
@@ -13,5 +13,5 @@ public static class Constants
 	     // Air heat capacity (used if transferring heat to atmosphere)
 	     public const float AIR_HEAT_CAPACITY = 1005f; // J/kg·°C
 				      // Density of air at sea level, 15°C
-	     public const float AIR_DENSITY = 1.225f; // kg/m³
+	     public const float AIR_DENSITY = 1.225f; // kg/m3
 }

@@ -51,7 +51,7 @@ public class TileData
 [System.Serializable]
 public class SoilComposition
 {
-	     // Component masses (kg/m³)
+	     // Component masses (kg/m3)
 	     [Range(0, 1550)] public float sand;
 	     [Range(0, 2100)] public float silt;
 	     [Range(0, 2650)] public float clay;
@@ -60,8 +60,8 @@ public class SoilComposition
 
 	     // Derived properties
 	     public float porosity;  //
-	     public float bulkDensity;    // kg/m³
-	     public float waterCapacity;  // m³/m³
+	     public float bulkDensity;    // kg/m3
+	     public float waterCapacity;  // m3/m3
 	     public float saturation;     // 0-1
 	     public float aeration;       // air-filled porosity
 	     public float infiltrationRate; // mm/hour
