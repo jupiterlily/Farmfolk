@@ -29,15 +29,15 @@ public class TileManager : MonoBehaviour
 		          grid.YGrid = worldsize.y;
 		          tiles = new WorldTile[worldsize.x, worldsize.y];
 		          //for each row of worlsize, allocate a tile and a position.
-		          for (int i = 0; i < grid.XGrid; i++)
-		          {
-				for (int j = 0; j < grid.YGrid; j++)
+				for (int i = 0; i < grid.XGrid; i++)
 				{
-					     TileData data = new TileData();
-					     data.tileWidth = grid.tileWidth;
-					     data.tileGridRef = new Vector2Int(i, j);
+					for (int j = 0; j < grid.YGrid; j++)
+					{
+					TileData data = new TileData();
+					data.tileWidth = grid.tileWidth;
+					data.tileGridRef = new Vector2Int(i, j);
 
-					     GameObject tile = Instantiate(tilePrefab, transform);
+					GameObject tile = Instantiate(tilePrefab, transform);
 
 					     tile.GetComponent<WorldTile>().Setup(data);
 					     grid.Map.SetValue(data, i, j);
@@ -124,8 +124,8 @@ public class TileManager : MonoBehaviour
 		          // 3. Get vapor density
 		          float vaporDensity = vaporKg / totalVolume; // kg/m3
 
-		          // 4. Max saturation at 20°C (approx)
-		          float saturationVaporDensity = 0.0173f; // kg/m3 at 20°C
+		          // 4. Max saturation at 20ï¿½C (approx)
+		          float saturationVaporDensity = 0.0173f; // kg/m3 at 20ï¿½C
 
 		          // 5. RH = actual / saturation
 		          float relativeHumidity = vaporDensity / saturationVaporDensity;
