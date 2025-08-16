@@ -54,7 +54,7 @@ public class SimulationMaster : MonoBehaviour
 		          {
 				foreach (int day in days)
 				{
-					     Debug.Log($"<color=#f9c74f>Current Solar Energy {SolarEnergyCalculator.GetLatitudeDescription(meridian)} at midday on day {day - 45}: {Mathf.FloorToInt(SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(meridian, day - 45, 0.5f))} W/m²</color>");
+					     Debug.Log($"<color=#f9c74f>Current Solar Energy {SolarEnergyCalculator.GetLatitudeDescription(meridian)} at midday on day {day - 45}: {Mathf.FloorToInt(SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(meridian, day - 45, 0.5f))} W/m2</color>");
 				}
 		          }
 
@@ -198,13 +198,13 @@ public class SimulationMaster : MonoBehaviour
 		          {
 
 		          }
-		          tileManager.TileUpdate(1);
+		          tileManager.TileUpdate(hours);
 		          Debug.Log("tiles updated");
 		          // Log solar energy every 3 hours.
 		          if (currentHourOfDay % 3 == 0 && Mathf.FloorToInt(previousTimeOfDay * 24f) % 3 != currentHourOfDay % 3)
 		          {
 				float currentEnergy = SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(currentLatitude, dayOfYear, currentTimeOfDay);
-				Debug.Log($"<color=#f9c74f>Current Solar Energy {SolarEnergyCalculator.GetLatitudeDescription(currentLatitude)} at {currentHourOfDay:00}:00: {Mathf.FloorToInt(currentEnergy)} W/m²</color>");
+				Debug.Log($"<color=#f9c74f>Current Solar Energy {SolarEnergyCalculator.GetLatitudeDescription(currentLatitude)} at {currentHourOfDay:00}:00: {Mathf.FloorToInt(currentEnergy)} W/m2</color>");
 		          }
 		          SimulationConstants.UpdateTimeConstants(0, 0, hours, 0, 0);
 		          intervalsEnergy = Mathf.FloorToInt(SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(currentLatitude, dayOfYear, currentTimeOfDay));
@@ -224,6 +224,8 @@ public class SimulationMaster : MonoBehaviour
 					     YearPasses(1);
 				}
 		          }
+		          tileManager.TileUpdate(days * 24);
+		          Debug.Log("tiles updated");
 		          SimulationConstants.UpdateTimeConstants(0, 0, 0, days, 0);
 		          SimulationConstants.UpdateDay(Mathf.FloorToInt(dayOfYear));
 		          UpdateReadout();

@@ -3,7 +3,7 @@ using UnityEngine;
 
 public static class SimulationConstants
 {
-	     public const float SolarConstant = 1361f; // W/m²
+	     public const float SolarConstant = 1361f; // W/m2
 	     public const float DayLength = 24f; // Length of a day in hours (constant)
 	     public const float YearLength = 365f; // Length of a year in days (constant)
 	     public const float AxialTilt = 23.5f; // Earth's axial tilt in degrees (constant, modifiable by user)
