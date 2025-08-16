@@ -172,8 +172,11 @@ public class SimulationMaster : MonoBehaviour
 		          //every  10 minutes
 		          if (currentMinuteOfHour == 0 || currentMinuteOfHour == 10 || currentMinuteOfHour == 20 || currentMinuteOfHour == 30 || currentMinuteOfHour == 40 || currentMinuteOfHour == 50)
 		          {
-				tileManager.TileUpdate(0.6f);
-				Debug.Log("tiles updated");
+
+		          }
+		          if (currentMinuteOfHour == 9 || currentMinuteOfHour == 29 || currentMinuteOfHour == 49)
+		          {
+
 		          }
 		          SimulationConstants.UpdateTimeConstants(0, minutes, 0, 0, 0);
 		          SimulationConstants.UpdateTime(currentTimeOfDay);
@@ -193,11 +196,10 @@ public class SimulationMaster : MonoBehaviour
 		          }
 		          if (currentHourOfDay == 0 || currentHourOfDay == 4 || currentHourOfDay == 8 || currentHourOfDay == 12 || currentHourOfDay == 16 || currentHourOfDay == 20)
 		          {
-				foreach (var tile in tileManager.tiles)
-				{
-					     SoilUtilities.RedistributeWaterLateral(tile, 4);
-				}
+
 		          }
+		          tileManager.TileUpdate(1);
+		          Debug.Log("tiles updated");
 		          // Log solar energy every 3 hours.
 		          if (currentHourOfDay % 3 == 0 && Mathf.FloorToInt(previousTimeOfDay * 24f) % 3 != currentHourOfDay % 3)
 		          {

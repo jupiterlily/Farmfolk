@@ -48,6 +48,14 @@ public class WorldTile : MonoBehaviour
 		          );
 
 		          GetComponent<Renderer>().material.color = TileUtilities.GetSoilColor(tileData.composition);
+		          if (tileData.surfaceMoisture > 5)
+		          {
+				GetComponent<Renderer>().material.color = Color.cyan;
+		          }
+		          if (tileData.surfaceMoisture > 50)
+		          {
+				GetComponent<Renderer>().material.color = Color.blue;
+		          }
 
 	     }
 

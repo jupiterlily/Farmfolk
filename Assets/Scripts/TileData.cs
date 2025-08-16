@@ -10,6 +10,7 @@ public class TileData
 	     [Header("Dynamic States")]
 	     public float surfaceMoisture;
 	     public float volume;
+	     public float soilTemperature;
 
 	     public void Initialize(TileData neighbor = null)
 	     {
@@ -35,7 +36,8 @@ public class TileData
 				composition.organicMatter = Mathf.Clamp(neighbor.composition.organicMatter + Random.Range(-2.5f, 2.5f), 0, 250f);
 				composition.compaction = Mathf.Clamp01(Random.Range(neighbor.composition.compaction, 1f));
 		          }
-		          SoilUtilities.CalculateDerivedProperties(composition);
+		          soilTemperature = Random.Range(10f, 20f); // initial temperature
+		          SoilUtilities.RecalculateTilePhysics(this);
 		          float wc = composition.waterCapacity * 1000;
 		          composition.water = Mathf.Clamp(neighbor.composition.water + Random.Range(-wc * 0.1f, wc * 0.1f), 0, wc);
 	     }

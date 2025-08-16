@@ -1,7 +1,7 @@
 using UnityEngine;
 
 // This class is responsible for simulating solar energy calculations based on time and location on Earth.
-public class SolarEnergyCalculator
+public static class SolarEnergyCalculator
 {
 	     // This method calculates the current solar energy at a specific latitude, day of the year, and time of day.
 	     public static float CalculateCurrentEnergyAtLatitude(float latitude, float dayOfYear, float timeOfDay)

@@ -6,4 +6,5 @@ public static class Constants
 	     public const float CLAY_DENSITY = 2650f;
 	     public const float ORGANIC_DENSITY = 250f;
 	     public const float WATER_DENSITY = 1000f;
+	     public const float GRAVITY_ACCELERATION = 9.81f;
 }

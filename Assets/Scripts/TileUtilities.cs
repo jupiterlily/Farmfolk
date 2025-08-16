@@ -69,4 +69,8 @@ public static class TileUtilities
 		          return grid.Map[xref, yref];
 
 	     }
+
+	     public static float MMToWaterMass(float mm) => mm / 1000f * Constants.WATER_DENSITY;
+	     public static float WaterMassToMM(float kgPerM2) => kgPerM2 / Constants.WATER_DENSITY * 1000f;
+
 }
