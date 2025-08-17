@@ -68,7 +68,7 @@ public class TileManager : MonoBehaviour
 					     SoilUtilities.RedistributeWaterLateral(tile, hours);
 					     SimulateSoilHour(tile.tileData, hours,
 					         SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(latitude, SimulationConstants.DayOfYear, SimulationConstants.TimeOfDay),
-					         kgPerTile);
+					         kgPerTile, latitude);
 
 					     tile.TileVisualUpdate();
 				}
@@ -83,7 +83,7 @@ public class TileManager : MonoBehaviour
 					     SoilUtilities.RedistributeWaterLateral(tile, hours);
 					     SimulateSoilHour(tile.tileData, hours,
 					         SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(latitude, SimulationConstants.DayOfYear, SimulationConstants.TimeOfDay),
-					         0);
+					         0, latitude);
 
 					     tile.TileVisualUpdate();
 				}
@@ -141,10 +141,10 @@ public class TileManager : MonoBehaviour
 		          float alpha = ((a * tempC) / (b + tempC)) + Mathf.Log(relativeHumidity);
 		          return (b * alpha) / (a - alpha);
 	     }
-	     public void SimulateSoilHour(TileData data, float hours, float energyWatts, float rainfallKg)
+	     public void SimulateSoilHour(TileData data, float hours, float energyWatts, float rainfallKg, float latitude)
 	     {
 		          float absorbedEnergy = SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(
-		              45f, SimulationConstants.DayOfYear, SimulationConstants.TimeOfDay);
+		              latitude, SimulationConstants.DayOfYear + 1, SimulationConstants.TimeOfDay + 0.0001f);
 
 		          // Update soil temperature
 		          SoilUtilities.UpdateSoilTemperature(data, absorbedEnergy, airTemp, hours);

@@ -224,7 +224,6 @@ public class SimulationMaster : MonoBehaviour
 					     YearPasses(1);
 				}
 		          }
-		          tileManager.TileUpdate(days * 24);
 		          Debug.Log("tiles updated");
 		          SimulationConstants.UpdateTimeConstants(0, 0, 0, days, 0);
 		          SimulationConstants.UpdateDay(Mathf.FloorToInt(dayOfYear));

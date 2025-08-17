@@ -36,9 +36,9 @@ public class TileData
 				composition.organicMatter = Mathf.Clamp(neighbor.composition.organicMatter + Random.Range(-2.5f, 2.5f), 0, 250f);
 				composition.compaction = Mathf.Clamp01(Random.Range(neighbor.composition.compaction, 1f));
 		          }
-		          soilTemperature = Random.Range(10f, 20f); // initial temperature
+		          soilTemperature = Random.Range(0f, 15f); // initial temperature
 		          SoilUtilities.RecalculateTilePhysics(this);
-		          float wc = composition.waterCapacity * 1000;
+		          float wc = composition.waterCapacity;
 		          composition.water = Mathf.Clamp(neighbor.composition.water + Random.Range(-wc * 0.1f, wc * 0.1f), 0, wc);
 	     }
 }
