@@ -172,7 +172,10 @@ public class SimulationMaster : MonoBehaviour
 		          //every  10 minutes
 		          if (currentMinuteOfHour == 0 || currentMinuteOfHour == 10 || currentMinuteOfHour == 20 || currentMinuteOfHour == 30 || currentMinuteOfHour == 40 || currentMinuteOfHour == 50)
 		          {
-
+				foreach (var tile in tileManager.tiles)
+				{
+					     tile.TileVisualUpdate(currentLatitude);
+				}
 		          }
 		          if (currentMinuteOfHour == 9 || currentMinuteOfHour == 29 || currentMinuteOfHour == 49)
 		          {

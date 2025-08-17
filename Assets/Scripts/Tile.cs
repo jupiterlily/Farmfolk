@@ -37,7 +37,7 @@ public class WorldTile : MonoBehaviour
 	     {
 		          SoilUtilities.CalculateDerivedProperties(tileData.composition);
 		          float height = SoilUtilities.CalculateEffectiveVolume(tileData.composition) + (tileData.surfaceMoisture / 1000);
-		          latitude += tileData.tileGridRef.x * 0.1f; // Adjust latitude based on tile position for variety
+		          latitude += tileData.tileGridRef.y / 3; // Adjust latitude based on tile position for variety
 		          transform.localScale = new Vector3(tileSize, height, tileSize);
 
 		          // Set position so that bottom of tile sits on ground
@@ -62,7 +62,7 @@ public class WorldTile : MonoBehaviour
 		          float lightFactor = Mathf.Clamp01(currentEnergy / SimulationConstants.SolarConstant);
 		          tileColor = Color.Lerp(tileColor, Color.white, lightFactor * 0.3f); // Blend with white based on light factor
 							   //blend with black based on how much light there isn't
-		          tileColor = Color.Lerp(tileColor, Color.black, (1 - lightFactor) * 0.85f); // Blend with black based on light factor
+		          tileColor = Color.Lerp(tileColor, Color.black, (1 - lightFactor) * 0.95f); // Blend with black based on light factor
 		          GetComponent<Renderer>().material.color = tileColor;
 	     }
 
