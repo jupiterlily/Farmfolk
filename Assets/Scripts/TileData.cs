@@ -92,6 +92,9 @@ public class AtmosphereTile
 	     public AtmosphereTile SWTile;
 	     public AtmosphereTile STile;
 	     public AtmosphereTile SETile;
+      public AtmosphereTile BelowTile;
+	     public AtmosphereTile AboveTile;
+
 }
 [System.Serializable]
 public class TileGrid
