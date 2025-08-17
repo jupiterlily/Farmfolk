@@ -17,18 +17,49 @@ public class TileManager : MonoBehaviour
 	     public float totalSilt; //total silt in the world
 	     public float totalClay; //total clay in the world
 	     public float totalOrganicMatter; //total organic matter in the world
-			        // Start is called before the first frame update
+
+	     // 3 layers, each with reduced resolution (10x tile size)
+	     public AtmosphereTile[,,] atmosphereTiles;
+	     // Start is called before the first frame update
 	     void Start()
 	     {
 		          grid = new TileGrid(worldsize.x, worldsize.y);
-
-
 		          grid.tileWidth = 1;
-
 		          grid.XGrid = worldsize.x;
 		          grid.YGrid = worldsize.y;
 		          tiles = new WorldTile[worldsize.x, worldsize.y];
-		          //for each row of worlsize, allocate a tile and a position.
+
+		          // Atmosphere tile setup
+		          int atmTileSize = 10;
+		          int atmGridX = Mathf.CeilToInt((float)worldsize.x / atmTileSize);
+		          int atmGridY = Mathf.CeilToInt((float)worldsize.y / atmTileSize);
+		          int atmLayers = 3;
+		          atmosphereTiles = new AtmosphereTile[atmLayers, atmGridX, atmGridY];
+
+		          for (int layer = 0; layer < atmLayers; layer++)
+		          {
+				int layorFactor = 10;
+				for (int i = 0; i < atmGridX; i++)
+				{
+					     for (int j = 0; j < atmGridY; j++)
+					     {
+						          AtmosphereTile atmTile = new AtmosphereTile();
+						          atmTile.tileGridRef = new Vector2Int(i, j);
+						          atmTile.tileWidth = atmTileSize;
+						          atmTile.layerHeight = layorFactor;
+
+						          atmTile.temperature = airTemp;
+						          atmTile.moisture = atmosphericMoisture / (atmGridX * atmGridY * atmLayers);
+						          atmTile.pressure = 101325f - (layer * 12000f); // Example pressure drop per km
+						          atmTile.windDirection = Vector3.right;
+						          atmTile.windSpeed = 0.01f;
+						          atmosphereTiles[layer, i, j] = atmTile;
+					     }
+
+				}
+				layorFactor *= 10; // Increase layer height by factor of 10 for each layer, later 1 is 10m, layer 2 is 100m, layer 3 is 1km 
+		          }
+
 		          for (int i = 0; i < grid.XGrid; i++)
 		          {
 				for (int j = 0; j < grid.YGrid; j++)
@@ -43,10 +74,13 @@ public class TileManager : MonoBehaviour
 					     grid.Map.SetValue(data, i, j);
 					     tiles.SetValue(tile.GetComponent<WorldTile>(), i, j);
 					     tile.transform.position = new Vector3(i, 1 / 2, j);
-					     //get a valid neighbor from ref
 					     tile.GetComponent<WorldTile>().tileData.Initialize(TileUtilities.GetValidNeighbour(data, grid));
-
 					     tile.GetComponent<Renderer>().material.color = TileUtilities.GetSoilColor(tile.GetComponent<WorldTile>().tileData.composition);
+
+					     // Optionally, link the lowest atmosphere tile to the TileData
+					     int atmX = i / atmTileSize;
+					     int atmY = j / atmTileSize;
+					     data.atmosphereTile = atmosphereTiles[0, atmX, atmY];
 				}
 		          }
 		          AllocateNeighbors();
@@ -54,61 +88,77 @@ public class TileManager : MonoBehaviour
 	     }
 	     public void TileUpdate(float hours)
 	     {
-		          // Calculate if precipitation should occur and how much
-		          float precipMass = CalculateCurrentPrecipitation(hours);
-		          float latitude = gameObject.GetComponent<SimulationMaster>().currentLatitude; // Example latitude, can be dynamic based on world location
-		          if (precipMass > 0)
+		          float latitude = gameObject.GetComponent<SimulationMaster>().currentLatitude;
+		          int atmTileSize = 10;
+		          int atmGridX = atmosphereTiles.GetLength(1);
+		          int atmGridY = atmosphereTiles.GetLength(2);
+
+		          // First, process precipitation for each atmosphere tile in the lowest layer
+		          for (int atmX = 0; atmX < atmGridX; atmX++)
 		          {
-				// Evenly distribute rainfall across all tiles for now
-				float kgPerTile = precipMass / (worldsize.x * worldsize.y);
-
-				foreach (var tile in tiles)
+				for (int atmY = 0; atmY < atmGridY; atmY++)
 				{
-					     SoilUtilities.RedistributeSurfaceWater(tile, hours);
-					     SoilUtilities.RedistributeWaterLateral(tile, hours);
-					     SimulateSoilHour(tile.tileData, hours,
-					         SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(latitude, SimulationConstants.DayOfYear, SimulationConstants.TimeOfDay),
-					         kgPerTile, latitude);
+					     AtmosphereTile atmo = atmosphereTiles[0, atmX, atmY];
 
-					     tile.TileVisualUpdate(latitude);
+					     // Calculate precipitation for this atmosphere tile
+					     float precipMass = CalculateCurrentPrecipitation(
+					         hours,
+					         atmo.moisture,
+					         CalculateRelativeHumidity(atmo),
+					         atmo.temperature
+					     );
+
+					     // Determine which world tiles are covered by this atmosphere tile
+					     int startX = atmX * atmTileSize;
+					     int startY = atmY * atmTileSize;
+					     int endX = Mathf.Min(startX + atmTileSize, worldsize.x);
+					     int endY = Mathf.Min(startY + atmTileSize, worldsize.y);
+
+					     int coveredTiles = (endX - startX) * (endY - startY);
+					     float kgPerTile = coveredTiles > 0 ? precipMass / coveredTiles : 0f;
+
+					     // Apply precipitation to each covered world tile
+					     for (int i = startX; i < endX; i++)
+					     {
+						          for (int j = startY; j < endY; j++)
+						          {
+								WorldTile tile = tiles[i, j];
+								TileData data = tile.tileData;
+
+								SoilUtilities.RedistributeSurfaceWater(tile, hours);
+								SoilUtilities.RedistributeWaterLateral(tile, hours);
+								SimulateSoilHour(data, hours,
+								    SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(latitude, SimulationConstants.DayOfYear, SimulationConstants.TimeOfDay),
+								    kgPerTile, latitude);
+
+								tile.TileVisualUpdate(latitude);
+						          }
+					     }
+
+					     // Remove total precipitation from the atmosphere tile
+					     atmo.moisture -= precipMass;
 				}
-
-				atmosphericMoisture -= precipMass;
 		          }
-		          else
-		          {
-				foreach (var tile in tiles)
-				{
-					     SoilUtilities.RedistributeSurfaceWater(tile, hours);
-					     SoilUtilities.RedistributeWaterLateral(tile, hours);
-					     SimulateSoilHour(tile.tileData, hours,
-					         SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(latitude, SimulationConstants.DayOfYear, SimulationConstants.TimeOfDay),
-					         0, latitude);
-
-					     tile.TileVisualUpdate(latitude);
-				}
-		          }
-
-
 
 		          UpdateTotals();
 	     }
 
-	     private float CalculateCurrentPrecipitation(float hours)
+	     // Precipitation calculation now takes atmosphere tile values
+	     private float CalculateCurrentPrecipitation(float hours, float atmoMoisture, float rH, float temp)
 	     {
 		          // 1. Check basic precipitation conditions
-		          if (atmosphericMoisture <= 0 || humidity <= 0.7f)
+		          if (atmoMoisture <= 0 || rH <= 0.7f)
 				return 0f;
 
 		          // 2. Calculate dew point depression (temperature - dew point)
-		          float dewPoint = CalculateDewPoint(airTemp, humidity);
-		          float dewPointDepression = airTemp - dewPoint;
+		          float dewPoint = CalculateDewPoint(temp, rH);
+		          float dewPointDepression = temp - dewPoint;
 
 		          // 3. Determine precipitation probability (0-1)
 		          float precipProbability = Mathf.Clamp01(
 		              1f - (dewPointDepression / 5f)  // More likely when temp close to dew point
-		              * Mathf.Pow(humidity, 2f)        // Much more likely at high humidity
-		              * Mathf.InverseLerp(25f, 5f, airTemp) // More likely at cooler temps
+		              * Mathf.Pow(rH, 2f)        // Much more likely at high humidity
+		              * Mathf.InverseLerp(25f, 5f, temp) // More likely at cooler temps
 		          );
 
 		          // 4. Roll for precipitation occurrence
@@ -116,18 +166,18 @@ public class TileManager : MonoBehaviour
 				return 0f;
 
 		          // 5. Calculate precipitation intensity (kg/m2/hour)
-		          float maxPossibleRate = 0.01f * atmosphericMoisture; // Max 1% of total moisture per hour
+		          float maxPossibleRate = 0.01f * atmoMoisture; // Max 1% of total moisture per hour
 		          float baseRate = Mathf.Lerp(0.1f, 10f, precipProbability); // 0.1-10 mm/hour range
 
 		          // Adjust for temperature (snow vs rain)
-		          float precipRate = airTemp > 0f ?
+		          float precipRate = temp > 0f ?
 		              baseRate :
 		              baseRate * 0.7f; // Snow falls slower than rain
 
 		          // 6. Calculate total precipitation mass
 		          float precipMass = precipRate * hours * (worldsize.x * worldsize.y); // Total kg for world
 		          precipMass = Mathf.Min(precipMass, maxPossibleRate * hours * (worldsize.x * worldsize.y));
-		          precipMass = Mathf.Min(precipMass, atmosphericMoisture * 0.5f); // Never remove more than 50% at once
+		          precipMass = Mathf.Min(precipMass, atmoMoisture * 0.5f); // Never remove more than 50% at once
 
 		          return precipMass;
 	     }
@@ -147,7 +197,7 @@ public class TileManager : MonoBehaviour
 		              latitude, SimulationConstants.DayOfYear + 1, SimulationConstants.TimeOfDay + 0.0001f);
 
 		          // Update soil temperature
-		          SoilUtilities.UpdateSoilTemperature(data, absorbedEnergy, airTemp, hours);
+		          SoilUtilities.UpdateSoilTemperature(data, absorbedEnergy, data.atmosphereTile.temperature, hours);
 
 		          // Get heat from soil and accumulate it
 		          float energyFromTile = SoilUtilities.PassHeatFromSoil(data, hours, this);
@@ -155,7 +205,7 @@ public class TileManager : MonoBehaviour
 		          // Now apply the accumulated energy to warm the atmosphere:
 		          float airMass = (worldsize.x * worldsize.y) * 3000f * Constants.AIR_DENSITY;
 		          float deltaAirTemp = energyFromTile / (airMass * Constants.AIR_HEAT_CAPACITY);
-		          airTemp += deltaAirTemp;
+		          data.atmosphereTile.temperature += deltaAirTemp;
 
 		          // Rest of your existing code...
 		          SoilUtilities.ApplyRainfall(data, rainfallKg, hours);
@@ -163,31 +213,22 @@ public class TileManager : MonoBehaviour
 		          SoilUtilities.ApplySelfCompaction(data, hours);
 		          SoilUtilities.UpdateDecompaction(data.composition, hours);
 
-		          humidity = CalculateRelativeHumidity();
-		          float evaporationTemp = (airTemp + data.soilTemperature) * 0.5f;
-		          atmosphericMoisture += SoilUtilities.ApplyEvaporation(data, energyWatts, humidity, evaporationTemp, 1f, hours);
+		          float rh = CalculateRelativeHumidity(data.atmosphereTile);
+		          float evaporationTemp = (data.atmosphereTile.temperature + data.soilTemperature) * 0.5f;
+		          data.atmosphereTile.moisture += SoilUtilities.ApplyEvaporation(data, energyWatts, rh, evaporationTemp, data.atmosphereTile.windSpeed, hours);
 
 		          SoilUtilities.CalculateDerivedProperties(data.composition);
 	     }
-	     private float CalculateRelativeHumidity()
+	     // Calculate RH for a specific atmosphere tile
+	     private float CalculateRelativeHumidity(AtmosphereTile atmo)
 	     {
-		          // 1. Calculate volume of atmosphere in m3
-		          float tileArea = 1f; // 1m2 per tile
-		          float height = 3000f; // 3 km atmospheric block
-		          float totalVolume = worldsize.x * worldsize.y * tileArea * height;
-
-		          // 2. Convert moisture to kg
-		          float vaporKg = atmosphericMoisture; // assuming 1L = 1kg
-
-		          // 3. Get vapor density
-		          float vaporDensity = vaporKg / totalVolume; // kg/m3
-
-		          // 4. Max saturation at 20�C (approx)
-		          float saturationVaporDensity = 0.0173f; // kg/m3 at 20�C
-
-		          // 5. RH = actual / saturation
+		          float tileArea = atmo.tileWidth * atmo.tileWidth;
+		          float height = atmo.layerHeight;
+		          float totalVolume = tileArea * height;
+		          float vaporKg = atmo.moisture;
+		          float vaporDensity = vaporKg / totalVolume;
+		          float saturationVaporDensity = 0.0173f; // kg/m3 at 20°C
 		          float relativeHumidity = vaporDensity / saturationVaporDensity;
-
 		          return Mathf.Clamp01(relativeHumidity);
 	     }
 
@@ -225,6 +266,7 @@ public class TileManager : MonoBehaviour
 		          float waterSum = 0f;
 		          SoilComposition soilSum = new SoilComposition();
 
+		          // Sum water from all world tiles
 		          for (int i = 0; i < worldsize.x; i++)
 		          {
 				for (int j = 0; j < worldsize.y; j++)
@@ -239,8 +281,22 @@ public class TileManager : MonoBehaviour
 				}
 		          }
 
-		          // Add atmospheric moisture to total water
-		          totalWater = waterSum + atmosphericMoisture;
+		          // Sum water from all atmosphere tiles
+		          int atmLayers = atmosphereTiles.GetLength(0);
+		          int atmGridX = atmosphereTiles.GetLength(1);
+		          int atmGridY = atmosphereTiles.GetLength(2);
+		          for (int layer = 0; layer < atmLayers; layer++)
+		          {
+				for (int i = 0; i < atmGridX; i++)
+				{
+					     for (int j = 0; j < atmGridY; j++)
+					     {
+						          waterSum += atmosphereTiles[layer, i, j].moisture;
+					     }
+				}
+		          }
+
+		          totalWater = waterSum;
 		          totalSand = soilSum.sand;
 		          totalSilt = soilSum.silt;
 		          totalClay = soilSum.clay;

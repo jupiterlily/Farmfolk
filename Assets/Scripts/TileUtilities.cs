@@ -5,10 +5,10 @@ public static class TileUtilities
 	     public static Color GetSoilColor(SoilComposition sc)
 	     {
 		          // USDA-like base colors
-		          Color sandColor = new Color(1f, 0.95f, 0.77f);
-		          Color siltColor = new Color(0.69f, 0.64f, 0.65f);
-		          Color clayColor = new Color(0.67f, 0.46f, 0.34f);
-		          Color organicColor = new Color(0.24f, 0.18f, 0.20f);
+		          Color sandColor = Constants.SAND_COLOR;
+		          Color siltColor = Constants.SILT_COLOR;
+		          Color clayColor = Constants.CLAY_COLOR;
+		          Color organicColor = Constants.ORGANIC_COLOR;
 
 		          // Volume fractions
 		          float sandVol = sc.sand / Constants.SAND_DENSITY;

@@ -3,6 +3,7 @@ using UnityEngine;
 
 public static class SoilUtilities
 {
+	     //soil
 	     public static SoilComposition CalculateDerivedProperties(SoilComposition sc)
 	     {
 		          // All calculations now use kg/m2 for water (equivalent to liters for 1m2 area)
@@ -91,7 +92,46 @@ public static class SoilUtilities
 		          float omFactor = 0.2f * (1f - organicMatter / Constants.ORGANIC_DENSITY);
 		          return Mathf.Clamp01(sandFactor + clayFactor + omFactor);
 	     }
+	     public static void ApplySurfaceErosion(TileData source, TileData target, float gradient, float waterMoved)
+	     {
+		          // Apply erosion and sediment transfer between tiles based on surface water movement
+		          var sc = source.composition;
+		          var tc = target.composition;
 
+		          float erosionFactor = gradient * sc.erodibility * 0.05f;
+		          float sedimentMass = erosionFactor * waterMoved;
+
+		          float fineTotal = sc.silt + sc.clay;
+		          if (fineTotal > 0f && sedimentMass > 0f)
+		          {
+				float siltRatio = sc.silt / fineTotal;
+				float clayRatio = sc.clay / fineTotal;
+
+				float siltMoved = sedimentMass * siltRatio;
+				float clayMoved = sedimentMass * clayRatio;
+
+				siltMoved = Mathf.Min(siltMoved, sc.silt);
+				clayMoved = Mathf.Min(clayMoved, sc.clay);
+
+				sc.silt -= siltMoved;
+				tc.silt += siltMoved;
+				sc.clay -= clayMoved;
+				tc.clay += clayMoved;
+
+				float organicMoved = sedimentMass * 0.1f;
+				organicMoved = Mathf.Min(organicMoved, sc.organicMatter);
+
+				sc.organicMatter -= organicMoved;
+				tc.organicMatter += organicMoved;
+
+				float erosionVolume = sedimentMass / sc.bulkDensity;
+				source.volume -= erosionVolume;
+				target.volume += erosionVolume;
+
+				RecalculateTilePhysics(source);
+				RecalculateTilePhysics(target);
+		          }
+	     }
 	     static float CalculateHorizontalPermeability(float sandPct, float clayPct, float porosity)
 	     {
 		          // Lateral water movement (cm/day)
@@ -137,45 +177,7 @@ public static class SoilUtilities
 		          sc.compaction = Mathf.Clamp01(sc.compaction - decompactionRate);
 	     }
 
-	     public static void ApplySurfaceErosion(TileData source, TileData target, float gradient, float waterMoved)
-	     {
-		          var sc = source.composition;
-		          var tc = target.composition;
 
-		          float erosionFactor = gradient * sc.erodibility * 0.05f;
-		          float sedimentMass = erosionFactor * waterMoved;
-
-		          float fineTotal = sc.silt + sc.clay;
-		          if (fineTotal > 0f && sedimentMass > 0f)
-		          {
-				float siltRatio = sc.silt / fineTotal;
-				float clayRatio = sc.clay / fineTotal;
-
-				float siltMoved = sedimentMass * siltRatio;
-				float clayMoved = sedimentMass * clayRatio;
-
-				siltMoved = Mathf.Min(siltMoved, sc.silt);
-				clayMoved = Mathf.Min(clayMoved, sc.clay);
-
-				sc.silt -= siltMoved;
-				tc.silt += siltMoved;
-				sc.clay -= clayMoved;
-				tc.clay += clayMoved;
-
-				float organicMoved = sedimentMass * 0.1f;
-				organicMoved = Mathf.Min(organicMoved, sc.organicMatter);
-
-				sc.organicMatter -= organicMoved;
-				tc.organicMatter += organicMoved;
-
-				float erosionVolume = sedimentMass / sc.bulkDensity;
-				source.volume -= erosionVolume;
-				target.volume += erosionVolume;
-
-				RecalculateTilePhysics(source);
-				RecalculateTilePhysics(target);
-		          }
-	     }
 
 	     public static void RecalculateTilePhysics(TileData data)
 	     {
@@ -223,7 +225,7 @@ public static class SoilUtilities
 
 		          // 3. Apply evaporation effects
 		          data.surfaceMoisture -= evaporatedKg;
-		          tileManager.atmosphericMoisture += evaporatedKg;
+		          data.atmosphereTile.moisture += evaporatedKg;
 
 		          // 4. Calculate energy used for evaporation
 		          float energyUsed = evaporatedKg * latentHeat;
@@ -288,20 +290,9 @@ public static class SoilUtilities
 		          UpdateCompaction(tileData.composition, hours, appliedPressure: pressure_kPa);
 		          RecalculateTilePhysics(tileData);
 	     }
+
 	     public static void RedistributeSurfaceWater(WorldTile tile, float hours)
 	     {
-		          // Helper to calculate total water for a tile + neighbors
-		          float GetTotalWater(WorldTile t)
-		          {
-				float total = t.tileData.surfaceMoisture;
-				foreach (var n in t.GetNeighbors())
-				{
-					     if (n != null)
-						          total += n.tileData.surfaceMoisture;
-				}
-				return total;
-		          }
-
 		          //  Debug.Log($"[SurfaceWater] Before redistribution: Total water = {GetTotalWater(tile)} kg");
 
 		          float flowRate = 0.1f * 1000f; // m3/hour -> kg/hour

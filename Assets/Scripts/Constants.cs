@@ -23,12 +23,12 @@ public static class Constants
 	     public const float SPACE_TEMPERATURE = 2.7f; // Cosmic microwave background (K)
 
 	     //colors
-	     public static readonly Color SAND_COLOR = new Color(0.76f, 0.69f, 0.50f); // Light brown
-	     public static readonly Color SILT_COLOR = new Color(0.65f, 0.60f, 0.55f); // Grayish
-	     public static readonly Color CLAY_COLOR = new Color(0.50f, 0.35f, 0.25f); // Dark brown
-	     public static readonly Color ORGANIC_COLOR = new Color(0.20f, 0.15f, 0.10f); // Dark gray
-	     public static readonly Color SHALLOW_WATER_COLOR = new Color(0.1f, 0.5f, 0.6f); // Blue
-	     public static readonly Color DEEP_WATER_COLOR = new Color(.1f, .4f, .5f);
-	     public static readonly Color AIR_COLOR = new Color(0.8f, 0.9f, 1.0f); // Light blue
+	     public static Color SAND_COLOR = new Color(0.76f, 0.69f, 0.50f); // Light brown
+	     public static Color SILT_COLOR = new Color(0.65f, 0.60f, 0.55f); // Grayish
+	     public static Color CLAY_COLOR = new Color(0.50f, 0.35f, 0.25f); // Dark brown
+	     public static Color ORGANIC_COLOR = new Color(0.20f, 0.15f, 0.10f); // Dark gray
+	     public static Color SHALLOW_WATER_COLOR = new Color(0.1f, 0.5f, 0.6f); // Blue
+	     public static Color DEEP_WATER_COLOR = new Color(.1f, .4f, .5f);
+	     public static Color AIR_COLOR = new Color(0.8f, 0.9f, 1.0f); // Light blue
 
 }

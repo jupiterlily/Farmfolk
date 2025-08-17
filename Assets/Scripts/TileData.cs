@@ -92,7 +92,7 @@ public class AtmosphereTile
 	     public AtmosphereTile SWTile;
 	     public AtmosphereTile STile;
 	     public AtmosphereTile SETile;
-      public AtmosphereTile BelowTile;
+	     public AtmosphereTile BelowTile;
 	     public AtmosphereTile AboveTile;
 
 }
