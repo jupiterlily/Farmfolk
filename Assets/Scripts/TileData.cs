@@ -11,6 +11,7 @@ public class TileData
 	     public float surfaceMoisture;
 	     public float volume;
 	     public float soilTemperature;
+	     public AtmosphereTile atmosphereTile;
 
 	     public void Initialize(TileData neighbor = null)
 	     {
@@ -23,23 +24,23 @@ public class TileData
 				composition.silt = Random.Range(21f, 525f);
 				composition.clay = Random.Range(26.5f, 662f);
 				composition.organicMatter = Random.Range(2.5f, 12.5f);
-				composition.compaction = Random.Range(0.5f, 1f);
+				composition.compaction = Random.Range(0.2f, 0.7f);
 
 		          }
 		          else
 		          {
 				// Inherit neighbor's traits with slight variation
-				composition.sand = Mathf.Clamp(neighbor.composition.sand + Random.Range(-15.5f, 15.5f), 0.001f, 1550f);
-				composition.silt = Mathf.Clamp(neighbor.composition.silt + Random.Range(-21f, 21f), 0.001f, 2100f);
-				composition.clay = Mathf.Clamp(neighbor.composition.clay + Random.Range(-26.5f, 26.5f), 0.001f, 2650f);
+				composition.sand = Mathf.Clamp(neighbor.composition.sand + Random.Range(-15.5f, 39f), 0.001f, 1550f);
+				composition.silt = Mathf.Clamp(neighbor.composition.silt + Random.Range(-21f, 52.5f), 0.001f, 2100f);
+				composition.clay = Mathf.Clamp(neighbor.composition.clay + Random.Range(-26.5f, 66.2f), 0.001f, 2650f);
 
-				composition.organicMatter = Mathf.Clamp(neighbor.composition.organicMatter + Random.Range(-2.5f, 2.5f), 0, 250f);
+				composition.organicMatter = Mathf.Clamp(neighbor.composition.organicMatter + Random.Range(-2.5f, 12.5f), 0, 250f);
 				composition.compaction = Mathf.Clamp01(Random.Range(neighbor.composition.compaction, 1f));
 		          }
 		          soilTemperature = Random.Range(0f, 15f); // initial temperature
 		          SoilUtilities.RecalculateTilePhysics(this);
 		          float wc = composition.waterCapacity;
-		          composition.water = Mathf.Clamp(neighbor.composition.water + Random.Range(-wc * 0.1f, wc * 0.1f), 0, wc);
+		          composition.water = Mathf.Clamp(Random.Range(0, wc), neighbor.composition.water * 0.75f, wc);
 	     }
 }
 
@@ -72,7 +73,26 @@ public class SoilComposition
 	     public float verticalPermeability; //(cm/day)
 	     public float compaction; //compaction percentage
 }
-
+[System.Serializable]
+public class AtmosphereTile
+{
+	     public Vector2Int tileGridRef;
+	     public float tileWidth;
+	     public int layerHeight; // 1km, 2km, or 3km
+	     public float temperature;
+	     public float moisture; // in liters
+	     public float pressure;
+	     public Vector3 windDirection;
+	     public float windSpeed;
+	     public AtmosphereTile NWTile;
+	     public AtmosphereTile NTile;
+	     public AtmosphereTile NETile;
+	     public AtmosphereTile WTile;
+	     public AtmosphereTile ETile;
+	     public AtmosphereTile SWTile;
+	     public AtmosphereTile STile;
+	     public AtmosphereTile SETile;
+}
 [System.Serializable]
 public class TileGrid
 {

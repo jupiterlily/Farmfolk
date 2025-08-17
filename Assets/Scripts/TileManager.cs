@@ -70,7 +70,7 @@ public class TileManager : MonoBehaviour
 					         SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(latitude, SimulationConstants.DayOfYear, SimulationConstants.TimeOfDay),
 					         kgPerTile, latitude);
 
-					     tile.TileVisualUpdate();
+					     tile.TileVisualUpdate(latitude);
 				}
 
 				atmosphericMoisture -= precipMass;
@@ -85,7 +85,7 @@ public class TileManager : MonoBehaviour
 					         SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(latitude, SimulationConstants.DayOfYear, SimulationConstants.TimeOfDay),
 					         0, latitude);
 
-					     tile.TileVisualUpdate();
+					     tile.TileVisualUpdate(latitude);
 				}
 		          }
 
