@@ -78,7 +78,7 @@ public class AtmosphereTile
 {
 	     public Vector2Int tileGridRef;
 	     public float tileWidth;
-	     public int layerHeight; // 1km, 2km, or 3km
+	     public int layerHeight; // 10m, 100m, 1000m
 	     public float temperature;
 	     public float moisture; // in liters
 	     public float pressure;
