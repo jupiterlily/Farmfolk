@@ -226,9 +226,9 @@ SubShader {
 
             float c = tex2D(_MainTex, input.atlas).a;
 
-            float2 pixelSize = float2(ddx(input.atlas.y), ddy(input.atlas.y));
-            pixelSize *= _TextureWidth * .75;
-            float scale = rsqrt(dot(pixelSize, pixelSize)) * _GradientScale * (_Sharpness + 1);
+            float2 pixelSise = float2(ddx(input.atlas.y), ddy(input.atlas.y));
+            pixelSise *= _TextureWidth * .75;
+            float scale = rsqrt(dot(pixelSise, pixelSise)) * _GradientScale * (_Sharpness + 1);
 
             float weight = input.weight;
             float bias = (.5 - weight) + (.5 / scale);

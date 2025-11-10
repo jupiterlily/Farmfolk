@@ -1,6 +1,6 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!1 &8500652070221592882
+--- !u!1 &32131678100906441
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -8,25 +8,25 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 8500652070221592889}
-  - component: {fileID: 8500652070221592894}
-  - component: {fileID: 8500652070221592895}
-  - component: {fileID: 8500652070221592892}
-  - component: {fileID: 8500652070221592893}
+  - component: {fileID: 4293651912176346625}
+  - component: {fileID: 5128893848117505858}
+  - component: {fileID: 7515036436837114996}
+  - component: {fileID: 514738085252077782}
+  - component: {fileID: 975802462823826026}
   m_Layer: 0
-  m_Name: Tile
+  m_Name: WorldTile
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &8500652070221592889
+--- !u!4 &4293651912176346625
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8500652070221592882}
+  m_GameObject: {fileID: 32131678100906441}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
@@ -35,21 +35,21 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!33 &8500652070221592894
+--- !u!33 &5128893848117505858
 MeshFilter:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8500652070221592882}
+  m_GameObject: {fileID: 32131678100906441}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
---- !u!23 &8500652070221592895
+--- !u!23 &7515036436837114996
 MeshRenderer:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8500652070221592882}
+  m_GameObject: {fileID: 32131678100906441}
   m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
@@ -63,7 +63,7 @@ MeshRenderer:
   m_RenderingLayerMask: 1
   m_RendererPriority: 0
   m_Materials:
-  - {fileID: 2100000, guid: 562a9050cc50bfd4db2ed0937d6d1da9, type: 2}
+  - {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
   m_StaticBatchInfo:
     firstSubMesh: 0
     subMeshCount: 0
@@ -85,13 +85,13 @@ MeshRenderer:
   m_SortingLayer: 0
   m_SortingOrder: 0
   m_AdditionalVertexStreams: {fileID: 0}
---- !u!65 &8500652070221592892
+--- !u!65 &514738085252077782
 BoxCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8500652070221592882}
+  m_GameObject: {fileID: 32131678100906441}
   m_Material: {fileID: 0}
   m_IncludeLayers:
     serializedVersion: 2
@@ -106,13 +106,13 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &8500652070221592893
+--- !u!114 &975802462823826026
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8500652070221592882}
+  m_GameObject: {fileID: 32131678100906441}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 575e157cfc0b9dd45ac6c66158bb116b, type: 3}
@@ -121,13 +121,57 @@ MonoBehaviour:
   tileData:
     tileGridRef: {x: 0, y: 0}
     tileWidth: 0
+    latitude: 0
+    longitude: 0
+    elevation: 0
     composition:
       sand: 0
       silt: 0
       clay: 0
       organicMatter: 0
+      water: 0
       porosity: 0
+      bulkDensity: 0
+      waterCapacity: 0
+      saturation: 0
+      aeration: 0
       infiltrationRate: 0
-      waterHoldingCapacity: 0
-    compaction: 0
-    moisture: 0
+      percolationRate: 0
+      hydraulicConductivity: 0
+      erodibility: 0
+      horizontalPermeability: 0
+      verticalPermeability: 0
+      compaction: 0
+    surfaceMoisture: 0
+    surfaceTemperature: 0
+    volume: 0
+    soilTemperature: 0
+    atmosphereTile:
+      tileGridRef: {x: 0, y: 0}
+      tileWidth: 0
+      layerHeight: 0
+      temperature: 0
+      density: 0
+      pressure: 0
+      windVelocity: {x: 0, y: 0, z: 0}
+      windSpeed: 0
+      horizontalNeighbors: []
+      waterVapor: 0
+      liquidWater: 0
+      oxygen: 0
+      carbonDioxide: 0
+      sand: 0
+      silt: 0
+      clay: 0
+      organicMatter: 0
+      cloudWaterContent: 0
+  isHovered: 0
+  visible: 1
+  NWTile: {fileID: 0}
+  NTile: {fileID: 0}
+  NETile: {fileID: 0}
+  WTile: {fileID: 0}
+  ETile: {fileID: 0}
+  SWTile: {fileID: 0}
+  STile: {fileID: 0}
+  SETile: {fileID: 0}

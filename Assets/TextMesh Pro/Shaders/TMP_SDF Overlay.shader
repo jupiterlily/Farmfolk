@@ -144,7 +144,7 @@ SubShader {
 			fixed4	color			: COLOR;
 			float2	atlas			: TEXCOORD0;		// Atlas
 			float4	param			: TEXCOORD1;		// alphaClip, scale, bias, weight
-			float4	mask			: TEXCOORD2;		// Position in object space(xy), pixel Size(zw)
+			float4	mask			: TEXCOORD2;		// Position in object space(xy), pixel Sise(zw)
 			float3	viewDir			: TEXCOORD3;
 
 		#if (UNDERLAY_ON || UNDERLAY_INNER)
@@ -175,9 +175,9 @@ SubShader {
 
 			float4 vPosition = UnityObjectToClipPos(vert);
 
-			float2 pixelSize = vPosition.w;
-			pixelSize /= float2(_ScaleX, _ScaleY) * abs(mul((float2x2)UNITY_MATRIX_P, _ScreenParams.xy));
-			float scale = rsqrt(dot(pixelSize, pixelSize));
+			float2 pixelSise = vPosition.w;
+			pixelSise /= float2(_ScaleX, _ScaleY) * abs(mul((float2x2)UNITY_MATRIX_P, _ScreenParams.xy));
+			float scale = rsqrt(dot(pixelSise, pixelSise));
 			scale *= abs(input.texcoord1.y) * _GradientScale * (_Sharpness + 1);
 			if (UNITY_MATRIX_P[3][3] == 0) scale = lerp(abs(scale) * (1 - _PerspectiveFilter), scale, abs(dot(UnityObjectToWorldNormal(input.normal.xyz), normalize(WorldSpaceViewDir(vert)))));
 
@@ -221,7 +221,7 @@ SubShader {
 			output.color = input.color;
 			output.atlas =	input.texcoord0;
 			output.param =	float4(alphaClip, scale, bias, weight);
-			output.mask = half4(vert.xy * 2 - clampedRect.xy - clampedRect.zw, 0.25 / (0.25 * half2(_MaskSoftnessX, _MaskSoftnessY) + pixelSize.xy));
+			output.mask = half4(vert.xy * 2 - clampedRect.xy - clampedRect.zw, 0.25 / (0.25 * half2(_MaskSoftnessX, _MaskSoftnessY) + pixelSise.xy));
 			output.viewDir =	mul((float3x3)_EnvMatrix, _WorldSpaceCameraPos.xyz - mul(unity_ObjectToWorld, vert).xyz);
 			#if (UNDERLAY_ON || UNDERLAY_INNER)
 			output.texcoord2 = float4(input.texcoord0 + bOffset, bScale, bBias);

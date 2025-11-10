@@ -16,10 +16,10 @@ void VertShader(inout appdata_full v, out Input data)
 #else
 	float4 vert = v.vertex;
 	float4 vPosition = UnityObjectToClipPos(vert);
-	float2 pixelSize = vPosition.w;
+	float2 pixelSise = vPosition.w;
 
-	pixelSize /= float2(_ScaleX, _ScaleY) * mul((float2x2)UNITY_MATRIX_P, _ScreenParams.xy);
-	float scale = rsqrt(dot(pixelSize, pixelSize));
+	pixelSise /= float2(_ScaleX, _ScaleY) * mul((float2x2)UNITY_MATRIX_P, _ScreenParams.xy);
+	float scale = rsqrt(dot(pixelSise, pixelSise));
 	scale *= abs(v.texcoord1.y) * _GradientScale * (_Sharpness + 1);
 	scale = lerp(scale * (1 - _PerspectiveFilter), scale, abs(dot(UnityObjectToWorldNormal(v.normal.xyz), normalize(WorldSpaceViewDir(vert)))));
 	data.param.y = scale;
@@ -35,9 +35,9 @@ void PixShader(Input input, inout SurfaceOutput o)
 {
 
 #if USE_DERIVATIVE
-	float2 pixelSize = float2(ddx(input.uv_MainTex.y), ddy(input.uv_MainTex.y));
-	pixelSize *= _TextureWidth * .75;
-	float scale = rsqrt(dot(pixelSize, pixelSize)) * _GradientScale * (_Sharpness + 1);
+	float2 pixelSise = float2(ddx(input.uv_MainTex.y), ddy(input.uv_MainTex.y));
+	pixelSise *= _TextureWidth * .75;
+	float scale = rsqrt(dot(pixelSise, pixelSise)) * _GradientScale * (_Sharpness + 1);
 #else
 	float scale = input.param.y;
 #endif

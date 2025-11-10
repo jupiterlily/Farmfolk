@@ -73,4 +73,81 @@ public static class TileUtilities
 	     public static float MMToWaterMass(float mm) => mm / 1000f * Constants.WATER_DENSITY;
 	     public static float WaterMassToMM(float kgPerM2) => kgPerM2 / Constants.WATER_DENSITY * 1000f;
 
+	     public static AtmosphereTile GetMyAtmosphere(TileData data, TileManager map, int layer)
+	     {
+		          //get the grid reference of the tile and find the corresponding atmosphere tile in the tile manager. Remember that the atmosphere tiles are stored at a different resolution than the surface tiles		          
+		          float resolution = map.tiles[data.tileGridRef.x, data.tileGridRef.y].tileData.tileWidth / map.atmosphereTiles[0, 0, layer].tileWidth;
+		          int nx = Mathf.FloorToInt(data.tileGridRef.x / resolution);
+		          int ny = Mathf.FloorToInt(data.tileGridRef.y / resolution);
+
+		          return map.atmosphereTiles[nx, ny, layer];
+	     }
+
+	     public static float CalculateIrregularPolygonArea(Vector3[] corners)
+	     {
+		          int n = corners.GetLength(1);
+		          float area = 0f;
+
+		          // Using 3D shoelace formula that projects to 2D plane
+		          for (int i = 0; i < n; i++)
+		          {
+				Vector3 current = corners[i];
+				Vector3 next = corners[(i + 1) % n];
+
+				// Project onto dominant plane (handles non-planar polygons)
+				area += (current.x * next.z - next.x * current.z);
+		          }
+
+		          return Mathf.Abs(area) * 0.5f;
+	     }
+
+	     // Alternative exact volume calculation using tetrahedral decomposition
+	     public static float CalculateExactVolume(Vector3[,] Corners)
+	     {
+		          int n = Corners.GetLength(1);
+		          Vector3 centroidBottom = CalculateCentroid(0, Corners);
+		          Vector3 centroidTop = CalculateCentroid(1, Corners);
+		          float volume = 0f;
+
+		          // Create tetrahedrons between each pair of edges
+		          for (int i = 0; i < n; i++)
+		          {
+				int j = (i + 1) % n;
+
+				// Bottom tetrahedron
+				volume += SignedTetrahedronVolume(
+				    centroidBottom,
+				    Corners[0, i],
+				    Corners[0, j],
+				    Corners[1, i]
+				);
+
+				// Top tetrahedron
+				volume += SignedTetrahedronVolume(
+				    centroidTop,
+				    Corners[1, i],
+				    Corners[1, j],
+				    Corners[0, j]
+				);
+		          }
+
+		          return Mathf.Abs(volume);
+	     }
+
+	     public static Vector3 CalculateCentroid(int layer, Vector3[,] Corners)
+	     {
+		          Vector3 sum = Vector3.zero;
+		          int n = Corners.GetLength(1);
+		          for (int i = 0; i < n; i++)
+		          {
+				sum += Corners[layer, i];
+		          }
+		          return sum / n;
+	     }
+
+	     public static float SignedTetrahedronVolume(Vector3 a, Vector3 b, Vector3 c, Vector3 d)
+	     {
+		          return Vector3.Dot((b - a), Vector3.Cross((c - a), (d - a))) / 6f;
+	     }
+
 }

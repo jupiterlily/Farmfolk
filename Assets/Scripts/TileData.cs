@@ -5,26 +5,33 @@ public class TileData
 {
 	     public Vector2Int tileGridRef;
 	     public float tileWidth;
-	     public SoilComposition composition;
+	     public float latitude; // Latitude in degrees
+	     public float longitude; // Longitude in degrees
+	     public float elevation; // Elevation in meters
+
+
+	     public Vector3[] tileCorners = new Vector3[8]; //tile corners for rendering and  physics
 
 	     [Header("Dynamic States")]
 	     public float surfaceMoisture;
+	     public float surfaceTemperature; // Surface temperature in Celsius
 	     public float volume;
 	     public float soilTemperature;
 	     public AtmosphereTile atmosphereTile;
-
-	     public void Initialize(TileData neighbor = null)
+	     public SoilComposition composition;
+	     public void Initialise(TileData neighbor = null)
 	     {
 		          composition = new SoilComposition();
 
 		          if (neighbor == null)
 		          {
-				// World-edge tile: Randomize but keep balanced
+				// World-edge tile: Randomise but keep balanced
 				composition.sand = Random.Range(15.5f, 390f);
 				composition.silt = Random.Range(21f, 525f);
 				composition.clay = Random.Range(26.5f, 662f);
 				composition.organicMatter = Random.Range(2.5f, 12.5f);
 				composition.compaction = Random.Range(0.2f, 0.7f);
+
 
 		          }
 		          else
@@ -36,6 +43,7 @@ public class TileData
 
 				composition.organicMatter = Mathf.Clamp(neighbor.composition.organicMatter + Random.Range(-2.5f, 12.5f), 0, 250f);
 				composition.compaction = Mathf.Clamp01(Random.Range(neighbor.composition.compaction, 1f));
+				// Inherit latitude and longitude from neighbor but offset slightly based on grid position				
 		          }
 		          soilTemperature = Random.Range(0f, 15f); // initial temperature
 		          SoilUtilities.RecalculateTilePhysics(this);
@@ -43,6 +51,7 @@ public class TileData
 		          composition.water = Mathf.Clamp(Random.Range(0, wc), neighbor.composition.water * 0.75f, wc);
 	     }
 }
+
 
 //nutrient capacity,  water  erosion  succeptibility, wind erosion succeptibility,  compactability,  water capacity, aeration
 
@@ -80,20 +89,40 @@ public class AtmosphereTile
 	     public float tileWidth;
 	     public int layerHeight; // 10m, 100m, 1000m
 	     public float temperature;
-	     public float moisture; // in liters
-	     public float pressure;
-	     public Vector3 windDirection;
+	     public float density; // in liters
+	     public float pressure; // in Pascals determined by temperature, 
+	     public Vector3 windVelocity;    // m/s (3D vector)
+	     public float RelativeHumidity
+	     {
+		          get
+		          {
+				return AtmosphereUtilities.CalculateRelativeHumidity(this);
+		          }
+	     }
+	     public float DewPoint
+	     {
+		          get
+		          {
+				return AtmosphereUtilities.CalculateDewPoint(temperature, RelativeHumidity);
+		          }
+	     }
 	     public float windSpeed;
-	     public AtmosphereTile NWTile;
-	     public AtmosphereTile NTile;
-	     public AtmosphereTile NETile;
-	     public AtmosphereTile WTile;
-	     public AtmosphereTile ETile;
-	     public AtmosphereTile SWTile;
-	     public AtmosphereTile STile;
-	     public AtmosphereTile SETile;
-	     public AtmosphereTile BelowTile;
-	     public AtmosphereTile AboveTile;
+
+	     public AtmosphereTile above;
+	     public AtmosphereTile below;
+	     public AtmosphereTile[] horizontalNeighbors;
+	     public float waterVapor;        // kg
+	     public float liquidWater;       // kg
+	     public float oxygen;            // kg
+	     public float carbonDioxide;     // kg
+	     public float nitrogen;
+	     public float sand; //kg
+	     public float silt; //kg
+	     public float clay; //kg
+	     public float organicMatter; //kg
+			   //clouds
+	     public float cloudWaterContent; // kg
+
 
 }
 [System.Serializable]
@@ -105,6 +134,7 @@ public class TileGrid
 	     public Vector3 originPoint;
 
 	     public TileData[,] Map;
+
 
 	     //return neighbors.
 	     public TileGrid(int worldX, int worldY)

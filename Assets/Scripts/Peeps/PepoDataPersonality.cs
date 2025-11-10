@@ -1,0 +1,346 @@
+using System.Collections.Generic;
+using UnityEngine;
+
+
+public class PersonalityAspect : PepoAspect
+{
+	     public PersonalityAspect(char n, float max, List<string> high, List<string> low, float v = -1, string hardname = null)
+	     {
+		          if (n == 'h' || n == 'H')
+		          {
+				name = "Honesty";
+				value = v;
+		          }
+		          if (n == 'e' || n == 'E')
+		          {
+				name = "Emotionality";
+				value = v;
+		          }
+		          if (n == 'x' || n == 'X')
+		          {
+				name = "Extraversion";
+				value = v;
+		          }
+		          if (n == 'a' || n == 'A')
+		          {
+				name = "Agreeableness";
+				value = v;
+		          }
+		          if (n == 'c' || n == 'C')
+		          {
+				name = "Conscientiousness";
+				value = v;
+		          }
+		          if (n == 'o' || n == 'O')
+		          {
+				name = "Openness";
+				value = v;
+		          }
+		          if (hardname != null)
+		          {
+				name = hardname;
+				value = v;
+		          }
+		          if (value > max / 2)
+		          {
+				descriptor = high[UnityEngine.Random.Range(0, high.Count)];
+		          }
+		          else
+		          {
+				descriptor = low[UnityEngine.Random.Range(0, low.Count)];
+		          }
+
+	     }
+
+}
+public class HEXACO
+{
+	     public PersonalityAspect Honesty = HEXACODimension.H;
+	     public PersonalityAspect Emotionality = HEXACODimension.E;
+	     public PersonalityAspect Extraversion = HEXACODimension.X;
+	     public PersonalityAspect Agreeableness = HEXACODimension.A;
+	     public PersonalityAspect Conscientiousness = HEXACODimension.C;
+	     public PersonalityAspect Openness = HEXACODimension.O;
+
+	     public float maximumValue = 10f;
+
+	     public HEXACO(float H = -1, float E = -1, float X = -1, float A = -1, float C = -1, float O = -1)
+	     {
+		          if (H < 0)
+		          {
+				Honesty.value = Random.Range(0, maximumValue);
+				Honesty.descriptor = (Honesty.value > maximumValue / 2) ? HEXACODimension.HFacets(false)[Random.Range(0, HEXACODimension.HFacets(false).Count)] : HEXACODimension.HFacets(true)[Random.Range(0, HEXACODimension.HFacets(true).Count)];
+		          }
+		          if (E < 0)
+		          {
+				Emotionality.value = Random.Range(0, maximumValue);
+				Emotionality.descriptor = (Emotionality.value > maximumValue / 2) ? HEXACODimension.EFacets(false)[Random.Range(0, HEXACODimension.EFacets(false).Count)] : HEXACODimension.EFacets(true)[Random.Range(0, HEXACODimension.EFacets(true).Count)];
+		          }
+		          if (X < 0)
+		          {
+				Extraversion.value = Random.Range(0, maximumValue);
+				Extraversion.descriptor = (Extraversion.value > maximumValue / 2) ? HEXACODimension.XFacets(false)[Random.Range(0, HEXACODimension.XFacets(false).Count)] : HEXACODimension.XFacets(true)[Random.Range(0, HEXACODimension.XFacets(true).Count)];
+		          }
+		          if (A < 0)
+		          {
+				Agreeableness.value = Random.Range(0, maximumValue);
+				Agreeableness.descriptor = (Agreeableness.value > maximumValue / 2) ? HEXACODimension.AFacets(false)[Random.Range(0, HEXACODimension.AFacets(false).Count)] : HEXACODimension.AFacets(true)[Random.Range(0, HEXACODimension.AFacets(true).Count)];
+		          }
+		          if (C < 0)
+		          {
+				Conscientiousness.value = Random.Range(0, maximumValue);
+				Conscientiousness.descriptor = (Conscientiousness.value > maximumValue / 2) ? HEXACODimension.CFacets(false)[Random.Range(0, HEXACODimension.CFacets(false).Count)] : HEXACODimension.CFacets(true)[Random.Range(0, HEXACODimension.CFacets(true).Count)];
+		          }
+		          if (O < 0)
+		          {
+				Openness.value = Random.Range(0, maximumValue);
+				Openness.descriptor = (Openness.value > maximumValue / 2) ? HEXACODimension.OFacets(false)[Random.Range(0, HEXACODimension.OFacets(false).Count)] : HEXACODimension.OFacets(true)[Random.Range(0, HEXACODimension.OFacets(true).Count)];
+		          }
+
+	     }
+	     public PersonalityAspect[] FullHexRange()
+	     {
+		          PersonalityAspect[] r = new PersonalityAspect[6];
+		          r[0] = Honesty;
+		          r[1] = Emotionality;
+		          r[2] = Extraversion;
+		          r[3] = Agreeableness;
+		          r[4] = Conscientiousness;
+		          r[5] = Openness;
+		          return r;
+	     }
+}
+
+public static class HEXACODimension
+{
+	     public static PersonalityAspect H => new PersonalityAspect('h', 10f, new List<string> { "humble" }, new List<string> { "manipulative" });
+	     public static PersonalityAspect E => new PersonalityAspect('e', 10f, new List<string> { "emotional" }, new List<string> { "detatched" });
+	     public static PersonalityAspect X => new PersonalityAspect('x', 10f, new List<string> { "extraverted" }, new List<string> { "introverted" });
+	     public static PersonalityAspect A => new PersonalityAspect('a', 10f, new List<string> { "forgiving" }, new List<string> { "resentful" });
+	     public static PersonalityAspect C => new PersonalityAspect('c', 10f, new List<string> { "careful" }, new List<string> { "reckless" });
+	     public static PersonalityAspect O => new PersonalityAspect('o', 10f, new List<string> { "open" }, new List<string> { "nonchalant" });
+	     public static List<string> HFacets(bool invert)
+	     {
+		          if (!invert)
+		          {
+				return new List<string> { "sincere", "honest", "faithful", "loyal", "modest", "unassuming", "authentic", "decent", "trustworthy", "honourable", "genuine", "direct" };
+		          }
+		          else
+		          {
+				return new List<string> { "sly", "deceitful", "greedy", "pretentious", "hypocritical", "boastful", "proud", "deceptive", "false", "duplicitous", "underhanded", "misleading", "two faced", "disingenuous" };
+		          }
+	     }
+	     public static List<string> EFacets(bool invert)
+	     {
+		          if (!invert)
+		          {
+				return new List<string> { "emotional", "sensitive", "sentimental", "anxious", "romantic", "idealistic", "hopeful", "passionate" };
+		          }
+		          else
+		          {
+				return new List<string> { "brave", "stoic", "independent", "self-assured", "stable", "serious", "cold", "pragmatic" };
+		          }
+		          ;
+	     }
+	     public static List<string> XFacets(bool invert)
+	     {
+		          if (!invert)
+		          {
+				return new List<string> { "outgoing", "lively", "extraverted", "sociable", "talkative", "bold", "active" };
+		          }
+		          else
+		          {
+				return new List<string> { "shy", "passive", "withdrawn", "introverted", "quiet", "reserved", "unenthusastic" };
+		          }
+	     }
+	     public static List<string> AFacets(bool invert)
+	     {
+		          if (!invert)
+		          {
+				return new List<string> { "patient", "tolerant", "peaceful", "mild", "agreeable", "lenient", "gentle", "accommodating" };
+		          }
+		          else
+		          {
+				return new List<string> { "ill-tempered", "quarrelsome", "stubborn", "choleric", "cynical" };
+		          }
+		          ;
+	     }
+	     public static List<string> CFacets(bool invert)
+	     {
+		          if (!invert)
+		          {
+				return new List<string> { "organised", "disciplined", "diligent", "careful", "thorough", "precise" };
+		          }
+		          else
+		          {
+				return new List<string> { "sloppy", "negligent", "reckless", "irresponsible", "absent-minded" };
+		          }
+	     }
+	     public static List<string> OFacets(bool invert)
+	     {
+		          if (!invert)
+		          {
+				return new List<string> { "intellectual", "creative", "unconventional", "innovative", "curious", "accepting" };
+		          }
+		          else
+		          {
+				return new List<string> { "shallow", "unimaginative", "conventional" };
+		          }
+		          ;
+	     }
+}
+
+public class Mood
+{
+	     public EmotionAspect Surprise = PlutchickDimension.Surprise;
+	     public EmotionAspect Anticipation = PlutchickDimension.Anticipation;
+	     public EmotionAspect Trust = PlutchickDimension.Trust;
+	     public EmotionAspect Disgust = PlutchickDimension.Disgust;
+	     public EmotionAspect Fear = PlutchickDimension.Fear;
+	     public EmotionAspect Anger = PlutchickDimension.Anger;
+	     public EmotionAspect Joy = PlutchickDimension.Joy;
+	     public EmotionAspect Sadness = PlutchickDimension.Sadness;
+
+	     public Mood(float s, float e, float t, float d, float f, float a, float j, float m)
+	     {
+		          Surprise.value = s;
+		          Anticipation.value = e;
+		          Trust.value = t;
+		          Disgust.value = d;
+		          Fear.value = f;
+		          Anger.value = a;
+		          Joy.value = j;
+		          Sadness.value = m;
+	     }
+	     public EmotionAspect[] FullHexRange()
+	     {
+		          EmotionAspect[] r = new EmotionAspect[8];
+		          r[0] = Surprise;
+		          r[1] = Anticipation;
+		          r[2] = Trust;
+		          r[3] = Disgust;
+		          r[4] = Fear;
+		          r[5] = Anger;
+		          r[6] = Joy;
+		          r[7] = Sadness;
+		          return r;
+	     }
+	     public void IntegrateFeeling(Feeling feeling)
+	     {
+		          int i = 0;
+		          foreach (var feel in FullHexRange())
+		          {
+				if (feel.name == feeling.aspects[i].name)
+				{
+					     feel.IntegrateAspect(feeling);
+				}
+		          }
+	     }
+}
+
+
+public class PlutchickDimension
+{
+	     public static EmotionAspect Surprise => new EmotionAspect('h', 10f, new List<string> { "amazement" }, new List<string> { "distraction" });
+	     public static EmotionAspect Anticipation => new EmotionAspect('e', 10f, new List<string> { "vigilance" }, new List<string> { "interest" });
+	     public static EmotionAspect Trust => new EmotionAspect('x', 10f, new List<string> { "admiration" }, new List<string> { "acceptance" });
+	     public static EmotionAspect Disgust => new EmotionAspect('a', 10f, new List<string> { "loathing" }, new List<string> { "boredom" });
+	     public static EmotionAspect Fear => new EmotionAspect('c', 10f, new List<string> { "terror" }, new List<string> { "apprehension" });
+	     public static EmotionAspect Anger => new EmotionAspect('o', 10f, new List<string> { "rage" }, new List<string> { "annoyance" });
+	     public static EmotionAspect Joy => new EmotionAspect('c', 10f, new List<string> { "ecstacy" }, new List<string> { "serenity" });
+	     public static EmotionAspect Sadness => new EmotionAspect('o', 10f, new List<string> { "grief" }, new List<string> { "pensiveness" });
+
+}
+public class EmotionAspect : PepoAspect
+{
+	     public string mild;
+	     public string intense;
+	     public EmotionAspect(char n, float max, List<string> high, List<string> low, float v = 5, string hardname = null)
+	     {
+		          if (n == 'a' || n == 'S')
+		          {
+				name = "Surprise"; //oh
+				value = v;
+		          }
+		          if (n == 'a' || n == 'A')
+		          {
+				name = "Anticipation"; //hm
+				value = v;
+		          }
+		          if (n == 't' || n == 'T')
+		          {
+				name = "Trust"; //aw
+				value = v;
+		          }
+		          if (n == 'd' || n == 'D')
+		          {
+				name = "Disgust"; //ew
+				value = v;
+		          }
+		          if (n == 'f' || n == 'F')
+		          {
+				name = "Fear"; //ah
+				value = v;
+		          }
+		          if (n == 'r' || n == 'R')
+		          {
+				name = "Anger"; //uh
+				value = v;
+		          }
+		          if (n == 'j' || n == 'J')
+		          {
+				name = "Joy"; //om
+				value = v;
+		          }
+		          if (n == 'm' || n == 'M')
+		          {
+				name = "Sadness"; //wa
+				value = v;
+		          }
+		          if (hardname != null)
+		          {
+				name = hardname;
+				value = v;
+		          }
+		          if (value > max * 0.66f)
+		          {
+				intense = high[UnityEngine.Random.Range(0, high.Count)];
+		          }
+		          if (value > max * 0.33f && value <= max * 0.66f)
+		          {
+				descriptor = name;
+		          }
+		          if (value <= max * 0.33f)
+		          {
+				mild = low[UnityEngine.Random.Range(0, low.Count)];
+		          }
+
+	     }
+}
+public class Feeling : PepoAspect
+{
+	     public List<EmotionAspect> aspects;
+
+	     public float timeLeft;
+	     public Feeling(List<EmotionAspect> emotions)
+	     {
+		          int i;
+		          if (emotions == null)
+		          {
+				emotions = new List<EmotionAspect>();
+		          }
+		          aspects = emotions;
+		          i = aspects.Count;
+		          value = 0;
+		          if (i > 0)
+		          {
+				foreach (var emotion in aspects)
+				{
+					     IntegrateAspect(emotion);
+				}
+		          }
+
+	     }
+}
+
+

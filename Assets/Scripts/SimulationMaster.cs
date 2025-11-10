@@ -45,7 +45,7 @@ public class SimulationMaster : MonoBehaviour
 
 	     void Start()
 	     {
-		          // Initialize the days per month array based on the year length.
+		          // Initialise the days per month array based on the year length.
 		          CalculateDaysPerMonth();
 		          // Calculate and log solar energy for predefined latitudes at the start of the simulation.
 		          List<int> days = new List<int> { 90, 91, 92, 182, 183, 184, 273, 275, 276, 363, 364, 365 };
@@ -174,12 +174,12 @@ public class SimulationMaster : MonoBehaviour
 		          {
 				foreach (var tile in tileManager.tiles)
 				{
-					     tile.TileVisualUpdate(currentLatitude);
+					     tile.TileVisualUpdate();
 				}
 		          }
 		          if (currentMinuteOfHour == 9 || currentMinuteOfHour == 29 || currentMinuteOfHour == 49)
 		          {
-
+				tileManager.SimulateAtmosphereStep(1 / 3f);
 		          }
 		          SimulationConstants.UpdateTimeConstants(0, minutes, 0, 0, 0);
 		          SimulationConstants.UpdateTime(currentTimeOfDay);
@@ -202,7 +202,7 @@ public class SimulationMaster : MonoBehaviour
 
 		          }
 		          tileManager.TileUpdate(hours);
-		          Debug.Log("tiles updated");
+		          //Debug.Log("tiles updated");
 		          // Log solar energy every 3 hours.
 		          if (currentHourOfDay % 3 == 0 && Mathf.FloorToInt(previousTimeOfDay * 24f) % 3 != currentHourOfDay % 3)
 		          {
@@ -228,6 +228,8 @@ public class SimulationMaster : MonoBehaviour
 				}
 		          }
 		          Debug.Log("tiles updated");
+		          ProgressPepoPopulation(days / SimulationConstants.YearLength);
+
 		          SimulationConstants.UpdateTimeConstants(0, 0, 0, days, 0);
 		          SimulationConstants.UpdateDay(Mathf.FloorToInt(dayOfYear));
 		          UpdateReadout();
@@ -241,9 +243,15 @@ public class SimulationMaster : MonoBehaviour
 				Debug.Log("<color=f94144>A new year has started!</color>");
 				year++;
 		          }
-
+		          ProgressPepoPopulation(years);
 		          // Update the time constants to reflect the passage of years in seconds.
 		          SimulationConstants.UpdateTimeConstants(0, 0, 0, 0, years);
 		          UpdateReadout();
+	     }
+
+	     void ProgressPepoPopulation(float years = 0)
+	     {
+		          gameObject.GetComponent<PepoPopManager>().agingIncrement = years;
+		          gameObject.GetComponent<PepoPopManager>().SimulateGenerations();
 	     }
 }
