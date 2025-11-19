@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public static class PepoNameUtilities
+public static class PepoUtilitiesNames
 {
 	     public static string InitialiseForname(PepoData lilGuy, List<string> exclude = null)
 	     {
@@ -9,13 +9,13 @@ public static class PepoNameUtilities
 		          List<string> names = new List<string>();
 		          if (lilGuy.ssd.presentsMasc)
 		          {
-				names.AddRange(PepoDataNames.maleNames);
+				names.AddRange(PepoLibraryNames.maleNames);
 		          }
 		          if (lilGuy.ssd.presentsFemme)
 		          {
-				names.AddRange(PepoDataNames.femaleNames);
+				names.AddRange(PepoLibraryNames.femaleNames);
 		          }
-		          names.AddRange(PepoDataNames.unisexNames);
+		          names.AddRange(PepoLibraryNames.unisexNames);
 		          if (exclude != null)
 		          {
 				names = FindUniqueNames(exclude, names);
@@ -32,11 +32,11 @@ public static class PepoNameUtilities
 		          List<string> names = new List<string>();
 		          if (exclude != null)
 		          {
-				names = FindUniqueNames(PepoDataNames.surnames, exclude);
+				names = FindUniqueNames(PepoLibraryNames.surnames, exclude);
 		          }
 		          else
 		          {
-				names = PepoDataNames.surnames;
+				names = PepoLibraryNames.surnames;
 		          }
 		          return names[Random.Range(0, names.Count)];
 	     }
@@ -66,14 +66,46 @@ public static class PepoNameUtilities
 		          }
 		          return names;
 	     }
-
-	     public static List<string> GetPepoNames(List<PepoData> pepos)
+	     public static List<string> GetPepoNames(List<PepoData> pepos, bool surnames = false)
 	     {
 		          List<string> names = new List<string>();
-		          foreach (PepoData pepo in pepos)
+		          if (!surnames)
 		          {
-				names.Add(pepo.forename);
+
+				foreach (PepoData pepo in pepos)
+				{
+					     names.Add(pepo.forename);
+				}
 		          }
+		          else
+		          {
+				foreach (PepoData pepo in pepos)
+				{
+					     names.Add(pepo.surname);
+				}
+
+		          }
+		          return names;
+	     }
+	     public static void GiveFamilyName(string familyName, List<PepoData> lilGuys)
+	     {
+		          foreach (var lilGuy in lilGuys)
+		          {
+				lilGuy.surname = familyName;
+		          }
+	     }
+
+	     public static List<string> PepoNamesToString(List<PepoName> nameData)
+	     {
+		          List<string> names = new List<string>();
+		          if (nameData != null)
+		          {
+				foreach (PepoName name in nameData)
+				{
+					     names.Add(names[0]);
+				}
+		          }
+
 		          return names;
 	     }
 }

@@ -188,6 +188,8 @@ public class SimulationMaster : MonoBehaviour
 	     // Handle the passage of hours within the simulation.
 	     void HourPasses(int hours)
 	     {
+
+		          gameObject.GetComponent<PepoPopManager>().SimulateNeeds(hours);
 		          for (int i = 0; i < hours; i++)
 		          {
 				currentHourOfDay++;
@@ -212,6 +214,7 @@ public class SimulationMaster : MonoBehaviour
 		          SimulationConstants.UpdateTimeConstants(0, 0, hours, 0, 0);
 		          intervalsEnergy = Mathf.FloorToInt(SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(currentLatitude, dayOfYear, currentTimeOfDay));
 		          UpdateReadout();
+		          gameObject.GetComponent<PepoPopManager>().uiManager.RefreshPepoPanels();
 	     }
 
 	     // Handle the passage of days within the simulation.

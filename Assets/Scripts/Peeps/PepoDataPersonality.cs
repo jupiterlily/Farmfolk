@@ -3,7 +3,7 @@ using UnityEngine;
 
 
 public class PersonalityAspect : PepoAspect
-{
+{//exists on a scale of 0-10 with 5 being the mid point
 	     public PersonalityAspect(char n, float max, List<string> high, List<string> low, float v = -1, string hardname = null)
 	     {
 		          if (n == 'h' || n == 'H')
@@ -201,7 +201,7 @@ public class Mood
 	     public EmotionAspect Joy = PlutchickDimension.Joy;
 	     public EmotionAspect Sadness = PlutchickDimension.Sadness;
 
-	     public Mood(float s, float e, float t, float d, float f, float a, float j, float m)
+	     public Mood(float s = 0, float e = 0, float t = 0, float d = 0, float f = 0, float a = 0, float j = 0, float m = 0)
 	     {
 		          Surprise.value = s;
 		          Anticipation.value = e;
@@ -241,14 +241,14 @@ public class Mood
 
 public class PlutchickDimension
 {
-	     public static EmotionAspect Surprise => new EmotionAspect('h', 10f, new List<string> { "amazement" }, new List<string> { "distraction" });
-	     public static EmotionAspect Anticipation => new EmotionAspect('e', 10f, new List<string> { "vigilance" }, new List<string> { "interest" });
-	     public static EmotionAspect Trust => new EmotionAspect('x', 10f, new List<string> { "admiration" }, new List<string> { "acceptance" });
-	     public static EmotionAspect Disgust => new EmotionAspect('a', 10f, new List<string> { "loathing" }, new List<string> { "boredom" });
-	     public static EmotionAspect Fear => new EmotionAspect('c', 10f, new List<string> { "terror" }, new List<string> { "apprehension" });
-	     public static EmotionAspect Anger => new EmotionAspect('o', 10f, new List<string> { "rage" }, new List<string> { "annoyance" });
-	     public static EmotionAspect Joy => new EmotionAspect('c', 10f, new List<string> { "ecstacy" }, new List<string> { "serenity" });
-	     public static EmotionAspect Sadness => new EmotionAspect('o', 10f, new List<string> { "grief" }, new List<string> { "pensiveness" });
+	     public static EmotionAspect Surprise => new EmotionAspect('s', 10f, new List<string> { "amazement" }, new List<string> { "distraction" });
+	     public static EmotionAspect Anticipation => new EmotionAspect('a', 10f, new List<string> { "vigilance" }, new List<string> { "interest" });
+	     public static EmotionAspect Trust => new EmotionAspect('t', 10f, new List<string> { "admiration" }, new List<string> { "acceptance" });
+	     public static EmotionAspect Disgust => new EmotionAspect('d', 10f, new List<string> { "loathing" }, new List<string> { "boredom" });
+	     public static EmotionAspect Fear => new EmotionAspect('f', 10f, new List<string> { "terror" }, new List<string> { "apprehension" });
+	     public static EmotionAspect Anger => new EmotionAspect('r', 10f, new List<string> { "rage" }, new List<string> { "annoyance" });
+	     public static EmotionAspect Joy => new EmotionAspect('j', 10f, new List<string> { "ecstacy" }, new List<string> { "serenity" });
+	     public static EmotionAspect Sadness => new EmotionAspect('m', 10f, new List<string> { "grief" }, new List<string> { "pensiveness" });
 
 }
 public class EmotionAspect : PepoAspect
@@ -257,7 +257,7 @@ public class EmotionAspect : PepoAspect
 	     public string intense;
 	     public EmotionAspect(char n, float max, List<string> high, List<string> low, float v = 5, string hardname = null)
 	     {
-		          if (n == 'a' || n == 'S')
+		          if (n == 's' || n == 'S')
 		          {
 				name = "Surprise"; //oh
 				value = v;

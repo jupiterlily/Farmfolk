@@ -21,7 +21,7 @@ public class PepoRelationshipData
 	     public float Animosity = 0; //how much we dislike them
 	     public float Affection = 0; //how much we like them
 	     public float Affiliation = 0; //how much they're in our in group
-	     public float Affinity = 0; //how much we wanna interact with them
+	     public float Attachment = 0; //how much we wanna interact with them
 
 	     public PepoRelationshipData(PepoData them, PepoData me, RelationshipType type, string name)
 	     {
@@ -41,7 +41,7 @@ public class PepoRelationshipData
 	     public void SpendTime(float time, PepoData me)
 	     {
 		          timeSpent += time;
-		          PepoRelationshipData card = PepoRelationalUtilities.HaveWeMet(pepo, me);
+		          PepoRelationshipData card = PepoUtilitiesBonds.HaveWeMet(pepo, me);
 		          if (card! == null)
 		          {
 				card.timeSpent += time;
@@ -57,6 +57,6 @@ public enum RelationshipType
 	     kin, parent, offspring, coparent,
 	     peer, acquaintence, friend, bestie,
 	     enemy, rival,
-	     lover, ex, spouse, rebuffed,
+	     lover, ex, spouse, incompatible,
 	     mentor, mentee, leader, follower,
 }

@@ -74,8 +74,8 @@ public static class PepoLogUtilities
 		          }
 
 		          // Group children by gender
-		          var boys = children.Where(c => c.ssd.hasY).ToList();
-		          var girls = children.Where(c => !c.ssd.hasY).ToList();
+		          var boys = children.Where(c => c.body.paternalChromosome.sexChromosome == "XY").ToList();
+		          var girls = children.Where(c => c.body.paternalChromosome.sexChromosome == "XX").ToList();
 
 		          List<string> descriptions = new List<string>();
 
@@ -115,7 +115,7 @@ public static class PepoLogUtilities
 	     private static string GetGenderTerm(PepoData pepo)
 	     {
 		          // More nuanced gender terms based on presentation and identity although this needs to be modified to account for trans, in and out the closet, intersex, geenderfluid, agender, man/woman, girl boy also need to account for age
-		          if (pepo.ssd.hasY)
+		          if (pepo.body.paternalChromosome.sexChromosome == "XY")
 		          {
 				if (pepo.ssd.presentsFemme && !pepo.ssd.presentsMasc)
 					     return "trans girl";
@@ -178,7 +178,7 @@ public static class PepoLogUtilities
 		          if (mother.RelationshipLibrary != null &&
 		              mother.RelationshipLibrary.ContainsKey(RelationshipType.lover))
 		          {
-				var lovers = PepoRelationalUtilities.ShipsToPepos(mother.RelationshipLibrary[RelationshipType.lover]);
+				var lovers = PepoUtilitiesBonds.ShipsToPepos(mother.RelationshipLibrary[RelationshipType.lover]);
 				if (!lovers.Contains(father))
 				{
 					     messages.Add("the biological father is not the mother's current partner");
@@ -214,7 +214,7 @@ public static class PepoLogUtilities
 		          {
 				bool arePartners = mother.RelationshipLibrary != null &&
 					   mother.RelationshipLibrary.ContainsKey(RelationshipType.lover) &&
-					   PepoRelationalUtilities.ShipsToPepos(mother.RelationshipLibrary[RelationshipType.lover])
+					   PepoUtilitiesBonds.ShipsToPepos(mother.RelationshipLibrary[RelationshipType.lover])
 					       .Contains(father);
 
 				if (arePartners)
@@ -258,7 +258,7 @@ public static class PepoLogUtilities
 		          {
 				tense = "was";
 		          }
-		          Debug.Log($"{PepoUtilities.GetFullName(pepo)} {tense} {Age(pepo)} old. They are {GenderIdentity(pepo)} and {Sexuality(pepo)}. It seems like they are {Hexaco(pepo.personality)}");
+		          Debug.Log($"{PepoUtilities.GetFullName(pepo)} {tense} {Age(pepo)} old. They are {GetGenderExpression(pepo)}. They value {Values(pepo, 4)}. It seems like they are {Hexaco(pepo.personality)}");
 	     }
 	     public static string Age(PepoData pepo)
 	     {
@@ -279,31 +279,10 @@ public static class PepoLogUtilities
 	     }
 	     public static string GetPregnancyStatus(PepoData pepo)
 	     {
-		          if (pepo.ssd?.hasX == true && pepo.womb != null && pepo.womb.Count > 0)
-				return $"Pregnant ({pepo.womb.Count})";
+		          //at the moment this just gets if they have awomb or not.
+		          if (pepo.body.paternalChromosome.sexChromosome == "XX" && pepo.womb != null && pepo.womb.Count > 0)
+				return $"({pepo.womb[0].bairns.Count} pregnancies)";
 		          return "Not pregnant";
-	     }
-	     public static string Sexuality(PepoData pepo)
-	     {
-		          string sexuality = "";
-
-		          if (pepo.ssd.likesMasc && pepo.ssd.likesFemme)
-		          {
-				sexuality = "like men and women";
-		          }
-		          if (!pepo.ssd.likesMasc && !pepo.ssd.likesFemme)
-		          {
-				sexuality = "prefer to keeep things friendly";
-		          }
-		          if (pepo.ssd.likesMasc && !pepo.ssd.likesFemme)
-		          {
-				sexuality = "like only men";
-		          }
-		          if (!pepo.ssd.likesMasc && pepo.ssd.likesFemme)
-		          {
-				sexuality = "like only women";
-		          }
-		          return sexuality;
 	     }
 	     public static string GenderIdentity(PepoData pepo)
 	     {
@@ -325,23 +304,23 @@ public static class PepoLogUtilities
 		          {
 				genderIdentity = "a woman";
 		          }
-		          if ((pepo.ssd.hasY && !pepo.ssd.isMasc && pepo.ssd.isFemme) || (!pepo.ssd.hasY && !pepo.ssd.isFemme && pepo.ssd.isMasc))
+		          if ((pepo.body.paternalChromosome.sexChromosome == "XY" && !pepo.ssd.isMasc && pepo.ssd.isFemme) || (pepo.body.paternalChromosome.sexChromosome == "XX" && !pepo.ssd.isFemme && pepo.ssd.isMasc))
 		          {
-				if (pepo.ssd.hasY)
+				if (pepo.body.paternalChromosome.sexChromosome == "XY")
 				{
 					     genderIdentity = string.Concat("trans, ", genderIdentity);
 				}
 		          }
 		          return genderIdentity;
 	     }
-	     public static string GetGenderExpression(SocioSexualData ssd, float age)
+	     public static string GetGenderExpression(PepoData pepo)
 	     {
 		          // Determine chromosomal sex first
 		          string chromosomalSex;
 		          bool intersex = false;
-		          if (ssd.hasY && ssd.hasX)
+		          if (pepo.body.paternalChromosome.sexChromosome == "XY" && pepo.body.maternalChromosome.sexChromosome == "XX")
 				chromosomalSex = "male";
-		          else if (ssd.hasX && !ssd.hasY)
+		          else if (pepo.body.paternalChromosome.sexChromosome == "XX" && pepo.body.maternalChromosome.sexChromosome == "XX")
 				chromosomalSex = "female";
 		          else
 		          {
@@ -351,98 +330,164 @@ public static class PepoLogUtilities
 
 		          // Determine gender identity
 		          string identity;
-		          if (ssd.isMasc && ssd.isFemme)
+		          if (pepo.ssd.isMasc && pepo.ssd.isFemme)
 				identity = "nonbinary";
-		          else if (!ssd.isMasc && !ssd.isFemme)
+		          else if (!pepo.ssd.isMasc && !pepo.ssd.isFemme)
 				identity = "agender";
-		          else if (ssd.isMasc && !ssd.isFemme)
+		          else if (pepo.ssd.isMasc && !pepo.ssd.isFemme)
 				identity = "man";
 		          else
 				identity = "woman";
 
 		          // Check if transgender (identity doesn't match chromosomal sex)
-		          bool isTrans = (ssd.hasY && ssd.isFemme) || (!ssd.hasY && ssd.isMasc);
+		          bool isTrans = (pepo.body.paternalChromosome.sexChromosome == "XY" && pepo.ssd.isFemme) || (pepo.body.paternalChromosome.sexChromosome == "XX" && pepo.ssd.isMasc);
 
 		          // Determine openness about gender identity
 		          string openness = "openly";
 		          if (isTrans)
 		          {
 				// If presenting differently than identity, might be closeted
-				bool presentsAsIdentity = (ssd.isFemme && ssd.presentsFemme) || (ssd.isMasc && ssd.presentsMasc);
+				bool presentsAsIdentity = (pepo.ssd.isFemme && pepo.ssd.presentsFemme) || (pepo.ssd.isMasc && pepo.ssd.presentsMasc);
 				openness = presentsAsIdentity ? "openly" : "not openly";
 		          }
 		          else if (!intersex && !isTrans)
 		          {
-				openness = "cisgender ";
+				openness = "cisgender";
 		          }
 
 		          // Determine presentation
 		          string presentation;
-		          if (ssd.presentsFemme && ssd.presentsMasc)
+		          if (pepo.ssd.presentsFemme && pepo.ssd.presentsMasc)
 				presentation = "androgynous presentation";
-		          else if (ssd.presentsFemme && !ssd.presentsMasc)
+		          else if (pepo.ssd.presentsFemme && !pepo.ssd.presentsMasc)
 				presentation = "feminine presentation";
-		          else if (!ssd.presentsFemme && ssd.presentsMasc)
+		          else if (!pepo.ssd.presentsFemme && pepo.ssd.presentsMasc)
 				presentation = "masculine presentation";
 		          else
 				presentation = "neutral presentation";
 
 		          // Age-appropriate terms
-		          string ageTerm = age < 18f ? (ssd.isFemme ? "girl" : "boy") : (ssd.isFemme ? "woman" : "man");
-
+		          string ageTerm = pepo.age < 4 ? (pepo.age > 2 ? "baby" : "toddler") : (pepo.ssd.isPrepubescent ? "child" : "adolescent");
+		          if (pepo.age < 23)
+		          {
+				return $"{ageTerm} with {presentation}";
+		          }
 		          // Build final description
 		          if (isTrans)
 		          {
-				return $"{openness} {identity} ({ageTerm}) with {presentation}";
+				return $"{openness} trans {GetOrientationDescription(pepo)}, {identity} with {presentation}";
 		          }
 		          else
 		          {
-				return $"{openness}{identity} ({ageTerm}) with {presentation}";
+				return $"{openness} {GetOrientationDescription(pepo)}, {identity} with {presentation}";
 		          }
 	     }
 
-	     public static string GetOrientationDescription(SocioSexualData ssd)
+	     public static string GetOrientationDescription(PepoData pepo)
 	     {
-		          if (ssd.isAsexual && ssd.isAromantic)
+		          if (pepo.ssd.isAsexual && !pepo.ssd.romanceFemme && !pepo.ssd.romanceMasc)
 				return "asexual and aromantic";
 
-		          if (ssd.isAsexual)
+		          if (pepo.ssd.isAsexual)
 				return "asexual";
 
-		          if (ssd.isAromantic)
-				return "aromantic";
-
 		          // Sexual orientation
-		          string sexualOrientation = "";
-		          if (ssd.likesMasc && ssd.likesFemme)
+		          string sexualOrientation = "straight";
+		          if (pepo.ssd.likesMasc && pepo.ssd.likesFemme)
 				sexualOrientation = "bisexual";
-		          else if (ssd.likesMasc && !ssd.likesFemme)
-				sexualOrientation = "homosexual" + (ssd.hasY ? "" : " (lesbian)");
-		          else if (!ssd.likesMasc && ssd.likesFemme)
-				sexualOrientation = "homosexual" + (!ssd.hasY ? "" : " (gay)");
+		          else if (pepo.ssd.likesMasc && !pepo.ssd.likesFemme && pepo.ssd.isFemme)
+				sexualOrientation = "lesbian";
+		          else if (!pepo.ssd.likesMasc && pepo.ssd.likesFemme && pepo.ssd.isMasc)
+				sexualOrientation = "gay";
 		          else
-				sexualOrientation = "questioning";
+				sexualOrientation = "queer";
 
 		          // Romantic orientation (if different from sexual)
-		          string romanticOrientation = "";
-		          if (ssd.platonicFemme && ssd.platonicMasc)
+		          string romanticOrientation = "pan";
+		          if (pepo.ssd.romanceFemme && pepo.ssd.romanceMasc)
 				romanticOrientation = "biromantic";
-		          else if (ssd.platonicFemme && !ssd.platonicMasc)
-				romanticOrientation = "homoromantic";
-		          else if (!ssd.platonicFemme && ssd.platonicMasc)
-				romanticOrientation = "homoromantic";
-		          else
-				romanticOrientation = "questioning";
 
-		          if (sexualOrientation.Contains(romanticOrientation.Replace("romantic", "sexual")) ||
-		              romanticOrientation.Contains(sexualOrientation.Replace("sexual", "romantic")))
-		          {
-				return sexualOrientation;
-		          }
+		          else if ((pepo.ssd.isFemme && pepo.ssd.romanceFemme && !pepo.ssd.romanceMasc) || (pepo.ssd.isMasc && pepo.ssd.romanceMasc && !pepo.ssd.romanceFemme))
+				romanticOrientation = "homoromantic";
+
+		          else if ((pepo.ssd.isFemme && !pepo.ssd.romanceFemme && pepo.ssd.romanceMasc) || (pepo.ssd.isMasc && !pepo.ssd.romanceMasc && pepo.ssd.romanceFemme))
+				romanticOrientation = "heteroromantic";
+
+		          else if (!pepo.ssd.romanceMasc && !pepo.ssd.romanceFemme)
+				romanticOrientation = "aromantic";
 
 		          return $"{sexualOrientation}, {romanticOrientation}";
 	     }
+	     public static string Values(PepoData pepo, int count = 3)
+	     {
+		          List<Value> ranked = PepoUtilitiesValues.GetTopValues(pepo.values, count);
+		          string values = "";
+		          for (int i = 0; i < count; i++)
+		          {
+				values += ranked[i].descriptor;
+				if (i == count - 2)
+				{
+					     values += " and ";
+				}
+				else if (i < count - 2)
+				{
+					     values += ", ";
+				}
+		          }
+		          return values;
+	     }
+	     public static string Needs(PepoData pepo, int count = 3)
+	     {
+		          if (pepo?.needs?.Physiological == null || pepo.needs.Safety == null)
+				return string.Empty;
 
+		          // Collect all urgent needs
+		          var urgentNeeds = new List<string>();
+
+		          // Check physiological needs
+		          foreach (var need in pepo.needs.Physiological)
+		          {
+				if (need.value <= need.warningThreshold)
+				{
+					     urgentNeeds.Add(need.descriptor);
+				}
+		          }
+
+		          // Check safety needs
+		          foreach (var need in pepo.needs.Safety)
+		          {
+				if (need.value <= need.warningThreshold)
+				{
+					     urgentNeeds.Add(need.descriptor);
+				}
+		          }
+
+		          // Limit to requested count
+		          if (urgentNeeds.Count > count)
+		          {
+				urgentNeeds = urgentNeeds.Take(count).ToList();
+		          }
+
+		          // Format the output string
+		          if (urgentNeeds.Count == 0)
+		          {
+				return string.Empty;
+		          }
+		          else if (urgentNeeds.Count == 1)
+		          {
+				return urgentNeeds[0];
+		          }
+		          else if (urgentNeeds.Count == 2)
+		          {
+				return $"{urgentNeeds[0]} and {urgentNeeds[1]}";
+		          }
+		          else
+		          {
+				string result = string.Join(", ", urgentNeeds.Take(urgentNeeds.Count - 1));
+				result += $", and {urgentNeeds[urgentNeeds.Count - 1]}";
+				return result;
+		          }
+	     }
 	     public static void LogDemographicData(List<PepoData> people)
 	     {
 		          if (people == null || people.Count == 0)
@@ -483,11 +528,11 @@ public static class PepoLogUtilities
 					     middleAged++;
 				else
 					     elderly++;
-
+				//person.body.hasY
 				// Gender and identity
-				bool isTrans = (person.ssd.hasY && person.ssd.isFemme) || (!person.ssd.hasY && person.ssd.isMasc);
+				bool isTrans = (person.body.paternalChromosome.sexChromosome == "XY" && person.ssd.isFemme) || (person.body.paternalChromosome.sexChromosome == "XX" && person.ssd.isMasc);
 				bool isNonBinary = (person.ssd.isMasc && person.ssd.isFemme) || (!person.ssd.isMasc && !person.ssd.isFemme);
-				bool isIntersex = (person.ssd.hasX && person.ssd.hasY) || (!person.ssd.hasX && !person.ssd.hasY);
+				bool isIntersex = (person.body.maternalChromosome.sexChromosome == "XY");
 
 				if (isIntersex)
 					     intersex++;
@@ -506,9 +551,9 @@ public static class PepoLogUtilities
 						          closetedTrans++;
 				}
 
-				if (person.ssd.hasY && !isTrans && !isNonBinary)
+				if (person.body.paternalChromosome.sexChromosome == "XY" && !isTrans && !isNonBinary)
 					     men++;
-				else if (!person.ssd.hasY && !isTrans && !isNonBinary)
+				else if (person.body.paternalChromosome.sexChromosome == "XX" && !isTrans && !isNonBinary)
 					     women++;
 
 				// Orientation
@@ -519,9 +564,9 @@ public static class PepoLogUtilities
 
 				if (person.ssd.likesMasc && person.ssd.likesFemme)
 					     bisexual++;
-				else if ((person.ssd.likesMasc && person.ssd.hasY) || (person.ssd.likesFemme && !person.ssd.hasY))
+				else if ((person.ssd.likesMasc && person.body.paternalChromosome.sexChromosome == "XY") || (person.ssd.likesFemme && person.body.paternalChromosome.sexChromosome == "XX"))
 					     gayLesbian++;
-				else if ((person.ssd.likesMasc && !person.ssd.hasY) || (person.ssd.likesFemme && person.ssd.hasY))
+				else if ((person.ssd.likesMasc && person.body.paternalChromosome.sexChromosome == "XX") || (person.ssd.likesFemme && person.body.paternalChromosome.sexChromosome == "XY"))
 					     straight++;
 				else
 					     questioning++;
@@ -547,8 +592,8 @@ public static class PepoLogUtilities
 		          if (person == null)
 				return "Unknown person";
 
-		          string expression = GetGenderExpression(person.ssd, person.age);
-		          string orientation = GetOrientationDescription(person.ssd);
+		          string expression = GetGenderExpression(person);
+		          string orientation = GetOrientationDescription(person);
 		          string ageDescription = Age(person);
 
 		          return $"{person.fullname} is {ageDescription} old, {expression}, and {orientation}";
@@ -559,7 +604,11 @@ public static class PepoLogUtilities
 		          string personality = string.Empty;
 		          foreach (var aspect in hexaco.FullHexRange())
 		          {
-				personality += string.Concat(AspectDegree(aspect.value, hexaco.maximumValue), aspect.descriptor, ", ");
+				if (aspect.value > 7 || aspect.value < 3)
+				{
+
+					     personality += string.Concat(AspectDegree(aspect.value, hexaco.maximumValue), aspect.descriptor, ", ");
+				}
 		          }
 		          return personality;
 	     }
@@ -648,7 +697,7 @@ public static class PepoLogUtilities
 				if (liveChildren >= 2)
 				{
 					     childrenWord += myChildren + " are";
-					     string parentWord = Pepo.ssd.hasY == true ? "father" : "mother";
+					     string parentWord = Pepo.body.paternalChromosome.sexChromosome == "XY" == true ? "father" : "mother";
 					     additionalMessages.Add($"{liveChildren} {childrenWord} now without a {parentWord}");
 				}
 		          }
@@ -656,7 +705,7 @@ public static class PepoLogUtilities
 		          if (Pepo.RelationshipLibrary.ContainsKey(RelationshipType.lover))
 		          {
 				// Partner message
-				foreach (var partner in PepoRelationalUtilities.ShipsToPepos(Pepo.RelationshipLibrary[RelationshipType.lover]))
+				foreach (var partner in PepoUtilitiesBonds.ShipsToPepos(Pepo.RelationshipLibrary[RelationshipType.lover]))
 				{
 					     if (partner != null && partner.isAlive)
 					     {
@@ -666,7 +715,7 @@ public static class PepoLogUtilities
 		          }
 		          if (Pepo.RelationshipLibrary.ContainsKey(RelationshipType.friend))
 		          {
-				foreach (var kin in PepoRelationalUtilities.ShipsToPepos(Pepo.RelationshipLibrary[RelationshipType.friend]))
+				foreach (var kin in PepoUtilitiesBonds.ShipsToPepos(Pepo.RelationshipLibrary[RelationshipType.friend]))
 				{
 					     if (kin != null && kin.isAlive)
 					     {
@@ -708,7 +757,7 @@ public static class PepoLogUtilities
 		          {
 				if (guy.isAlive)
 				{
-					     if (guy.ssd.hasY)
+					     if (guy.body.paternalChromosome.sexChromosome == "XY")
 					     {
 						          men++;
 					     }

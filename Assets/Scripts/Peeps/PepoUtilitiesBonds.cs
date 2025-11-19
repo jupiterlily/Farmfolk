@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-public class PepoRelationalUtilities
+public class PepoUtilitiesBonds
 {
 	     // take alist of relationshipData and terutn a list of Pepos
 	     public static List<PepoData> ShipsToPepos(List<PepoRelationshipData> ships)
@@ -56,7 +56,7 @@ public class PepoRelationalUtilities
 		          }
 		          relationshipData.relationshipTypes.Add(type);
 		          me.RelationshipLibrary[type].Add(relationshipData);
-		          UnityEngine.Debug.Log($"[Relationship Manager]{PepoUtilities.GetFullName(me)} is now {PepoUtilities.GetFullName(them)}'s {type.ToString()}");
+		          UnityEngine.Debug.Log($"[Relationship Manager]{PepoUtilities.GetFullName(me)} is now {PepoUtilities.GetFullName(them)}'s {name}");
 		          return me.RelationshipLibrary;
 	     }
 	     public static Dictionary<RelationshipType, List<PepoRelationshipData>> RemoveRelation(PepoData me, PepoData them, RelationshipType type)
@@ -89,4 +89,5 @@ public class PepoRelationalUtilities
 		          }
 		          return null; //because i do not know you
 	     }
+
 }
