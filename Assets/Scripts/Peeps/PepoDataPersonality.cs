@@ -69,32 +69,32 @@ public class HEXACO
 		          if (H < 0)
 		          {
 				Honesty.value = Random.Range(0, maximumValue);
-				Honesty.descriptor = (Honesty.value > maximumValue / 2) ? HEXACODimension.HFacets(false)[Random.Range(0, HEXACODimension.HFacets(false).Count)] : HEXACODimension.HFacets(true)[Random.Range(0, HEXACODimension.HFacets(true).Count)];
+				Honesty.descriptor = (Honesty.value > maximumValue / 2) ? "honest" : "manipulative";
 		          }
 		          if (E < 0)
 		          {
 				Emotionality.value = Random.Range(0, maximumValue);
-				Emotionality.descriptor = (Emotionality.value > maximumValue / 2) ? HEXACODimension.EFacets(false)[Random.Range(0, HEXACODimension.EFacets(false).Count)] : HEXACODimension.EFacets(true)[Random.Range(0, HEXACODimension.EFacets(true).Count)];
+				Emotionality.descriptor = (Emotionality.value > maximumValue / 2) ? "emotional" : "detatched";
 		          }
 		          if (X < 0)
 		          {
 				Extraversion.value = Random.Range(0, maximumValue);
-				Extraversion.descriptor = (Extraversion.value > maximumValue / 2) ? HEXACODimension.XFacets(false)[Random.Range(0, HEXACODimension.XFacets(false).Count)] : HEXACODimension.XFacets(true)[Random.Range(0, HEXACODimension.XFacets(true).Count)];
+				Extraversion.descriptor = (Extraversion.value > maximumValue / 2) ? "extraverted" : "introverted";
 		          }
 		          if (A < 0)
 		          {
 				Agreeableness.value = Random.Range(0, maximumValue);
-				Agreeableness.descriptor = (Agreeableness.value > maximumValue / 2) ? HEXACODimension.AFacets(false)[Random.Range(0, HEXACODimension.AFacets(false).Count)] : HEXACODimension.AFacets(true)[Random.Range(0, HEXACODimension.AFacets(true).Count)];
+				Agreeableness.descriptor = (Agreeableness.value > maximumValue / 2) ? "forgiving" : "resentful";
 		          }
 		          if (C < 0)
 		          {
 				Conscientiousness.value = Random.Range(0, maximumValue);
-				Conscientiousness.descriptor = (Conscientiousness.value > maximumValue / 2) ? HEXACODimension.CFacets(false)[Random.Range(0, HEXACODimension.CFacets(false).Count)] : HEXACODimension.CFacets(true)[Random.Range(0, HEXACODimension.CFacets(true).Count)];
+				Conscientiousness.descriptor = (Conscientiousness.value > maximumValue / 2) ? "careful" : "reckless";
 		          }
 		          if (O < 0)
 		          {
 				Openness.value = Random.Range(0, maximumValue);
-				Openness.descriptor = (Openness.value > maximumValue / 2) ? HEXACODimension.OFacets(false)[Random.Range(0, HEXACODimension.OFacets(false).Count)] : HEXACODimension.OFacets(true)[Random.Range(0, HEXACODimension.OFacets(true).Count)];
+				Openness.descriptor = (Openness.value > maximumValue / 2) ? "open" : "stubborn";
 		          }
 
 	     }
@@ -257,44 +257,61 @@ public class EmotionAspect : PepoAspect
 	     public string intense;
 	     public EmotionAspect(char n, float max, List<string> high, List<string> low, float v = 5, string hardname = null)
 	     {
+		          maxValue = max;
 		          if (n == 's' || n == 'S')
 		          {
 				name = "Surprise"; //oh
+				mild = "Distraction";
+				intense = "Amazement";
 				value = v;
 		          }
 		          if (n == 'a' || n == 'A')
 		          {
 				name = "Anticipation"; //hm
+				mild = "Interest";
+				intense = "Vigilence";
 				value = v;
 		          }
 		          if (n == 't' || n == 'T')
 		          {
 				name = "Trust"; //aw
+				mild = "Acceptance";
+				intense = "Admiration";
 				value = v;
 		          }
 		          if (n == 'd' || n == 'D')
 		          {
 				name = "Disgust"; //ew
+				mild = "Boredom";
+				intense = "Loathing";
 				value = v;
 		          }
 		          if (n == 'f' || n == 'F')
 		          {
 				name = "Fear"; //ah
+				mild = "Apprehension";
+				intense = "Terror";
 				value = v;
 		          }
 		          if (n == 'r' || n == 'R')
 		          {
 				name = "Anger"; //uh
+				mild = "Annoyance";
+				intense = "Rage";
 				value = v;
 		          }
 		          if (n == 'j' || n == 'J')
 		          {
 				name = "Joy"; //om
+				mild = "Serene";
+				intense = "Ecstacy";
 				value = v;
 		          }
 		          if (n == 'm' || n == 'M')
 		          {
 				name = "Sadness"; //wa
+				mild = "Pensiveness";
+				intense = "Grief";
 				value = v;
 		          }
 		          if (hardname != null)

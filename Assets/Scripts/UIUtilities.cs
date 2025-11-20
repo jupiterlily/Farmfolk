@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -171,7 +172,7 @@ public static class UIUtilities
 		          }
 
 		          Graph graph = GraphFloats(values, hexaco.maximumValue, type);
-
+		          graph.title = string.Join(", ", PepoUtilitiesPersonality.GetPersonalityName(hexaco).Take(3));
 		          // Set HEXACO-specific colors
 		          graph.axisLabels = new string[] { "H", "E", "X", "A", "C", "O" };
 		          graph.axisColors = new Color[]
@@ -216,9 +217,9 @@ public static class UIUtilities
 		          //fear, trust. joy, anticipation, anger, disgust, sadness, surprise
 		          Graph graph = GraphFloats(values, 10f, type);
 		          //the label is the highest one by the degree.
-		          string feeling = PepoUtilitiesPersonality.GetFeelingName(mood);
+		          graph.title = PepoUtilitiesPersonality.GetFeelingName(mood);
 		          // Set mood-specific colors (Plutchik's wheel colors)
-		          graph.axisLabels = new string[] { "", "", $"{feeling}", "", "", "", "", "" };
+		          graph.axisLabels = new string[] { "fear", "", "joy", "", "anger", "", "woe", "" };
 		          graph.axisColors = new Color[]
 		          {
 		          new Color(0,1,0.25f),       // Fear
@@ -368,6 +369,7 @@ public class Graph
 	     public Color[] pointColors; // Color for each point
 	     public Color lineColor = Color.white;
 	     public float lineWidth = 0.1f;
+	     public string title;
 	     public string[] axisLabels; // Labels for each axis
 	     public Color[] axisColors; // Colors for each axis
 	     public bool showAxes = true;
@@ -410,7 +412,7 @@ public static class RadarGraphFactory
 		          rt.sizeDelta = new Vector2(size, size);
 
 		          // Draw the radar graph
-		          DrawRadarGraph(graphGO, graph, size * 0.4f); // Scale to fit
+		          DrawRadarGraph(graphGO, graph, size * 0.55f); // Scale to fit
 
 		          if (parent != null)
 				graphGO.transform.SetParent(parent, false);
@@ -422,7 +424,11 @@ public static class RadarGraphFactory
 	     {
 		          // Create background
 		          CreateBackground(parent, new Color(0.1f, 0.1f, 0.2f, 0.3f));
-
+		          //put graph title here
+		          if (!string.IsNullOrEmpty(graph.title))
+		          {
+				CreateGraphTitle(parent, graph.title);
+		          }
 		          // Create axes if requested
 		          if (graph.showAxes && graph.axisColors != null && graph.axisLabels != null)
 		          {
@@ -449,6 +455,25 @@ public static class RadarGraphFactory
 
 		          Image bgImage = background.AddComponent<Image>();
 		          bgImage.color = color;
+	     }
+	     private static void CreateGraphTitle(GameObject parent, string title)
+	     {
+		          GameObject titleGO = new GameObject("GraphTitle");
+		          titleGO.transform.SetParent(parent.transform, false);
+
+		          RectTransform titleRT = titleGO.AddComponent<RectTransform>();
+		          titleRT.anchorMin = new Vector2(0.5f, 1f); // Top center
+		          titleRT.anchorMax = new Vector2(0.5f, 1f);
+		          titleRT.pivot = new Vector2(0.5f, 1f);
+		          titleRT.sizeDelta = new Vector2(80f, 20f);
+		          titleRT.anchoredPosition = new Vector2(0f, 3f); // Slightly below top edge
+
+		          TextMeshProUGUI titleText = titleGO.AddComponent<TextMeshProUGUI>();
+		          titleText.text = title;
+		          titleText.fontSize = 6;
+		          titleText.color = Color.white;
+		          titleText.alignment = TextAlignmentOptions.Top;
+		          titleText.fontStyle = FontStyles.Normal;
 	     }
 
 	     private static void CreateRadarAxes(GameObject parent, Graph graph, float axisLength)
@@ -568,10 +593,10 @@ public static class RadarGraphFactory
 		          labelText.text = label;
 		          labelText.fontSize = 6;
 		          labelText.color = color;
-		          if (label.Length >= 3)
-		          {
-				labelText.color = Color.white;
-		          }
+		          //        if (label.Length >= 3)
+		          //        {
+		          //labelText.color = Color.white;
+		          //        }
 		          labelText.alignment = TextAlignmentOptions.Center;
 	     }
 }

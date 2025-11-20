@@ -76,7 +76,69 @@ public static class PepoUtilitiesPersonality
 		          }
 		          return false;
 	     }
+	     public static List<string> GetPersonalityName(HEXACO hexaco)
+	     {
+		          List<string> names = new List<string>();
+		          if (hexaco == null)
+				return names;
 
+		          // Get all personality traits
+		          PersonalityAspect[] traits = hexaco.FullHexRange();
+
+		          // Filter traits that are significantly high (>=7.5) or low (<=2.5)
+		          var significantTraits = traits
+		              .Where(t => t != null && (t.value >= 6.66666f || t.value <= 3.33333f))
+		              .OrderByDescending(t => Mathf.Abs(t.value - 5f)) // Order by distance from midpoint (5)
+		              .ToList();
+
+		          if (significantTraits.Count == 0)
+				return names;
+
+		          // Generate dyad combinations from significant traits
+		          var dyadNames = GeneratePersonalityDyads(significantTraits);
+		          names.AddRange(dyadNames);
+
+		          // Also add individual trait descriptors for significant traits
+		          foreach (var trait in significantTraits)
+		          {
+				if (!string.IsNullOrEmpty(trait.descriptor) && !names.Contains(trait.descriptor))
+				{
+					     names.Add(trait.descriptor);
+				}
+		          }
+
+		          return names;
+	     }
+
+	     private static List<string> GeneratePersonalityDyads(List<PersonalityAspect> significantTraits)
+	     {
+		          List<string> dyadNames = new List<string>();
+
+		          // Generate combinations of significant traits (pairs)
+		          for (int i = 0; i < significantTraits.Count; i++)
+		          {
+				for (int j = i + 1; j < significantTraits.Count; j++)
+				{
+					     var trait1 = significantTraits[i];
+					     var trait2 = significantTraits[j];
+
+					     string key1 = $"{(trait1.value >= 5f ? "High" : "Low")}{trait1.name}-{(trait2.value >= 5f ? "High" : "Low")}{trait2.name}";
+					     string key2 = $"{(trait2.value >= 5f ? "High" : "Low")}{trait2.name}-{(trait1.value >= 5f ? "High" : "Low")}{trait1.name}";
+
+					     // Try both orderings of the key
+					     if (PepoLibraryPersonality.PersonalityDyads.TryGetValue(key1, out string dyadName) ||
+					         PepoLibraryPersonality.PersonalityDyads.TryGetValue(key2, out dyadName))
+					     {
+						          if (!dyadNames.Contains(dyadName))
+						          {
+								dyadNames.Add(dyadName);
+						          }
+					     }
+				}
+		          }
+
+		          return dyadNames;
+	     }
 	     public static string GetFeelingName(Mood mood)
 	     {
 		          if (mood == null)
@@ -87,12 +149,21 @@ public static class PepoUtilitiesPersonality
 
 		          // Filter emotions that are above a minimum threshold (e.g., 3.0)
 		          var significantEmotions = emotions
-		              .Where(e => e != null && e.value >= 2f)
+		              .Where(e => e != null && e.value >= 5f)
 		              .OrderByDescending(e => e.value)
 		              .ToList();
 
-		          if (significantEmotions.Count == 0)
-				return "Neutral";
+
+		          if (significantEmotions.Count < 1)
+		          {
+				//identify the top emotion and give adescriptor for that string.
+				var emotionalRanking = emotions.Where(e => e != null)
+					     .OrderByDescending(e => e.value).ToList();
+
+				return GetEmotionIntensityDescriptor(emotionalRanking[0]);
+
+		          }
+
 
 		          // Get the top emotion
 		          EmotionAspect topEmotion = significantEmotions[0];
@@ -135,17 +206,6 @@ public static class PepoUtilitiesPersonality
 					     }
 				}
 		          }
-
-		          // Try with just the top emotion
-		          if (topEmotion != null && !string.IsNullOrEmpty(topEmotion.name))
-		          {
-				string singleEmotionKey = topEmotion.name;
-				if (PepoLibraryPersonality.Feelings.TryGetValue(singleEmotionKey, out string singleFeeling))
-				{
-					     return singleFeeling;
-				}
-		          }
-
 		          // Final fallback: return the top emotion's descriptor
 		          if (topEmotion != null)
 		          {

@@ -40,7 +40,6 @@ public static class PepoFactoryBonds
 				name = "father";
 		          }
 		          PepoFactoryBonds.AsymetricalRelationship(parent, RelationshipType.parent, child, RelationshipType.offspring, name, "child");
-		          //access the child in the relationship library and 
 		          // Find the child in the parent's offspring relationship list and set obligation to 10
 		          if (parent.RelationshipLibrary.TryGetValue(RelationshipType.offspring, out List<PepoRelationshipData> offspringList))
 		          {

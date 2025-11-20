@@ -83,7 +83,7 @@ public static class PepoLibraryValues
 
 		          foreach (var v in list)
 		          {
-				v.maxValue = 7;
+				v.maxValue = 7;//7 = acted on in the last 12 hours, 6 = acted on in the last day, 5 = acted on in the last week = 4 acted on in the last month, 3 =  acted on in the last quarter, 2 = acted on in the last 6 months, 1 = acted on in the last year
 				v.value = 0;
 		          }
 

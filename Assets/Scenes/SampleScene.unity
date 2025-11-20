@@ -280,8 +280,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 10, y: 30}
+  m_AnchoredPosition: {x: -3.5, y: 0}
+  m_SizeDelta: {x: 3, y: 30}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &194558566
 MonoBehaviour:
@@ -530,6 +530,34 @@ MonoBehaviour:
   pepoPanel: {fileID: 1748989352}
   pepoPopManager: {fileID: 1440901001}
   pepoUI: {fileID: 0}
+  mascEyes:
+  - {fileID: -1857247962, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  - {fileID: 1235864439, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  - {fileID: 1908215024, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  - {fileID: 1989353263, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  femmeEyes:
+  - {fileID: 627150797, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  - {fileID: -1298769913, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  - {fileID: 2133620845, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  - {fileID: 1896953085, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  headShape:
+  - {fileID: -764172056, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  - {fileID: 2088305077, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  - {fileID: -1391115697, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  - {fileID: -949157053, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  - {fileID: -627751141, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  mouthShape:
+  - {fileID: 679540728, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  - {fileID: 2048499891, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  - {fileID: -1763252785, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  - {fileID: 519786009, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  - {fileID: -520302433, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  noseShape:
+  - {fileID: -1757048869, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  - {fileID: 812976655, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  - {fileID: 415162058, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  - {fileID: 2142615014, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
+  - {fileID: 1378827053, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
 --- !u!1 &1091395968
 GameObject:
   m_ObjectHideFlags: 0
@@ -825,8 +853,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   initialPepos: 20
   generationSteps: 80
-  maxPepos: 250
-  minPopulationThreshold: 50
+  maxPepos: 350
+  minPopulationThreshold: 40
   immigrantCount: 3
   multipleBirthChance: 0.02
   identicalTwinsChance: 0.004
@@ -835,7 +863,7 @@ MonoBehaviour:
   maxSiblings: 4
   childbearingMinAge: 16
   childbearingMaxAge: 45
-  agingIncrement: 7
+  agingIncrement: 3
   gestationalPeriod: 0.77
   amountOfPeopleToHaveExisted: 0
   generations: 0

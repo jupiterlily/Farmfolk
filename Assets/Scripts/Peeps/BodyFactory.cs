@@ -8,8 +8,9 @@ public static class BodyFactory
 		          // Each parent contributes one chromosome to the offspring
 		          Chromosome matChromosome = SelectRandomChromosome(mother);
 		          Chromosome patChromosome = SelectRandomChromosome(father);
-
-		          return new BodyData(matChromosome, patChromosome);
+		          BodyData body = new BodyData(matChromosome, patChromosome);
+		          body.ExpressChromosomes();
+		          return body;
 	     }
 
 	     // Helper method to randomly select one chromosome from a parent

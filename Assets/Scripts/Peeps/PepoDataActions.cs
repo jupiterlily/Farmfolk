@@ -1,26 +1,6 @@
 using System.Collections.Generic;
-using UnityEngine;
 
-public class PepoResource : PepoAspect
-{                   //can be anything, physical, social, emotional
-	     //food	     
-	     public string category;
-}
-public class PhysicalResource : PepoResource
-{
-	     public Vector3 location; //coordinates in lat, long, alt
-	     public float mass; //mass per unit
-	     public float amount;
-	     public string units; //unit for value
-	     public PhysicalResource(string name, float amount, float value, Vector3 location, string description)
-	     {
-		          this.name = name;
-		          this.value = value;
-		          this.amount = amount;
-		          this.location = location;
-		          this.descriptor = description;
-	     }
-}
+
 public class PepoState
 {
 	     //moral weight, emotional impact, value change, need change, resource change
@@ -76,15 +56,15 @@ public class ResourceState : PepoState
 		          float i = 0; //category counter
 		          foreach (var r in resources)
 		          {
-				if (r.category == resourceName)
+				if (r.category.Contains(resourceName))
 				{
-					     i += r.value;
+					     i += r.count;
 				}
 				if (r.name == resourceName)
 				{
 					     if (exceedValue && !exactValue)
 					     {
-						          if (r.value > targetValue)
+						          if (r.count > targetValue)
 						          {
 								isMet = true;
 								break;
@@ -92,7 +72,7 @@ public class ResourceState : PepoState
 					     }
 					     if (exceedValue && exactValue)
 					     {
-						          if (r.value >= targetValue)
+						          if (r.count >= targetValue)
 						          {
 								isMet = true;
 								break;
@@ -100,7 +80,7 @@ public class ResourceState : PepoState
 					     }
 					     if (reduceValue && exactValue)
 					     {
-						          if (r.value <= targetValue)
+						          if (r.count <= targetValue)
 						          {
 								isMet = true;
 								break;
@@ -108,7 +88,7 @@ public class ResourceState : PepoState
 					     }
 					     if (reduceValue && !exactValue)
 					     {
-						          if (r.value < targetValue)
+						          if (r.count < targetValue)
 						          {
 								isMet = true;
 								break;

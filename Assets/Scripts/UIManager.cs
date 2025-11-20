@@ -11,15 +11,30 @@ public class UIManager : MonoBehaviour
 
 	     private List<GameObject> currentPanels = new List<GameObject>();
 
+	     public List<Sprite> mascEyes;
+	     public List<Sprite> femmeEyes;
+	     public List<Sprite> headShape;
+	     public List<Sprite> mouthShape;
+	     public List<Sprite> noseShape;
 	     void Start()
 	     {
 		          // Ensure we have a reference to PepoUIManager
 		          if (pepoUI == null)
-				pepoUI = new PepoUIManager();
+				pepoUI = GetComponent<PepoUIManager>() ?? gameObject.AddComponent<PepoUIManager>();
+
+		          // Pass sprite references to PepoUIManager
+		          if (pepoUI != null)
+		          {
+				pepoUI.mascEyes = mascEyes;
+				pepoUI.femmeEyes = femmeEyes;
+				pepoUI.headShape = headShape;
+				pepoUI.mouthShape = mouthShape;
+				pepoUI.noseShape = noseShape;
+		          }
+
 		          // Initial population of UI
 		          RefreshPepoPanels();
 	     }
-
 	     void Update()
 	     {
 		          // Only refresh UI occasionally or when population changes
