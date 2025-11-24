@@ -12,12 +12,12 @@ public static class PepoUtilitiesPersonality
 				return false;
 		          }
 		          //if i have high honest i'm not a liar
-		          if (dude.personality.Honesty.value >= 7)
+		          if (dude.personality.Honesty.value >= 9)
 		          {
 				return false;
 		          }
-		          //if hedonism, power, conformity, negative then i won't lie
-		          if (dude.values[2].value < 0 || dude.values[4].value < 0 || dude.values[6].value < 0)
+		          //if hedonism or power, negative then i won't lie.
+		          if (dude.values[2].value < 0 || dude.values[4].value < 0)
 		          {
 				//if i value sacrifice, authenticity or solidarity i am not a liar
 				return false;
@@ -72,6 +72,7 @@ public static class PepoUtilitiesPersonality
 		          if (lieRoll < lieChance)
 		          {
 				Debug.LogWarning($"[PersonalityManager]{dude.fullname} is a filthy fucking liar");
+
 				return true;
 		          }
 		          return false;

@@ -49,6 +49,7 @@ public class PersonalityAspect : PepoAspect
 		          {
 				descriptor = low[UnityEngine.Random.Range(0, low.Count)];
 		          }
+		          maxValue = max;
 
 	     }
 

@@ -50,7 +50,8 @@ public class PepoUtilities
 				}
 				if (Pepo.age < 10f)
 				{
-					     Pepo.mother.ssd.wantsChildren++;
+					     Pepo.mother.ssd.wantsChildren[0]++;
+					     Pepo.mother.ssd.wantsChildren[1]++;
 				}
 		          }
 		          return losses;
@@ -79,4 +80,6 @@ public class PepoUtilities
 	     {
 		          return null;
 	     }
+
+
 }

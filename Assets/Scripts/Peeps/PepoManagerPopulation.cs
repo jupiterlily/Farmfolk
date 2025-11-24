@@ -46,7 +46,13 @@ public class PepoPopManager : MonoBehaviour
 	     private void InitialisePopulation()
 	     {
 		          Pepos = new PepoPopulation(initialPepos);
-
+		          //        foreach (var pepo in Pepos.population)
+		          //        {
+		          //int number = Random.Range(1, 5);
+		          //pepo.body.maternalChromosome.eyeColor = number;
+		          //pepo.body.paternalChromosome.eyeColor = number;
+		          //pepo.body.ExpressChromosomes();
+		          //        }
 		          Debug.Log($"[PepoManager] Initial population: {Pepos.population.Count} total, {mamas.Count} mamas, {papas.Count} papas");
 
 	     }
@@ -130,7 +136,7 @@ public class PepoPopManager : MonoBehaviour
 				{
 					     foreach (var guy in papas)
 					     {
-						          if (!PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.lover]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.offspring]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.parent]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.kin]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.incompatible]).Contains(guy) && i <= attempts)
+						          if (!PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.lover]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.spouse]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.offspring]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.parent]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.kin]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.incompatible]).Contains(guy) && i <= attempts)
 						          {//check if we're related by an int of our average conscientousness scores
 								float c = (mum.personality.Conscientiousness.value + guy.personality.Conscientiousness.value) / 2;
 								if (guy.isAlive && !PepoSystemMatchmaking.AreRelated(mum, guy, ((int)c)))
@@ -138,28 +144,51 @@ public class PepoPopManager : MonoBehaviour
 
 									     if (PepoSystemMatchmaking.AmIAttracted(mum, guy, (int)mum.personality.Conscientiousness.value))
 									     {
-										          PepoFactoryBonds.MutualRelationship(mum, guy, RelationshipType.lover);
-										          match = true;
-										          break;
-									     }
+										          //if his agreeableness is below 7 we check if he likes me back
+										          RelationshipType type = RelationshipType.lover;
+										          //if we both have a security value above 8 and we don't have a spouse already we make us spouses
+										          if (mum.values[5].value >= 7 && guy.values[5].value >= 7 && mum.RelationshipLibrary[RelationshipType.spouse].Count == 0 && guy.RelationshipLibrary[RelationshipType.spouse].Count == 0)
+										          {
+												type = RelationshipType.spouse;
+										          }
+										          {
+												if (guy.personality.Agreeableness.value < 8)
+												{
+													     if (PepoSystemMatchmaking.AmIAttracted(guy, mum, (int)guy.personality.Conscientiousness.value))
+													     {
+														          PepoFactoryBonds.MutualRelationship(mum, guy, type);
+														          match = true;
+														          break;
+													     }
+												}
+												else
+												{
+													     //he likes me back automatically
+													     PepoFactoryBonds.MutualRelationship(mum, guy, type);
+													     match = true;
+													     break;
+												}
+										          }
 
-								}
-								else
-								{
-									     //add him to my list of kin
-									     PepoFactoryBonds.MutualRelationship(mum, guy, RelationshipType.kin);
-									     i++;
+									     }
+									     else
+									     {
+										          //add him to my list of kin
+										          PepoFactoryBonds.MutualRelationship(mum, guy, RelationshipType.kin);
+										          i++;
+									     }
 								}
 						          }
-					     }
-					     if (!match)
-					     {
-						          f++;
+						          if (!match)
+						          {
+								f++;
+						          }
 					     }
 				}
 		          }
 		          return f;
 	     }
+
 	     private List<PepoData> ProcessGeneration()
 	     {
 		          var newGeneration = new List<PepoData>();

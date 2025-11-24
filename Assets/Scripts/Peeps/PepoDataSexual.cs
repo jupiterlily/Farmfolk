@@ -8,7 +8,7 @@ public class SocioSexualData
 	     public bool isPrepubescent = false;
 	     //public bool hasY = false; //can impregnate
 	     //public bool hasX = true; //can have a womb
-	     public int wantsChildren = 0;
+	     public int[] wantsChildren;
 
 	     public string identity = string.Empty;
 
@@ -39,7 +39,8 @@ public class SocioSexualData
 		          //hasX = (Random.value > 0.01f) ? true : false;
 		          isFertile = (Random.value > 0.01f) ? true : false;
 		          isPrepubescent = true;
-		          wantsChildren = Random.Range(0, 7);
+		          int minBairns = Random.Range(0, 15);
+		          wantsChildren = new int[] { minBairns, Random.Range(minBairns, 15) };
 		          isMonogamous = (Random.value > 0.3f) ? true : false;
 		          isAsexual = (Random.value < 0.3f) ? true : false;
 		          isAplatonic = (Random.value < 0.7f) ? true : false;

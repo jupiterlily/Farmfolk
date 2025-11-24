@@ -10,9 +10,18 @@ public class PepoUIManager : MonoBehaviour
 	     public List<Sprite> mascEyes;
 	     public List<Sprite> femmeEyes;
 	     public List<Sprite> headShape;
+	     public List<Sprite> freckles;
 	     public List<Sprite> mouthShape;
 	     public List<Sprite> noseShape;
+	     public List<Sprite> eyecolor;
+	     public List<Sprite> uHairBack;
+	     public List<Sprite> uHairFront;
+	     public List<Sprite> mHairBack;
+	     public List<Sprite> mHairFront;
+	     public List<Sprite> fHairBack;
+	     public List<Sprite> fHairFront;
 
+	     Dictionary<string, List<Sprite>> portraitLibrary;
 	     public GameObject CreateStatusPanel(PepoData pepo, Transform parent = null, Vector2 panelSize = default)
 	     {
 		          if (pepo == null)
@@ -25,7 +34,7 @@ public class PepoUIManager : MonoBehaviour
 				panelSize = new Vector2(180f, 180f);
 
 		          // Create panel with proper layout
-		          GameObject panel = new GameObject($"PepoStatusPanel_{pepo.forename}");
+		          GameObject panel = new GameObject($"PepoStatusPanel_{pepo.fullname}");
 		          RectTransform panelRT = panel.AddComponent<RectTransform>();
 		          panel.AddComponent<CanvasRenderer>();
 
@@ -34,7 +43,7 @@ public class PepoUIManager : MonoBehaviour
 		          panelImage.color = new Color(0.1f, 0.1f, 0.1f, 0.8f);
 
 		          // Change to Horizontal Layout Group for portrait + info side by side
-		          var layoutGroup = panel.AddComponent<HorizontalLayoutGroup>();
+		          var layoutGroup = panel.AddComponent<VerticalLayoutGroup>();
 		          layoutGroup.padding = new RectOffset(5, 5, 5, 5);
 		          layoutGroup.spacing = 5f;
 		          layoutGroup.childControlHeight = true;
@@ -52,264 +61,334 @@ public class PepoUIManager : MonoBehaviour
 				panel.transform.SetParent(parent, false);
 
 		          // Create portrait container
-		          GameObject portraitContainer = CreatePortrait(pepo);
-		          portraitContainer.transform.SetParent(panel.transform, false);
+		          GameObject personalPanel = new GameObject("PersonalPanel");
+		          RectTransform personalRT = personalPanel.AddComponent<RectTransform>();
+		          var PanelLayoutGroup = personalPanel.AddComponent<HorizontalLayoutGroup>();
+		          PanelLayoutGroup.padding = new RectOffset(5, 5, 5, 5);
+		          PanelLayoutGroup.spacing = 5f;
+		          PanelLayoutGroup.childControlHeight = true;
+		          PanelLayoutGroup.childForceExpandHeight = false;
 
-		          // Create info container (vertical layout for text and graphs)
-		          GameObject infoContainer = CreateInfoContainer(pepo);
-		          infoContainer.transform.SetParent(panel.transform, false);
+		          // Create info container (vertical layout for text and graphs)		          
+		          GameObject portraitContainer = PepoUIUtilities.CreatePortrait(pepo, fHairBack, fHairFront, mHairBack, mHairFront, uHairBack, uHairFront, headShape, eyecolor, mascEyes, femmeEyes, noseShape, mouthShape, freckles);
+		          portraitContainer.transform.SetParent(personalPanel.transform, false);
 
+		          GameObject infoContainer = PepoUIUtilities.CreateInfoContainer(pepo);
+		          infoContainer.transform.SetParent(personalPanel.transform, false);
+		          personalPanel.transform.SetParent(panel.transform, false);
+		          GameObject graphContainer = PepoUIUtilities.CreateGraphContainer(pepo);
+		          graphContainer.transform.SetParent(panel.transform, false);
+		          //GameObject familyTree = CreateFamilyTree(pepo, 2, panel.transform, new Vector2(panelSize.x - 10f, panelSize.y));
 		          return panel;
 	     }
 
-	     private GameObject CreatePortrait(PepoData pepo)
+	     public GameObject CreateFamilyTree(PepoData pepo, int generations, Transform parent = null, Vector2 size = default)
 	     {
-		          GameObject portrait = new GameObject("Portrait");
-		          RectTransform rt = portrait.AddComponent<RectTransform>();
-		          rt.sizeDelta = new Vector2(64f, 64f); // Fixed size for portrait
+		          if (pepo == null)
+				return null;
 
-		          // Add layout element to control sizing
-		          var layoutElement = portrait.AddComponent<LayoutElement>();
-		          layoutElement.preferredWidth = 64f;
-		          layoutElement.preferredHeight = 64f;
-		          layoutElement.minWidth = 32f;
-		          layoutElement.minHeight = 32f;
+		          if (size == default)
+				size = new Vector2(500f, 400f);
 
-		          // Create layered sprites
-		          CreateLayeredSprite(portrait.transform, GetHeadSprite(pepo), "Head", 0);
-		          CreateLayeredSprite(portrait.transform, GetEyeSprite(pepo), "Eyes", 1);
-		          CreateLayeredSprite(portrait.transform, GetNoseSprite(pepo), "Nose", 2);
-		          CreateLayeredSprite(portrait.transform, GetMouthSprite(pepo), "Mouth", 3);
+		          GameObject tree = new GameObject($"FamilyTree_{pepo.forename}_{pepo.surname}");
+		          RectTransform treeRT = tree.AddComponent<RectTransform>();
+		          treeRT.sizeDelta = size;
 
-		          return portrait;
+		          if (parent != null)
+				tree.transform.SetParent(parent, false);
+
+		          // Main vertical layout for generations
+		          var verticalLayout = tree.AddComponent<VerticalLayoutGroup>();
+		          verticalLayout.spacing = 3f;
+		          verticalLayout.padding = new RectOffset(2, 2, 2, 2);
+		          verticalLayout.childControlHeight = false;
+		          verticalLayout.childForceExpandHeight = false;
+
+		          // Collect family data (ancestors + root + descendants)
+		          var familyData = CollectFamilyData(pepo, generations);
+
+		          // Create each generation with appropriate labels
+		          for (int i = 0; i < familyData.Count; i++)
+		          {
+				string generationLabel = GetGenerationLabel(i, familyData.Count, pepo);
+				CreateGenerationPanel(tree.transform, familyData[i], generationLabel, i);
+		          }
+
+		          return tree;
 	     }
 
-	     private GameObject CreateInfoContainer(PepoData pepo)
+	     private static string GetGenerationLabel(int index, int totalGenerations, PepoData root)
 	     {
-		          GameObject infoContainer = new GameObject("InfoContainer");
-		          RectTransform rt = infoContainer.AddComponent<RectTransform>();
+		          int rootIndex = (totalGenerations - 1) / 2; // Root should be in the middle
 
-		          // Add Vertical Layout Group
-		          var layoutGroup = infoContainer.AddComponent<VerticalLayoutGroup>();
-		          layoutGroup.spacing = 2f;
-		          layoutGroup.childControlHeight = true;
-		          layoutGroup.childForceExpandHeight = true;
-		          layoutGroup.childControlWidth = true;
-		          layoutGroup.childForceExpandWidth = true;
+		          if (index < rootIndex)
+		          {
+				// Ancestors
+				int generationsBack = rootIndex - index;
+				if (generationsBack == 1)
+					     return "Parents";
+				if (generationsBack == 2)
+					     return "Grandparents";
+				if (generationsBack == 3)
+					     return "Great-Grandparents";
+				return $"{generationsBack - 1}x Great-Grandparents";
+		          }
+		          else if (index == rootIndex)
+		          {
+				return $"{root.forename} {root.surname}";
+		          }
+		          else
+		          {
+				// Descendants
+				int generationsForward = index - rootIndex;
+				if (generationsForward == 1)
+					     return "Children";
+				if (generationsForward == 2)
+					     return "Grandchildren";
+				if (generationsForward == 3)
+					     return "Great-Grandchildren";
+				return $"{generationsForward - 1}x Great-Grandchildren";
+		          }
+	     }
 
-		          // Add Content Size Fitter
-		          var sizeFitter = infoContainer.AddComponent<ContentSizeFitter>();
-		          sizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
+	     private void CreateGenerationPanel(Transform parent, List<PepoData> generation, string label, int generationIndex)
+	     {
+		          GameObject generationPanel = new GameObject($"Generation_{generationIndex}");
+		          generationPanel.transform.SetParent(parent, false);
+
+		          // Vertical layout for label + members
+		          var verticalLayout = generationPanel.AddComponent<VerticalLayoutGroup>();
+		          verticalLayout.spacing = 3f;
+		          verticalLayout.childAlignment = TextAnchor.MiddleCenter;
+
+		          var sizeFitter = generationPanel.AddComponent<ContentSizeFitter>();
 		          sizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
+		          sizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-		          // Create text elements
-		          CreateTMPText(infoContainer.transform, PepoUtilities.GetFullName(pepo), 12, FontStyles.Bold);
-		          CreateTMPText(infoContainer.transform, PepoLogUtilities.Age(pepo), 8);
-		          CreateTMPText(infoContainer.transform, $"{PepoLogUtilities.GetGenderExpression(pepo)} ", 8);
-		          CreateTMPText(infoContainer.transform, PepoLogUtilities.GetPregnancyStatus(pepo), 8);
+		          // Add generation label
+		          AddGenerationLabel(generationPanel.transform, label);
 
-		          // Create graph container
-		          GameObject graphContainer = CreateGraphContainer(infoContainer.transform);
+		          // Horizontal layout for family members
+		          GameObject membersContainer = new GameObject("Members");
+		          membersContainer.transform.SetParent(generationPanel.transform, false);
 
-		          // Add radar graphs (your existing code)
-		          if (pepo.personality != null)
-		          {
-				GameObject radar = CreateHexacoRadar(pepo, graphContainer.transform, 50f);
-				if (radar != null)
-				{
-					     RectTransform radarRT = radar.GetComponent<RectTransform>();
-					     radarRT.sizeDelta = new Vector2(80f, 80f);
-					     var radarLayout = radar.AddComponent<LayoutElement>();
-					     radarLayout.preferredWidth = 60f;
-					     radarLayout.preferredHeight = 60f;
-					     radarLayout.flexibleWidth = 0f;
-					     radarLayout.flexibleHeight = 0f;
-				}
-		          }
-
-		          // Add other radars (mood and values) - your existing code here
-		          if (pepo.mood != null)
-		          {
-				GameObject moodRadar = CreateMoodRadar(pepo, graphContainer.transform, 50f);
-				if (moodRadar != null)
-				{
-					     RectTransform radarRT = moodRadar.GetComponent<RectTransform>();
-					     radarRT.sizeDelta = new Vector2(80f, 80f);
-					     var radarLayout = moodRadar.AddComponent<LayoutElement>();
-					     radarLayout.preferredWidth = 60f;
-					     radarLayout.preferredHeight = 60f;
-					     radarLayout.flexibleWidth = 0f;
-					     radarLayout.flexibleHeight = 0f;
-				}
-		          }
-
-		          if (pepo.values != null && pepo.values.Count > 0)
-		          {
-				GameObject valuesRadar = CreateValuesRadar(pepo, graphContainer.transform, 50f);
-				if (valuesRadar != null)
-				{
-					     RectTransform radarRT = valuesRadar.GetComponent<RectTransform>();
-					     radarRT.sizeDelta = new Vector2(80f, 80f);
-					     var radarLayout = valuesRadar.AddComponent<LayoutElement>();
-					     radarLayout.preferredWidth = 60f;
-					     radarLayout.preferredHeight = 60f;
-				}
-		          }
-
-		          return infoContainer;
-	     }
-
-	     private void CreateLayeredSprite(Transform parent, Sprite sprite, string name, int order)
-	     {
-		          if (sprite == null)
-				return;
-
-		          GameObject spriteObj = new GameObject(name);
-		          spriteObj.transform.SetParent(parent, false);
-
-		          RectTransform rt = spriteObj.AddComponent<RectTransform>();
-		          rt.anchorMin = Vector2.zero;
-		          rt.anchorMax = Vector2.one;
-		          rt.sizeDelta = Vector2.zero;
-		          rt.anchoredPosition = Vector2.zero;
-
-		          Image image = spriteObj.AddComponent<Image>();
-		          image.sprite = sprite;
-		          image.preserveAspect = true;
-
-		          // Set sorting order (you might need a custom component for this in UI)
-		          // For UI, we rely on hierarchy order - later children render on top
-	     }
-
-	     // Sprite selection methods based on BodyData
-	     private Sprite GetHeadSprite(PepoData pepo)
-	     {
-		          if (pepo?.body == null || headShape == null || headShape.Count == 0)
-				return null;
-
-		          int headIndex = GetExpressedTrait(pepo.body, 0); // headShape trait
-		          return headShape[Mathf.Clamp(headIndex - 1, 0, headShape.Count - 1)];
-	     }
-
-	     private Sprite GetEyeSprite(PepoData pepo)
-	     {
-		          if (pepo?.body == null)
-				return null;
-
-		          int eyeShapeIndex = GetExpressedTrait(pepo.body, 3); // eyeShape trait
-		          string genderExpression = PepoLogUtilities.GetGenderExpression(pepo);
-
-		          List<Sprite> eyeList = (genderExpression == "Masculine") ? mascEyes : femmeEyes;
-		          if (eyeList == null || eyeList.Count == 0)
-				return null;
-
-		          return eyeList[Mathf.Clamp(eyeShapeIndex - 1, 0, eyeList.Count - 1)];
-	     }
-
-	     private Sprite GetNoseSprite(PepoData pepo)
-	     {
-		          if (pepo?.body == null || noseShape == null || noseShape.Count == 0)
-				return null;
-
-		          int noseIndex = GetExpressedTrait(pepo.body, 6); // noseShape trait
-		          return noseShape[Mathf.Clamp(noseIndex - 1, 0, noseShape.Count - 1)];
-	     }
-
-	     private Sprite GetMouthSprite(PepoData pepo)
-	     {
-		          if (pepo?.body == null || mouthShape == null || mouthShape.Count == 0)
-				return null;
-
-		          int mouthIndex = GetExpressedTrait(pepo.body, 7); // mouthShape trait
-		          return mouthShape[Mathf.Clamp(mouthIndex - 1, 0, mouthShape.Count - 1)];
-	     }
-
-	     private int GetExpressedTrait(BodyData body, int traitIndex)
-	     {
-		          if (body.expressedChromosomes == null || body.expressedChromosomes.Count <= traitIndex)
-				return 1; // Default to first variant
-
-		          return body.expressedChromosomes[traitIndex] == 0 ?
-		              body.maternalChromosome.GetTraitByIndex(traitIndex) :
-		              body.paternalChromosome.GetTraitByIndex(traitIndex);
-	     }
-
-	     private static GameObject CreateGraphContainer(Transform parent)
-	     {
-		          GameObject container = new GameObject("GraphContainer");
-		          container.transform.SetParent(parent, false);
-
-		          RectTransform containerRT = container.AddComponent<RectTransform>();
-		          containerRT.sizeDelta = new Vector2(160f, 50f); // Width to fit 2 graphs
-
-		          // Add Horizontal Layout Group
-		          var horizontalLayout = container.AddComponent<HorizontalLayoutGroup>();
-		          horizontalLayout.padding = new RectOffset(2, 2, 2, 2);
-		          horizontalLayout.spacing = 5f;
+		          var horizontalLayout = membersContainer.AddComponent<HorizontalLayoutGroup>();
+		          horizontalLayout.spacing = 3f;
 		          horizontalLayout.childAlignment = TextAnchor.MiddleCenter;
-		          horizontalLayout.childControlWidth = false;
 		          horizontalLayout.childControlHeight = false;
-		          horizontalLayout.childForceExpandWidth = false;
 		          horizontalLayout.childForceExpandHeight = false;
 
-		          // Add Content Size Fitter
-		          var sizeFitter = container.AddComponent<ContentSizeFitter>();
-		          sizeFitter.horizontalFit = ContentSizeFitter.FitMode.PreferredSize;
-		          sizeFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
-
-		          return container;
+		          // Create individual panels for each person in this generation
+		          foreach (var person in generation)
+		          {
+				if (person != null)
+				{
+					     CreateFamilyMemberPanel(membersContainer.transform, person, 2);
+				}
+		          }
 	     }
 
-	     private static void CreateTMPText(Transform parent, string text, int fontSize, FontStyles style = FontStyles.Normal)
+
+
+	     private static void AddGenerationLabel(Transform parent, string label)
 	     {
-		          GameObject textGO = new GameObject("TMP_Text");
+		          GameObject labelObj = new GameObject("GenerationLabel");
+		          labelObj.transform.SetParent(parent, false);
+
+		          var layoutElement = labelObj.AddComponent<LayoutElement>();
+		          layoutElement.preferredHeight = 8;
+		          layoutElement.minHeight = 6;
+
+		          var text = labelObj.AddComponent<TextMeshProUGUI>();
+		          text.text = label;
+		          text.fontSize = 4;
+		          text.color = Color.white;
+		          text.alignment = TextAlignmentOptions.Center;
+		          text.fontStyle = FontStyles.Bold;
+	     }
+	     private static List<List<PepoData>> CollectFamilyData(PepoData root, int maxGenerations)
+	     {
+		          var familyData = new List<List<PepoData>>();
+
+		          // First, collect all ancestors (from oldest to youngest)
+		          var ancestors = CollectAncestors(root, maxGenerations);
+
+		          // Then, collect all descendants (from oldest to youngest)  
+		          var descendants = CollectDescendants(root, maxGenerations);
+
+		          // Combine them: ancestors + root + descendants
+		          familyData.AddRange(ancestors);
+		          familyData.Add(new List<PepoData> { root }); // The root person and their mothers children
+		          familyData.AddRange(descendants);
+
+		          return familyData;
+	     }
+
+	     private static List<List<PepoData>> CollectAncestors(PepoData root, int maxGenerations)
+	     {
+		          var ancestors = new List<List<PepoData>>();
+		          var currentGeneration = new List<PepoData> { root };
+
+		          for (int gen = 1; gen <= maxGenerations; gen++)
+		          {
+				var parentGeneration = new List<PepoData>();
+
+				foreach (var person in currentGeneration)
+				{
+					     if (person?.mother != null && !parentGeneration.Contains(person.mother))
+						          parentGeneration.Add(person.mother);
+					     if (person?.father != null && !parentGeneration.Contains(person.father))
+						          parentGeneration.Add(person.father);
+				}
+
+				if (parentGeneration.Count > 0)
+				{
+					     ancestors.Insert(0, parentGeneration); // Insert at beginning to maintain chronological order
+					     currentGeneration = parentGeneration;
+				}
+				else
+				{
+					     break;
+				}
+		          }
+
+		          return ancestors;
+	     }
+
+	     private static List<List<PepoData>> CollectDescendants(PepoData root, int maxGenerations)
+	     {
+		          var descendants = new List<List<PepoData>>();
+		          var currentGeneration = new List<PepoData> { root };
+
+		          for (int gen = 1; gen <= maxGenerations; gen++)
+		          {
+				var childGeneration = new List<PepoData>();
+
+				foreach (var person in currentGeneration)
+				{
+					     if (person?.offspring != null)
+					     {
+						          foreach (var child in person.offspring)
+						          {
+								if (child != null && !childGeneration.Contains(child))
+									     childGeneration.Add(child);
+						          }
+					     }
+				}
+
+				if (childGeneration.Count > 0)
+				{
+					     descendants.Add(childGeneration);
+					     currentGeneration = childGeneration;
+				}
+				else
+				{
+					     break;
+				}
+		          }
+
+		          return descendants;
+	     }
+	     private static void AddGenerationLabel(Transform parent, int generationNumber, int totalGenerations)
+	     {
+		          GameObject labelObj = new GameObject("GenerationLabel");
+		          labelObj.transform.SetParent(parent, false);
+
+		          var layoutElement = labelObj.AddComponent<LayoutElement>();
+		          layoutElement.preferredWidth = 50;
+		          layoutElement.minWidth = 20;
+
+		          var text = labelObj.AddComponent<TextMeshProUGUI>();
+		          text.text = GetGenerationLabel(generationNumber, totalGenerations);
+		          text.fontSize = 4;
+		          text.color = Color.gray;
+		          text.alignment = TextAlignmentOptions.Center;
+		          text.verticalAlignment = VerticalAlignmentOptions.Middle;
+	     }
+
+	     private static string GetGenerationLabel(int generationNumber, int totalGenerations)
+	     {
+		          if (generationNumber == 0)
+				return "Self";
+		          if (generationNumber == 1)
+				return "Parents";
+		          if (generationNumber == 2)
+				return "Grandparents";
+		          if (generationNumber == 3)
+				return "Great-Grandparents";
+		          return $"{generationNumber}G Back";
+	     }
+
+	     private void CreateFamilyMemberPanel(Transform parent, PepoData person, int generationNumber)
+	     {
+		          GameObject memberPanel = new GameObject($"FamilyMember_{person.forename}");
+		          memberPanel.transform.SetParent(parent, false);
+
+		          // Vertical layout for portrait + name
+		          var verticalLayout = memberPanel.AddComponent<VerticalLayoutGroup>();
+		          verticalLayout.spacing = 2f;
+		          verticalLayout.padding = new RectOffset(2, 2, 2, 2);
+		          verticalLayout.childAlignment = TextAnchor.MiddleCenter;
+		          verticalLayout.childControlHeight = false;
+		          verticalLayout.childForceExpandHeight = false;
+		          verticalLayout.childControlWidth = true;
+		          verticalLayout.childForceExpandWidth = true;
+
+
+		          var layoutElement = memberPanel.AddComponent<LayoutElement>();
+		          layoutElement.preferredWidth = 30;
+		          layoutElement.minWidth = 30;
+		          layoutElement.flexibleWidth = 0f;
+
+		          // Create portrait then make it smaller etc.
+		          GameObject portrait = PepoUIUtilities.CreatePortrait(person, fHairBack, fHairFront, mHairBack, mHairFront, uHairBack, uHairFront, headShape, eyecolor, mascEyes, femmeEyes, noseShape, mouthShape, freckles);
+		          portrait.transform.SetParent(memberPanel.transform, false);
+		          portrait.transform.localScale = Vector3.one * 0.25f;
+
+		          // Add name and basic info
+		          AddMemberInfo(memberPanel.transform, person, generationNumber);
+
+
+	     }
+
+	     private static void AddMemberInfo(Transform parent, PepoData person, int generationNumber)
+	     {
+		          GameObject infoPanel = new GameObject("MemberInfo");
+		          infoPanel.transform.SetParent(parent, false);
+
+		          var verticalLayout = infoPanel.AddComponent<VerticalLayoutGroup>();
+		          verticalLayout.spacing = 1f;
+		          verticalLayout.childControlHeight = false;
+		          verticalLayout.childForceExpandHeight = false;
+
+		          // Name
+		          CreateFamilyTreeText(infoPanel.transform, person.forename, 5, FontStyles.Normal, Color.white);
+
+		          // Age and status for older generations
+		          if (generationNumber > 0)
+		          {
+				string status = person.isAlive ? $"Age: {person.age}" : "Deceased";
+				Color statusColor = person.isAlive ? Color.white : Color.gray;
+				CreateFamilyTreeText(infoPanel.transform, status, 4, FontStyles.Normal, statusColor);
+		          }
+	     }
+
+	     private static void CreateFamilyTreeText(Transform parent, string text, int fontSize, FontStyles style, Color color)
+	     {
+		          GameObject textGO = new GameObject("FamilyTreeText");
 		          textGO.transform.SetParent(parent, false);
 
-		          RectTransform rt = textGO.AddComponent<RectTransform>();
-		          rt.sizeDelta = new Vector2(160f, 20f);
+		          var layoutElement = textGO.AddComponent<LayoutElement>();
+		          layoutElement.preferredHeight = 6;
+		          layoutElement.minHeight = 4;
 
 		          var tmpText = textGO.AddComponent<TextMeshProUGUI>();
 		          tmpText.text = text;
 		          tmpText.fontSize = fontSize;
 		          tmpText.fontStyle = style;
-		          tmpText.color = Color.white;
+		          tmpText.color = color;
 		          tmpText.alignment = TextAlignmentOptions.Center;
-
-		          // Add layout element for text
-		          var layoutElement = textGO.AddComponent<LayoutElement>();
-		          layoutElement.preferredHeight = 15f;
-		          layoutElement.minHeight = 12f;
+		          tmpText.verticalAlignment = VerticalAlignmentOptions.Middle;
 	     }
-
-	     public static GameObject CreateHexacoRadar(PepoData pepo, Transform parent = null, float pixelRadius = 60f)
-	     {
-		          if (pepo?.personality == null)
-				return null;
-
-		          Graph pepoGraph = UIUtilities.CreateHexacoGraph(pepo.personality);
-		          return RadarGraphFactory.CreateRadarGraph(pepoGraph, parent, pixelRadius, $"HexacoRadar_{pepo.forename}");
-	     }
-
-	     public static GameObject CreateMoodRadar(PepoData pepo, Transform parent = null, float pixelRadius = 60f)
-	     {
-		          if (pepo?.mood == null)
-				return null;
-
-		          Graph pepoGraph = UIUtilities.CreateMoodGraph(pepo.mood);
-		          return RadarGraphFactory.CreateRadarGraph(pepoGraph, parent, pixelRadius, $"MoodRadar_{pepo.forename}");
-	     }
-	     public static GameObject CreateValuesRadar(PepoData pepo, Transform parent = null, float pixelRadius = 60f)
-	     {
-		          if (pepo?.values == null || pepo.values.Count == 0)
-				return null;
-
-		          Graph valuesGraph = UIUtilities.CreateValuesGraph(pepo.values);
-		          return RadarGraphFactory.CreateRadarGraph(valuesGraph, parent, pixelRadius, $"ValuesRadar_{pepo.forename}");
-	     }
-	     public static GameObject CreateCustomRadar(Graph graph, Transform parent = null, float size = 60f, string name = "CustomRadar")
-	     {
-		          return RadarGraphFactory.CreateRadarGraph(graph, parent, size, name);
-	     }
-
 }
 

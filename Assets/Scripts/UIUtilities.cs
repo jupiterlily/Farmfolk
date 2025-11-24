@@ -177,11 +177,11 @@ public static class UIUtilities
 		          graph.axisLabels = new string[] { "H", "E", "X", "A", "C", "O" };
 		          graph.axisColors = new Color[]
 		          {
-            Color.magenta,    // Honesty-Humility
-            Color.red,        // Emotionality
-            Color.yellow,     // eXtraversion
-            Color.green,      // Agreeableness
-            Color.cyan,       // Conscientiousness
+            Color.magenta,    // Honesty-Humility should be green
+            Color.red,        // Emotionality is yellow
+            Color.yellow,     // eXtraversion is peachy orange
+            Color.green,      // Agreeableness is salmon pink
+            Color.cyan,       // Conscientiousness is purple
             Color.blue        // Openness
 		          };
 
@@ -359,6 +359,141 @@ public static class UIUtilities
 	     {
 		          Color.RGBToHSV(baseColor, out float h, out float s, out float v);
 		          return Color.HSVToRGB(h, saturation, v);
+	     }
+
+	     public static Color[] GetPepoColors(BodyData body)
+	     {
+		          if (body == null)
+				return new Color[4]; // Return empty array if no body data
+
+		          // Get expressed traits
+		          int skinHue = body.expressedChromosomes[10];
+		          int skinSaturation = body.expressedChromosomes[9];
+		          int skinDepth = body.expressedChromosomes[8];
+		          int eyeColor = body.expressedChromosomes[4];
+		          int eyeDarkness = body.expressedChromosomes[5];
+		          int hairEumelanin = body.expressedChromosomes[1];
+		          int hairPheomelanin = body.expressedChromosomes[2];
+
+		          return new Color[4]
+		          {
+        GetHairColor(hairEumelanin, hairPheomelanin),    // Index 0
+        GetEyeColor(eyeColor, eyeDarkness),              // Index 1
+        GetSkinColor(skinHue, skinSaturation, skinDepth), // Index 2
+        GetMouthColor(skinHue, skinSaturation, skinDepth) // Index 3
+		          };
+	     }
+	     private static Color GetSkinColor(int hue, int saturation, int depth)
+	     {
+		          // Convert trait values (1-6) to HSV ranges
+		          float h = MapRange(hue, 1, 6, 25f / 360, 40f / 360); // Full hue spectrum
+		          float s = MapRange(saturation, 1, 6, 0.2f, 0.6f); // Moderate to high saturation
+		          float v = MapRange(depth, 1, 6, 0.95f, 0.25f); // Dark to light
+
+		          Color skinColor = Color.HSVToRGB(h, s, v);
+		          return skinColor;
+	     }
+
+	     private static Color GetEyeColor(int color, int darkness)
+	     {
+		          // Map eye color to specific hue ranges
+		          float h = 0f;
+		          float sMin = 0.35f, sMax = 0.8f;
+		          float vMin = 0.4f, vMax = 0.95f;
+		          switch (color)
+		          {
+		          case 1: // Violet
+		          h = 275f / 360f;
+		          sMin = 0.45f;
+		          sMax = 078f;
+		          vMin = 0.65f;
+		          vMax = 0.95f;
+		          break;
+		          case 2: // Blue
+		          h = 220f / 360f;
+		          sMin = 0.05f;
+		          sMax = 0.65f;
+		          vMin = 0.25f;
+		          vMax = 0.95f; // keep blues visibly bright
+		          break;
+		          case 3: // Blue-Green / teal
+		          h = 195f / 360f;
+		          sMin = 0.05f;
+		          sMax = 0.6f;
+		          vMin = 0.25f;
+		          vMax = 0.95f;
+		          break;
+		          case 4: // Green
+		          h = 130f / 360f;
+		          sMin = 0.1f;
+		          sMax = 0.5f;
+		          vMin = 0.45f;
+		          vMax = 0.95f;
+		          break;
+		          case 5: // Hazel (yellow-brown)
+		          h = 45f / 360f;
+		          sMin = 0.4f;
+		          sMax = 0.8f;
+		          vMin = 0.5f;
+		          vMax = 0.9f;
+		          break;
+		          case 6: // Brown
+		          h = 20f / 360f;
+		          sMin = 0.15f;
+		          sMax = 0.7f;
+		          vMin = 0.15f;
+		          vMax = 0.7f;
+		          break;
+		          default:
+		          h = 0f; //albino red
+		          sMin = 0.5f;
+		          sMax = 0.8f;
+		          vMin = 0.55f;
+		          vMax = 0.95f;
+		          break;
+		          }
+
+		          // darkness is 1..4 (1 = lightest). Map so darker -> lower value
+		          float s = MapRange(darkness, 1, 4, sMax, sMin);
+		          float v = MapRange(darkness, 1, 4, vMax, vMin);
+
+		          Color eyeColor = Color.HSVToRGB(h, s, v);
+
+
+
+		          return eyeColor;
+	     }
+
+	     private static Color GetHairColor(int eumelanin, int pheomelanin)
+	     {
+		          // Eumelanin controls darkness (black/brown), Pheomelanin controls redness
+		          float baseHue = MapRange(pheomelanin, 1, 6, 0.02f, 0.15f); // Slight yellow to orange-red
+		          float saturation = MapRange(eumelanin + pheomelanin, 1, 14, 0.3f, 0.55f); // More pheomelanin = more saturation
+		          float value = MapRange(eumelanin, 1, 9, 0.8f, 0.02f); // More eumelanin = darker
+
+		          Color hairColor = Color.HSVToRGB(baseHue, saturation, value);
+		          return hairColor;
+	     }
+
+	     private static Color GetMouthColor(int skinHue, int skinSaturation, int skinDepth)
+	     {
+		          // Start with skin color but make it slightly more red/pink
+		          Color skinColor = GetSkinColor(skinHue, skinSaturation, skinDepth);
+
+		          // Convert to HSV to adjust
+		          Color.RGBToHSV(skinColor, out float h, out float s, out float v);
+
+		          // Make slightly more red and saturated for lips
+		          h = Mathf.Clamp(h + 0.853f, 0.9f, 1f);
+		          s = Mathf.Clamp(s + 0.2f, 0.2f, 0.35f);
+		          v = Mathf.Clamp(v - 0.1f, 0.35f, .7f);
+
+		          return Color.HSVToRGB(h, s, v);
+	     }
+
+	     private static float MapRange(float value, float fromMin, float fromMax, float toMin, float toMax)
+	     {
+		          return (value - fromMin) / (fromMax - fromMin) * (toMax - toMin) + toMin;
 	     }
 }
 
@@ -599,4 +734,5 @@ public static class RadarGraphFactory
 		          //        }
 		          labelText.alignment = TextAlignmentOptions.Center;
 	     }
+
 }

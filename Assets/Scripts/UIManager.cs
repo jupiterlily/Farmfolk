@@ -13,9 +13,17 @@ public class UIManager : MonoBehaviour
 
 	     public List<Sprite> mascEyes;
 	     public List<Sprite> femmeEyes;
+	     public List<Sprite> eyeColor;
 	     public List<Sprite> headShape;
+	     public List<Sprite> freckles;
 	     public List<Sprite> mouthShape;
 	     public List<Sprite> noseShape;
+	     public List<Sprite> uHairBack;
+	     public List<Sprite> uHhairFront;
+	     public List<Sprite> mHairBack;
+	     public List<Sprite> mHairFront;
+	     public List<Sprite> fHairBack;
+	     public List<Sprite> fHairFront;
 	     void Start()
 	     {
 		          // Ensure we have a reference to PepoUIManager
@@ -28,8 +36,16 @@ public class UIManager : MonoBehaviour
 				pepoUI.mascEyes = mascEyes;
 				pepoUI.femmeEyes = femmeEyes;
 				pepoUI.headShape = headShape;
+				pepoUI.freckles = freckles;
 				pepoUI.mouthShape = mouthShape;
 				pepoUI.noseShape = noseShape;
+				pepoUI.eyecolor = eyeColor;
+				pepoUI.uHairBack = uHairBack;
+				pepoUI.uHairFront = uHhairFront;
+				pepoUI.mHairBack = mHairBack;
+				pepoUI.mHairFront = mHairFront;
+				pepoUI.fHairBack = fHairBack;
+				pepoUI.fHairFront = fHairFront;
 		          }
 
 		          // Initial population of UI

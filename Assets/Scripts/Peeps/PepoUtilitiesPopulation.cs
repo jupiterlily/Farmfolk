@@ -125,7 +125,7 @@ public static class PepoUtilitiesPopulation
 		          var lilGuys = new List<PepoData>();
 		          foreach (var pepo in pepos)
 		          {
-				if (pepo == null || pepo.ssd.isPrepubescent || pepo.ssd.wantsChildren < 1)
+				if (pepo == null || pepo.ssd.isPrepubescent || pepo.ssd.wantsChildren[1] < 1)
 					     continue;
 				lilGuys.Add(pepo);
 		          }

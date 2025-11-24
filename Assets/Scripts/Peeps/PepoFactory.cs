@@ -21,6 +21,7 @@ public static class PepoFactory
 		          clone.mass = donor.mass;
 		          clone.mood = new Mood();
 		          clone.body = new BodyData(clone.body.maternalChromosome, clone.body.paternalChromosome);
+		          clone.body.expressedChromosomes = donor.body.expressedChromosomes;
 		          foreach (var emotion in clone.mood.FullHexRange())
 		          {
 				emotion.value = Random.Range(0, 10f);
@@ -138,6 +139,7 @@ public static class PepoFactory
 	     public static void InitialiseRelationshipLibrary(PepoData pepo)
 	     {
 		          pepo.RelationshipLibrary.Add(RelationshipType.lover, new List<PepoRelationshipData>());
+		          pepo.RelationshipLibrary.Add(RelationshipType.spouse, new List<PepoRelationshipData>());
 		          pepo.RelationshipLibrary.Add(RelationshipType.ex, new List<PepoRelationshipData>());
 		          pepo.RelationshipLibrary.Add(RelationshipType.offspring, new List<PepoRelationshipData>());
 		          pepo.RelationshipLibrary.Add(RelationshipType.parent, new List<PepoRelationshipData>());

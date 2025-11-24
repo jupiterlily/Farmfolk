@@ -24,6 +24,8 @@ public static class BodyFactory
 	     // Create a random individual (for initial population)
 	     public static BodyData CreateRandomIndividual()
 	     {
-		          return new BodyData();
+		          BodyData body = new BodyData();
+		          body.ExpressChromosomes();
+		          return body;
 	     }
 }

@@ -24,6 +24,25 @@ public static class PepoSystemMatchmaking
 				PepoFactoryBonds.ParasocialRelationship(me, target, RelationshipType.incompatible, "strictly platonic acquaintence");
 				return false;
 		          }
+		          //what do we think of theri appearnace? people who value conformity or have low openness want people who look like them
+		          if (degree >= 2)
+		          {
+				float similarityscore = PepoUtilitiesMatchmaking.ComparePhysicalAppearance(me, target);
+				float requiredSimilarity = 0f;
+				//low openness or high conformity means you want people who look like you
+				requiredSimilarity += (1 - me.personality.Openness.value / me.personality.Openness.maxValue) / 3;
+				requiredSimilarity += (me.values[6].value / me.values[6].maxValue) / 3;
+				//high universalism means you want people who look different to you
+				requiredSimilarity -= (me.values[9].value / me.values[9].maxValue) / 3;
+				if (similarityscore < requiredSimilarity)
+				{
+					     Debug.LogWarning($"[Relationship Manager]{me.fullname} doesn't find {target.fullname} physically attractive (similarity: {similarityscore}, required: {requiredSimilarity})");
+
+					     PepoFactoryBonds.ParasocialRelationship(me, target, RelationshipType.incompatible, "strictly platonic acquaintence");
+					     return false;
+				}
+
+		          }
 		          //am I romantically inclined towards them?
 		          if (degree >= 3 && (!me.ssd.romanceFemme && (target.ssd.presentsFemme || target.ssd.isFemme)) || (!me.ssd.romanceMasc && (target.ssd.presentsMasc || target.ssd.isMasc) && !PepoUtilitiesPersonality.IsLying(target)))
 		          {
@@ -42,28 +61,28 @@ public static class PepoSystemMatchmaking
 		          if (degree >= 5 && (target.age > (me.age / 2) + 7 && !PepoUtilitiesPersonality.IsLying(target) && !PepoUtilitiesPersonality.IsLying(me)))
 		          {
 				Debug.LogWarning($"[Relationship Manager]{target.fullname} is too young for {me.fullname}");
-				//PepoFactoryBonds.ParasocialRelationship(me, target, RelationshipType.incompatible, "strictly platonic acquaintence");
+				PepoFactoryBonds.ParasocialRelationship(me, target, RelationshipType.incompatible, "strictly platonic acquaintence");
 				return false;
 		          }
 		          //are they too old?
 		          if (degree >= 6 && (target.age > me.age * 2 && !PepoUtilitiesPersonality.IsLying(target) && !PepoUtilitiesPersonality.IsLying(me)))
 		          {
 				Debug.LogWarning($"[Relationship Manager]{target.fullname} is too old for {me.fullname}");
-				//PepoFactoryBonds.ParasocialRelationship(me, target, RelationshipType.incompatible, "strictly platonic acquaintence");
+				PepoFactoryBonds.ParasocialRelationship(me, target, RelationshipType.incompatible, "strictly platonic acquaintence");
 				return false;
 		          }
 		          //am I old enough
 		          if (degree >= 7 && (me.age > (target.age / 2) + 7 && !PepoUtilitiesPersonality.IsLying(target) && !PepoUtilitiesPersonality.IsLying(me)))
 		          {
 				Debug.LogWarning($"[Relationship Manager]{me.fullname} thinks they aren't old enough to date {target.fullname}");
-				//PepoFactoryBonds.ParasocialRelationship(me, target, RelationshipType.incompatible, "strictly platonic acquaintence");
+				PepoFactoryBonds.ParasocialRelationship(me, target, RelationshipType.incompatible, "strictly platonic acquaintence");
 				return false;
 		          }
 		          //am I too old?
 		          if (degree >= 8 && (me.age > target.age * 2 && !PepoUtilitiesPersonality.IsLying(target) && !PepoUtilitiesPersonality.IsLying(me)))
 		          {
 				Debug.LogWarning($"[Relationship Manager]{me.fullname} thinks they are too old for {target.fullname}");
-				//PepoFactoryBonds.ParasocialRelationship(me, target, RelationshipType.incompatible, "strictly platonic acquaintence");
+				PepoFactoryBonds.ParasocialRelationship(me, target, RelationshipType.incompatible, "strictly platonic acquaintence");
 				return false;
 		          }
 		          //if i am monogomous i am not attracted to people who aren't monogomous, unlessss they are dishonest about it
@@ -73,8 +92,8 @@ public static class PepoSystemMatchmaking
 				PepoFactoryBonds.ParasocialRelationship(me, target, RelationshipType.incompatible, "strictly platonic acquaintence");
 				return false;
 		          }
-		          int iWant = me.ssd.wantsChildren - me.knownOffspring?.Count(o => o != null && o.isAlive) ?? 0;
-		          int theyWant = target.ssd.wantsChildren - target.knownOffspring?.Count(o => o != null && o.isAlive) ?? 0;
+		          int iWant = me.ssd.wantsChildren[1] - me.knownOffspring?.Count(o => o != null && o.isAlive) ?? 0;
+		          int theyWant = target.ssd.wantsChildren[0] - target.knownOffspring?.Count(o => o != null && o.isAlive) ?? 0;
 		          int diff = iWant - theyWant;
 		          if (degree >= 9 && (iWant > theyWant || (iWant > theyWant && !PepoUtilitiesPersonality.IsLying(target))))
 		          {
@@ -340,21 +359,13 @@ public static class PepoSystemMatchmaking
 		          private static bool CheckFertilityPreferences(PepoData me, PepoData target)
 		          {
 				// Check if both want children to similar degree
-				int wantDiff = Mathf.Abs(me.ssd.wantsChildren - target.ssd.wantsChildren);
-				if (wantDiff > 2) // More than 2 steps difference
-				{
-					     Debug.Log($"[Biological] Fertility preference mismatch: {me.ssd.wantsChildren} vs {target.ssd.wantsChildren}");
-					     return false;
+				if (me.ssd.wantsChildren[1] >= target.ssd.wantsChildren[0])
+				{//if my max wanted kids is above their minimum we match
+					     return true;
 				}
 
-				// Check monogamy compatibility
-				if (me.ssd.isMonogamous && target.lovers > 0)
-				{
-					     Debug.Log($"[Biological] Monogamy mismatch");
-					     return false;
-				}
-
-				return true;
+				Debug.Log($"[Biological] Fertility preference mismatch: {me.ssd.wantsChildren} vs {target.ssd.wantsChildren}");
+				return false;
 		          }
 	     }
 
