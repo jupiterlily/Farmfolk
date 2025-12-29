@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-public class Need : PepoAspect
+public class Need : NumericalAspect
 {
 	     public float currentLevel;
 	     public float decayRate; // per hour

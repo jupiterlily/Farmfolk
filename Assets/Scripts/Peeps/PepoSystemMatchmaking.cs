@@ -58,7 +58,7 @@ public static class PepoSystemMatchmaking
 				return false;
 		          }
 		          //are they old enough
-		          if (degree >= 5 && (target.age > (me.age / 2) + 7 && !PepoUtilitiesPersonality.IsLying(target) && !PepoUtilitiesPersonality.IsLying(me)))
+		          if (degree >= 5 && (target.age < (me.age / 2) + 7 && !PepoUtilitiesPersonality.IsLying(target) && !PepoUtilitiesPersonality.IsLying(me)))
 		          {
 				Debug.LogWarning($"[Relationship Manager]{target.fullname} is too young for {me.fullname}");
 				PepoFactoryBonds.ParasocialRelationship(me, target, RelationshipType.incompatible, "strictly platonic acquaintence");
@@ -79,7 +79,7 @@ public static class PepoSystemMatchmaking
 				return false;
 		          }
 		          //am I too old?
-		          if (degree >= 8 && (me.age > target.age * 2 && !PepoUtilitiesPersonality.IsLying(target) && !PepoUtilitiesPersonality.IsLying(me)))
+		          if (degree >= 8 && (me.age < target.age * 2 && !PepoUtilitiesPersonality.IsLying(target) && !PepoUtilitiesPersonality.IsLying(me)))
 		          {
 				Debug.LogWarning($"[Relationship Manager]{me.fullname} thinks they are too old for {target.fullname}");
 				PepoFactoryBonds.ParasocialRelationship(me, target, RelationshipType.incompatible, "strictly platonic acquaintence");

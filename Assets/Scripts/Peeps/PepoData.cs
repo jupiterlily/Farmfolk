@@ -4,8 +4,9 @@ using UnityEngine;
 
 public class PepoData
 {
-	     public string forename = "John";
-	     public string surname = "Doe";
+	     public QualitativeAspect[] pepoName = new QualitativeAspect[2] { new QualitativeAspect() { name = "forename", value = "John" }, new QualitativeAspect() { name = "surname", value = "Doe" } };
+	     public string forename => pepoName[0].value;
+	     public string surname => pepoName[pepoName.Length - 1].value;
 	     public string fullname => PepoUtilities.GetFullName(this);
 	     //latitute, longitude, altitude
 	     public Vector3 currentLocation = Vector3.zero;
@@ -20,6 +21,7 @@ public class PepoData
 	     public Mood mood;
 	     public MaslowHeirachy needs;
 	     public List<Value> values = new List<Value>(PepoFactoryValues.RandomValues());
+	     public PepoResources resources; //the stuff we think we have and what we want.
 
 	     public List<PregnancyData> womb;
 
@@ -103,11 +105,14 @@ public class PepoLook
 public class Aspect
 {
 	     public string name;
-	     public float value;
-
 }
-public class PepoAspect : Aspect
+public class QualitativeAspect : Aspect
 {
+	     public string value;
+}
+public class NumericalAspect : Aspect
+{
+	     public float value;
 	     public float maxValue;
 	     public float minValue;
 	     public bool polar; //does the aspect have poles?
@@ -116,7 +121,7 @@ public class PepoAspect : Aspect
 	     public int timesIntegrated = 1;
 	     //normalises and averages
 	     // Normalizes and averages aspects
-	     public void IntegrateAspect(PepoAspect aspect, bool additive = true)
+	     public void IntegrateAspect(NumericalAspect aspect, bool additive = true)
 	     {
 		          float scaledAspectValue = aspect.value;
 		          float factor = maxValue / aspect.maxValue;

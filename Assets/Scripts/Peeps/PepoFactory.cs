@@ -1,5 +1,6 @@
 
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class PepoFactory
@@ -8,8 +9,8 @@ public static class PepoFactory
 	     public static PepoData ClonePepo(PepoData donor, bool newborn = false)
 	     {
 		          PepoData clone = new PepoData() { };
-		          clone.forename = donor.forename;
-		          clone.surname = donor.surname;
+
+		          clone.pepoName = donor.pepoName;
 		          clone.massGenetics = donor.massGenetics;
 		          clone.height = donor.height;
 		          clone.ssd = donor.ssd;
@@ -85,13 +86,13 @@ public static class PepoFactory
 		          pepo.currentLocation = pepo.homeLocation;
 
 		          InitialiseRelationshipLibrary(pepo);
-
-		          pepo.forename = PepoUtilitiesNames.InitialiseForname(pepo);
-		          pepo.surname = PepoUtilitiesNames.InitialiseSurname();
+		          //
+		          pepo.pepoName[0].value = PepoUtilitiesNames.InitialiseForname(pepo);
+		          pepo.pepoName[1].value = PepoUtilitiesNames.InitialiseSurname();
 		          pepo.personality = new HEXACO();
-		          if (pepo.age > 25)
+		          if (pepo.age > 19)
 		          {
-				PepoSystemAgeing.InitialisePuberty(25, pepo);
+				PepoSystemAgeing.InitialisePuberty(19, pepo);
 		          }
 		          pepo.needs = new MaslowHeirachy(pepo);
 		          pepo.mood = new Mood();
@@ -100,7 +101,6 @@ public static class PepoFactory
 				emotion.value = Random.Range(0, pepo.personality.Emotionality.value);
 		          }
 		          PepoLogUtilities.LogPepo(pepo);
-
 		          return pepo;
 	     }
 	     public static PepoData InitialiseFromParents(PepoData mat, PepoData pat)
@@ -120,8 +120,24 @@ public static class PepoFactory
 		          bairn.father = pat;
 		          mat.offspring.Add(bairn);
 		          pat.offspring.Add(bairn);
-		          PepoUtilitiesNames.InitialiseForname(bairn);
-		          bairn.surname = mat.surname; //pat's surname
+		          //create a list of names from me, my parents, my partner and my other children.
+		          List<string> excludedNames = new List<string>();
+
+		          // Siblings
+		          excludedNames.AddRange(mat.offspring.Select(s => s.forename));
+		          excludedNames.AddRange(pat.offspring.Select(s => s.forename));
+
+		          // Aunts/uncles (excluding parents)
+		          if (mat.mother != null)
+				excludedNames.AddRange(mat.mother.offspring.Where(a => a != mat).Select(a => a.forename));
+
+		          if (pat.mother != null)
+				excludedNames.AddRange(pat.mother.offspring.Where(a => a != pat).Select(a => a.forename));
+
+		          // Remove duplicates if needed
+		          excludedNames = excludedNames.Distinct().ToList();
+		          PepoUtilitiesNames.InitialiseForname(bairn, excludedNames);
+		          bairn.pepoName[1].value = mat.surname; //mothers surname. this should become a method that filters through a pepos values and cluture to return aname they wulod give to a child. default tohaving the mother choose for now but pepos should have cultural rules that determine who chooses the name.
 		          bairn.currentLocation = mat.currentLocation;
 		          bairn.homeLocation = mat.homeLocation;
 		          bairn.needs = new MaslowHeirachy(bairn);
@@ -143,8 +159,20 @@ public static class PepoFactory
 		          pepo.RelationshipLibrary.Add(RelationshipType.ex, new List<PepoRelationshipData>());
 		          pepo.RelationshipLibrary.Add(RelationshipType.offspring, new List<PepoRelationshipData>());
 		          pepo.RelationshipLibrary.Add(RelationshipType.parent, new List<PepoRelationshipData>());
+		          pepo.RelationshipLibrary.Add(RelationshipType.coparent, new List<PepoRelationshipData>());
 		          pepo.RelationshipLibrary.Add(RelationshipType.kin, new List<PepoRelationshipData>());
 		          pepo.RelationshipLibrary.Add(RelationshipType.incompatible, new List<PepoRelationshipData>());
 		          pepo.RelationshipLibrary.Add(RelationshipType.friend, new List<PepoRelationshipData>());
+		          pepo.RelationshipLibrary.Add(RelationshipType.bestie, new List<PepoRelationshipData>());
+		          pepo.RelationshipLibrary.Add(RelationshipType.acquaintence, new List<PepoRelationshipData>());
+		          pepo.RelationshipLibrary.Add(RelationshipType.enemy, new List<PepoRelationshipData>());
+		          pepo.RelationshipLibrary.Add(RelationshipType.rival, new List<PepoRelationshipData>());
+		          pepo.RelationshipLibrary.Add(RelationshipType.courting, new List<PepoRelationshipData>());
+		          pepo.RelationshipLibrary.Add(RelationshipType.mentor, new List<PepoRelationshipData>());
+		          pepo.RelationshipLibrary.Add(RelationshipType.mentee, new List<PepoRelationshipData>());
+		          pepo.RelationshipLibrary.Add(RelationshipType.leader, new List<PepoRelationshipData>());
+		          pepo.RelationshipLibrary.Add(RelationshipType.follower, new List<PepoRelationshipData>());
+		          pepo.RelationshipLibrary.Add(RelationshipType.rolemodel, new List<PepoRelationshipData>());
+		          pepo.RelationshipLibrary.Add(RelationshipType.peer, new List<PepoRelationshipData>());
 	     }
 }

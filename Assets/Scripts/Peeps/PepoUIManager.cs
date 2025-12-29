@@ -11,7 +11,8 @@ public class PepoUIManager : MonoBehaviour
 	     public List<Sprite> femmeEyes;
 	     public List<Sprite> headShape;
 	     public List<Sprite> freckles;
-	     public List<Sprite> mouthShape;
+	     public List<Sprite> bottomLips;
+	     public List<Sprite> topLips;
 	     public List<Sprite> noseShape;
 	     public List<Sprite> eyecolor;
 	     public List<Sprite> uHairBack;
@@ -20,6 +21,9 @@ public class PepoUIManager : MonoBehaviour
 	     public List<Sprite> mHairFront;
 	     public List<Sprite> fHairBack;
 	     public List<Sprite> fHairFront;
+	     public List<Sprite> brows;
+	     public List<Sprite> stubble;
+	     public List<Sprite> moustaches;
 
 	     Dictionary<string, List<Sprite>> portraitLibrary;
 	     public GameObject CreateStatusPanel(PepoData pepo, Transform parent = null, Vector2 panelSize = default)
@@ -70,7 +74,7 @@ public class PepoUIManager : MonoBehaviour
 		          PanelLayoutGroup.childForceExpandHeight = false;
 
 		          // Create info container (vertical layout for text and graphs)		          
-		          GameObject portraitContainer = PepoUIUtilities.CreatePortrait(pepo, fHairBack, fHairFront, mHairBack, mHairFront, uHairBack, uHairFront, headShape, eyecolor, mascEyes, femmeEyes, noseShape, mouthShape, freckles);
+		          GameObject portraitContainer = PepoUIUtilities.CreatePortrait(pepo, fHairBack, fHairFront, mHairBack, mHairFront, uHairBack, uHairFront, headShape, eyecolor, mascEyes, femmeEyes, noseShape, topLips, bottomLips, freckles, brows, stubble, moustaches);
 		          portraitContainer.transform.SetParent(personalPanel.transform, false);
 
 		          GameObject infoContainer = PepoUIUtilities.CreateInfoContainer(pepo);
@@ -341,7 +345,7 @@ public class PepoUIManager : MonoBehaviour
 		          layoutElement.flexibleWidth = 0f;
 
 		          // Create portrait then make it smaller etc.
-		          GameObject portrait = PepoUIUtilities.CreatePortrait(person, fHairBack, fHairFront, mHairBack, mHairFront, uHairBack, uHairFront, headShape, eyecolor, mascEyes, femmeEyes, noseShape, mouthShape, freckles);
+		          GameObject portrait = PepoUIUtilities.CreatePortrait(person, fHairBack, fHairFront, mHairBack, mHairFront, uHairBack, uHairFront, headShape, eyecolor, mascEyes, femmeEyes, noseShape, topLips, bottomLips, freckles, brows, stubble, moustaches);
 		          portrait.transform.SetParent(memberPanel.transform, false);
 		          portrait.transform.localScale = Vector3.one * 0.25f;
 

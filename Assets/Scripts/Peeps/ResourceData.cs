@@ -23,6 +23,12 @@ public class ResourceData
 		          mass += (tempMass * amount);
 	     }
 }
+public class PepoResources
+{
+	     public List<ResourceData> inventory;
+	     public Dictionary<ResourceData, PlaceData> storage; //this is a pepos perception of what is stored there. maybe they get there and it's gone.
+	     public List<ResourceData> wishlist; //this is stuff a pepo is looking to acquire
+}
 public class PepoResource : ResourceData
 {                   //can be anything, physical, social, emotional but this is aresource as it exists on the pepo.
 	     //food	     

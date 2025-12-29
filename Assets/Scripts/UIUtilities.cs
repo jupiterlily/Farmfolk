@@ -387,7 +387,7 @@ public static class UIUtilities
 	     {
 		          // Convert trait values (1-6) to HSV ranges
 		          float h = MapRange(hue, 1, 6, 25f / 360, 40f / 360); // Full hue spectrum
-		          float s = MapRange(saturation, 1, 6, 0.2f, 0.6f); // Moderate to high saturation
+		          float s = MapRange(saturation, 1, 6, 0.25f, 0.6f); // Moderate to high saturation
 		          float v = MapRange(depth, 1, 6, 0.95f, 0.25f); // Dark to light
 
 		          Color skinColor = Color.HSVToRGB(h, s, v);
@@ -404,45 +404,45 @@ public static class UIUtilities
 		          {
 		          case 1: // Violet
 		          h = 275f / 360f;
-		          sMin = 0.45f;
-		          sMax = 078f;
-		          vMin = 0.65f;
-		          vMax = 0.95f;
+		          sMin = 0.25f;
+		          sMax = 0.60f;
+		          vMin = 0.40f;
+		          vMax = 0.55f;
 		          break;
 		          case 2: // Blue
-		          h = 220f / 360f;
-		          sMin = 0.05f;
+		          h = 215f / 360f;
+		          sMin = 0.20f;
 		          sMax = 0.65f;
-		          vMin = 0.25f;
+		          vMin = 0.45f;
 		          vMax = 0.95f; // keep blues visibly bright
 		          break;
 		          case 3: // Blue-Green / teal
 		          h = 195f / 360f;
-		          sMin = 0.05f;
+		          sMin = 0.20f;
 		          sMax = 0.6f;
 		          vMin = 0.25f;
 		          vMax = 0.95f;
 		          break;
 		          case 4: // Green
-		          h = 130f / 360f;
-		          sMin = 0.1f;
-		          sMax = 0.5f;
+		          h = 120f / 360f;
+		          sMin = 0.35f;
+		          sMax = 0.7f;
 		          vMin = 0.45f;
-		          vMax = 0.95f;
+		          vMax = 0.65f;
 		          break;
 		          case 5: // Hazel (yellow-brown)
-		          h = 45f / 360f;
+		          h = 55f / 360f;
 		          sMin = 0.4f;
-		          sMax = 0.8f;
-		          vMin = 0.5f;
-		          vMax = 0.9f;
+		          sMax = 0.7f;
+		          vMin = 0.4f;
+		          vMax = 0.6f;
 		          break;
 		          case 6: // Brown
-		          h = 20f / 360f;
-		          sMin = 0.15f;
-		          sMax = 0.7f;
-		          vMin = 0.15f;
-		          vMax = 0.7f;
+		          h = 25f / 360f;
+		          sMin = 0.30f;
+		          sMax = 0.65f;
+		          vMin = 0.20f;
+		          vMax = 0.6f;
 		          break;
 		          default:
 		          h = 0f; //albino red
@@ -467,9 +467,10 @@ public static class UIUtilities
 	     private static Color GetHairColor(int eumelanin, int pheomelanin)
 	     {
 		          // Eumelanin controls darkness (black/brown), Pheomelanin controls redness
-		          float baseHue = MapRange(pheomelanin, 1, 6, 0.02f, 0.15f); // Slight yellow to orange-red
-		          float saturation = MapRange(eumelanin + pheomelanin, 1, 14, 0.3f, 0.55f); // More pheomelanin = more saturation
-		          float value = MapRange(eumelanin, 1, 9, 0.8f, 0.02f); // More eumelanin = darker
+		          float baseHue = MapRange(pheomelanin, 1, 6, 0.15f, 0.02f); // Slight yellow to orange-red
+		          float saturation = MapRange(eumelanin, 1, 9, 0.3f, 0.75f); // More pheomelanin = more saturation
+		          float value = MapRange(eumelanin + pheomelanin, 2, 15, 0.1f, 0.8f); // more eumelanin = darker
+
 
 		          Color hairColor = Color.HSVToRGB(baseHue, saturation, value);
 		          return hairColor;
@@ -484,7 +485,7 @@ public static class UIUtilities
 		          Color.RGBToHSV(skinColor, out float h, out float s, out float v);
 
 		          // Make slightly more red and saturated for lips
-		          h = Mathf.Clamp(h + 0.853f, 0.9f, 1f);
+		          h = Mathf.Clamp(h + 0.873f, 0.9f, 1f);
 		          s = Mathf.Clamp(s + 0.2f, 0.2f, 0.35f);
 		          v = Mathf.Clamp(v - 0.1f, 0.35f, .7f);
 

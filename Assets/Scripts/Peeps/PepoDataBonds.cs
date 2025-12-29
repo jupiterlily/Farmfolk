@@ -8,7 +8,6 @@ public class PepoRelationshipData
 	     public List<int> met; //list of ints in simulationconstants
 	     public float timeSpent = 0;
 	     public List<RelationshipType> relationshipTypes = new List<RelationshipType>();
-
 	     public List<PepoSecretData> secrets = new List<PepoSecretData>(); //list of secrets we have told them
 
 	     public float Confidence = 0; //how much we trust them. Increased by them being reliable, honest, keeping promises, being competent. can be influenced by reputation. you can be confident in someone and still not like them.
@@ -62,7 +61,7 @@ public enum RelationshipType
 	     peer, acquaintence, friend, bestie,
 	     enemy, rival,
 	     lover, ex, spouse, incompatible, courting,
-	     mentor, mentee, leader, follower,
+	     mentor, mentee, leader, follower, rolemodel
 }
 //secret data structure
 public class PepoSecretData

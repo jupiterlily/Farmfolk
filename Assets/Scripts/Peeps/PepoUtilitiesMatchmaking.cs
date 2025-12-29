@@ -88,4 +88,24 @@ public static class PepoUtilitiesMatchmaking
 		          return similarityScore / p1.body.expressedChromosomes.Count;
 	     }
 
+	     // Compare two Pepos for an overall similarity score (0..1)
+	     public static float CompareSimilarity(PepoData a, PepoData b)
+	     {
+		          if (a == null || b == null)
+				return 0f;
+
+		          // weights for subsystems (tune as needed)
+		          const float wSSD = 0.25f;
+		          const float wBody = 0.25f;
+		          const float wPersonality = 0.25f;
+		          const float wValues = 0.25f;
+
+		          float ssdScore = PepoUtilities.CompareSocioSexualData(a.ssd, b.ssd);
+		          float bodyScore = PepoUtilities.CompareBodyData(a.body, b.body);
+		          float personalityScore = PepoUtilities.CompareHEXACO(a.personality, b.personality);
+		          float valuesScore = PepoUtilitiesValues.CompareValuesCompatibility(a.values, b.values);
+
+		          float overall = ssdScore * wSSD + bodyScore * wBody + personalityScore * wPersonality + valuesScore * wValues;
+		          return Mathf.Clamp01(overall);
+	     }
 }

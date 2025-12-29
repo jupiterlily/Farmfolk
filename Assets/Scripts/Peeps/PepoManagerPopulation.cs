@@ -27,6 +27,7 @@ public class PepoPopManager : MonoBehaviour
 	     public int generations = 0;
 
 	     public PepoPopulation Pepos;
+	     public List<PlaceData> placeDatas;
 
 	     private List<PepoData> Ancestors = new List<PepoData>();
 	     // private List<PepoData> Pepos.population = new List<PepoData>();
@@ -132,11 +133,12 @@ public class PepoPopManager : MonoBehaviour
 		          int f = 0; //failed to find a match.
 		          foreach (var mum in mamas)
 		          {
+				float attemptsTotal = attempts + mum.personality.Conscientiousness.value + mum.personality.Extraversion.value;
 				if ((mum.lovers == 0 || !mum.ssd.isMonogamous) && mum.womb != null)
 				{
 					     foreach (var guy in papas)
 					     {
-						          if (!PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.lover]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.spouse]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.offspring]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.parent]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.kin]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.incompatible]).Contains(guy) && i <= attempts)
+						          if (!PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.lover]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.spouse]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.offspring]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.parent]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.kin]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.incompatible]).Contains(guy) && i <= attemptsTotal)
 						          {//check if we're related by an int of our average conscientousness scores
 								float c = (mum.personality.Conscientiousness.value + guy.personality.Conscientiousness.value) / 2;
 								if (guy.isAlive && !PepoSystemMatchmaking.AreRelated(mum, guy, ((int)c)))
@@ -185,6 +187,7 @@ public class PepoPopManager : MonoBehaviour
 						          }
 					     }
 				}
+				i = 0;
 		          }
 		          return f;
 	     }
@@ -196,6 +199,7 @@ public class PepoPopManager : MonoBehaviour
 
 		          if (mamas.Count > 0 && papas.Count > 0)
 		          {
+				//if half of the mamas are unpaired, we bring in new people
 				if (PairMamas() > (mamas.Count / 2))
 				{
 					     for (int i = 0; i < immigrantCount; i++)

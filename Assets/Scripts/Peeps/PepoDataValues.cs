@@ -1,4 +1,4 @@
-public class Value : PepoAspect
+public class Value : NumericalAspect
 {
 	     public string opposite;
 	     //radian for position on the wheel

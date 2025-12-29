@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 
-public class PersonalityAspect : PepoAspect
+public class PersonalityAspect : NumericalAspect
 {//exists on a scale of 0-10 with 5 being the mid point
 	     public PersonalityAspect(char n, float max, List<string> high, List<string> low, float v = -1, string hardname = null)
 	     {
@@ -252,7 +252,7 @@ public class PlutchickDimension
 	     public static EmotionAspect Sadness => new EmotionAspect('m', 10f, new List<string> { "grief" }, new List<string> { "pensiveness" });
 
 }
-public class EmotionAspect : PepoAspect
+public class EmotionAspect : NumericalAspect
 {
 	     public string mild;
 	     public string intense;
@@ -335,7 +335,7 @@ public class EmotionAspect : PepoAspect
 
 	     }
 }
-public class Feeling : PepoAspect
+public class Feeling : NumericalAspect
 {
 	     public List<EmotionAspect> aspects;
 

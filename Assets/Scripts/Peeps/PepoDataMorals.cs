@@ -1,7 +1,7 @@
 using System.Collections.Generic;
 
 // Base moral foundation class
-public class MoralFoundation : PepoAspect
+public class MoralFoundation : NumericalAspect
 {
 	     public string PositivePole;
 	     public string NegativePole;

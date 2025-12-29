@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class PepoState
 {
-	     //moral weight, emotional impact, value change, need change, resource change
+	     //these are used for checking if apepo matches the precondition, or it is used to apply the postcondition. it's the "state" we set the pepo to.
 	     public string name;
 	     public float targetValue;
 	     public bool exceedValue;
@@ -171,7 +171,7 @@ public class AspectState : PepoState
 		          }
 
 	     }
-	     public bool CheckCriteria(PepoAspect aspect)
+	     public bool CheckCriteria(NumericalAspect aspect)
 	     {
 		          bool isMet = false;
 		          if (aspect.descriptor == requiredAspect)
@@ -238,24 +238,26 @@ public class PhysicalAction : PepoAction
 }
 public class MentalAction : PepoAction
 {
-
+	     //reherse, appraise
 }
 //run social actions based on extraversion
 public class SocialAction : PepoAction
 {
-
+	     //object/target
+	     public List<PepoData> actors;
+	     public Dictionary<PepoState, List<PepoState>> targetConsequences; //precondition -> consequence
 }
 public class VerbalInteraction : SocialAction
 {
-
+	     //get attention, tell (similar to show but allows lying), 
 }
 public class NonVerbalInteraction : SocialAction
 {
+	     //watch, show, copy, reinforce, discourage
 
-}
-public class GroupSocialAction : SocialAction
-{
-
+	     public NonVerbalInteraction(PepoData Subject, Verb Verb, List<PepoData> Object)
+	     {
+	     }
 }
 
 public class PepoGoal
@@ -265,11 +267,9 @@ public class PepoGoal
 public enum ActionType
 {
 	     // Basic Physiological Needs
-	     Eat, Drink, Forage, Hunt, Cook, StoreFood, ShareFood, WasteFood,
-	     FindWater, CollectWater, PurifyWater, StoreWater, ShareWater, WasteWater,
-	     FindShelter, BuildShelter, MaintainShelter, ImproveShelter, ShareShelter, AbandonShelter,
-	     Sleep, Rest, Nap, WakeUp, FindRestingPlace, ShareRestingPlace,
-	     FindToilet, UseToilet, HoldUrine, ShareToilet, WasteUrine,
+	     Consume, Acquire, Store, Build,
+	     Sleep, Rest, Nap, Awaken, Return, Cosleep,
+	     FindToilet, UseToilet, HoldUrine, ShareToilet,
 	     Bathe, CleanSelf, Groom, Dress, Undress,
 
 	     // Safety & Security
@@ -349,10 +349,10 @@ public enum ActionType
 	     Follow, Serve, Resist, Overthrow,
 
 	     // Sanctity/Degradation
-	     Purify, Clean, Sanctify, Consecrate,
+	     Purify, Clean, Sanctify, Consecrate, Waste,
 	     Defile, Desecrate, Pollute, Corrupt,
 	     HonorTradition, BreakTradition, Conserve,
-	     MockRitual, Celebrate,
+	     Mock, Celebrate,
 
 	     // Liberty/Oppression
 	     Free, Liberate, Empower, Enable, Emancipate,
@@ -382,12 +382,12 @@ public enum ActionType
 	     BeFlexible, BeRigid, Adapt, ResistChange,
 
 	     // Conscientiousness
-	     Disorganize, Improvise,
+	     Disorganize, Improvise, Maintain,
 	     WorkHard, BeLazy, Quit,
 	     BeThorough, BeCareless, Detail, Overlook,
 
 	     // Openness to Experience
-	     BeCreative, BeConventional, Maintain,
+	     BeCreative, BeConventional,
 	     BeCurious, BeIndifferent, Stay,
 	     IgnoreArt, SeekBeauty, IgnoreBeauty,
 

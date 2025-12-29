@@ -19,32 +19,27 @@ public static class PepoSystemAgeing
 				Debug.Log($"[PepoManager]{PepoUtilities.GetFullName(pepo)} has hit menopause");
 				pepo.ssd.isFertile = false;
 		          }
-
-		          //        if (pepo.womb != null && pepo.womb.Count > 0)
-		          //        {
-		          //foreach (var p in pepo.womb)
-		          //{
-		          //	     float timeleft = p.gestation;
-		          //	     if (p.gestation < years)
-		          //	     {
-		          //		          p.Progress(timeleft);
-		          //		          foreach (var bairn in p.bairns)
-		          //		          {
-		          //				bairn.age += years - timeleft;
-		          //		          }
-		          //	     }
-		          //}
-		          //        }
-
+		          else if (pepo.body.paternalChromosome.sexChromosome == "XY" && pepo.ssd.presentsMasc)
+		          {
+				pepo.body.cosmeticFeatures.UpdateFacialHair(pepo);
+		          }
 	     }
+
 	     public static void InitialisePuberty(float pubertyAge, PepoData pepo)
 	     {
 		          pepo.ssd.isFertile = true;
 		          pepo.ssd.isPrepubescent = false;
+
 		          if (pepo.body.paternalChromosome.sexChromosome == "XX")
 		          {
 				pepo.womb = new List<PregnancyData>();
 		          }
+		          else if (pepo.body.paternalChromosome.sexChromosome == "XY")
+		          {
+				// Initialize facial hair for XY individuals at puberty
+				pepo.body.cosmeticFeatures.InitializeStubbleAndMoustache(pepo);
+		          }
+
 		          Debug.Log($"[PepoManager]{PepoUtilities.GetFullName(pepo)} has hit puberty. They are a {PepoLogUtilities.GetGenderExpression(pepo)}");
 	     }
 }
