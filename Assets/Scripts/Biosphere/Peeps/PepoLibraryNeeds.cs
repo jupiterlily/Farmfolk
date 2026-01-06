@@ -6,9 +6,9 @@ public static class PepoLibraryNeeds
 	     { new Need("hunger", "food", "eat", "stuffed", "full", "peckish", "hungry", "starving", 2000, true, decayRate: 83.33f), //2000 calories, 83.33 cal per hour = 24 hours to deplete
 	     new Need("thirst", "water", "drink", "bloated", "satisfied", "thirsty", "parched", "dehydrated", 3000, true, decayRate: 125f), //3000 ml, 125 ml per hour = 24 hours to deplete
 	     new Need("rest", "sleep", "rest", "well-rested", "alert", "sleepy", "tired", "exhausted", 8, true, decayRate: 1f), //8 hours of sleep, 1 hour per hour = 8 hours to deplete
-									//  new Need("oxygen", "air", "breathe", "hyperventilating", "breathing", "breathless", "gasping", "suffocating", 1440, true, decayRate: 60f), //1440 minutes of oxygen, 60 minutes per hour = 24 hours to deplete
-									//   new Need("temperature", "warmth", "warm up", "overheated", "warm", "comfortable", "cold", "freezing", 100, true, decayRate: 4.16f), //100 units of temperature comfort, 4.16 units per hour = 24 hours to deplete
-									new Need("bladder", "toilet", "tinkle", "relieved", "comfortable", "urgent", "desperate", "incontinent", 450, false, decayRate: 85f), //100 units of bladder/bowel comfort, 4.16 units per hour = 24 hours to deplete
+	//  new Need("oxygen", "air", "breathe", "hyperventilating", "breathing", "breathless", "gasping", "suffocating", 1440, true, decayRate: 60f), //1440 minutes of oxygen, 60 minutes per hour = 24 hours to deplete
+	//   new Need("temperature", "warmth", "warm up", "overheated", "warm", "comfortable", "cold", "freezing", 100, true, decayRate: 4.16f), //100 units of temperature comfort, 4.16 units per hour = 24 hours to deplete
+	new Need("bladder", "toilet", "tinkle", "relieved", "comfortable", "urgent", "desperate", "incontinent", 450, false, decayRate: 85f), //100 units of bladder/bowel comfort, 4.16 units per hour = 24 hours to deplete
 	     };
 
 	     public static List<Need> SafetyNeeds = new List<Need>(){                      new Need("health", "care", "heal", "healthy", "fine", "suffering", "critical", "dying", 100, true), //health out of 100, decays slowly without care)

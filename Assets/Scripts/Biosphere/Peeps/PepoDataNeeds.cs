@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Need : NumericalAspect
 {
-	     public float currentLevel;
+
 	     public float decayRate; // per hour
 	     public float satietyThreshold; // below this level, peep shows signs of need
 	     public float criticalThreshold;
@@ -34,7 +34,7 @@ public class Need : NumericalAspect
 		          this.belowCritical = critical;
 		          this.maxValue = maxValue;
 		          minValue = 0;
-		          this.currentLevel = value >= 0 ? value : Random.Range(maxValue * lowThreshold, maxValue * safeThreshold);
+		          this.value = value >= 0 ? value : Random.Range(maxValue * lowThreshold, maxValue * safeThreshold);
 		          this.decayRate = decayRate;
 		          this.satietyThreshold = maxValue * safeThreshold;
 		          this.criticalThreshold = maxValue * lowThreshold;
@@ -42,28 +42,28 @@ public class Need : NumericalAspect
 	     }
 	     public void Satisfy(float amount)
 	     {
-		          currentLevel = Mathf.Min(currentLevel + amount, maxValue);
+		          value = Mathf.Min(value + amount, maxValue);
 	     }
 	     public void Deplete(float amount)
 	     {
-		          currentLevel = Mathf.Max(currentLevel - amount, 0);
+		          value = Mathf.Max(value - amount, 0);
 	     }
 	     public void DescribeNeed()
 	     {
 		          //a switch that sets the description based on current level
-		          if (currentLevel >= maxValue)
+		          if (value >= maxValue)
 		          {
 				descriptor = overMax;
 		          }
-		          else if (currentLevel >= satietyThreshold && currentLevel < maxValue)
+		          else if (value >= satietyThreshold && value < maxValue)
 		          {
 				descriptor = aboveSatiety;
 		          }
-		          else if (currentLevel >= warningThreshold && currentLevel < satietyThreshold)
+		          else if (value >= warningThreshold && value < satietyThreshold)
 		          {
 				descriptor = belowSatiety;
 		          }
-		          else if (currentLevel >= criticalThreshold && currentLevel < warningThreshold)
+		          else if (value >= criticalThreshold && value < warningThreshold)
 		          {
 				descriptor = aboveCritical;
 		          }

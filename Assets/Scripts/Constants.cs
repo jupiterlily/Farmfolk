@@ -12,6 +12,7 @@ public static class Constants
 
 
 	     // Energy (Joules per kg)
+	     public const float LATENT_HEAT_EVAPORATION = 2260f; // kJ/kg (approximate)
 	     public const float LATENT_HEAT_VAPORIZATION = 2_260_000f; // J/kg
 	     public const float LATENT_HEAT_CONDENSATION = 2.5e6f; // J/kg
 	     public const float AIR_SPECIFIC_HEAT = 1005f; // J/kg·K

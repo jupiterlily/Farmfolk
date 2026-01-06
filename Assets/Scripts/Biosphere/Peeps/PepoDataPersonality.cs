@@ -237,6 +237,11 @@ public class Mood
 				}
 		          }
 	     }
+	     //Apply Mood effect
+	     public void ApplyMoodEffect(float[] moodEffect)
+	     {
+
+	     }
 }
 
 

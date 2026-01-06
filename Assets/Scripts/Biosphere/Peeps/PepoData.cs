@@ -95,13 +95,6 @@ public class Stat
 		          currentValue = maxValue;
 	     }
 }
-
-public class PepoLook
-{
-	     public Color hairColor;
-	     public Color eyeColor;
-}
-
 public class Aspect
 {
 	     public string name;
@@ -119,8 +112,10 @@ public class NumericalAspect : Aspect
 	     public float polarPoint; //ie 0 for values, 5 for personality.
 	     public string descriptor;
 	     public int timesIntegrated = 1;
-	     //normalises and averages
-	     // Normalizes and averages aspects
+
+	     public float currentLevel => value / maxValue; //as a percentage of maxValue
+				       //normalises and averages
+				       // Normalizes and averages aspects
 	     public void IntegrateAspect(NumericalAspect aspect, bool additive = true)
 	     {
 		          float scaledAspectValue = aspect.value;
@@ -167,6 +162,7 @@ public class NumericalAspect : Aspect
 				value = (scaledAspectValue + value) / 2f;
 		          }
 	     }
+
 
 	     // Helper method to get normalized value (0-1 range)
 	     public float GetNormalizedValue()

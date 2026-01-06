@@ -367,13 +367,13 @@ public static class UIUtilities
 				return new Color[4]; // Return empty array if no body data
 
 		          // Get expressed traits
-		          int skinHue = body.expressedChromosomes[10];
-		          int skinSaturation = body.expressedChromosomes[9];
-		          int skinDepth = body.expressedChromosomes[8];
-		          int eyeColor = body.expressedChromosomes[4];
-		          int eyeDarkness = body.expressedChromosomes[5];
-		          int hairEumelanin = body.expressedChromosomes[1];
-		          int hairPheomelanin = body.expressedChromosomes[2];
+		          int skinHue = (int)body.expressedChromosomes[10].value;
+		          int skinSaturation = (int)body.expressedChromosomes[9].value;
+		          int skinDepth = (int)body.expressedChromosomes[8].value;
+		          int eyeColor = (int)body.expressedChromosomes[4].value;
+		          int eyeDarkness = (int)body.expressedChromosomes[5].value;
+		          int hairEumelanin = (int)body.expressedChromosomes[1].value;
+		          int hairPheomelanin = (int)body.expressedChromosomes[2].value;
 
 		          return new Color[4]
 		          {

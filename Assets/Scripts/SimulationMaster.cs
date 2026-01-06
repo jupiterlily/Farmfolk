@@ -39,9 +39,7 @@ public class SimulationMaster : MonoBehaviour
 	     private float intervalsEnergy; // Energy calculated at specific intervals.
 
 	     public TileManager tileManager;
-
-	     [SerializeField]
-	     public List<Sprite> plantSprites;
+	     public int initialPlantCount;
 
 	     void Start()
 	     {
@@ -57,7 +55,6 @@ public class SimulationMaster : MonoBehaviour
 					     Debug.Log($"<color=#f9c74f>Current Solar Energy {SolarEnergyCalculator.GetLatitudeDescription(meridian)} at midday on day {day - 45}: {Mathf.FloorToInt(SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(meridian, day - 45, 0.5f))} W/m2</color>");
 				}
 		          }
-
 		          tileManager = gameObject.GetComponent<TileManager>();
 	     }
 
@@ -180,6 +177,9 @@ public class SimulationMaster : MonoBehaviour
 		          if (currentMinuteOfHour == 9 || currentMinuteOfHour == 29 || currentMinuteOfHour == 49)
 		          {
 				tileManager.SimulateAtmosphereStep(1 / 3f);
+
+				tileManager.demeter.lightManager.CheckPlantLightLevel(tileManager.demeter);
+				tileManager.demeter.gardener.GrowPlants(tileManager.demeter, Mathf.FloorToInt(20 * 60));
 		          }
 		          SimulationConstants.UpdateTimeConstants(0, minutes, 0, 0, 0);
 		          SimulationConstants.UpdateTime(currentTimeOfDay);
@@ -203,6 +203,7 @@ public class SimulationMaster : MonoBehaviour
 		          if (currentHourOfDay == 0 || currentHourOfDay == 4 || currentHourOfDay == 8 || currentHourOfDay == 12 || currentHourOfDay == 16 || currentHourOfDay == 20)
 		          {
 
+				tileManager.demeter.gardener.DrawAllPlants(tileManager.demeter);
 		          }
 		          tileManager.TileUpdate(hours);
 		          //Debug.Log("tiles updated");

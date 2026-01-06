@@ -45,15 +45,161 @@ public static class SolarEnergyCalculator
 		          Vector3 lightDirection = new Vector3(Mathf.Cos(zenithAngle), Mathf.Sin(zenithAngle), 0);
 		          return lightDirection;
 	     }
+	     // Method that takes latitude, longitude, and day of year to calculate solar energy
+	     public static float CalculateSolarEnergyAtLocation(
+	         float latitude,
+	         float longitude,
+	         float dayOfYear,
+	         float currentHourUTC = 0f,
+	         float planetaryRotationPeriod = 24f) // Default to Earth's 24-hour day
+	     {
+		          // Calculate local solar time from longitude and UTC time
+		          // Each 15 degrees of longitude equals 1 hour time difference
+		          float longitudeHourOffset = longitude / 15f;
+		          float localSolarTime = currentHourUTC + longitudeHourOffset;
+
+		          // Normalize to 0-24 range
+		          localSolarTime = Mathf.Repeat(localSolarTime, planetaryRotationPeriod);
+
+		          // Convert to fraction of day
+		          float timeOfDay = localSolarTime / planetaryRotationPeriod;
+
+		          // Use existing method with calculated local time
+		          return CalculateCurrentEnergyAtLatitude(latitude, dayOfYear, timeOfDay);
+	     }
+
+	     // Method that returns solar energy over time for a specific location
+	     public static float[] CalculateDailySolarEnergyAtLocation(
+	         float latitude,
+	         float longitude,
+	         float dayOfYear,
+	         int samplesPerDay = 24)
+	     {
+		          float[] dailyEnergy = new float[samplesPerDay];
+
+		          for (int i = 0; i < samplesPerDay; i++)
+		          {
+				float timeOfDay = (float)i / samplesPerDay;
+				dailyEnergy[i] = CalculateCurrentEnergyAtLatitude(latitude, dayOfYear, timeOfDay);
+		          }
+
+		          return dailyEnergy;
+	     }
+
+	     // Method that calculates peak solar energy time for a location on a given day
+	     public static float CalculatePeakSolarTime(
+	         float latitude,
+	         float longitude,
+	         float dayOfYear,
+	         float currentHourUTC = 0f)
+	     {
+		          // Calculate solar noon at this location
+		          // Solar noon occurs when the sun is at the highest point
+		          // For a spherical planet with uniform rotation, this is when local solar time = 12:00
+
+		          float longitudeHourOffset = longitude / 15f;
+		          float localSolarNoon = 12f; // Local solar noon
+
+		          // Convert to UTC
+		          float utcPeakTime = localSolarNoon - longitudeHourOffset;
+
+		          // Normalize to 0-24 range
+		          utcPeakTime = Mathf.Repeat(utcPeakTime, 24f);
+
+		          return utcPeakTime;
+	     }
+
+	     // Method to calculate total daily solar energy at a location
+	     public static float CalculateTotalDailyEnergyAtLocation(
+	         float latitude,
+	         float longitude,
+	         float dayOfYear,
+	         int integrationSteps = 96) // 96 = every 15 minutes
+	     {
+		          float totalEnergy = 0f;
+		          float timeStep = 1f / integrationSteps;
+
+		          for (int i = 0; i < integrationSteps; i++)
+		          {
+				float timeOfDay = i * timeStep;
+				float energy = CalculateCurrentEnergyAtLatitude(latitude, dayOfYear, timeOfDay);
+				totalEnergy += energy * timeStep; // Integrate over time
+		          }
+
+		          return totalEnergy;
+	     }
+
+	     // Light angle method using latitude and longitude
+	     public static Vector3 CalculateLightAngleAtLocation(
+	         float latitude,
+	         float longitude,
+	         float dayOfYear,
+	         float currentHourUTC = 0f)
+	     {
+		          // Calculate local solar time
+		          float longitudeHourOffset = longitude / 15f;
+		          float localSolarTime = currentHourUTC + longitudeHourOffset;
+		          localSolarTime = Mathf.Repeat(localSolarTime, 24f);
+		          float timeOfDay = localSolarTime / 24f;
+
+		          // Use existing method
+		          return CalculateLightAngle(latitude, dayOfYear, timeOfDay);
+	     }
 
 
-	     // This method returns a descriptive string for a given latitude, providing context about its geographical location.
+
+	     // Method to get sunrise and sunset times for a location
+	     public static Vector2 GetSunriseSunsetTimes(
+	         float latitude,
+	         float longitude,
+	         float dayOfYear,
+	         float currentHourUTC = 0f)
+	     {
+		          // Calculate day length based on latitude and declination
+		          float declination = SimulationConstants.AxialTilt * Mathf.Sin(2 * Mathf.PI * (dayOfYear / SimulationConstants.YearLength));
+
+		          // Calculate sunrise hour angle (in degrees)
+		          float cosSunriseAngle = -Mathf.Tan(latitude * Mathf.Deg2Rad) * Mathf.Tan(declination * Mathf.Deg2Rad);
+		          cosSunriseAngle = Mathf.Clamp(cosSunriseAngle, -1f, 1f);
+
+		          float sunriseHourAngle = Mathf.Acos(cosSunriseAngle) * Mathf.Rad2Deg;
+
+		          // Convert hour angle to time (hours)
+		          float dayLengthHours = (2f * sunriseHourAngle / 15f);
+		          float sunriseTime = 12f - (dayLengthHours / 2f);
+		          float sunsetTime = 12f + (dayLengthHours / 2f);
+
+		          // Adjust for polar day/night
+		          if (cosSunriseAngle >= 1f)
+		          {
+				// Polar night (no sunrise)
+				return new Vector2(-1f, -1f);
+		          }
+		          else if (cosSunriseAngle <= -1f)
+		          {
+				// Polar day (24 hours of sunlight)
+				return new Vector2(0f, 24f);
+		          }
+
+		          // Convert to UTC using longitude
+		          float longitudeHourOffset = longitude / 15f;
+		          float sunriseUTC = sunriseTime - longitudeHourOffset;
+		          float sunsetUTC = sunsetTime - longitudeHourOffset;
+
+		          // Normalize to 0-24 range
+		          sunriseUTC = Mathf.Repeat(sunriseUTC, 24f);
+		          sunsetUTC = Mathf.Repeat(sunsetUTC, 24f);
+
+		          return new Vector2(sunriseUTC, sunsetUTC);
+	     }
+
+	     // Get latitude description (your existing method)
 	     public static string GetLatitudeDescription(float latitude)
 	     {
+		          // ... (your existing implementation)
 		          string description = "";
 		          float absLatitude = Mathf.Abs(latitude);
 
-		          // Determine if the latitude is close to any major meridian, providing a specific description if so.
 		          foreach (var meridian in SimulationConstants.meridians)
 		          {
 				float meridianLatitude = meridian.Value;
@@ -70,7 +216,6 @@ public static class SolarEnergyCalculator
 				}
 		          }
 
-		          // Classify the latitude into broader geographical regions.
 		          if (absLatitude < 23.5f)
 		          {
 				description = "in the <color=#43aa8b>Tropical Region</color>";
@@ -86,4 +231,29 @@ public static class SolarEnergyCalculator
 
 		          return description;
 	     }
+
+	     // Get longitude description
+	     public static string GetLongitudeDescription(float longitude)
+	     {
+		          longitude = Mathf.Repeat(longitude + 180f, 360f) - 180f; // Normalize to -180 to 180
+
+		          if (Mathf.Abs(longitude) < 0.1f)
+		          {
+				return "on the <b>Prime Meridian</b>";
+		          }
+		          else if (Mathf.Abs(longitude - 180f) < 0.1f || Mathf.Abs(longitude + 180f) < 0.1f)
+		          {
+				return "on the <b>International Date Line</b>";
+		          }
+		          else if (longitude > 0)
+		          {
+				return "in the <color=#f94144>Eastern Hemisphere</color>";
+		          }
+		          else
+		          {
+				return "in the <color=#f8961e>Western Hemisphere</color>";
+		          }
+	     }
+
+
 }

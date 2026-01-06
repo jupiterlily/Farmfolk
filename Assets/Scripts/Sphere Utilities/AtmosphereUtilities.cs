@@ -206,4 +206,11 @@ public static class AtmosphereUtilities
 		          return (b * alpha) / resultDenom; // Return dew point in Celsius
 	     }
 
+	     public static float CalculateSaturationVaporPressure(float temperature)
+	     {
+		          // Tetens formula for saturation vapor pressure in hPa
+		          float t = temperature - 273.15f; // Convert to Celsius
+		          return 6.11f * Mathf.Exp((17.27f * t) / (t + 237.3f)) * 100f; // Convert to Pa
+	     }
+
 }

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 //instantiates tiles within a grid and  gives  them a grid reference
@@ -19,6 +20,8 @@ public class TileManager : MonoBehaviour
 
 	     // 3 layers, each with reduced resolution (10x tile sise)
 	     public AtmosphereTile[,,] atmosphereTiles;
+
+	     public Demeter demeter;
 	     // Start is called before the first frame update
 	     void Start()
 	     {
@@ -97,7 +100,39 @@ public class TileManager : MonoBehaviour
 				}
 		          }
 		          AllocateNeighbors();
+		          TileUpdate(1f); // Initial update
+		          WakeDemeter();
 
+	     }
+	     void WakeDemeter()
+	     {
+		          demeter = new Demeter();
+		          // Initialize systems early in the lifecycle
+		          demeter.lightManager = new LightManager(demeter.NightTint);
+		          demeter.gardener = new Gardener();
+		          demeter.tileManager = this;
+		          demeter.xBounds = new Vector2(0, worldsise.x);
+		          demeter.yBounds = new Vector2(0, worldsise.y);
+		          //go through tile data and find tiles that have no surface water but some soil moisture.
+		          List<Vector3> plantPositions = FindPlantPositions();
+		          // Set the plant count and initialize
+		          demeter.initialPlantCount = plantPositions.Count;
+		          demeter.InitializePlants(plantPositions);  // Call this explicitly
+
+	     }
+	     public List<Vector3> FindPlantPositions()
+	     {
+		          List<Vector3> plantPositions = new List<Vector3>();
+		          foreach (var tile in tiles)
+		          {
+				TileData data = tile.tileData;
+				if (data.composition.water > 50f && data.surfaceMoisture < 1f)
+				{
+					     Vector3 pos = new Vector3(data.tileGridRef.x + Random.Range(0f, 1f), 0, data.tileGridRef.y + Random.Range(0f, 1f));
+					     plantPositions.Add(pos);
+				}
+		          }
+		          return plantPositions;
 	     }
 	     public void TileUpdate(float hours)
 	     {
@@ -118,6 +153,8 @@ public class TileManager : MonoBehaviour
 					     int endY = Mathf.Min(startY + atmTileSise, worldsise.y);
 
 					     int coveredTiles = (endX - startX) * (endY - startY);
+					     //    HydrosphereUtilities.AtmosphericEvaporation(atmo);
+					     //  HydrosphereUtilities.CondenseVapour(atmo);
 					     for (int i = startX; i < endX; i++)
 					     {
 						          for (int j = startY; j < endY; j++)
@@ -139,13 +176,13 @@ public class TileManager : MonoBehaviour
 		          UpdateTotals();
 	     }
 	     //get latitude of a cell based on its grid position
-	     public float GetLatitude(int x, int y)
+	     public float GetLatitude(float x, float y)
 	     {
 		          // Assuming latitude varies linearly across the grid
 		          return (x / (float)worldsise.x) * 180 - 90f; // Map x to -90 to 90 range
 	     }
 	     //get longitude of a cell based on its grid position
-	     public float GetLongitude(int x, int y)
+	     public float GetLongitude(float x, float y)
 	     {
 		          // Assuming longitude varies linearly across the grid
 		          return (y / (float)worldsise.y) * 360f - 180f; // Map y to -180 to 180 range
@@ -158,7 +195,6 @@ public class TileManager : MonoBehaviour
 
 		          // Update soil temperature  and evaporate water
 		          SoilUtilities.UpdateSoilTemperature(data, absorbedEnergy, data.atmosphereTile.temperature, hours);
-		          //HydrosphereUtilities.SurfaceCondensation(data, hours);
 		          // Get heat from soil and accumulate it
 		          float energyFromTile = SoilUtilities.PassHeatFromSoil(data, hours, this);
 
