@@ -7,120 +7,190 @@ public static class PepoLibraryValues
 	     {
 		          var list = new List<Value>();
 
-		          // Openness to change
-		          Value Agency = new Value(); //0
-		          Agency.name = "agency";
-		          Agency.opposite = "obedience";
-		          Agency.descriptor = "independent thought and action—choosing, creating, and exploring";
-		          Agency.location = (40f * Mathf.PI / 180f);
-		          list.Add(Agency);
+		          // Openness to change - Agency splits
+		          //self direction
+		          Value Curiosity = new Value(); //0
+		          Curiosity.name = "curiosity";
+		          Curiosity.opposite = "dogma";
+		          Curiosity.descriptor = "exploring ideas and questioning the world";
+		          Curiosity.location = (30f * Mathf.PI / 180f);
+		          list.Add(Curiosity);
 
-		          Value Stimulation = new Value(); //1
-		          Stimulation.name = "stimulation";
-		          Stimulation.opposite = "stability"; // More than routine - active resistance to growth
-		          Stimulation.descriptor = "excitement, novelty and challenge in life";
-		          Stimulation.location = (80f * Mathf.PI / 180f);
-		          list.Add(Stimulation);
+		          //self direction
+		          Value Autonomy = new Value(); //1
+		          Autonomy.name = "autonomy";
+		          Autonomy.opposite = "servility";
+		          Autonomy.descriptor = "acting independently and making own choices";
+		          Autonomy.location = (50f * Mathf.PI / 180f);
+		          list.Add(Autonomy);
+
+		          //stimulation
+		          Value Excitement = new Value(); //2
+		          Excitement.name = "excitement";
+		          Excitement.opposite = "routine";
+		          Excitement.descriptor = "seeking novelty, thrills, and stimulation";
+		          Excitement.location = (80f * Mathf.PI / 180f);
+		          list.Add(Excitement);
+
+		          //health
+		          Value Vitality = new Value(); //3
+		          Vitality.name = "vitality";
+		          Vitality.opposite = "deprivation";
+		          Vitality.descriptor = "pursuing health, energy, and well-being";
+		          Vitality.location = (100f * Mathf.PI / 180f);
+		          list.Add(Vitality);
 
 		          // Self-enhancement
-		          Value Hedonism = new Value();//2
-		          Hedonism.name = "hedonism";
-		          Hedonism.opposite = "humility"; // Sacrificing personal pleasure for group cohesion
-		          Hedonism.descriptor = "pleasure or sensuous gratification for oneself";
-		          Hedonism.location = (120f * Mathf.PI / 180f);
-		          list.Add(Hedonism);
+		          //hedonism
+		          Value Indulgence = new Value(); //4
+		          Indulgence.name = "indulgence";
+		          Indulgence.opposite = "austerity";
+		          Indulgence.descriptor = "seeking pleasure and sensuous gratification";
+		          Indulgence.location = (120f * Mathf.PI / 180f);
+		          list.Add(Indulgence);
 
-		          Value Achievement = new Value();//3
-		          Achievement.name = "achievement";
-		          Achievement.opposite = "concern"; // Shared success vs individual accomplishment
-		          Achievement.descriptor = "personal success through demonstrating competence according to social standards";
-		          Achievement.location = (160f * Mathf.PI / 180f);
-		          list.Add(Achievement);
+		          //achievement
+		          Value Accomplishment = new Value(); //5
+		          Accomplishment.name = "accomplishment";
+		          Accomplishment.opposite = "complacency";
+		          Accomplishment.descriptor = "achieving success and demonstrating competence";
+		          Accomplishment.location = (140f * Mathf.PI / 180f);
+		          list.Add(Accomplishment);
 
-		          Value Power = new Value();//4
-		          Power.name = "power";
-		          Power.opposite = "solidarity"; // Exactly right - collective power vs individual dominance
-		          Power.descriptor = "social status and prestige, control or dominance over people and resources";
-		          Power.location = (200f * Mathf.PI / 180f);
-		          list.Add(Power);
+		          // Power splits
+		          Value Dominance = new Value(); //6
+		          Dominance.name = "dominance";
+		          Dominance.opposite = "submission";
+		          Dominance.descriptor = "controlling and dominating others";
+		          Dominance.location = (170f * Mathf.PI / 180f);
+		          list.Add(Dominance);
 
-		          // Conservation
-		          Value Security = new Value();//5
-		          Security.name = "security";
-		          Security.opposite = "discovery"; // The courage to be exposed and uncertain
-		          Security.descriptor = "safety, harmony, and stability of society, of relationships, and of self";
-		          Security.location = (240f * Mathf.PI / 180f);
+		          Value Accumulation = new Value(); //7
+		          Accumulation.name = "resources";
+		          Accumulation.opposite = "generosity";
+		          Accumulation.descriptor = "gathering resources, wealth, and possessions";
+		          Accumulation.location = (190f * Mathf.PI / 180f);
+		          list.Add(Accumulation);
+		          //face
+		          Value Status = new Value(); //8
+		          Status.name = "status";
+		          Status.opposite = "shame";
+		          Status.descriptor = "maintaining social standing and reputation";
+		          Status.location = (210f * Mathf.PI / 180f);
+		          list.Add(Status);
+
+		          // Conservation - Security splits
+		          //security
+		          Value Security = new Value(); //9
+		          Security.name = "safety";
+		          Security.opposite = "risk";
+		          Security.descriptor = "ensuring personal safety and stability";
+		          Security.location = (230f * Mathf.PI / 180f);
 		          list.Add(Security);
-
-		          Value Conformity = new Value();//6
-		          Conformity.name = "conformity";
-		          Conformity.opposite = "authenticity"; // Active non-conformity, not just individualism
-		          Conformity.descriptor = "restraint of actions, inclinations, and impulses likely to upset or harm others and violate social expectations or norms";
-		          Conformity.location = (280f * Mathf.PI / 180f);
-		          list.Add(Conformity);
-
-		          Value Tradition = new Value();//7
+		          //security
+		          Value Order = new Value(); //10
+		          Order.name = "security";
+		          Order.opposite = "chaos";
+		          Order.descriptor = "maintaining societal structure and predictability";
+		          Order.location = (250f * Mathf.PI / 180f);
+		          list.Add(Order);
+		          //tradition
+		          Value Tradition = new Value(); //11
 		          Tradition.name = "tradition";
-		          Tradition.opposite = "innovation"; // Not just progress - active dismantling of established systems
-		          Tradition.descriptor = "respect, commitment, and acceptance of the customs and ideas that one's culture or religion provides";
-		          Tradition.location = (320f * Mathf.PI / 180f);
+		          Tradition.opposite = "iconoclasm";
+		          Tradition.descriptor = "upholding established customs and heritage";
+		          Tradition.location = (270f * Mathf.PI / 180f);
 		          list.Add(Tradition);
 
-		          // Self-transcendence
-		          Value Benevolence = new Value();//8
-		          Benevolence.name = "benevolence";
-		          Benevolence.opposite = "exploitation"; // Active harm vs passive self-interest
-		          Benevolence.descriptor = "preserving and enhancing the welfare of those with whom one is in frequent personal contact (the 'in-group')";
-		          Benevolence.location = (0f * Mathf.PI / 180f);
-		          list.Add(Benevolence);
+		          // Conformity splits
+		          //conformity
+		          Value Obedience = new Value(); //12
+		          Obedience.name = "obedience";
+		          Obedience.opposite = "rebellion";
+		          Obedience.descriptor = "following rules and authority structures";
+		          Obedience.location = (290f * Mathf.PI / 180f);
+		          list.Add(Obedience);
+		          //conformity
+		          Value Conformity = new Value(); //13
+		          Conformity.name = "cohesion";
+		          Conformity.opposite = "authenticity";
+		          Conformity.descriptor = "fitting in and meeting social expectations";
+		          Conformity.location = (310f * Mathf.PI / 180f);
+		          list.Add(Conformity);
+		          //humility
+		          Value Humility = new Value(); //14
+		          Humility.name = "humility";
+		          Humility.opposite = "arrogance";
+		          Humility.descriptor = "remaining modest and knowing one's place";
+		          Humility.location = (330f * Mathf.PI / 180f);
+		          list.Add(Humility);
 
-		          Value Universalism = new Value();//9
-		          Universalism.name = "universalism";
-		          Universalism.opposite = "supremacy"; // Fear of the other vs embrace of all
-		          Universalism.descriptor = "understanding, appreciation, tolerance, and protection for the welfare of all people and for nature";
-		          Universalism.location = (360f * Mathf.PI / 180f);
-		          list.Add(Universalism);
+		          // Self-transcendence - Universalism splits
+		          Value Preservation = new Value(); //15
+		          Preservation.name = "preservation";
+		          Preservation.opposite = "extraction";
+		          Preservation.descriptor = "protecting nature and the environment";
+		          Preservation.location = (350f * Mathf.PI / 180f);
+		          list.Add(Preservation);
+
+		          Value Compassion = new Value(); //16
+		          Compassion.name = "compassion";
+		          Compassion.opposite = "exploitation";
+		          Compassion.descriptor = "caring for the welfare of all people";
+		          Compassion.location = (10f * Mathf.PI / 180f);
+		          list.Add(Compassion);
+
+		          Value Acceptance = new Value(); //17
+		          Acceptance.name = "tolerance";
+		          Acceptance.opposite = "supremacy";
+		          Acceptance.descriptor = "embracing diversity and different perspectives";
+		          Acceptance.location = (20f * Mathf.PI / 180f);
+		          list.Add(Acceptance);
+
+		          // Benevolence splits
+		          Value Nurturing = new Value(); //18
+		          Nurturing.name = "caring";
+		          Nurturing.opposite = "cruelty";
+		          Nurturing.descriptor = "caring for and supporting close others";
+		          Nurturing.location = (340f * Mathf.PI / 180f);
+		          list.Add(Nurturing);
+
+		          Value Loyalty = new Value(); //19
+		          Loyalty.name = "dependability";
+		          Loyalty.opposite = "unpredictability";
+		          Loyalty.descriptor = "remaining dependable and faithful to one's group";
+		          Loyalty.location = (0f * Mathf.PI / 180f);
+		          list.Add(Loyalty);
 
 		          foreach (var v in list)
 		          {
-				v.maxValue = 7;//7 = acted on in the last 12 hours, 6 = acted on in the last day, 5 = acted on in the last week = 4 acted on in the last month, 3 =  acted on in the last quarter, 2 = acted on in the last 6 months, 1 = acted on in the last year
+				v.maxValue = 7;
 				v.value = 0;
+				v.minValue = -1;
 		          }
 
 		          return list;
 	     }
 
-	     // Openness to change
-	     public static Value Agency => basicHumanValues()[0];
-	     public static Value Stimulation => basicHumanValues()[1];
-	     public static Value Hedonism => basicHumanValues()[2];
-	     public static Value Achievement => basicHumanValues()[3];
-	     public static Value Power => basicHumanValues()[4];
-	     public static Value Security => basicHumanValues()[5];
-	     public static Value Conformity => basicHumanValues()[6];
-	     public static Value Tradition => basicHumanValues()[7];
-	     public static Value Benevolence => basicHumanValues()[8];
-	     public static Value Universalism => basicHumanValues()[9];
-
-	     //Openness to change
-
-	     //    Self-direction – independent thought and action—choosing, creating, and exploring
-	     //    Stimulation – excitement, novelty and challenge in life
-
-	     //Self-enhancement
-
-	     //    Hedonism – pleasure or sensuous gratification for oneself
-	     //    Achievement – personal success through demonstrating competence according to social standards
-	     //    Power – social status and prestige, control or dominance over people and resources
-
-	     //Conservation
-
-	     //    Security – safety, harmony, and stability of society, of relationships, and of self
-	     //    Conformity – restraint of actions, inclinations, and impulses likely to upset or harm others and violate social expectations or norms
-	     //    Tradition – respect, commitment, and acceptance of the customs and ideas that one's culture or religion provides
-
-	     //Self-transcendence
-
-	     //    Benevolence – preserving and enhancing the welfare of those with whom one is in frequent personal contact (the 'in-group')
-	     //    Universalism – understanding, appreciation, tolerance, and protection for the welfare of all people and for nature
+	     // Static properties for each value
+	     public static Value AgencyThought => basicHumanValues()[0];
+	     public static Value AgencyAction => basicHumanValues()[1];
+	     public static Value Stimulation => basicHumanValues()[2];
+	     public static Value Health => basicHumanValues()[3];
+	     public static Value Hedonism => basicHumanValues()[4];
+	     public static Value Achievement => basicHumanValues()[5];
+	     public static Value PowerDominance => basicHumanValues()[6];
+	     public static Value PowerResources => basicHumanValues()[7];
+	     public static Value Face => basicHumanValues()[8];
+	     public static Value SecurityPersonal => basicHumanValues()[9];
+	     public static Value SecuritySociety => basicHumanValues()[10];
+	     public static Value Tradition => basicHumanValues()[11];
+	     public static Value ConformityRules => basicHumanValues()[12];
+	     public static Value ConformityInterpersonal => basicHumanValues()[13];
+	     public static Value Humility => basicHumanValues()[14];
+	     public static Value UniversalismNature => basicHumanValues()[15];
+	     public static Value UniversalismConcern => basicHumanValues()[16];
+	     public static Value UniversalismTolerance => basicHumanValues()[17];
+	     public static Value BenevolenceCaring => basicHumanValues()[18];
+	     public static Value BenevolenceDependability => basicHumanValues()[19];
 }

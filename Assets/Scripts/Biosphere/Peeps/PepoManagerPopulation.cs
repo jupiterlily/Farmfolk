@@ -55,7 +55,7 @@ public class PepoPopManager : MonoBehaviour
 		          //pepo.body.ExpressChromosomes();
 		          //        }
 		          Debug.Log($"[PepoManager] Initial population: {Pepos.population.Count} total, {mamas.Count} mamas, {papas.Count} papas");
-
+		          PepoRoleSystem.AssignRolesToPepoPopulation(Pepos, PepoLibraryRoles.HunterGatherer);
 	     }
 
 	     public void SimulateGenerations()
@@ -107,6 +107,7 @@ public class PepoPopManager : MonoBehaviour
 				CheckPopulationHealth();
 				RebuildParentLists();
 				PepoLogUtilities.LogDemographicData(Pepos.population);
+				PepoRoleSystem.AssignRolesToPepoPopulation(Pepos, PepoLibraryRoles.HunterGatherer);
 		          }
 	     }
 	     public void SimulateNeeds(float hours)
@@ -334,6 +335,7 @@ public class PepoPopManager : MonoBehaviour
 				mamas.Remove(dead);
 				papas.Remove(dead);
 				Ancestors.Add(dead);
+				Pepos.RemovePepoFromRoles(dead);
 		          }
 
 	     }

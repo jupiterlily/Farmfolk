@@ -51,7 +51,7 @@ public class Gardener
 				{
 
 					     Vector3 activationCenter = demeter.GetRandomPosition();
-					     demeter.CreateNewPlant(demeter.AllPlants.Count, activationCenter);
+					     demeter.CreateNewPlant(demeter.AllPlants.Count, demeter.tileManager.tiles[(int)activationCenter.x, (int)activationCenter.z].tileData);
 				}
 		          }
 	     }
@@ -59,7 +59,7 @@ public class Gardener
 	     /// <summary>
 	     /// Redraws all active plants based on their current growth state
 	     /// </summary>
-	     public void DrawAllPlants(Demeter demeter)
+	     public void UpdatePlantAges(Demeter demeter)
 	     {
 		          // Create a copy of keys since dictionary might be modified
 		          var activePlantsSnapshot = new List<Plant>(demeter.ActivePlants.Keys);

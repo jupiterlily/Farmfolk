@@ -99,6 +99,30 @@ public class TileManager : MonoBehaviour
 					     data.atmosphereTile = atmosphereTiles[0, atmX, atmY];
 				}
 		          }
+
+		          // connect atmosphere tiles
+		          for (int layer = 0; layer < atmLayers; layer++)
+		          {
+				for (int i = 0; i < atmGridX; i++)
+				{
+					     for (int j = 0; j < atmGridY; j++)
+					     {
+						          AtmosphereTile atmTile = atmosphereTiles[layer, i, j];
+
+						          // Connect to layer below
+						          if (layer > 0)
+						          {
+								atmTile.below = atmosphereTiles[layer - 1, i, j];
+						          }
+
+						          // Connect to layer above
+						          if (layer < atmLayers - 1)
+						          {
+								atmTile.above = atmosphereTiles[layer + 1, i, j];
+						          }
+					     }
+				}
+		          }
 		          AllocateNeighbors();
 		          TileUpdate(1f); // Initial update
 		          WakeDemeter();
@@ -114,66 +138,258 @@ public class TileManager : MonoBehaviour
 		          demeter.xBounds = new Vector2(0, worldsise.x);
 		          demeter.yBounds = new Vector2(0, worldsise.y);
 		          //go through tile data and find tiles that have no surface water but some soil moisture.
-		          List<Vector3> plantPositions = FindPlantPositions();
+		          List<TileData> plantPositions = FindPlantPositions();
 		          // Set the plant count and initialize
 		          demeter.initialPlantCount = plantPositions.Count;
 		          demeter.InitializePlants(plantPositions);  // Call this explicitly
 
 	     }
-	     public List<Vector3> FindPlantPositions()
+	     public List<TileData> FindPlantPositions()
 	     {
-		          List<Vector3> plantPositions = new List<Vector3>();
+		          List<TileData> plantPositions = new List<TileData>();
 		          foreach (var tile in tiles)
 		          {
 				TileData data = tile.tileData;
 				if (data.composition.water > 50f && data.surfaceMoisture < 1f)
 				{
-					     Vector3 pos = new Vector3(data.tileGridRef.x + Random.Range(0f, 1f), 0, data.tileGridRef.y + Random.Range(0f, 1f));
-					     plantPositions.Add(pos);
+					     plantPositions.Add(data);
 				}
 		          }
 		          return plantPositions;
 	     }
+	     /// <summary>
+	     /// Main update method - called from SimulationMaster
+	     /// </summary>
 	     public void TileUpdate(float hours)
 	     {
-		          float latitude = gameObject.GetComponent<SimulationMaster>().currentLatitude;
+		          // First: Run atmospheric simulation
+		          AtmosphereUtilities.SimulateAtmosphere(atmosphereTiles, hours);
+
+		          // Second: Apply precipitation from atmosphere to surface
+		          ApplyPrecipitationToSurface(hours);
+
+		          // Third: Update each tile's soil and hydrosphere
+		          UpdateAllTiles(hours);
+
+		          // Fourth: Validate conservation
+		          UpdateTotals();
+	     }
+
+	     /// <summary>
+	     /// Applies precipitation from atmosphere tiles to surface tiles
+	     /// </summary>
+	     private void ApplyPrecipitationToSurface(float hours)
+	     {
 		          int atmTileSise = 10;
 		          int atmGridX = atmosphereTiles.GetLength(1);
 		          int atmGridY = atmosphereTiles.GetLength(2);
-		          //AtmosphereUtilities.SimulateAtmosphere(atmosphereTiles, hours);
+
 		          for (int atmX = 0; atmX < atmGridX; atmX++)
 		          {
 				for (int atmY = 0; atmY < atmGridY; atmY++)
 				{
 					     AtmosphereTile atmo = atmosphereTiles[0, atmX, atmY];
-					     // Determine which world tiles are covered by this atmosphere tile
-					     int startX = atmX * atmTileSise;
-					     int startY = atmY * atmTileSise;
-					     int endX = Mathf.Min(startX + atmTileSise, worldsise.x);
-					     int endY = Mathf.Min(startY + atmTileSise, worldsise.y);
 
-					     int coveredTiles = (endX - startX) * (endY - startY);
-					     //    HydrosphereUtilities.AtmosphericEvaporation(atmo);
-					     //  HydrosphereUtilities.CondenseVapour(atmo);
-					     for (int i = startX; i < endX; i++)
+					     // Only process if there are clouds
+					     if (atmo.cloudWaterContent <= 0)
+						          continue;
+
+					     // Calculate relative humidity for precipitation check
+					     float relativeHumidity = AtmosphereUtilities.CalculateRelativeHumidity(atmo);
+
+					     // Calculate precipitation using the refactored method
+					     float precipitation = CalculatePrecipitationForAtmosphereTile(
+					         atmo,
+					         relativeHumidity,
+					         hours
+					     );
+
+					     if (precipitation <= 0)
+						          continue;
+
+					     // Distribute precipitation to surface tiles under this atmosphere tile
+					     DistributePrecipitationToSurfaceTiles(atmX, atmY, precipitation, hours);
+
+					     // Remove precipitated water from atmosphere
+					     atmo.cloudWaterContent -= precipitation;
+
+					     // Debug logging
+					     if (precipitation > 0.1f)
 					     {
-						          for (int j = startY; j < endY; j++)
-						          {
-								float rain = HydrosphereUtilities.CalculateCurrentPrecipitation(hours, atmo.cloudWaterContent, atmo.RelativeHumidity, atmo.temperature) / 100;
-								WorldTile tile = tiles[i, j];
-								TileData data = tile.tileData;
-								SoilUtilities.ApplyRainfall(data, rain, hours);
-								atmo.cloudWaterContent -= rain;
-								SimulateSoilHour(data, hours, data.latitude);
-								tile.TileVisualUpdate();
-
-
-						          }
+						          Debug.Log($"Precipitation: {precipitation}kg from atmosphere tile ({atmX},{atmY})");
 					     }
 				}
 		          }
+	     }
 
-		          UpdateTotals();
+	     /// <summary>
+	     /// Calculates precipitation for an atmosphere tile
+	     /// </summary>
+	     private float CalculatePrecipitationForAtmosphereTile(
+	         AtmosphereTile atmosphereTile,
+	         float relativeHumidity,
+	         float hours)
+	     {
+		          if (atmosphereTile == null || atmosphereTile.cloudWaterContent <= 0)
+				return 0f;
+
+		          // Basic precipitation conditions
+		          if (relativeHumidity < 0.95f)
+				return 0f;
+
+		          // Calculate dew point
+		          float dewPoint = AtmosphereUtilities.CalculateDewPoint(
+		              atmosphereTile.temperature,
+		              relativeHumidity
+		          );
+
+		          // Precipitation intensity depends on temperature below dew point
+		          float temperatureBelowDewPoint = dewPoint - atmosphereTile.temperature;
+
+		          if (temperatureBelowDewPoint <= 0)
+				return 0f;
+
+		          // Base precipitation rate: 0-20 mm/hour based on conditions
+		          float baseRate = Mathf.Lerp(0f, 20f, Mathf.Clamp01(temperatureBelowDewPoint / 10f));
+
+		          // Adjust for relative humidity
+		          float humidityFactor = Mathf.Pow(relativeHumidity, 3f);
+
+		          // Adjust for cloud water content
+		          float cloudFactor = Mathf.Clamp01(atmosphereTile.cloudWaterContent / 1000f);
+
+		          // Total precipitation rate in mm/hour
+		          float precipRate = baseRate * humidityFactor * cloudFactor;
+
+		          // Convert to kg for this atmosphere tile area
+		          float tileArea = atmosphereTile.tileWidth * atmosphereTile.tileWidth;
+		          float precipMass = precipRate * tileArea * hours; // mm * m² = kg
+
+		          // Cannot precipitate more than available cloud water
+		          precipMass = Mathf.Min(precipMass, atmosphereTile.cloudWaterContent * 0.8f);
+
+		          return precipMass;
+	     }
+
+	     /// <summary>
+	     /// Distributes precipitation to individual surface tiles
+	     /// </summary>
+	     private void DistributePrecipitationToSurfaceTiles(
+	         int atmX, int atmY,
+	         float totalPrecipitation,
+	         float hours)
+	     {
+		          int atmTileSise = 10;
+		          int startX = atmX * atmTileSise;
+		          int startY = atmY * atmTileSise;
+		          int endX = Mathf.Min(startX + atmTileSise, worldsise.x);
+		          int endY = Mathf.Min(startY + atmTileSise, worldsise.y);
+
+		          int tileCount = (endX - startX) * (endY - startY);
+		          if (tileCount == 0)
+				return;
+
+		          // Calculate precipitation per surface tile (kg)
+		          float precipitationPerTile = totalPrecipitation / tileCount;
+
+		          for (int x = startX; x < endX; x++)
+		          {
+				for (int y = startY; y < endY; y++)
+				{
+					     WorldTile tile = tiles[x, y];
+					     if (tile == null)
+						          continue;
+
+					     TileData data = tile.tileData;
+
+					     // Add precipitation to surface moisture
+					     data.surfaceMoisture += precipitationPerTile;
+
+					     // Apply cooling from precipitation
+					     ApplyPrecipitationCooling(data, precipitationPerTile, hours);
+
+					     // If temperature is below freezing, handle snow/ice
+					     if (data.atmosphereTile.temperature < 0)
+					     {
+						          // In a more complete system, you'd track snow accumulation
+						          data.surfaceTemperature -= precipitationPerTile * 0.005f;
+					     }
+				}
+		          }
+	     }
+
+	     /// <summary>
+	     /// Applies cooling effect from precipitation
+	     /// </summary>
+	     private void ApplyPrecipitationCooling(TileData data, float precipitation, float hours)
+	     {
+		          if (precipitation <= 0)
+				return;
+
+		          // Rain cools the surface when it's warmer than the rain temperature
+		          float rainTemperature = data.atmosphereTile.temperature;
+		          float temperatureDifference = data.surfaceTemperature - rainTemperature;
+
+		          if (temperatureDifference > 0)
+		          {
+				// Simple cooling model: rain absorbs heat from surface
+				float coolingEffect = precipitation * temperatureDifference * 0.1f * hours;
+				data.surfaceTemperature = Mathf.Max(
+				    data.surfaceTemperature - coolingEffect,
+				    rainTemperature
+				);
+		          }
+	     }
+
+	     /// <summary>
+	     /// Updates all tiles' soil and hydrosphere
+	     /// </summary>
+	     private void UpdateAllTiles(float hours)
+	     {
+		          for (int x = 0; x < worldsise.x; x++)
+		          {
+				for (int y = 0; y < worldsise.y; y++)
+				{
+					     WorldTile tile = tiles[x, y];
+					     if (tile == null)
+						          continue;
+
+					     TileData data = tile.tileData;
+
+					     // Calculate solar radiation for this tile
+					     float solarRadiation = SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(
+					         data.latitude,
+					         SimulationConstants.DayOfYear,
+					         SimulationConstants.TimeOfDay
+					     );
+
+					     // Update hydrosphere for this tile
+					     UpdateTileHydrosphere(data, solarRadiation, hours);
+
+					     // Update soil processes
+					     UpdateTileSoil(data, hours, data.latitude, solarRadiation);
+
+					     // Visual update
+					     tile.TileVisualUpdate();
+				}
+		          }
+	     }
+
+	     /// <summary>
+	     /// Updates hydrosphere for a single tile
+	     /// </summary>
+	     private void UpdateTileHydrosphere(TileData data, float solarRadiation, float hours)
+	     {
+		          if (data == null || data.atmosphereTile == null)
+				return;
+
+		          // Use the refactored HydrosphereUtilities
+		          HydrosphereUtilities.UpdateHydrosphere(
+		              data.atmosphereTile,
+		              data,
+		              solarRadiation,
+		              hours
+		          );
 	     }
 	     //get latitude of a cell based on its grid position
 	     public float GetLatitude(float x, float y)
@@ -187,11 +403,88 @@ public class TileManager : MonoBehaviour
 		          // Assuming longitude varies linearly across the grid
 		          return (y / (float)worldsise.y) * 360f - 180f; // Map y to -180 to 180 range
 	     }
+	     /// <summary>
+	     /// Updates soil processes for a single tile
+	     /// </summary>
+	     private void UpdateTileSoil(TileData data, float hours, float latitude, float solarRadiation)
+	     {
+		          if (data == null)
+				return;
 
+		          // Calculate solar energy for soil heating
+		          float absorbedEnergy = solarRadiation;
+
+		          // Update soil temperature with proper energy balance
+		          float soilMass = SoilUtilities.GetSoilMass(data.composition);
+		          float heatCapacity = SoilUtilities.GetSoilHeatCapacity(data.composition);
+
+		          if (soilMass > 0 && heatCapacity > 0)
+		          {
+				// Energy gain from solar radiation
+				float solarTempIncrease = (absorbedEnergy * hours * 3600f) / (soilMass * heatCapacity);
+
+				// Energy exchange with air
+				float airTempDiff = data.atmosphereTile.temperature - data.soilTemperature;
+				float conductiveTransfer = airTempDiff * 0.01f * hours;
+
+				// Apply changes
+				data.soilTemperature += solarTempIncrease + conductiveTransfer;
+		          }
+
+		          // Apply soil processes
+		          ApplySoilProcesses(data, hours);
+	     }
+
+	     /// <summary>
+	     /// Applies various soil processes
+	     /// </summary>
+	     private void ApplySoilProcesses(TileData data, float hours)
+	     {
+		          if (data == null)
+				return;
+
+		          // Get the world tile for this data
+		          WorldTile tile = tiles[data.tileGridRef.x, data.tileGridRef.y];
+		          if (tile == null)
+				return;
+
+		          // Apply soil utilities
+		          SoilUtilities.InfiltrateSurfaceMoisture(data, hours);
+		          SoilUtilities.ApplySelfCompaction(data, hours);
+		          SoilUtilities.UpdateDecompaction(data.composition, hours);
+		          SoilUtilities.CalculateDerivedProperties(data.composition);
+
+		          // Redistribute water (surface and lateral)
+		          HydrosphereUtilities.RedistributeSurfaceWater(tile, hours);
+		          SoilUtilities.RedistributeWaterLateral(tile, hours);
+	     }
 	     public void SimulateSoilHour(TileData data, float hours, float latitude)
 	     {
+		          // Calculate solar energy ONCE
 		          float absorbedEnergy = SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(
 		              latitude, SimulationConstants.DayOfYear + 1, SimulationConstants.TimeOfDay + 0.0001f);
+
+		          // Update soil temperature with proper energy balance
+		          float soilMass = SoilUtilities.GetSoilMass(data.composition);
+		          float heatCapacity = SoilUtilities.GetSoilHeatCapacity(data.composition);
+
+		          if (soilMass > 0 && heatCapacity > 0)
+		          {
+				// Energy gain from solar radiation
+				float solarTempIncrease = (absorbedEnergy * hours * 3600f) / (soilMass * heatCapacity);
+
+				// Energy exchange with air
+				float airTempDiff = data.atmosphereTile.temperature - data.soilTemperature;
+				float conductiveTransfer = airTempDiff * 0.01f * hours; // Simple conduction
+
+				// Apply changes
+				data.soilTemperature += solarTempIncrease + conductiveTransfer;
+
+				// Evaporation cooling
+				float evaporation = SoilUtilities.ApplyEvaporation(
+				    data, absorbedEnergy, data.atmosphereTile.RelativeHumidity,
+				    data.atmosphereTile.temperature, data.atmosphereTile.windSpeed, hours);
+		          }
 
 		          // Update soil temperature  and evaporate water
 		          SoilUtilities.UpdateSoilTemperature(data, absorbedEnergy, data.atmosphereTile.temperature, hours);
@@ -199,9 +492,10 @@ public class TileManager : MonoBehaviour
 		          float energyFromTile = SoilUtilities.PassHeatFromSoil(data, hours, this);
 
 		          // Now apply the accumulated energy to warm the atmosphere:
-		          float airMass = (worldsise.x * worldsise.y) * 3000f * Constants.AIR_DENSITY;
+		          float airMass = data.atmosphereTile.tileWidth * data.atmosphereTile.tileWidth * data.atmosphereTile.layerHeight * Constants.AIR_DENSITY;
 		          float deltaAirTemp = energyFromTile / (airMass * Constants.AIR_SPECIFIC_HEAT);
 		          data.atmosphereTile.temperature += deltaAirTemp;
+
 
 		          //lateral water movement
 		          HydrosphereUtilities.RedistributeSurfaceWater(tiles[data.tileGridRef.x, data.tileGridRef.y], hours);

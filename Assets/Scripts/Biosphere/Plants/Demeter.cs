@@ -39,7 +39,7 @@ public class Demeter : MonoBehaviour
 		          // Don't initialize here - wait for SimulationMaster to call it
 	     }
 
-	     public void InitializePlants(List<Vector3> locations)
+	     public void InitializePlants(List<TileData> locations)
 	     {
 
 
@@ -74,7 +74,7 @@ public class Demeter : MonoBehaviour
 	     /// <summary>
 	     /// Initializes plant dictionaries and creates initial plants
 	     /// </summary>
-	     private void BuildPlantDictionaries(List<Vector3> locations)
+	     private void BuildPlantDictionaries(List<TileData> locations)
 	     {
 		          PlantMap = new Dictionary<Plant, Vector3>();
 		          AllPlants = new List<Plant>();
@@ -93,22 +93,18 @@ public class Demeter : MonoBehaviour
 	     /// <summary>
 	     /// Creates a new plant and adds it to the appropriate collections
 	     /// </summary>
-	     public void CreateNewPlant(int index, Vector3 activationCenter)
+	     public void CreateNewPlant(int index, TileData tile)
 	     {
 		          Plant newPlant = new Plant();
-		          Vector3 plantPosition = GetRandomPosition();
-		          float distanceToCenter = Vector3.Distance(plantPosition, activationCenter);
+		          Vector3 plantPosition = new Vector3(tile.tileGridRef.x, tile.volume, tile.tileGridRef.y);
 
 		          // Add to all plants regardless of activation status
 		          PlantMap.Add(newPlant, plantPosition);
 		          AllPlants.Add(newPlant);
 		          PlantCurrentStage.Add(newPlant, "Seedling");
+		          newPlant.CurrentTile = tile;
+		          ActivatePlant(newPlant, plantPosition, index);
 
-		          // Only activate plants within the activation radius
-		          if (distanceToCenter <= activationRadius)
-		          {
-				ActivatePlant(newPlant, plantPosition, index);
-		          }
 	     }
 
 	     /// <summary>
@@ -166,7 +162,8 @@ public class Demeter : MonoBehaviour
 		          string axiom = GenerateStageAxiom(plant, stageName);
 		          CreateGrowthStage(stageName, axiom, plantContainer, plant);
 		          PlantCurrentStage[plant] = stageName;
-
+		          //the amount of 'L' in the axiom represents the number of leaves
+		          plant.Leaves.NumberOfLeaves = axiom.Split('L').Length - 1;
 		          //update plant axiom.
 		          plant.axiom = axiom;
 		          plant.lSystem.axiom = axiom;

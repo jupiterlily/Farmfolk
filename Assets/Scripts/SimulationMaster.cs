@@ -176,7 +176,7 @@ public class SimulationMaster : MonoBehaviour
 		          }
 		          if (currentMinuteOfHour == 9 || currentMinuteOfHour == 29 || currentMinuteOfHour == 49)
 		          {
-				tileManager.SimulateAtmosphereStep(1 / 3f);
+				//tileManager.SimulateAtmosphereStep(1 / 3f);
 
 				tileManager.demeter.lightManager.CheckPlantLightLevel(tileManager.demeter);
 				tileManager.demeter.gardener.GrowPlants(tileManager.demeter, Mathf.FloorToInt(20 * 60));
@@ -203,7 +203,7 @@ public class SimulationMaster : MonoBehaviour
 		          if (currentHourOfDay == 0 || currentHourOfDay == 4 || currentHourOfDay == 8 || currentHourOfDay == 12 || currentHourOfDay == 16 || currentHourOfDay == 20)
 		          {
 
-				tileManager.demeter.gardener.DrawAllPlants(tileManager.demeter);
+				tileManager.demeter.gardener.UpdatePlantAges(tileManager.demeter);
 		          }
 		          tileManager.TileUpdate(hours);
 		          //Debug.Log("tiles updated");

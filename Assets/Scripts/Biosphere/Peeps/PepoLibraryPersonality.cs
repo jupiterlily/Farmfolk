@@ -117,7 +117,7 @@ public static class PepoLibraryPersonality
 	         {
 		             // Honesty-Humility (Sincere/Fair vs. Greedy/Pretentious)
 		          { "HighHonesty-HighEmotionality", "Idealistic" },          // H-High, E-High: Genuine in emotions
-		          { "HighHonesty-LowEmotionality", "Solid" },          // H-High, E-Low: Moral without emotional display
+		          { "HighHonesty-LowEmotionality", "Stoic" },          // H-High, E-Low: Moral without emotional display
 		          { "LowHonesty-HighEmotionality", "Mercurial" },     // H-Low, E-High:
 		          { "LowHonesty-LowEmotionality", "Cold" },   // H-Low, E-Low: 
 
@@ -125,7 +125,7 @@ public static class PepoLibraryPersonality
 		          { "HighHonesty-HighExtraversion", "Sincere" },      // H-High, X-High: Openly sincere
 		          { "HighHonesty-LowExtraversion", "Humble" },          // H-High, X-Low: Quietly authentic
 		          { "LowHonesty-HighExtraversion", "Charming" },   // H-Low, X-High: Socially manipulative
-		          { "LowHonesty-LowExtraversion", "Reserved" },   // H-Low, X-Low: Withdrawn but deceptive
+		          { "LowHonesty-LowExtraversion", "Antisocial" },   // H-Low, X-Low: Withdrawn but deceptive
 
 		          // Honesty-Humility × Agreeableness (Patient/Forgiving vs. Irritable/Stubborn)
 		          { "HighHonesty-HighAgreeableness", "Benevolent" },         // H-High, A-High: Sincerely forgiving
@@ -154,8 +154,8 @@ public static class PepoLibraryPersonality
 		          // Emotionality × Agreeableness
 		          { "HighEmotionality-HighAgreeableness", "Empathetic" },      // E-High, A-High: Emotionally compassionate
 		          { "HighEmotionality-LowAgreeableness", "Resentful" },   // E-High, A-Low: Emotionally bitter
-		          { "LowEmotionality-HighAgreeableness", "Stoic" },        // E-Low, A-High: Rationally forgiving
-		          { "LowEmotionality-LowAgreeableness", "Cold" },         // E-Low, A-Low: Unemotionally rigid
+		          { "LowEmotionality-HighAgreeableness", "Tolerant" },        // E-Low, A-High: Rationally forgiving
+		          { "LowEmotionality-LowAgreeableness", "Rigid" },         // E-Low, A-Low: Unemotionally rigid
 
 		          // Emotionality × Conscientiousness
 		          { "HighEmotionality-HighConscientiousness", "Cautious" },          // E-High, C-High: Anxiously meticulous
@@ -194,7 +194,7 @@ public static class PepoLibraryPersonality
 		          { "LowAgreeableness-LowConscientiousness", "Hostile" },      // A-Low, C-Low: Stubbornly disorganized
 
 		          // Agreeableness × Openness
-		          { "HighAgreeableness-HighOpenness", "Tolerant" },             // A-High, O-High: HighOpenness-minded
+		          { "HighAgreeableness-HighOpenness", "Welcoming" },             // A-High, O-High: HighOpenness-minded
 		          { "HighAgreeableness-LowOpenness", "Compliant" },       // A-High, O-Low: Traditionally agreeable
 		          { "LowAgreeableness-HighOpenness", "Critical" },         // A-Low, O-High: Skeptical and stubborn
 		          { "LowAgreeableness-LowOpenness", "Intolerant" },  // A-Low, O-Low: Traditionally stubborn

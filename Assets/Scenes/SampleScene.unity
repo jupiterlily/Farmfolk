@@ -461,7 +461,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_UiScaleMode: 1
-  m_ReferencePixelsPerUnit: 100
+  m_ReferencePixelsPerUnit: 64
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
@@ -653,6 +653,10 @@ MonoBehaviour:
   - {fileID: 1520225497, guid: 6e9d8d24942b94944b982cea032bf9d4, type: 3}
   - {fileID: 1867339706, guid: 6e9d8d24942b94944b982cea032bf9d4, type: 3}
   - {fileID: -856674352, guid: 6e9d8d24942b94944b982cea032bf9d4, type: 3}
+  - {fileID: 1477042734, guid: 6e9d8d24942b94944b982cea032bf9d4, type: 3}
+  - {fileID: -1086708236, guid: 6e9d8d24942b94944b982cea032bf9d4, type: 3}
+  - {fileID: -1060738430, guid: 6e9d8d24942b94944b982cea032bf9d4, type: 3}
+  - {fileID: -630572793, guid: 6e9d8d24942b94944b982cea032bf9d4, type: 3}
   stubble:
   - {fileID: 291742616, guid: 38c9555411dd0ec40a5f1c9eaf75daba, type: 3}
   - {fileID: -662395203, guid: 38c9555411dd0ec40a5f1c9eaf75daba, type: 3}
@@ -900,7 +904,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce010db710ee9f949b8eeb00988dc2e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  worldsise: {x: 32, y: 32}
+  worldsise: {x: 50, y: 50}
   grid:
     tileWidth: 0
     XGrid: 0
@@ -915,7 +919,7 @@ MonoBehaviour:
   totalSilt: 0
   totalClay: 0
   totalOrganicMatter: 0
-  demeter: {fileID: 0}
+  demeter: {fileID: 1956233986128766911, guid: bc8a76db48a4b1a4ab671cc8f9e3423a, type: 3}
 --- !u!4 &1440900998
 Transform:
   m_ObjectHideFlags: 0
@@ -974,9 +978,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fa2202a81ca9dc4eb5b2fc7d684a014, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialPepos: 80
-  generationSteps: 5
-  maxPepos: 300
+  initialPepos: 450
+  generationSteps: 20
+  maxPepos: 700
   minPopulationThreshold: 15
   immigrantCount: 3
   multipleBirthChance: 0.02

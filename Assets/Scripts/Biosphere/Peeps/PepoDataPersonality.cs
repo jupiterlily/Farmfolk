@@ -54,6 +54,7 @@ public class PersonalityAspect : NumericalAspect
 	     }
 
 }
+
 public class HEXACO
 {
 	     public PersonalityAspect Honesty = HEXACODimension.H;

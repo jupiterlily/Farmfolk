@@ -18,7 +18,10 @@ public class PepoPopulation
 	     public int AnnualBirths = 0;
 	     public int AnnualDeaths = 0;
 
+	     public Dictionary<PepoDataRoles, List<PepoData>> roleAssignments = new Dictionary<PepoDataRoles, List<PepoData>>();
 	     public int populationChange => AnnualBirths - AnnualDeaths;
+
+
 
 	     public PepoPopulation(int size)
 	     {
@@ -27,5 +30,16 @@ public class PepoPopulation
 				population.Add(PepoFactory.InitialiseRandom());
 		          }
 	     }
-}
 
+	     //remove dead pepos from role assignments
+	     public void RemovePepoFromRoles(PepoData pepo)
+	     {
+		          foreach (var role in roleAssignments.Keys)
+		          {
+				if (roleAssignments[role].Contains(pepo))
+				{
+					     roleAssignments[role].Remove(pepo);
+				}
+		          }
+	     }
+}

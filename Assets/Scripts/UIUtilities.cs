@@ -293,26 +293,46 @@ public static class UIUtilities
 	     {
 		          switch (valueName.ToLower())
 		          {
-		          case "agency":
-		          return "Ag";
-		          case "stimulation":
-		          return "St";
-		          case "hedonism":
-		          return "He";
-		          case "achievement":
+		          case "curiosity":
+		          return "Cu";
+		          case "autonomy":
+		          return "Au";
+		          case "excitement":
+		          return "Ex";
+		          case "vitality":
+		          return "Vi";
+		          case "indulgence":
+		          return "In";
+		          case "accomplishment":
+		          return "Am";
+		          case "dominance":
+		          return "Do";
+		          case "accumulation":
 		          return "Ac";
-		          case "power":
-		          return "Po";
+		          case "status":
+		          return "St";
+		          case "safety":
+		          return "Sf";
 		          case "security":
 		          return "Se";
-		          case "conformity":
-		          return "Co";
 		          case "tradition":
 		          return "Tr";
-		          case "benevolence":
-		          return "Be";
-		          case "universalism":
-		          return "Un";
+		          case "obedience":
+		          return "Ob";
+		          case "cohesion":
+		          return "Ch";
+		          case "humility":
+		          return "Hu";
+		          case "preservation":
+		          return "Pr";
+		          case "compassion":
+		          return "Cm";
+		          case "tolerance":
+		          return "To";
+		          case "caring":
+		          return "Cr";
+		          case "dependability":
+		          return "Dp";
 		          default:
 		          return valueName.Substring(0, 2);
 		          }
@@ -323,32 +343,52 @@ public static class UIUtilities
 		          switch (valueName.ToLower())
 		          {
 		          // Openness to change - Blues
-		          case "agency":
+		          case "curiosity":
 		          return new Color(0.2f, 0.6f, 1f); // Bright blue
-		          case "stimulation":
+		          case "autonomy":
 		          return new Color(0.4f, 0.8f, 1f); // Light blue
+		          case "excitement":
+		          return new Color(0.6f, 1f, 1f); // Cyan
+		          case "vitality":
+		          return new Color(0.2f, 0.8f, 0.8f); // Teal
 
 		          // Self-enhancement - Reds/Oranges
-		          case "hedonism":
-		          return new Color(1f, 0.4f, 0.2f); // Orange
-		          case "achievement":
-		          return new Color(1f, 0.6f, 0f); // Gold
-		          case "power":
+		          case "indulgence":
+		          return new Color(1f, 0.6f, 0.2f); // Orange
+		          case "accomplishment":
+		          return new Color(1f, 0.8f, 0f); // Gold
+		          case "dominance":
 		          return new Color(1f, 0.2f, 0.2f); // Red
+		          case "accumulation":
+		          return new Color(0.8f, 0f, 0f); // Dark red
+		          case "status":
+		          return new Color(1f, 0.4f, 0.6f); // Pink
 
 		          // Conservation - Greens
+		          case "safety":
+		          return new Color(0.6f, 1f, 0.6f); // Light green
 		          case "security":
-		          return new Color(0.3f, 0.8f, 0.3f); // Green
-		          case "conformity":
-		          return new Color(0.5f, 0.9f, 0.5f); // Light green
+		          return new Color(0.4f, 0.8f, 0.4f); // Green
 		          case "tradition":
-		          return new Color(0.1f, 0.6f, 0.1f); // Dark green
+		          return new Color(0.2f, 0.6f, 0.2f); // Dark green
+		          case "obedience":
+		          return new Color(0.8f, 1f, 0.4f); // Lime
+		          case "cohesion":
+		          return new Color(0.6f, 0.8f, 0.2f); // Yellow-green
+		          case "humility":
+		          return new Color(0.5f, 0.5f, 0.2f); // Olive
 
 		          // Self-transcendence - Purples
-		          case "benevolence":
+		          case "preservation":
 		          return new Color(0.8f, 0.4f, 1f); // Purple
-		          case "universalism":
-		          return new Color(0.6f, 0.2f, 0.8f); // Dark purple
+		          case "compassion":
+		          return new Color(1f, 0.4f, 0.8f); // Magenta
+		          case "tolerance":
+		          return new Color(0.9f, 0.6f, 1f); // Lavender
+		          case "caring":
+		          return new Color(1f, 0.6f, 0.8f); // Rose
+		          case "dependability":
+		          return new Color(0.7f, 0.4f, 0.9f); // Violet
 
 		          default:
 		          return Color.gray;

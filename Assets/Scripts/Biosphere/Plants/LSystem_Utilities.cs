@@ -185,7 +185,7 @@ public class LSystem_Utilities
 		          }
 		          return count;
 	     }
-
+	     //apply rules to input string with a probability based on scale
 	     public static string ExpandString(string input, System.Random random, float scale, Dictionary<char, string[]> rules)
 	     {
 		          System.Text.StringBuilder newString = new System.Text.StringBuilder();
@@ -195,7 +195,7 @@ public class LSystem_Utilities
 				if (rules.TryGetValue(c, out string[] replacements))
 				{
 					     // Calculate probability based on iteration depth
-					     float applyRuleProbability = Mathf.Lerp(1f, 0.6f, scale);
+					     float applyRuleProbability = Mathf.Lerp(1f, 1f, scale);
 
 					     if (random.NextDouble() < applyRuleProbability)
 					     {
@@ -229,11 +229,11 @@ public class LSystem_Utilities
 				case '>':
 				sb.Append('<');
 				break;
-				case 'v':
-				sb.Append('^');
+				case '+':
+				sb.Append('-');
 				break;
-				case '^':
-				sb.Append('v');
+				case '-':
+				sb.Append('+');
 				break;
 				case '/':
 				sb.Append('|');

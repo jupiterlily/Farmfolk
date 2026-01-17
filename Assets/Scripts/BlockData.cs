@@ -7,6 +7,7 @@ public class BlockData
 	     public Vector2Int gridRef; //grid reference for the block
 	     public float longitude; //longitude in degrees
 	     public float latitude; //latitude in degrees
+
 	     public float surfaceWidth; //width at cubed sphere surface in meters
 	     public float surfaceLength; //length at cubed sphere surface in meters
 	     public float Volume

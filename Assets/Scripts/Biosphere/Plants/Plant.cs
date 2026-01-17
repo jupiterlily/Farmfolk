@@ -40,6 +40,7 @@ public class Plant
 	     public float TranspirationModifier { get; private set; } = 1;
 	     private MetabolicPathways metabolicPathways = new MetabolicPathways();
 	     public LSystem lSystem; //gets added and  instantiated with the plant
+	     public TileData CurrentTile; //gets assigned when the plant is placed
 	     public GameObject PlantObject; //gets added and instantiated with the plant
 	     public Plant()
 	     {
@@ -67,7 +68,7 @@ public class Plant
 		          {
 				foreach (string rule in ruleSet.Value)
 				{
-					     if (rule.Contains("<") || rule.Contains(">") || rule.Contains("/") || rule.Contains("|") || rule.Contains("v") || rule.Contains("^"))
+					     if (rule.Contains("<") || rule.Contains(">") || rule.Contains("/") || rule.Contains("|") || rule.Contains("+") || rule.Contains("-"))
 					     {
 						          string mirrored = LSystem_Utilities.MirrorRule(rule);
 						          if (!mirroredRulePairs.ContainsKey(rule) &&

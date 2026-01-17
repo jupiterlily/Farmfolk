@@ -530,16 +530,16 @@ public class CosmeticFeatures
 				foreach (var kvp in stubbleCounts)
 				{
 					     //weight by conformity and tradition
-					     stubblePref.Add(kvp.Key, (int)(kvp.Value * (pepo.values.Find(v => v.name == "conformity").value) + pepo.values.Find(v => v.name == "tradition").value));
+					     stubblePref.Add(kvp.Key, (int)(kvp.Value * (pepo.values.Find(v => v.name == "cohesion").value) + pepo.values.Find(v => v.name == "tradition").value));
 					     //counterweight by self-direction and stimulation
-					     stubblePref[kvp.Key] -= (int)(kvp.Value * (pepo.values.Find(v => v.name == "agency").value) + pepo.values.Find(v => v.name == "stimulation").value);
+					     stubblePref[kvp.Key] -= (int)(kvp.Value * (pepo.values.Find(v => v.name == "autonomy").value) + pepo.values.Find(v => v.name == "excitement").value);
 				}
 				foreach (var kvp in styleCounts)
 				{
 					     //weight by conformity and tradition
-					     moustachePref.Add(kvp.Key, (int)(kvp.Value * (pepo.values.Find(v => v.name == "conformity").value) + pepo.values.Find(v => v.name == "tradition").value));
+					     moustachePref.Add(kvp.Key, (int)(kvp.Value * (pepo.values.Find(v => v.name == "cohesion").value) + pepo.values.Find(v => v.name == "tradition").value));
 					     //counterweight by self-direction and stimulation
-					     moustachePref[kvp.Key] -= (int)(kvp.Value * (pepo.values.Find(v => v.name == "agency").value) + pepo.values.Find(v => v.name == "stimulation").value);
+					     moustachePref[kvp.Key] -= (int)(kvp.Value * (pepo.values.Find(v => v.name == "autonomy").value) + pepo.values.Find(v => v.name == "excitement").value);
 				}
 				//choose the styles with the highest weight
 				if (stubblePref.Count > 0)
@@ -572,7 +572,7 @@ public class CosmeticFeatures
 
 				}
 				// Facial hair styles influenced by personality and experimentation
-				if (experimentation > 0.6f && pepo.values.Find(v => v.name == "agency").value > 5 && Random.value < 0.3f)
+				if (experimentation > 0.6f && pepo.values.Find(v => v.name == "autonomy").value > 5 && Random.value < 0.3f)
 				{
 					     stubbleLevel = Random.Range(0, 6); // Try different levels
 					     moustacheStyle = Random.Range(0, 16); // Try different styles
