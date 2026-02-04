@@ -227,7 +227,7 @@ public class ResourceEffect : IEffect
 		          }
 		          else
 		          {
-				var newResource = new ResourceData { name = ResourceName, count = (int)ChangeAmount, description = $"{ResourceName} added by action." };
+				//var newResource = new ResourceData { name = ResourceName, count = (int)ChangeAmount, description = $"{ResourceName} added by action." };
 		          }
 	     }
 }

@@ -28,12 +28,24 @@ public static class PepoSystemMatchmaking
 		          if (degree >= 2)
 		          {
 				float similarityscore = PepoUtilitiesMatchmaking.ComparePhysicalAppearance(me, target);
+				if (me.values[11].value > 1)
+				{
+					     float parentalsimilarityscore = PepoUtilitiesMatchmaking.ComparePhysicalAppearance(me.mother, target);
+					     parentalsimilarityscore += PepoUtilitiesMatchmaking.ComparePhysicalAppearance(me.father, target);
+					     parentalsimilarityscore /= 2f;
+					     //tradition
+					     parentalsimilarityscore *= (me.values[11].value / me.values[11].maxValue);
+					     similarityscore *= parentalsimilarityscore;
+				}
 				float requiredSimilarity = 0f;
 				//low openness or high conformity means you want people who look like you
-				requiredSimilarity += (1 - me.personality.Openness.value / me.personality.Openness.maxValue) / 3;
-				requiredSimilarity += (me.values[6].value / me.values[6].maxValue) / 3;
+				requiredSimilarity += (1 - me.personality.Openness.value / me.personality.Openness.maxValue) / 4;
+				requiredSimilarity += (me.values[13].value / me.values[13].maxValue) / 4;
+
 				//high universalism means you want people who look different to you
-				requiredSimilarity -= (me.values[9].value / me.values[9].maxValue) / 3;
+				requiredSimilarity -= (me.values[17].value / me.values[17].maxValue) / 4;
+				//high excitement means you want different and new
+				requiredSimilarity -= (me.values[2].value / me.values[2].maxValue) / 4;
 				if (similarityscore < requiredSimilarity)
 				{
 					     Debug.LogWarning($"[Relationship Manager]{me.fullname} doesn't find {target.fullname} physically attractive (similarity: {similarityscore}, required: {requiredSimilarity})");

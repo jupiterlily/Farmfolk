@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public static class AtmosphereUtilities
@@ -6,68 +7,197 @@ public static class AtmosphereUtilities
 	     /// <summary>
 	     /// Simulates atmospheric processes using a conservative finite-volume approach
 	     /// </summary>
-	     public static void SimulateAtmosphere(AtmosphereTile[,,] atmosphereTiles, float hours)
+	     //  public static void SimulateAtmosphere(AtmosphereTile[,,] atmosphereTiles, float hours)
+	     //  {
+	     //        int layers = atmosphereTiles.GetLength(0);
+	     //        int width = atmosphereTiles.GetLength(1);
+	     //        int height = atmosphereTiles.GetLength(2);
+
+	     //        // Store initial energy state for conservation check
+	     //        float initialTotalEnergy = CalculateTotalEnergy(atmosphereTiles);
+	     //        float initialTotalWater = CalculateTotalWater(atmosphereTiles);
+
+	     //        // Use floats but with proper scaling to avoid precision issues
+	     //        float[,,] newTemps = new float[layers, width, height];
+	     //        float[,,] newVapor = new float[layers, width, height];
+	     //        float[,,] newCloudWater = new float[layers, width, height];
+	     //        float[,,] newLiquidWater = new float[layers, width, height];
+	     //        Vector3[,,] newWinds = new Vector3[layers, width, height];
+
+	     //        // First: Calculate all temperature changes WITHOUT water phase changes
+	     //        for (int layer = 0; layer < layers; layer++)
+	     //        {
+	     //for (int x = 0; x < width; x++)
+	     //{
+	     //	     for (int y = 0; y < height; y++)
+	     //	     {
+	     //		          AtmosphereTile current = atmosphereTiles[layer, x, y];
+
+	     //		          // 1. Adiabatic change - ensure small values
+	     //		          float adiabaticChange = CalculateAdiabaticChange(current, layer, layers) * hours;
+
+	     //		          // 2. Radiative change - ensure small values
+	     //		          float radiativeChange = CalculateRadiativeChange(current, layer, layers, hours);
+
+	     //		          // Apply temperature changes
+	     //		          newTemps[layer, x, y] = current.temperature + adiabaticChange + radiativeChange;
+
+	     //		          // Copy water values
+	     //		          newVapor[layer, x, y] = current.waterVapor.Mass;
+	     //		          newCloudWater[layer, x, y] = current.cloudWaterContent.Mass;
+	     //		          newLiquidWater[layer, x, y] = current.liquidWater.Mass;
+
+	     //		          // Calculate wind changes
+	     //		          Vector3 pressureForce = CalculatePressureGradientForce(atmosphereTiles, layer, x, y, width, height);
+	     //		          float latitude = (y / (float)height * 180f) - 90f;
+	     //		          Vector3 coriolisForce = CalculateCoriolisEffect(current.windVelocity, latitude);
+	     //		          float frictionCoefficient = (layer == 0) ? 0.05f : 0.01f;
+	     //		          Vector3 friction = -current.windVelocity * frictionCoefficient;
+
+	     //		          newWinds[layer, x, y] = current.windVelocity +
+	     //		              (pressureForce + coriolisForce + friction) * hours;
+	     //		          newWinds[layer, x, y] = Vector3.ClampMagnitude(newWinds[layer, x, y], 50f);
+	     //	     }
+	     //}
+	     //        }
+
+	     //        // Second: Apply conservative advection
+	     //        ApplyConservativeAdvection(
+	     //            atmosphereTiles,
+	     //            ref newTemps, ref newVapor, ref newCloudWater, ref newLiquidWater,
+	     //            newWinds, hours
+	     //        );
+
+	     //        // Third: Apply phase changes with PROPER energy scaling
+	     //        for (int layer = 0; layer < layers; layer++)
+	     //        {
+	     //for (int x = 0; x < width; x++)
+	     //{
+	     //	     for (int y = 0; y < height; y++)
+	     //	     {
+	     //		          AtmosphereTile current = atmosphereTiles[layer, x, y];
+	     //		          float volume = current.tileWidth * current.tileWidth * current.layerHeight;
+
+	     //		          // Get the advected temperature
+	     //		          float tempAfterAdvection = newTemps[layer, x, y];
+
+	     //		          // Apply phase changes with proper scaling
+	     //		          ApplyPhaseChangesWithProperScaling(
+	     //		              ref tempAfterAdvection,
+	     //		              ref newVapor[layer, x, y],
+	     //		              ref newCloudWater[layer, x, y],
+	     //		              ref newLiquidWater[layer, x, y],
+	     //		              current.pressure,
+	     //		              volume,
+	     //		              current.windSpeed,
+	     //		              hours
+	     //		          );
+
+	     //		          // Store final temperature
+	     //		          newTemps[layer, x, y] = tempAfterAdvection;
+	     //	     }
+	     //}
+	     //        }
+
+	     //        // Fourth: Apply all changes to original tiles
+	     //        for (int layer = 0; layer < layers; layer++)
+	     //        {
+	     //for (int x = 0; x < width; x++)
+	     //{
+	     //	     for (int y = 0; y < height; y++)
+	     //	     {
+	     //		          AtmosphereTile tile = atmosphereTiles[layer, x, y];
+
+	     //		          // Apply temperature with smoothing and strict bounds
+	     //		          float targetTemp = Mathf.Clamp(newTemps[layer, x, y], -100f, 100f);
+	     //		          tile.temperature = Mathf.Lerp(tile.temperature, targetTemp, 0.3f);
+
+	     //		          // Apply water components with conservation
+	     //		          float totalWaterBefore = tile.waterVapor.Mass + tile.cloudWaterContent.Mass + tile.liquidWater.Mass;
+	     //		          float totalWaterAfter = newVapor[layer, x, y] + newCloudWater[layer, x, y] + newLiquidWater[layer, x, y];
+
+	     //		          // Redistribute to maintain exact conservation
+	     //		          if (totalWaterAfter > 0)
+	     //		          {
+	     //				float ratio = totalWaterBefore / totalWaterAfter;
+	     //				tile.waterVapor = Mathf.Max(0, newVapor[layer, x, y] * ratio);
+	     //				tile.cloudWaterContent = Mathf.Max(0, newCloudWater[layer, x, y] * ratio);
+	     //				tile.liquidWater = Mathf.Max(0, newLiquidWater[layer, x, y] * ratio);
+	     //		          }
+
+	     //		          // Apply wind
+	     //		          tile.windVelocity = newWinds[layer, x, y];
+	     //		          tile.windSpeed = tile.windVelocity.magnitude;
+
+	     //		          // Recalculate pressure
+	     //		          float vaporDensity = tile.waterVapor.Mass / Mathf.Max(tile.layerHeight * tile.tileWidth * tile.tileWidth, 0.001f);
+	     //		          tile.pressure = CalculateRealisticPressure(
+	     //		              tile.temperature,
+	     //		              vaporDensity,
+	     //		              layer * tile.layerHeight,
+	     //		              tile.waterVapor.Mass
+	     //		          );
+	     //	     }
+	     //}
+	     //        }
+
+	     //        // Fifth: Validate conservation
+	     //        float finalTotalEnergy = CalculateTotalEnergy(atmosphereTiles);
+	     //        float finalTotalWater = CalculateTotalWater(atmosphereTiles);
+
+	     //        float energyError = Mathf.Abs(finalTotalEnergy - initialTotalEnergy);
+	     //        float waterError = Mathf.Abs(finalTotalWater - initialTotalWater);
+
+	     //        if (energyError > 1e6f) // If error is more than 1 MJ
+	     //        {
+	     //Debug.LogError($"Energy conservation error: {energyError} J");
+	     //        }
+
+	     //        if (waterError > 0.1f)
+	     //        {
+	     //Debug.LogWarning($"Water conservation error: {waterError} kg");
+	     //        }
+	     //  }
+
+	     /// <summary>
+	     /// Apply phase changes with PROPERLY SCALED energy calculations
+	     /// </summary>
+	     /// <summary>
+	     /// Calculate realistic air mass using ideal gas law
+	     /// </summary>
+	     /// 
+	     /// <summary>
+	     /// Apply semi-Lagrangian advection to transport atmospheric properties based on wind
+	     /// This conserves mass while smoothly transporting water vapor, cloud water, and thermal energy
+	     /// </summary>
+	     public static void ApplyAtmosphericAdvection(AtmosphereTile[,,] atmosphereTiles, float hours)
 	     {
 		          int layers = atmosphereTiles.GetLength(0);
 		          int width = atmosphereTiles.GetLength(1);
 		          int height = atmosphereTiles.GetLength(2);
 
-		          // Store initial energy state for conservation check
-		          float initialTotalEnergy = CalculateTotalEnergy(atmosphereTiles);
-		          float initialTotalWater = CalculateTotalWater(atmosphereTiles);
+		          // Create temporary storage for advected quantities
+		          List<ThermalEnergy>[,,] advectedVapor = new List<ThermalEnergy>[layers, width, height];
+		          List<ThermalEnergy>[,,] advectedCloud = new List<ThermalEnergy>[layers, width, height];
+		          List<ThermalEnergy>[,,] advectedIce = new List<ThermalEnergy>[layers, width, height];
 
-		          // Use floats but with proper scaling to avoid precision issues
-		          float[,,] newTemps = new float[layers, width, height];
-		          float[,,] newVapor = new float[layers, width, height];
-		          float[,,] newCloudWater = new float[layers, width, height];
-		          float[,,] newLiquidWater = new float[layers, width, height];
-		          Vector3[,,] newWinds = new Vector3[layers, width, height];
-
-		          // First: Calculate all temperature changes WITHOUT water phase changes
-		          for (int layer = 0; layer < layers; layer++)
+		          // Initialize temporary storage
+		          for (int l = 0; l < layers; l++)
 		          {
 				for (int x = 0; x < width; x++)
 				{
 					     for (int y = 0; y < height; y++)
 					     {
-						          AtmosphereTile current = atmosphereTiles[layer, x, y];
-
-						          // 1. Adiabatic change - ensure small values
-						          float adiabaticChange = CalculateAdiabaticChange(current, layer, layers) * hours;
-
-						          // 2. Radiative change - ensure small values
-						          float radiativeChange = CalculateRadiativeChange(current, layer, layers, hours);
-
-						          // Apply temperature changes
-						          newTemps[layer, x, y] = current.temperature + adiabaticChange + radiativeChange;
-
-						          // Copy water values
-						          newVapor[layer, x, y] = current.waterVapor;
-						          newCloudWater[layer, x, y] = current.cloudWaterContent;
-						          newLiquidWater[layer, x, y] = current.liquidWater;
-
-						          // Calculate wind changes
-						          Vector3 pressureForce = CalculatePressureGradientForce(atmosphereTiles, layer, x, y, width, height);
-						          float latitude = (y / (float)height * 180f) - 90f;
-						          Vector3 coriolisForce = CalculateCoriolisEffect(current.windVelocity, latitude);
-						          float frictionCoefficient = (layer == 0) ? 0.05f : 0.01f;
-						          Vector3 friction = -current.windVelocity * frictionCoefficient;
-
-						          newWinds[layer, x, y] = current.windVelocity +
-						              (pressureForce + coriolisForce + friction) * hours;
-						          newWinds[layer, x, y] = Vector3.ClampMagnitude(newWinds[layer, x, y], 50f);
+						          advectedVapor[l, x, y] = new List<ThermalEnergy>();
+						          advectedCloud[l, x, y] = new List<ThermalEnergy>();
+						          advectedIce[l, x, y] = new List<ThermalEnergy>();
 					     }
 				}
 		          }
 
-		          // Second: Apply conservative advection
-		          ApplyConservativeAdvection(
-		              atmosphereTiles,
-		              ref newTemps, ref newVapor, ref newCloudWater, ref newLiquidWater,
-		              newWinds, hours
-		          );
+		          float timeStepSeconds = hours * 3600f;
 
-		          // Third: Apply phase changes with PROPER energy scaling
+		          // Step 1: Calculate advection for each tile
 		          for (int layer = 0; layer < layers; layer++)
 		          {
 				for (int x = 0; x < width; x++)
@@ -75,30 +205,29 @@ public static class AtmosphereUtilities
 					     for (int y = 0; y < height; y++)
 					     {
 						          AtmosphereTile current = atmosphereTiles[layer, x, y];
-						          float volume = current.tileWidth * current.tileWidth * current.layerHeight;
+						          if (current == null)
+								continue;
 
-						          // Get the advected temperature
-						          float tempAfterAdvection = newTemps[layer, x, y];
-
-						          // Apply phase changes with proper scaling
-						          ApplyPhaseChangesWithProperScaling(
-						              ref tempAfterAdvection,
-						              ref newVapor[layer, x, y],
-						              ref newCloudWater[layer, x, y],
-						              ref newLiquidWater[layer, x, y],
-						              current.pressure,
-						              volume,
-						              current.windSpeed,
-						              hours
+						          // Semi-Lagrangian: trace back to where the air came from
+						          Vector2 departure = CalculateDeparturePoint(
+						              current,
+						              x, y, width, height,
+						              timeStepSeconds
 						          );
 
-						          // Store final temperature
-						          newTemps[layer, x, y] = tempAfterAdvection;
+						          // Bilinear interpolation to get properties from departure point
+						          AdvectProperties(
+						              atmosphereTiles,
+						              departure, layer,
+						              current,
+						              advectedVapor, advectedCloud, advectedIce,
+						              x, y
+						          );
 					     }
 				}
 		          }
 
-		          // Fourth: Apply all changes to original tiles
+		          // Step 2: Apply advected properties back to tiles
 		          for (int layer = 0; layer < layers; layer++)
 		          {
 				for (int x = 0; x < width; x++)
@@ -106,163 +235,347 @@ public static class AtmosphereUtilities
 					     for (int y = 0; y < height; y++)
 					     {
 						          AtmosphereTile tile = atmosphereTiles[layer, x, y];
+						          if (tile == null)
+								continue;
 
-						          // Apply temperature with smoothing and strict bounds
-						          float targetTemp = Mathf.Clamp(newTemps[layer, x, y], -100f, 100f);
-						          tile.temperature = Mathf.Lerp(tile.temperature, targetTemp, 0.3f);
-
-						          // Apply water components with conservation
-						          float totalWaterBefore = tile.waterVapor + tile.cloudWaterContent + tile.liquidWater;
-						          float totalWaterAfter = newVapor[layer, x, y] + newCloudWater[layer, x, y] + newLiquidWater[layer, x, y];
-
-						          // Redistribute to maintain exact conservation
-						          if (totalWaterAfter > 0)
+						          // Replace water vapor with advected vapor
+						          if (advectedVapor[layer, x, y].Count > 0)
 						          {
-								float ratio = totalWaterBefore / totalWaterAfter;
-								tile.waterVapor = Mathf.Max(0, newVapor[layer, x, y] * ratio);
-								tile.cloudWaterContent = Mathf.Max(0, newCloudWater[layer, x, y] * ratio);
-								tile.liquidWater = Mathf.Max(0, newLiquidWater[layer, x, y] * ratio);
+								tile.waterVapor = advectedVapor[layer, x, y][0];
 						          }
 
-						          // Apply wind
-						          tile.windVelocity = newWinds[layer, x, y];
-						          tile.windSpeed = tile.windVelocity.magnitude;
+						          // Replace cloud water with advected cloud
+						          if (advectedCloud[layer, x, y].Count > 0)
+						          {
+								tile.cloudWaterContent = advectedCloud[layer, x, y][0];
+						          }
 
-						          // Recalculate pressure
-						          float vaporDensity = tile.waterVapor / Mathf.Max(tile.layerHeight * tile.tileWidth * tile.tileWidth, 0.001f);
-						          tile.pressure = CalculateRealisticPressure(
-						              tile.temperature,
-						              vaporDensity,
-						              layer * tile.layerHeight,
-						              tile.waterVapor
-						          );
+						          // Replace ice with advected ice
+						          if (advectedIce[layer, x, y].Count > 0)
+						          {
+								tile.iceParticles = advectedIce[layer, x, y][0];
+						          }
 					     }
 				}
-		          }
-
-		          // Fifth: Validate conservation
-		          float finalTotalEnergy = CalculateTotalEnergy(atmosphereTiles);
-		          float finalTotalWater = CalculateTotalWater(atmosphereTiles);
-
-		          float energyError = Mathf.Abs(finalTotalEnergy - initialTotalEnergy);
-		          float waterError = Mathf.Abs(finalTotalWater - initialTotalWater);
-
-		          if (energyError > 1e6f) // If error is more than 1 MJ
-		          {
-				Debug.LogError($"Energy conservation error: {energyError} J");
-		          }
-
-		          if (waterError > 0.1f)
-		          {
-				Debug.LogWarning($"Water conservation error: {waterError} kg");
 		          }
 	     }
 
 	     /// <summary>
-	     /// Apply phase changes with PROPERLY SCALED energy calculations
+	     /// Calculate where air at this location came from in the previous timestep
+	     /// Using semi-Lagrangian approach
 	     /// </summary>
-	     public static void ApplyPhaseChangesWithProperScaling(
-	         ref float temperature,
-	         ref float vapor,
-	         ref float cloudWater,
-	         ref float liquidWater,
-	         float pressure,
-	         float volume,
-	         float windSpeed,
-	         float hours)
+	     private static Vector2 CalculateDeparturePoint(
+	         AtmosphereTile current,
+	         int x, int y,
+	         int width, int height,
+	         float timeStepSeconds)
 	     {
-		          if (volume <= 0)
+		          if (current == null)
+				return new Vector2(x, y);
+
+		          // Wind carries the parcel
+		          Vector3 windVelocity = current.windVelocity;
+		          float cellWidth = current.tileWidth;
+
+		          // Displacement in grid cells
+		          float dx = (windVelocity.x * timeStepSeconds) / cellWidth;
+		          float dy = (windVelocity.z * timeStepSeconds) / cellWidth;
+
+		          // Departure point (where this cell's air came from)
+		          float departureX = x - dx;
+		          float departureY = y - dy;
+
+		          // Wrap around at poles (periodic boundary in longitude)
+		          departureX = ((departureX % width) + width) % width;
+		          departureY = ((departureY % height) + height) % height;
+
+		          return new Vector2(departureX, departureY);
+	     }
+
+	     /// <summary>
+	     /// Advect atmospheric properties using bilinear interpolation from departure point
+	     /// </summary>
+	     private static void AdvectProperties(
+	         AtmosphereTile[,,] atmosphereTiles,
+	         Vector2 departurePoint,
+	         int layer,
+	         AtmosphereTile currentTile,
+	         List<ThermalEnergy>[,,] advectedVapor,
+	         List<ThermalEnergy>[,,] advectedCloud,
+	         List<ThermalEnergy>[,,] advectedIce,
+	         int x, int y)
+	     {
+		          int width = atmosphereTiles.GetLength(1);
+		          int height = atmosphereTiles.GetLength(2);
+
+		          // Integer grid points for bilinear interpolation
+		          int x0 = Mathf.FloorToInt(departurePoint.x);
+		          int x1 = (x0 + 1) % width;
+		          int y0 = Mathf.FloorToInt(departurePoint.y);
+		          int y1 = (y0 + 1) % height;
+
+		          // Fractional parts for interpolation
+		          float fx = departurePoint.x - x0;
+		          float fy = departurePoint.y - y0;
+
+		          // Get four corner tiles
+		          AtmosphereTile t00 = atmosphereTiles[layer, x0, y0];
+		          AtmosphereTile t10 = atmosphereTiles[layer, x1, y0];
+		          AtmosphereTile t01 = atmosphereTiles[layer, x0, y1];
+		          AtmosphereTile t11 = atmosphereTiles[layer, x1, y1];
+
+		          if (t00 == null || t10 == null || t01 == null || t11 == null)
 				return;
 
-		          // Calculate saturation properly
-		          float saturationMass = CalculateSaturationWaterMass(temperature, pressure, volume);
-		          float relativeHumidity = vapor / Mathf.Max(saturationMass, 0.001f);
+		          // Bilinear interpolation for water vapor
+		          ThermalEnergy interpolatedVapor = BilinearInterpolateEnergy(
+		              t00.waterVapor, t10.waterVapor, t01.waterVapor, t11.waterVapor,
+		              fx, fy
+		          );
+		          advectedVapor[layer, x, y].Add(interpolatedVapor);
 
-		          // Calculate air mass CORRECTLY
-		          float airMass = CalculateRealisticAirMass(temperature, pressure, volume);
+		          // Bilinear interpolation for cloud water
+		          ThermalEnergy interpolatedCloud = BilinearInterpolateEnergy(
+		              t00.cloudWaterContent, t10.cloudWaterContent, t01.cloudWaterContent, t11.cloudWaterContent,
+		              fx, fy
+		          );
+		          advectedCloud[layer, x, y].Add(interpolatedCloud);
 
-		          // If airMass is too small (floating point issue), use a reasonable minimum
-		          if (airMass < 0.1f)
+		          // Bilinear interpolation for ice
+		          ThermalEnergy interpolatedIce = BilinearInterpolateEnergy(
+		              t00.iceParticles, t10.iceParticles, t01.iceParticles, t11.iceParticles,
+		              fx, fy
+		          );
+		          advectedIce[layer, x, y].Add(interpolatedIce);
+	     }
+
+	     /// <summary>
+	     /// Bilinear interpolation of ThermalEnergy properties
+	     /// Preserves mass and temperature through interpolation
+	     /// </summary>
+	     private static ThermalEnergy BilinearInterpolateEnergy(
+	         ThermalEnergy e00, ThermalEnergy e10, ThermalEnergy e01, ThermalEnergy e11,
+	         float fx, float fy)
+	     {
+		          // Interpolate mass
+		          float interpolatedMass = BilinearInterpolate(
+		              e00.Mass, e10.Mass, e01.Mass, e11.Mass,
+		              fx, fy
+		          );
+
+		          // Interpolate temperature (mass-weighted)
+		          float totalMass = e00.Mass + e10.Mass + e01.Mass + e11.Mass;
+		          float interpolatedTemp = 0f;
+
+		          if (totalMass > 0.001f)
 		          {
-				// Typical air density at sea level: ~1.2 kg/m³
-				airMass = 1.2f * volume;
+				interpolatedTemp = BilinearInterpolate(
+				    e00.Temperature * e00.Mass,
+				    e10.Temperature * e10.Mass,
+				    e01.Temperature * e01.Mass,
+				    e11.Temperature * e11.Mass,
+				    fx, fy
+				) / interpolatedMass;
+		          }
+		          else
+		          {
+				// Fall back to simple temperature interpolation if no mass
+				interpolatedTemp = BilinearInterpolate(
+				    e00.Temperature, e10.Temperature, e01.Temperature, e11.Temperature,
+				    fx, fy
+				);
 		          }
 
-		          // Calculate heat capacity of this air mass
-		          float heatCapacity = airMass * Constants.AIR_SPECIFIC_HEAT; // J/K
+		          // Create new interpolated energy object
+		          ThermalEnergy result = new ThermalEnergy(
+		              interpolatedMass,
+		              e00.SpecificHeat,  // Assume same specific heat for all water
+		              e00.LatentHeatFusion,
+		              e00.LatentHeatVaporization,
+		              e00.MeltingPoint,
+		              e00.BoilingPoint,
+		              e00.ThermalConductivity,
+		              interpolatedTemp
+		          );
 
-		          // Apply phase changes with LIMITED rates
-		          float timeStepFactor = Mathf.Min(hours, 1.0f); // Don't allow more than 1 hour at once
+		          return result;
+	     }
 
-		          if (relativeHumidity > 1.01f && vapor > 0) // Slightly above 1.0 to avoid oscillation
+	     /// <summary>
+	     /// Bilinear interpolation helper for scalar values
+	     /// </summary>
+	     private static float BilinearInterpolate(float v00, float v10, float v01, float v11, float fx, float fy)
+	     {
+		          float x0y = Mathf.Lerp(v00, v10, fx);
+		          float x1y = Mathf.Lerp(v01, v11, fx);
+		          return Mathf.Lerp(x0y, x1y, fy);
+	     }
+
+	     /// <summary>
+	     /// Apply flux-based conservative advection using semi-Lagrangian with mass fixup
+	     /// More stable for extreme wind velocities
+	     /// </summary>
+	     public static void ApplyConservativeFluxAdvection(AtmosphereTile[,,] atmosphereTiles, float hours)
+	     {
+		          int layers = atmosphereTiles.GetLength(0);
+		          int width = atmosphereTiles.GetLength(1);
+		          int height = atmosphereTiles.GetLength(2);
+
+		          float timeStepSeconds = hours * 3600f;
+
+		          // Process each layer
+		          for (int layer = 0; layer < layers; layer++)
 		          {
-				// CONDENSATION
-				float excessVapor = Mathf.Max(0, vapor - saturationMass);
-				float condensationRate = 0.1f * timeStepFactor; // Max 10% per hour
-				float vaporToCondense = Mathf.Min(excessVapor * condensationRate, vapor);
+				// Advect in X direction
+				AdvectInDirection(atmosphereTiles, layer, 0, width, height, timeStepSeconds);
 
-				if (vaporToCondense > 0 && heatCapacity > 0)
+				// Advect in Z direction  
+				AdvectInDirection(atmosphereTiles, layer, 1, width, height, timeStepSeconds);
+
+				// Advect in vertical (Y) direction
+				AdvectVertical(atmosphereTiles, layer, width, height, timeStepSeconds);
+		          }
+	     }
+
+	     /// <summary>
+	     /// Advect in a specific horizontal direction (0=X, 1=Z)
+	     /// </summary>
+	     private static void AdvectInDirection(
+	         AtmosphereTile[,,] atmosphereTiles,
+	         int layer,
+	         int direction,
+	         int width, int height,
+	         float timeStepSeconds)
+	     {
+		          // Create temporary arrays for fluxes
+		          float[,] vaporFlux = new float[width, height];
+		          float[,] cloudFlux = new float[width, height];
+		          float[,] iceFlux = new float[width, height];
+
+		          // Calculate fluxes
+		          for (int x = 0; x < width; x++)
+		          {
+				for (int y = 0; y < height; y++)
 				{
-					     // Convert vapor to cloud water
-					     vapor -= vaporToCondense;
-					     cloudWater += vaporToCondense;
+					     AtmosphereTile tile = atmosphereTiles[layer, x, y];
+					     if (tile == null)
+						          continue;
 
-					     // Calculate temperature change PROPERLY
-					     // Latent heat of condensation: J/kg
-					     float energyReleased = vaporToCondense * Constants.LATENT_HEAT_CONDENSATION; // J
-					     float temperatureChange = energyReleased / heatCapacity; // K
+					     float cellWidth = tile.tileWidth;
+					     float windComponent = (direction == 0) ? tile.windVelocity.x : tile.windVelocity.z;
 
-					     // Apply temperature change
-					     temperature += temperatureChange;
+					     // Upwind scheme: determine source based on wind direction
+					     int sourceIndex = (windComponent >= 0) ?
+					         ((direction == 0) ? (x - 1 + width) % width : (y - 1 + height) % height) :
+					         ((direction == 0) ? (x + 1) % width : (y + 1) % height);
 
-					     // Debug log for large changes
-					     if (Mathf.Abs(temperatureChange) > 10f)
-					     {
-						          Debug.LogWarning($"Large condensation temp change: {temperatureChange}K, " +
-						              $"vaporCondensed: {vaporToCondense}kg, airMass: {airMass}kg, heatCap: {heatCapacity}J/K");
-					     }
+					     AtmosphereTile source = (direction == 0) ?
+					         atmosphereTiles[layer, sourceIndex, y] :
+					         atmosphereTiles[layer, x, sourceIndex];
+
+					     if (source == null)
+						          continue;
+
+					     // Calculate flux: velocity * mass
+					     float flux = Mathf.Abs(windComponent) * timeStepSeconds / cellWidth;
+					     flux = Mathf.Clamp01(flux);  // Limit to prevent over-shooting
+
+					     vaporFlux[x, y] = source.waterVapor.Mass * flux;
+					     cloudFlux[x, y] = source.cloudWaterContent.Mass * flux;
+					     iceFlux[x, y] = source.iceParticles.Mass * flux;
 				}
 		          }
-		          else if (relativeHumidity < 0.99f && (cloudWater > 0 || liquidWater > 0))
+
+		          // Apply fluxes
+		          for (int x = 0; x < width; x++)
 		          {
-				// EVAPORATION
-				float vaporDeficit = Mathf.Max(0, saturationMass - vapor);
-				float evaporationRate = 0.05f * timeStepFactor; // Max 5% per hour
-
-				// Adjust for wind and humidity
-				float humidityFactor = 1.0f - relativeHumidity;
-				float windFactor = 1.0f + windSpeed * 0.1f;
-				float maxEvaporation = vaporDeficit * evaporationRate * humidityFactor * windFactor;
-
-				float availableWater = cloudWater + liquidWater;
-				float waterToEvaporate = Mathf.Min(maxEvaporation, availableWater);
-
-				if (waterToEvaporate > 0 && heatCapacity > 0)
+				for (int y = 0; y < height; y++)
 				{
-					     // Evaporate from clouds first
-					     float fromClouds = Mathf.Min(waterToEvaporate, cloudWater);
-					     cloudWater -= fromClouds;
+					     AtmosphereTile tile = atmosphereTiles[layer, x, y];
+					     if (tile == null)
+						          continue;
 
-					     // Then from liquid
-					     float fromLiquid = Mathf.Min(waterToEvaporate - fromClouds, liquidWater);
-					     liquidWater -= fromLiquid;
+					     int prevIndex = (direction == 0) ? (x - 1 + width) % width : (y - 1 + height) % height;
+					     int nextIndex = (direction == 0) ? (x + 1) % width : (y + 1) % height;
 
-					     // Add to vapor
-					     vapor += waterToEvaporate;
+					     AtmosphereTile prev = (direction == 0) ?
+					         atmosphereTiles[layer, prevIndex, y] :
+					         atmosphereTiles[layer, x, prevIndex];
 
-					     // Calculate temperature change PROPERLY
-					     float energyAbsorbed = waterToEvaporate * Constants.LATENT_HEAT_EVAPORATION; // J
-					     float temperatureChange = -energyAbsorbed / heatCapacity; // K (negative)
+					     AtmosphereTile next = (direction == 0) ?
+					         atmosphereTiles[layer, nextIndex, y] :
+					         atmosphereTiles[layer, x, nextIndex];
 
-					     // Apply temperature change
-					     temperature += temperatureChange;
+					     if (prev == null || next == null)
+						          continue;
+
+					     // Inflow from previous cell, outflow to next cell
+					     float inFlux = vaporFlux[prevIndex, y];
+					     float outFlux = vaporFlux[x, y];
+
+					     float vaporChange = inFlux - outFlux;
+
+					     // Update only if mass change is reasonable
+					     if (Mathf.Abs(vaporChange) > 0.001f && tile.waterVapor.Mass + vaporChange > 0)
+					     {
+						          tile.waterVapor.ChangeMass(tile.waterVapor.Mass + vaporChange);
+					     }
 				}
 		          }
 	     }
 
 	     /// <summary>
-	     /// Calculate realistic air mass using ideal gas law
+	     /// Advect vertical motion (updrafts/downdrafts)
 	     /// </summary>
+	     private static void AdvectVertical(
+	         AtmosphereTile[,,] atmosphereTiles,
+	         int layer,
+	         int width, int height,
+	         float timeStepSeconds)
+	     {
+		          if (layer <= 0 || layer >= atmosphereTiles.GetLength(0) - 1)
+				return;
+
+		          // Simple vertical advection between layers
+		          for (int x = 0; x < width; x++)
+		          {
+				for (int y = 0; y < height; y++)
+				{
+					     AtmosphereTile current = atmosphereTiles[layer, x, y];
+					     AtmosphereTile above = atmosphereTiles[layer + 1, x, y];
+					     AtmosphereTile below = atmosphereTiles[layer - 1, x, y];
+
+					     if (current == null || above == null || below == null)
+						          continue;
+
+					     // Vertical velocity (small, typically)
+					     float verticalVelocity = current.windVelocity.y;
+
+					     // Simple averaging of vertical exchange
+					     float exchangeFraction = 0.01f * timeStepSeconds;  // Minimal vertical mixing
+
+					     if (Mathf.Abs(verticalVelocity) > 0.001f)
+					     {
+						          if (verticalVelocity > 0)
+						          {
+								// Upward motion: move moisture up
+								float toMove = current.waterVapor.Mass * exchangeFraction;
+								ThermalEnergyUtilities.TransferMassAndEnergy(
+								    current.waterVapor, above.waterVapor, toMove
+								);
+						          }
+						          else
+						          {
+								// Downward motion: move moisture down
+								float toMove = current.waterVapor.Mass * exchangeFraction;
+								ThermalEnergyUtilities.TransferMassAndEnergy(
+								    current.waterVapor, below.waterVapor, toMove
+								);
+						          }
+					     }
+				}
+		          }
+	     }
 	     public static float CalculateRealisticAirMass(float temperatureC, float pressurePa, float volumeM3)
 	     {
 		          // Using ideal gas law: PV = nRT
@@ -374,14 +687,10 @@ public static class AtmosphereUtilities
 						          AtmosphereTile tile = atmosphereTiles[layer, x, y];
 
 						          // Sensible heat
-						          float volume = tile.tileWidth * tile.tileWidth * tile.layerHeight;
-						          float airMass = CalculateRealisticAirMass(tile.temperature, tile.pressure, volume);
-						          float sensibleHeat = airMass * Constants.AIR_SPECIFIC_HEAT * (tile.temperature + 273.15f);
+						          tile.energy.ForEach(e =>
 
-						          // Latent heat
-						          float latentHeat = tile.waterVapor * Constants.LATENT_HEAT_CONDENSATION;
 
-						          totalEnergy += sensibleHeat + latentHeat;
+								totalEnergy += e.StoredEnergy + e.SpecificHeat);
 					     }
 				}
 		          }
@@ -494,25 +803,6 @@ public static class AtmosphereUtilities
 		          return verticalMotion * dryLapseRate * 3600f; // °C per hour
 	     }
 
-	     public static float CalculateRadiativeChange(AtmosphereTile tile, int layer, int totalLayers, float hours)
-	     {
-		          if (tile == null)
-				return 0f;
-
-		          // Much smaller radiative cooling rates
-		          float coolingRate = -0.01f * hours; // Max 0.01°C per hour
-
-		          // Adjust for altitude
-		          float altitudeFactor = layer / (float)totalLayers;
-		          coolingRate *= (1f + altitudeFactor * 0.5f);
-
-		          // Adjust for clouds
-		          float cloudFactor = Mathf.Lerp(1f, 0.1f, Mathf.Clamp01(tile.cloudWaterContent * 10f));
-
-		          return coolingRate * cloudFactor;
-	     }
-
-
 	     public static void ApplyConservativeAdvection(
 	     AtmosphereTile[,,] oldState,
 	     double[,,] temps, double[,,] vapor, double[,,] cloud, double[,,] liquid,
@@ -597,72 +887,7 @@ public static class AtmosphereUtilities
 		          }
 	     }
 
-	     /// <summary>
-	     /// Applies phase changes with guaranteed conservation
-	     /// </summary>
-	     public static void ApplyConsistentPhaseChanges(
-	         ref double temperature, ref double vapor, ref double cloud, ref double liquid,
-	         float pressure, double volume, float windSpeed, float hours)
-	     {
-		          if (volume <= 0)
-				return;
 
-		          // Calculate current saturation
-		          double saturationVapor = CalculateMaxWaterVapor((float)temperature, pressure) * volume;
-		          double relativeHumidity = vapor / Math.Max(saturationVapor, 0.001);
-
-		          // Rate constants
-		          double condensationRate = 0.2 * hours;
-		          double evaporationRate = 0.1 * hours;
-
-		          // Calculate air mass for heat capacity
-		          double airMass = CalculateAirMass((float)temperature, pressure, volume);
-		          double airHeatCapacity = airMass * Constants.AIR_SPECIFIC_HEAT;
-
-		          if (relativeHumidity > 1.0 && vapor > 0)
-		          {
-				// Condensation
-				double excessVapor = vapor - saturationVapor;
-				double vaporToCondense = Math.Min(excessVapor * condensationRate, vapor);
-
-				// Convert to cloud water
-				vapor -= vaporToCondense;
-				cloud += vaporToCondense;
-
-				// Release latent heat
-				double heatReleased = vaporToCondense * Constants.LATENT_HEAT_CONDENSATION;
-				temperature += heatReleased / Math.Max(airHeatCapacity, 0.001);
-		          }
-		          else if (relativeHumidity < 0.95 && (cloud > 0 || liquid > 0))
-		          {
-				// Evaporation
-				double vaporDeficit = saturationVapor - vapor;
-				double maxEvaporation = Math.Min(vaporDeficit * evaporationRate, cloud + liquid);
-
-				// Adjust evaporation rate based on wind and humidity
-				double humidityFactor = 1.0 - relativeHumidity;
-				double windFactor = 1.0 + windSpeed * 0.05;
-				double actualEvaporation = maxEvaporation * humidityFactor * windFactor;
-
-				if (actualEvaporation > 0)
-				{
-					     // Evaporate from clouds first
-					     double fromClouds = Math.Min(actualEvaporation, cloud);
-					     cloud -= fromClouds;
-
-					     // Then from liquid
-					     double fromLiquid = Math.Min(actualEvaporation - fromClouds, liquid);
-					     liquid -= fromLiquid;
-
-					     // Add to vapor
-					     vapor += (fromClouds + fromLiquid);
-
-					     // Absorb latent heat
-					     double heatAbsorbed = (fromClouds + fromLiquid) * Constants.LATENT_HEAT_EVAPORATION;
-					     temperature -= heatAbsorbed / Math.Max(airHeatCapacity, 0.001);
-				}
-		          }
-	     }
 
 	     // [Rest of the helper functions remain mostly the same, but ensure CalculateMaxWaterVapor is correct]
 
@@ -686,13 +911,6 @@ public static class AtmosphereUtilities
 		          return ws * rho_air;
 	     }
 
-	     public static float BilinearInterpolate(float q00, float q10, float q01, float q11, float tx, float ty)
-	     {
-		          float r0 = Mathf.Lerp(q00, q10, tx);
-		          float r1 = Mathf.Lerp(q01, q11, tx);
-		          return Mathf.Lerp(r0, r1, ty);
-	     }
-
 	     public static float CalculateTotalWater(AtmosphereTile[,,] atmosphereTiles)
 	     {
 		          float total = 0f;
@@ -703,7 +921,7 @@ public static class AtmosphereUtilities
 					     for (int y = 0; y < atmosphereTiles.GetLength(2); y++)
 					     {
 						          AtmosphereTile tile = atmosphereTiles[layer, x, y];
-						          total += tile.waterVapor + tile.cloudWaterContent + tile.liquidWater;
+						          total += tile.waterVapor.Mass + tile.cloudWaterContent.Mass;
 					     }
 				}
 		          }
@@ -755,7 +973,7 @@ public static class AtmosphereUtilities
 				// Force = pressure gradient / density (simplified)
 				// Negative because air flows from high to low pressure
 				Vector3 direction = new Vector3(dx[i], 0, dy[i]).normalized;
-				force += direction * pressureDiff * 100f; // Scaling factor
+				force += direction * pressureDiff / Constants.AIR_DENSITY; // Scaling factor
 		          }
 
 		          return force;
@@ -815,20 +1033,21 @@ public static class AtmosphereUtilities
 	     {
 		          if (tile == null)
 				return 0f;
-
-		          float tempK = tile.temperature + 273.15f;
+		          hours *= 3600f; // Convert to seconds
+		          float tempK = tile.temperature;
 		          if (tempK <= 0f)
 				return 0f;
 
-		          // Simple radiative cooling: cools at night, minimal during day
-		          float spaceTemp = 2.7f; // Cosmic background
+		          float surfaceArea = tile.tileWidth * tile.tileWidth;
 
-		          // Simple model: always radiate, but much less than blackbody
-		          float coolingRate = 0.1f; // °C/hour base rate
-		          float tempDifference = tempK - spaceTemp;
+		          if (tempK <= 0 || surfaceArea <= 0)
+				return 0f;
 
-		          // Cooling increases with temperature difference
-		          return coolingRate * (tempDifference / 273f) * hours;
+		          // P = ε * σ * A * (T^4 - T_space^4)
+		          float power = Constants.ATMOSPHERIC_EMISSIVITY * Constants.STEFAN_BOLTZMANN * surfaceArea *
+		              (Mathf.Pow(tempK, 4) - Mathf.Pow(Constants.COSMIC_BACKGROUND, 4));
+
+		          return power * hours;  // Watts (J/s)
 	     }
 
 	     /// <summary>
@@ -839,12 +1058,12 @@ public static class AtmosphereUtilities
 		          if (tile == null)
 				return 0f;
 
-		          float tempC = tile.temperature;
-		          if (Mathf.Abs(tempC + 237.3f) < 0.001f)
+		          float temp = tile.temperature;
+		          if (temp < 0.001f)
 				return 0f;
 
 		          // Tetens formula for saturation vapor pressure in kPa
-		          float satVaporPressure_kPa = 0.6108f * Mathf.Exp((17.27f * tempC) / (tempC + 237.3f));
+		          float satVaporPressure_kPa = 0.6108f * Mathf.Exp((17.27f * temp) / (temp + 237.3f));
 		          float satVaporPressure_Pa = satVaporPressure_kPa * 1000f;
 
 		          // Calculate actual vapor pressure from water vapor content
@@ -853,11 +1072,10 @@ public static class AtmosphereUtilities
 				volume = 1f;
 
 		          // moles = mass / molar mass
-		          float molesWater = tile.waterVapor / 0.018f; // kg to moles (water = 18g/mol)
-		          float T = tempC + 273.15f;
+		          float molesWater = tile.waterVapor.Mass / 0.018f; // kg to moles (water = 18g/mol)
 
 		          // Using ideal gas law: P = nRT/V
-		          float actualVaporPressure = (molesWater * Constants.GAS_CONSTANT * T) / volume;
+		          float actualVaporPressure = (molesWater * Constants.GAS_CONSTANT * temp) / volume;
 
 		          if (satVaporPressure_Pa < 0.001f)
 				return 0f;

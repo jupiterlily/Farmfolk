@@ -463,6 +463,48 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: moustaches_15
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fad09178358e89140b81dba6e06088ed
+      internalID: 1137903054
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: moustaches_16
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: adf22756a2f61d04a825e12d46c3eeb7
+      internalID: -387658418
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -481,6 +523,8 @@ TextureImporter:
       moustaches_12: 748200095
       moustaches_13: 1629097844
       moustaches_14: 885512102
+      moustaches_15: 1137903054
+      moustaches_16: -387658418
       moustaches_2: -527244982
       moustaches_3: 1236425731
       moustaches_4: -1172395581

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class SoilUtilities
@@ -9,10 +10,10 @@ public static class SoilUtilities
 		          // All calculations now use kg/m2 for water (equivalent to liters for 1m2 area)
 
 		          // 1. Solid volume fractions (m3/m3)
-		          float sandVol = sc.sand / Constants.SAND_DENSITY;
-		          float siltVol = sc.silt / Constants.SILT_DENSITY;
-		          float clayVol = sc.clay / Constants.CLAY_DENSITY;
-		          float organicVol = sc.organicMatter / Constants.ORGANIC_DENSITY;
+		          float sandVol = sc.sand.Mass / Constants.SAND_DENSITY;
+		          float siltVol = sc.silt.Mass / Constants.SILT_DENSITY;
+		          float clayVol = sc.clay.Mass / Constants.CLAY_DENSITY;
+		          float organicVol = sc.organicMaterial.Mass / Constants.ORGANIC_DENSITY;
 		          float totalSolidVol = sandVol + siltVol + clayVol + organicVol;
 
 		          if (totalSolidVol <= 0f)
@@ -24,15 +25,15 @@ public static class SoilUtilities
 		          float clayPct = clayVol / totalSolidVol * 100f;
 
 		          // 3. Porosity & bulk density
-		          float rawPorosity = CalculatePorosity(sandPct, clayPct, sc.organicMatter);
+		          float rawPorosity = CalculatePorosity(sandPct, clayPct, sc.organicMaterial.Mass);
 		          sc.porosity = Mathf.Clamp01(rawPorosity * (1f - sc.compaction * 0.85f));
 
-		          sc.bulkDensity = (sc.sand + sc.silt + sc.clay + sc.organicMatter) / totalSolidVol;
+		          sc.bulkDensity = (sc.sand.Mass + sc.silt.Mass + sc.clay.Mass + sc.organicMaterial.Mass) / totalSolidVol;
 		          sc.bulkDensity *= 1f + (sc.compaction * 0.2f);
 
 		          // 4. Water properties - now using kg/m2 (equivalent to liters for 1m2 area)
 		          sc.waterCapacity = CalculateWaterCapacity(sc.porosity, clayPct) * 1000f; // Convert m3/m3 to kg/m2
-		          sc.saturation = sc.waterCapacity > 0f ? Mathf.Clamp01(sc.water / sc.waterCapacity) : 0f;
+		          sc.saturation = sc.waterCapacity > 0f ? Mathf.Clamp01(sc.water.Mass / sc.waterCapacity) : 0f;
 
 		          // 5. Flow properties
 		          sc.infiltrationRate = CalculateInfiltrationRate(sandPct, sc.saturation) * (1f - sc.compaction * 0.9f);
@@ -46,20 +47,20 @@ public static class SoilUtilities
 
 		          // 6. Structural properties
 		          sc.aeration = sc.porosity * (1f - sc.saturation);
-		          sc.erodibility = CalculateErodibility(sandPct, clayPct, sc.organicMatter);
+		          sc.erodibility = CalculateErodibility(sandPct, clayPct, sc.organicMaterial.Mass);
 
 		          return sc;
 	     }
 
 	     public static float GetSoilMass(SoilComposition sc)
 	     {
-		          return sc.sand + sc.silt + sc.clay + sc.organicMatter + sc.water;
+		          return sc.sand.Mass + sc.silt.Mass + sc.clay.Mass + sc.organicMaterial.Mass + sc.water.Mass;
 	     }
-	     static float CalculatePorosity(float sandPct, float clayPct, float organicMatter)
+	     static float CalculatePorosity(float sandPct, float clayPct, float organicMaterial)
 	     {
 		          // Saxton & Rawls (2006) model with organic matter adjustment
 		          return 0.45f - 0.0012f * sandPct + 0.0021f * clayPct +
-		              0.025f * (organicMatter / Constants.ORGANIC_DENSITY);
+		              0.025f * (organicMaterial / Constants.ORGANIC_DENSITY);
 	     }
 
 	     static float CalculateWaterCapacity(float porosity, float clayPct)
@@ -90,12 +91,12 @@ public static class SoilUtilities
 		          //hydraulic conductivity is used to determine how quickly water can move through soil when fully saturated
 	     }
 
-	     static float CalculateErodibility(float sandPct, float clayPct, float organicMatter)
+	     static float CalculateErodibility(float sandPct, float clayPct, float organicMaterial)
 	     {
 		          // Revised USLE K-factor approximation
 		          float sandFactor = 0.2f + 0.3f * (sandPct / 100f);
 		          float clayFactor = 0.3f * (clayPct / 100f);
-		          float omFactor = 0.2f * (1f - organicMatter / Constants.ORGANIC_DENSITY);
+		          float omFactor = 0.2f * (1f - organicMaterial / Constants.ORGANIC_DENSITY);
 		          return Mathf.Clamp01(sandFactor + clayFactor + omFactor);
 	     }
 	     public static void ApplySurfaceErosion(TileData source, TileData target, float gradient, float waterMoved)
@@ -104,33 +105,29 @@ public static class SoilUtilities
 		          var sc = source.composition;
 		          var tc = target.composition;
 
-		          sc.erodibility = CalculateErodibility(sc.sand, sc.clay, sc.organicMatter);
+		          sc.erodibility = CalculateErodibility(sc.sand.Mass, sc.clay.Mass, sc.organicMaterial.Mass);
 
 		          float erosionFactor = gradient * sc.erodibility * 0.05f;
 		          float sedimentMass = erosionFactor * waterMoved;
 
-		          float fineTotal = sc.silt + sc.clay;
+		          float fineTotal = sc.silt.Mass + sc.clay.Mass;
 		          if (fineTotal > 0f && sedimentMass > 0f)
 		          {
-				float siltRatio = sc.silt / fineTotal;
-				float clayRatio = sc.clay / fineTotal;
+				float siltRatio = sc.silt.Mass / fineTotal;
+				float clayRatio = sc.clay.Mass / fineTotal;
 
 				float siltMoved = sedimentMass * siltRatio;
 				float clayMoved = sedimentMass * clayRatio;
 
-				siltMoved = Mathf.Min(siltMoved, sc.silt);
-				clayMoved = Mathf.Min(clayMoved, sc.clay);
-
-				sc.silt -= siltMoved;
-				tc.silt += siltMoved;
-				sc.clay -= clayMoved;
-				tc.clay += clayMoved;
+				siltMoved = Mathf.Min(siltMoved, sc.silt.Mass);
+				clayMoved = Mathf.Min(clayMoved, sc.clay.Mass);
 
 				float organicMoved = sedimentMass * 0.1f;
-				organicMoved = Mathf.Min(organicMoved, sc.organicMatter);
+				organicMoved = Mathf.Min(organicMoved, sc.organicMaterial.Mass);
 
-				sc.organicMatter -= organicMoved;
-				tc.organicMatter += organicMoved;
+				ThermalEnergyUtilities.TransferMassAndEnergy(sc.silt, tc.silt, siltMoved);
+				ThermalEnergyUtilities.TransferMassAndEnergy(sc.clay, tc.clay, clayMoved);
+				ThermalEnergyUtilities.TransferMassAndEnergy(sc.organicMaterial, tc.organicMaterial, organicMoved);
 
 				float erosionVolume = sedimentMass / sc.bulkDensity;
 				source.volume -= erosionVolume;
@@ -155,13 +152,13 @@ public static class SoilUtilities
 	     public static float CalculateEffectiveVolume(SoilComposition sc)
 	     {
 		          // Volume of each solid component (m3/m3)
-		          float sandVol = sc.sand / Constants.SAND_DENSITY;
-		          float siltVol = sc.silt / Constants.SILT_DENSITY;
-		          float clayVol = sc.clay / Constants.CLAY_DENSITY;
-		          float organicVol = sc.organicMatter / Constants.ORGANIC_DENSITY;
+		          float sandVol = sc.sand.Mass / Constants.SAND_DENSITY;
+		          float siltVol = sc.silt.Mass / Constants.SILT_DENSITY;
+		          float clayVol = sc.clay.Mass / Constants.CLAY_DENSITY;
+		          float organicVol = sc.organicMaterial.Mass / Constants.ORGANIC_DENSITY;
 
 		          float solidVolume = sandVol + siltVol + clayVol + organicVol;
-		          float waterVolume = sc.water / 1000f; // Convert kg/m2 back to m3/m3 for volume calculation
+		          float waterVolume = sc.water.Mass / 1000f; // Convert kg/m2 back to m3/m3 for volume calculation
 		          float airVolume = sc.aeration; // already calculated from porosity and saturation
 
 		          float total = solidVolume + waterVolume + airVolume;
@@ -188,81 +185,85 @@ public static class SoilUtilities
 	     public static void RecalculateTilePhysics(TileData data)
 	     {
 		          CalculateDerivedProperties(data.composition);
-		          data.volume = CalculateEffectiveVolume(data.composition) + data.surfaceMoisture / 1000;
+		          data.volume = CalculateEffectiveVolume(data.composition) + data.surfaceWater.Mass / 1000;
 	     }
 
-	     public static void UpdateSoilTemperature(TileData data, float solarWatts, float airTemp, float hours)
+	     public static void UpdateSoilTemperature(TileData data, float hours)
 	     {
-		          //absorb solar radiation and then balance temperature between surface temp and soil temp
-		          float energyAbsorbed = solarWatts * hours * 3600f * 0.7f;
-		          float soilMass = data.composition.sand + data.composition.silt + data.composition.clay + data.composition.organicMatter + data.composition.water;
-		          float heatCapacity = GetSoilHeatCapacity(data.composition);
-
-		          float deltaT_solar = energyAbsorbed / (soilMass * heatCapacity);
-		          float thermalExchangeCoeff = 10f;
-		          float deltaT_air = (airTemp - data.soilTemperature) * thermalExchangeCoeff * hours / (soilMass * heatCapacity);
-
-		          data.surfaceTemperature += deltaT_solar + deltaT_air;
-
-		          // Gradually equilibrate soil temperature towards surface temperature
-		          float equilibrationRate = 0.1f; // Adjust for faster/slower equilibration
-		          data.soilTemperature += (data.surfaceTemperature - data.soilTemperature) * equilibrationRate * hours;
-		          data.surfaceTemperature -= (data.surfaceTemperature - data.soilTemperature) * equilibrationRate * hours;
-
-	     }
-	     public static float PassHeatFromSoil(TileData data, float hours, TileManager tileManager)
-	     {
-		          SoilComposition sc = data.composition;
-		          float latentHeat = Constants.LATENT_HEAT_VAPORIZATION;
-
-		          // Soil thermal properties
-		          float soilMass = data.composition.sand + data.composition.silt + data.composition.clay + data.composition.organicMatter + data.composition.water; // kg/m2 (for top 1m of soil)
-		          float heatCapacity = GetSoilHeatCapacity(sc);
-
-		          // Air properties (for the entire atmospheric column)
-		          float airMassPerTile = 3000f * Constants.AIR_DENSITY; // 3km column of air per tile
-		          float totalAirMass = airMassPerTile * tileManager.worldsise.x * tileManager.worldsise.y;
-
-		          // 1. Calculate heat transfer between soil and air
-		          float heatTransferCoefficient = 10f; // W/m2·K (typical for soil-air interface)
-		          float temperatureDifference = data.soilTemperature - tileManager.airTemp;
-		          float heatFlowRate = heatTransferCoefficient * temperatureDifference; // Watts per m2
-
-		          // Convert to energy over time period (Joules)
-		          float energyTransferred = heatFlowRate * hours * 3600f;
-
-		          // 2. Calculate maximum possible evaporation
-		          float maxEvaporableKg = energyTransferred / latentHeat;
-		          float surfaceWater = data.surfaceMoisture;
-		          float evaporatedKg = Mathf.Min(surfaceWater, maxEvaporableKg);
-
-		          // 3. Apply evaporation effects
-		          data.surfaceMoisture -= evaporatedKg;
-		          data.atmosphereTile.waterVapor += evaporatedKg;
-
-		          // 4. Calculate energy used for evaporation
-		          float energyUsed = evaporatedKg * latentHeat;
-
-		          // 5. Calculate remaining energy for sensible heat transfer
-		          float sensibleHeatEnergy = energyTransferred - energyUsed;
-
-		          // 6. Update temperatures
-		          if (sensibleHeatEnergy > 0)
+		          List<ThermalEnergy> energyData = data.composition.energy;
+		          energyData.OrderByDescending(v => v.Mass);
+		          if (data.surfaceWater.Mass > 1f)
 		          {
-				// Soil cools and air warms
-				float soilDeltaT = sensibleHeatEnergy / (soilMass * heatCapacity);
-				data.soilTemperature = Mathf.Max(tileManager.airTemp - 5f, data.soilTemperature - soilDeltaT);
-
-				// Only return the portion that should affect the global air temperature
-				// (since this is called per tile, we return the energy and let TileManager handle the aggregation)
-				return sensibleHeatEnergy;
+				//transfer the heat between the soil and the surface
+				ThermalEnergyUtilities.ConductHeat(data.surfaceWater, energyData[0], data.tileWidth * data.tileWidth, 1, hours);
 		          }
 		          else
 		          {
-				// All energy went to evaporation
-				return 0f;
+				//radiate heat to the atmosphere.
+				ThermalEnergyUtilities.ConductHeat(data.atmosphereTile.above.above.nitrogen, energyData[0], data.tileWidth * data.tileWidth, 1, hours);
 		          }
+		          //distribute heat between all the components within the soil.
+		          ThermalEnergyUtilities.MixTemperaturesByPhase(data.composition.energy);
+
+
+
+
 	     }
+	     //  public static float PassHeatFromSoil(TileData data, float hours, TileManager tileManager)
+	     //  {
+	     //        SoilComposition sc = data.composition;
+	     //        float latentHeat = Constants.LATENT_HEAT_VAPORIZATION;
+
+	     //        // Soil thermal properties
+	     //        float soilMass = data.composition.sand.Mass + data.composition.silt.Mass + data.composition.clay.Mass + data.composition.organicMaterial.Mass + data.composition.water.Mass; // kg/m2 (for top 1m of soil)
+	     //        float heatCapacity = GetSoilHeatCapacity(sc);
+
+	     //        // Air properties (for the entire atmospheric column)
+	     //        float airMassPerTile = 3000f * Constants.AIR_DENSITY; // 3km column of air per tile
+	     //        float totalAirMass = airMassPerTile * tileManager.worldsise.x * tileManager.worldsise.y;
+
+	     //        // 1. Calculate heat transfer between soil and air
+	     //        float heatTransferCoefficient = 10f; // W/m2·K (typical for soil-air interface)
+	     //        float temperatureDifference = data.soilTemperature - tileManager.airTemp;
+	     //        float heatFlowRate = heatTransferCoefficient * temperatureDifference; // Watts per m2
+
+	     //        // Convert to energy over time period (Joules)
+	     //        float energyTransferred = heatFlowRate * hours * 3600f;
+
+	     //        // 2. Calculate maximum possible evaporation
+	     //        float maxEvaporableKg = energyTransferred / latentHeat;
+	     //        float surfaceWater = data.surfaceWater.Mass;
+	     //        float evaporatedKg = Mathf.Min(surfaceWater, maxEvaporableKg);
+
+	     //        //// 3. Apply evaporation effects
+	     //        //data.surfaceMoisture -= evaporatedKg;
+	     //        //data.atmosphereTile.waterVapor += evaporatedKg;
+	     //        //this is just to keep it running but we now haven't factored in energy for phase changes.
+	     //        ThermalEnergyUtilities.TransferMassAndEnergy(data.surfaceWater, data.atmosphereTile.waterVapor, evaporatedKg);
+
+	     //        // 4. Calculate energy used for evaporation
+	     //        float energyUsed = evaporatedKg * latentHeat;
+
+	     //        // 5. Calculate remaining energy for sensible heat transfer
+	     //        float sensibleHeatEnergy = energyTransferred - energyUsed;
+
+	     //        // 6. Update temperatures
+	     //        if (sensibleHeatEnergy > 0)
+	     //        {
+	     //// Soil cools and air warms
+	     //float soilDeltaT = sensibleHeatEnergy / (soilMass * heatCapacity);
+	     ////data.soilTemperature = Mathf.Max(tileManager.airTemp - 5f, data.soilTemperature - soilDeltaT);
+
+	     //// Only return the portion that should affect the global air temperature
+	     //// (since this is called per tile, we return the energy and let TileManager handle the aggregation)
+	     //return sensibleHeatEnergy;
+	     //        }
+	     //        else
+	     //        {
+	     //// All energy went to evaporation
+	     //return 0f;
+	     //        }
+	     //  }
 
 	     public static float GetSoilHeatCapacity(SoilComposition comp)
 	     {
@@ -272,48 +273,48 @@ public static class SoilUtilities
 		          float clayCp = 900f;
 		          float siltCp = 900f;
 
-		          float total = comp.sand + comp.clay + comp.silt + comp.organicMatter + comp.water;
+		          float total = comp.sand.Mass + comp.clay.Mass + comp.silt.Mass + comp.organicMaterial.Mass + comp.water.Mass;
 		          if (total == 0)
 				return 1000f;
 
-		          float cp = (comp.water * waterCp +
-			      comp.organicMatter * organicCp +
-			      comp.sand * sandCp +
-			      comp.clay * clayCp +
-			      comp.silt * siltCp) / total;
+		          float cp = (comp.water.Mass * waterCp +
+			      comp.organicMaterial.Mass * organicCp +
+			      comp.sand.Mass * sandCp +
+			      comp.clay.Mass * clayCp +
+			      comp.silt.Mass * siltCp) / total;
 
 		          return cp;
 	     }
 
 
-	     public static void ApplyRainfall(TileData tileData, float kgRain, float hours)
-	     {
-		          if (kgRain <= 0f)
-				return;
+	     //  public static void ApplyRainfall(TileData tileData, float kgRain, float hours)
+	     //  {
+	     //        if (kgRain <= 0f)
+	     //return;
 
-		          //Debug.Log($"[Rainfall] Adding {kgRain} kg/m2 to tile at {Time.time} s");
+	     //        //Debug.Log($"[Rainfall] Adding {kgRain} kg/m2 to tile at {Time.time} s");
 
-		          // Add water to surface moisture directly
-		          tileData.surfaceMoisture += kgRain;
-		          //Debug.Log($"[Rainfall] Surface moisture now: {tileData.surfaceMoisture} kg/m2");
+	     //        // Add water to surface moisture directly
+	     //        tileData.surfaceMoisture += kgRain;
+	     //        //Debug.Log($"[Rainfall] Surface moisture now: {tileData.surfaceMoisture} kg/m2");
 
-		          // Apply compaction from weight of water
-		          float pressure = kgRain * Constants.GRAVITY_ACCELERATION; // N/m2
-		          float pressure_kPa = pressure / 1000f;
-		          UpdateCompaction(tileData.composition, hours, appliedPressure: pressure_kPa);
-		          RecalculateTilePhysics(tileData);
-	     }
+	     //        // Apply compaction from weight of water
+	     //        float pressure = kgRain * Constants.GRAVITY_ACCELERATION; // N/m2
+	     //        float pressure_kPa = pressure / 1000f;
+	     //        UpdateCompaction(tileData.composition, hours, appliedPressure: pressure_kPa);
+	     //        RecalculateTilePhysics(tileData);
+	     //  }
 
 	     public static void RedistributeWaterLateral(WorldTile tile, float hours)
 	     {
 		          // Helper to calculate total water for a tile + neighbors
 		          float GetTotalWater(WorldTile t)
 		          {
-				float total = t.tileData.composition.water;
+				float total = t.tileData.composition.water.Mass;
 				foreach (var n in t.GetNeighbors())
 				{
 					     if (n != null)
-						          total += n.tileData.composition.water;
+						          total += n.tileData.composition.water.Mass;
 				}
 				return total;
 		          }
@@ -323,7 +324,7 @@ public static class SoilUtilities
 		          SoilComposition sc = tile.tileData.composition;
 		          float rate = sc.horizontalPermeability / 100f / 24f; // cm/day -> m/hour
 
-		          float waterToMove = sc.water;
+		          float waterToMove = sc.water.Mass;
 		          List<WorldTile> neighbors = tile.GetNeighbors();
 
 		          foreach (WorldTile neighbor in neighbors)
@@ -339,30 +340,30 @@ public static class SoilUtilities
 				float transfer = deltaSat * rate * hours * 1000f; // m3 -> kg
 				transfer = Mathf.Clamp(transfer, 0f, waterToMove);
 
-				sc.water -= transfer;
-				nc.water += transfer;
+				//sc.water -= transfer;
+				//nc.water += transfer;
+
+				ThermalEnergyUtilities.TransferMassAndEnergy(sc.water, nc.water, transfer);
+
 				waterToMove -= transfer;
 
-				float fineTotal = sc.silt + sc.clay;
+				float fineTotal = sc.silt.Mass + sc.clay.Mass;
 				if (fineTotal > 0f)
 				{
 					     float sedimentFraction = sc.erodibility * Mathf.Clamp01(deltaSat);
 					     float sedimentTransfer = sedimentFraction * transfer;
 
-					     float siltRatio = sc.silt / fineTotal;
-					     float clayRatio = sc.clay / fineTotal;
+					     float siltRatio = sc.silt.Mass / fineTotal;
+					     float clayRatio = sc.clay.Mass / fineTotal;
 
 					     float siltMoved = sedimentTransfer * siltRatio;
 					     float clayMoved = sedimentTransfer * clayRatio;
 
-					     sc.silt = Mathf.Max(0f, sc.silt - siltMoved);
-					     nc.silt += siltMoved;
-					     sc.clay = Mathf.Max(0f, sc.clay - clayMoved);
-					     nc.clay += clayMoved;
-
 					     float organicMoved = sedimentTransfer * 0.1f;
-					     sc.organicMatter = Mathf.Max(0f, sc.organicMatter - organicMoved);
-					     nc.organicMatter += organicMoved;
+
+					     ThermalEnergyUtilities.TransferMassAndEnergy(sc.silt, nc.silt, siltMoved);
+					     ThermalEnergyUtilities.TransferMassAndEnergy(sc.clay, nc.clay, clayMoved);
+					     ThermalEnergyUtilities.TransferMassAndEnergy(sc.organicMaterial, nc.organicMaterial, organicMoved);
 				}
 
 				RecalculateTilePhysics(neighbor.tileData);
@@ -379,15 +380,16 @@ public static class SoilUtilities
 		          var sc = tileData.composition;
 
 		          // Handle overflow first
-		          if (sc.water > sc.waterCapacity)
+		          if (sc.water.Mass > sc.waterCapacity)
 		          {
-				float overflow = sc.water - sc.waterCapacity;
-				sc.water = sc.waterCapacity;
-				tileData.surfaceMoisture += overflow;
+				float overflow = sc.water.Mass - sc.waterCapacity;
+				//sc.water = sc.waterCapacity;
+				//tileData.surfaceMoisture += overflow;
+				ThermalEnergyUtilities.TransferMassAndEnergy(sc.water, tileData.surfaceWater, overflow);
 				//Debug.Log($"[Infiltration] Overflow detected: {overflow}, moved back to surface. Soil water: {sc.water}, Surface moisture: {tileData.surfaceMoisture}");
 		          }
 
-		          if (tileData.surfaceMoisture <= 0f)
+		          if (tileData.surfaceWater.Mass <= 0f)
 				return;
 
 		          float compactionModifier = Mathf.Lerp(1f, 0.2f, sc.compaction);
@@ -395,12 +397,13 @@ public static class SoilUtilities
 
 		          float maxInfiltration = sc.infiltrationRate * hours;
 		          float effectiveInfiltration = maxInfiltration * compactionModifier * saturationModifier;
-		          float infiltrated = Mathf.Min(tileData.surfaceMoisture, effectiveInfiltration);
-		          float availableCapacity = sc.waterCapacity - sc.water;
+		          float infiltrated = Mathf.Min(tileData.surfaceWater.Mass, effectiveInfiltration);
+		          float availableCapacity = sc.waterCapacity - sc.water.Mass;
 		          float absorbed = Mathf.Min(infiltrated, availableCapacity);
 
-		          sc.water += absorbed;
-		          tileData.surfaceMoisture -= absorbed;
+		          //sc.water += absorbed;
+		          //tileData.surfaceMoisture -= absorbed;
+		          ThermalEnergyUtilities.TransferMassAndEnergy(tileData.surfaceWater, sc.water, absorbed);
 
 		          //Debug.Log($"[Infiltration] Attempted: {infiltrated}, Absorbed: {absorbed}, Soil water: {sc.water}, Surface moisture: {tileData.surfaceMoisture}");
 
@@ -431,7 +434,7 @@ public static class SoilUtilities
 		          float soilTempK = td.soilTemperature + 273.15f;
 
 		          // 1. Calculate net radiation (improved)
-		          float albedo = td.surfaceMoisture > 0 ? 0.05f : 0.23f; // Water has lower albedo
+		          float albedo = td.surfaceWater.Mass > 0 ? 0.05f : 0.23f; // Water has lower albedo
 		          float netRadiation = solarRadiation * (1 - albedo);
 
 		          // 2. Vapor pressure calculations
@@ -440,13 +443,13 @@ public static class SoilUtilities
 		          float vaporPressureDeficit = Mathf.Max(0, es - ea);
 
 		          // 3. Aerodynamic resistance (improved for surface roughness)
-		          float roughnessLength = td.surfaceMoisture > 0 ? 0.0002f : 0.01f; // Smooth for water
+		          float roughnessLength = td.surfaceWater.Mass > 0 ? 0.0002f : 0.01f; // Smooth for water
 		          float ra = Mathf.Log(2f / roughnessLength) / (0.4f * windSpeed);
 		          ra = Mathf.Max(ra, 10f); // Minimum resistance
 
 		          // 4. Surface resistance - different for water vs soil
 		          float rs;
-		          if (td.surfaceMoisture > 10f)
+		          if (td.surfaceWater.Mass > 10f)
 		          {
 				// Open water - minimal resistance
 				rs = 0f;
@@ -454,7 +457,7 @@ public static class SoilUtilities
 		          else
 		          {
 				// Soil moisture resistance (Jarvis-type model)
-				float theta = td.composition.water / td.composition.waterCapacity;
+				float theta = td.composition.water.Mass / td.composition.waterCapacity;
 				rs = theta > 0.5f ? 50f :
 				     theta > 0.3f ? 100f * (0.5f - theta) :
 				     5000f;
@@ -472,47 +475,35 @@ public static class SoilUtilities
 		          float actualEvaporation = 0f;
 
 		          // 7. Evaporate from surface water first
-		          if (td.surfaceMoisture > 0)
+		          if (td.surfaceWater.Mass > 0)
 		          {
-				float surfaceEvap = Mathf.Min(maxEvaporation, td.surfaceMoisture);
-				td.surfaceMoisture -= surfaceEvap;
+				float surfaceEvap = Mathf.Min(maxEvaporation, td.surfaceWater.Mass);
+				//td.surfaceMoisture -= surfaceEvap;
 				actualEvaporation += surfaceEvap;
 				maxEvaporation -= surfaceEvap;
-
+				ThermalEnergyUtilities.TransferMassAndEnergy(td.surfaceWater, td.atmosphereTile.waterVapor, surfaceEvap);
 				// Surface water evaporation cools the surface more efficiently
 				float energyUsed = surfaceEvap * latentHeat;
 				float tempReduction = energyUsed / (soilSpecificHeat * waterDensity * 0.01f); // Top 1cm
-				td.soilTemperature = Mathf.Max(airTempC - 2f, td.soilTemperature - tempReduction);
+									   //td.soilTemperature = Mathf.Max(airTempC - 2f, td.soilTemperature - tempReduction);
 		          }
 
 		          // 8. Then evaporate from soil if energy remains
-		          if (maxEvaporation > 0 && td.composition.water > 0)
+		          if (maxEvaporation > 0 && td.composition.water.Mass > 0)
 		          {
 				float soilEvap = Mathf.Min(
 				    maxEvaporation,
-				    td.composition.water,
+				    td.composition.water.Mass,
 				    td.composition.waterCapacity * 0.1f * hours // Max 10% of capacity per hour
 				);
-
-				td.composition.water -= soilEvap;
+				ThermalEnergyUtilities.TransferMassAndEnergy(td.composition.water, td.atmosphereTile.waterVapor, soilEvap);
+				//td.composition.water -= soilEvap;
 				actualEvaporation += soilEvap;
 
 				// Soil evaporation cooling (less efficient)
 				float energyUsed = soilEvap * latentHeat;
 				float tempReduction = energyUsed / (soilSpecificHeat * td.composition.bulkDensity * 0.05f); // Top 5cm
-				td.soilTemperature = Mathf.Max(airTempC - 5f, td.soilTemperature - tempReduction);
-		          }
-
-		          // 9. Add evaporated moisture to atmosphere
-		          if (actualEvaporation > 0 && td.atmosphereTile != null)
-		          {
-				td.atmosphereTile.waterVapor += actualEvaporation;
-		          }
-
-		          // Ensure minimal evaporation when water is present
-		          if (actualEvaporation <= 0 && (td.surfaceMoisture > 0 || td.composition.water > 0))
-		          {
-				actualEvaporation = 0.00001f * hours;
+										  //td.soilTemperature = Mathf.Max(airTempC - 5f, td.soilTemperature - tempReduction);
 		          }
 
 		          return actualEvaporation;

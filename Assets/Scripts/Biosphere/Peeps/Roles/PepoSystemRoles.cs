@@ -48,4 +48,27 @@ public static class PepoRoleSystem
 				}
 		          }
 	     }
+
+	     //take a list of pepos and an amount of time. update their inventory based on the amount of tasks they can complete in that time
+
+	     public static void ProgressPepoRoles(PepoPopulation pepos, float hours = 0)
+	     {
+		          if (hours > 0)
+		          {
+
+				foreach (PepoDataRoles role in pepos.roleAssignments.Keys)
+				{
+					     if (role.roleName.Contains("water"))
+					     {
+						          foreach (PepoData pepo in pepos.roleAssignments[role])
+						          {
+								PhysicalResource Water = new PhysicalResource("water", 5000, 1000, 1000, "for thirsty boys", false, 0, 0, Vector3.zero);
+								pepo.resources.AddorRemoveResource(ResourceLibrary.PhysicalResources()[0]);
+						          }
+					     }
+				}
+
+		          }
+	     }
+
 }

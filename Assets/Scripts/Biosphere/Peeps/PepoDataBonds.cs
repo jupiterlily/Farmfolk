@@ -61,7 +61,59 @@ public enum RelationshipType
 	     peer, acquaintence, friend, bestie,
 	     enemy, rival,
 	     lover, ex, spouse, incompatible, courting,
-	     mentor, mentee, leader, follower, rolemodel
+	     mentor, mentee, leader, follower, rolemodel,
+
+	     // New hierarchical types
+	     patron, client,
+	     ritual_superior, ritual_inferior,
+	     alliance_partner,
+	     obligated_kin_elder, obligated_kin_younger,
+	     ceremonial_connection,
+	     trade_partner,
+	     oath_bound,
+	     status_rival,  // Same status level but competitive
+	     lineage_superior, lineage_inferior,
+	     skill_master, skill_apprentice,
+	     resource_dependent,
+	     protection_sworn,
+
+	     // Kinship
+	     Parent, Child, Sibling, MaternalGrandparent, PaternalGrandparent, Grandchild,
+	     PaternalAvuncular, MaternalAvuncular, Nibling, Cousin, InLaw,
+
+	     // Social Bonds
+	     Peer, Acquaintance, Friend, CloseFriend, BestFriend,
+	     Ally, Rival, Enemy, Nemesis,
+	     Benefactor, Dependent, Patron, Client,
+
+	     // Romantic/Sexual
+	     Lover, ExLover, Spouse, ExSpouse,
+	     Courting, Betrothed, Concubine, Paramour,
+	     Incompatible, ForbiddenAttraction,
+
+	     // Mentorship
+	     Mentor, Mentee, Apprentice, Master,
+	     Teacher, Student, Guru, Disciple,
+
+	     // Leadership
+	     Leader, Follower, Subordinate, Superior,
+	     Chieftain, Tribesperson, Elder, Youth,
+	     RoleModel, Idolized,
+
+	     // Task/Professional
+	     WorkPartner, TeamMember, TaskLeader,
+	     Specialist, Generalist, Consultant,
+
+	     // Ceremonial
+	     RitualKin, BloodBrother, OathSworn,
+	     CeremonialParent, InitiateGuide,
+
+	     // Asymmetric Relationships
+	     Protector, Protected,
+	     Caregiver, CareReceiver,
+	     Debtor, Creditor,
+	     Hostage, Captor
+
 }
 //secret data structure
 public class PepoSecretData

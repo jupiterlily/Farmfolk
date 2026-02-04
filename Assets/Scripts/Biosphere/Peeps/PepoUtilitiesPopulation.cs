@@ -39,7 +39,8 @@ public static class PepoUtilitiesPopulation
 	     }
 	     public static List<PepoData> RemovePeposFromList(List<PepoData> pool, List<PepoData> exiles)
 	     {
-		          List<PepoData> lilGuys = pool;
+		          List<PepoData> lilGuys = new List<PepoData>();
+		          lilGuys.AddRange(pool);
 		          foreach (var pepo in pool)
 		          {
 				if (exiles.Contains(pepo))
@@ -302,5 +303,104 @@ public static class PepoUtilitiesPopulation
 		          AuntsUncles.AddRange(FindFullSiblings(me.mother));
 		          AuntsUncles.AddRange(FindFullSiblings(me.father));
 		          return Cousins;
+	     }
+
+	     public static List<PepoData> OthersInMyRoles(PepoData me, PepoPopulation population)
+	     {
+		          List<PepoData> peers = new List<PepoData>();
+		          //go through the roles assignes to this population
+		          foreach (var p in population.roleAssignments)
+		          {
+				//if the list of people doing the job isn't empty
+				if (p.Value != null)
+				{
+					     //if iam on the list
+					     if (p.Value.Contains(me))
+					     {
+						          //add my coworker to my list of peers if they aren't already on the list
+						          foreach (var pepo in p.Value)
+						          {
+								if (!peers.Contains(pepo))
+								{
+									     peers.Add(pepo);
+								}
+						          }
+					     }
+				}
+		          }
+		          peers.Remove(me);
+		          return peers;
+	     }
+
+	     public static float PairLovers(List<PepoData> singles, PepoPopulation pop, int attempts = 5)
+	     {
+		          bool match = false;
+		          int i = 0;
+		          int f = 0; //failed to find a match.
+		          foreach (var single in singles)
+		          {
+				float attemptsTotal = attempts + single.personality.Conscientiousness.value + single.personality.Extraversion.value;
+				if ((single.lovers == 0 || !single.ssd.isMonogamous) && single.womb != null)
+				{
+					     List<PepoData> pringles = PepoUtilitiesBonds.ShipsToPepos(single.RelationshipLibrary[RelationshipType.courting]);
+					     pringles.AddRange(PepoUtilitiesBonds.ShipsToPepos(single.RelationshipLibrary[RelationshipType.friend]));
+					     pringles.AddRange(PepoUtilitiesBonds.ShipsToPepos(single.RelationshipLibrary[RelationshipType.peer]));
+					     pringles.AddRange(PepoUtilitiesBonds.ShipsToPepos(single.RelationshipLibrary[RelationshipType.acquaintence]));
+					     pringles.AddRange(PepoUtilitiesBonds.ShipsToPepos(single.RelationshipLibrary[RelationshipType.follower]));
+					     pringles.Remove(single);
+					     foreach (var pringle in pringles)
+					     {
+						          if (!PepoUtilitiesBonds.ShipsToPepos(single.RelationshipLibrary[RelationshipType.lover]).Contains(pringle) && !PepoUtilitiesBonds.ShipsToPepos(single.RelationshipLibrary[RelationshipType.spouse]).Contains(pringle) && !PepoUtilitiesBonds.ShipsToPepos(single.RelationshipLibrary[RelationshipType.offspring]).Contains(pringle) && !PepoUtilitiesBonds.ShipsToPepos(single.RelationshipLibrary[RelationshipType.parent]).Contains(pringle) && !PepoUtilitiesBonds.ShipsToPepos(single.RelationshipLibrary[RelationshipType.kin]).Contains(pringle) && !PepoUtilitiesBonds.ShipsToPepos(single.RelationshipLibrary[RelationshipType.incompatible]).Contains(pringle) && i <= attemptsTotal)
+						          {//check if we're related by an int of our average conscientousness scores
+								float c = (single.personality.Conscientiousness.value + pringle.personality.Conscientiousness.value) / 2;
+								if (pringle.isAlive && !PepoSystemMatchmaking.AreRelated(single, pringle, ((int)c)))
+								{
+
+									     if (PepoSystemMatchmaking.AmIAttracted(single, pringle, (int)single.personality.Conscientiousness.value))
+									     {
+										          //if his agreeableness is below 7 we check if he likes me back
+										          RelationshipType type = RelationshipType.lover;
+										          //if we both have a security value above 8 and we don't have a spouse already we make us spouses
+										          if (single.values[5].value >= 7 && pringle.values[5].value >= 7 && single.RelationshipLibrary[RelationshipType.spouse].Count == 0 && pringle.RelationshipLibrary[RelationshipType.spouse].Count == 0)
+										          {
+												type = RelationshipType.spouse;
+										          }
+										          {
+												if (pringle.personality.Agreeableness.value < 8)
+												{
+													     if (PepoSystemMatchmaking.AmIAttracted(pringle, single, (int)pringle.personality.Conscientiousness.value))
+													     {
+														          PepoFactoryBonds.MutualRelationship(single, pringle, type);
+														          match = true;
+														          break;
+													     }
+												}
+												else
+												{
+													     //he likes me back automatically
+													     PepoFactoryBonds.MutualRelationship(single, pringle, type);
+													     match = true;
+													     break;
+												}
+										          }
+
+									     }
+									     else
+									     {
+										          //add him to my list of kin
+										          PepoFactoryBonds.MutualRelationship(single, pringle, RelationshipType.kin);
+										          i++;
+									     }
+								}
+						          }
+						          if (!match)
+						          {
+								f++;
+						          }
+					     }
+				}
+				i = 0;
+		          }
+		          return f;
 	     }
 }

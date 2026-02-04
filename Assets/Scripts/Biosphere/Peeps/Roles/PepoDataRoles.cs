@@ -11,6 +11,9 @@ public class PepoDataRoles
 	     public List<string> supportingRoles = new List<string>(); //roles that need to exist for this role to function/be applicable.
 	     public float minimumAge = 0f;
 	     public float maximumAge = 2000f;
+
+	     //skill and experience metrics. a dictionary of skills involved and xp/hour
+
 	     public PepoDataRoles(string name, string description, string era, List<PepoRolePrerequisite> prerequisites, float min, float max, List<string> precursors = null)
 	     {
 		          roleName = name;
@@ -34,4 +37,13 @@ public class PepoRolePrerequisite
 		          minimum = min;
 		          maximum = max;
 	     }
+}
+
+public class PepoRoleTask
+{
+	     public string name;
+	     public string description;
+	     public float hours;
+	     public PepoResource yield;
+
 }

@@ -12,639 +12,10 @@ public class LSystem : MonoBehaviour
 	     public float iterationScaleFactor = 0.8f;
 
 	     // Rules - kept the same as yours
-	     public static Dictionary<char, string[]> MasterRules = new Dictionary<char, string[]>()
-{
-	     // ========== Structural Components ==========
-	      { 'S', new string[] {
-		         // "S",       // Minimal growth
-		          "S",
-	     }},
-    
-	     // ========== <Leaf Production ==========
-	     { 'l', new string[] {
-		          "<L",        // Single <leaf
-		          "<L<L",       // <Leaf pair
-		          "<L<L<L", // <Leaf triplet
-		          "<L<L<L<L",
-		          "<L<L<L<L<L",
-		          "[/S-<L]",
-		          "[/S-<L<L]",
-		          "[/S-<L<L<L]",
-		          "[/S-<L<L<L<L]",
-		          "[/b-S<L]",
-		          "[/b-S<L<L]",
-		          "[/b-S<L<L<L]",
-		          "[/b-S<L<L<L<L]",
-		          "[/S-b<L]",
-		          "[/S-b<L<L]",
-		          "[/S-b<L<L<L]",
-		          "[/S-b<L<L<L<L]",
-		          "[<S<L][>S<L]",
-		          "[<S<L<L][>S<L<L]",
-		          "[<S<L<L<L][>S<L<L<L]",
-		          "[<S<L<L<L<L][>S<L<L<L<L]",
-		          "[<S<L][vS<L][>S<L]",
-		          "[<S<L<L][vS<L<L][>S<L<L]",
-		          "[<S<L<L<L][vS<L<L<L][>S<L<L<L]",
-		          "[<S<L<L<L<L][vS<L<L<L<L][>S<L<L<L<L]",
-		          "[<S<L]<[<S<L]<[>S<L]",
-		          "[<S<L<L]<[<S<L<L]<[>S<L<L]",
-		          "[<S<L<L<L]<[<S<L<L<L]<[>S<L<L<L]",
-		          "[vS<L]",
-		          "[<S<L<L]",
-		          "[<S<L<L<L]",
-		          "[<S<L<L<L<L]",
-		          "[<bS<L]",
-		          "[<bS<L<L]",
-		          "[<bS<L<L<L]",
-		          "[<bS<L<L<L<L]",
-		          "[<Sb<L]",
-		          "[<Sb<L<L]",
-		          "[<Sb<L<L<L]",
-		          "[<Sb<L<L<L<L]",
-		          "[<Sb[<S<L]]",
-		          "[<Sb[<S<L<L]]",
-		          "[<Sb[<S<L<L<L]]",
-		          "[<Sb[<S<L<L<L<L]]",
-		          "[vSb[<S<L]]",
-		          "[vSb[<S<L<L]]",
-		          "[vSb[<S<L<L<L]]",
-		          "[vSb[<S<L<L<L<L]]",
-		          "[<Sb[<S<L]]",
-		          "[<Sb[<S<L>S<L]]",
-		          "[<Sb[<S<L>S<L<S<L]]",
-		          "[<Sb[<S<L>S<L<S<L>S<L]]",
-		          "[<Sb[<S<L]]",
-		          "[<Sb[<S<L<S<L]]",
-		          "[<Sb[<S<L<S<L<S<L]]",
-		          "[<Sb[<S<L<S<L<S<L<S<L]]",
-		          "[vSb[<S<L]]",
-		          "[vSb[<S<L>S<L]]",
-		          "[vSb[<S<L>S<L<S<L]]",
-		          "[vSb[<S<L>S<L<S<L>S<L]]",
-		          "[vSb[<S<L]]",
-		          "[vSb[<S<L<S<L]]",
-		          "[vSb[<S<L<S<L<S<L]]",
-		          "[vSb[<S<L<S<L<S<L<S<L]]",
-		          "<L",        // Single <leaf
-		          "<L>>L",       // <Leaf pair
-		          "<L>>L<<<L", // <Leaf triplet
-		          "<L>>L<<<L>>>>L",
-		          "<L>>L<<<L>>>>L<<<<<L",
-		          "[/S-<L]",
-		          "[/S-<L>>L]",
-		          "[/S-<L>>L<<<L]",
-		          "[/S-<L>>L<<<L>>>>L]",
-		          "[/b-S<L]",
-		          "[/b-S<L>>L]",
-		          "[/b-S<L>>L<<<L]",
-		          "[/b-S<L>>L<<<L>>>>L]",
-		          "[/S-b<L]",
-		          "[/S-b<L>>L]",
-		          "[/S-b<L>>L<<<L]",
-		          "[/S-b<L>>L<<<L>>>>L]",
-		          "[<S<L][>S<L]",
-		          "[<S<L>>L][>S<L>>L]",
-		          "[<S<L>>L<<<L][>S<L>>L<<<L]",
-		          "[<S<L>>L<<<L>>>>L][>S<L>>L<<<L>>>>L]",
-		          "[<S<L][vS<L][>S<L]",
-		          "[<S<L>>L][vS<L>>L][>S<L>>L]",
-		          "[<S<L>>L<<<L][vS<L>>L<<<L][>S<L>>L<<<L]",
-		          "[<S<L>>L<<<L>>>>L][vS<L>>L<<<L>>>>L][>S<L>>L<<<L>>>>L]",
-		          "[<S<L]<[<S<L]<[>S<L]",
-		          "[<S<L>>L]<[<S<L>>L]<[>S<L>>L]",
-		          "[<S<L>>L<<<L]<[<S<L>>L<<<L]<[>S<L>>L<<<L]",
-		          "[vS<L]",
-		          "[<S<L>>L]",
-		          "[<S<L>>L<<<L]",
-		          "[<S<L>>L<<<L>>>>L]",
-		          "[<bS<L]",
-		          "[<bS<L>>L]",
-		          "[<bS<L>>L<<<L]",
-		          "[<bS<L>>L<<<L>>>>L]",
-		          "[<Sb<L]",
-		          "[<Sb<L>>L]",
-		          "[<Sb<L>>L<<<L]",
-		          "[<Sb<L>>L<<<L>>>>L]",
-		          "[<Sb[<S<L]]",
-		          "[<Sb[<S<L>>L]]",
-		          "[<Sb[<S<L>>L<<<L]]",
-		          "[<Sb[<S<L>>L<<<L>>>>L]]",
-		          "[vSb[<S<L]]",
-		          "[vSb[<S<L>>L]]",
-		          "[vSb[<S<L>>L<<<L]]",
-		          "[vSb[<S<L>>L<<<L>>>>L]]",
-		          "[<Sb[<S>-L]]",
-		          "[<Sb[<S>-L>S>-L]]",
-		          "[<Sb[<S>-L>S>-L<S>-L]]",
-		          "[<Sb[<S>-L>S>-L<S>-L>S>-L]]",
-		          "[<Sb[<S>-L]]",
-		          "[<Sb[<S>-L<S>-L]]",
-		          "[<Sb[<S>-L<S>-L<S>-L]]",
-		          "[<Sb[<S>-L<S>-L<S>-L<S>-L]]",
-		          "[vSb[<S>-L]]",
-		          "[vSb[<S>-L>S>-L]]",
-		          "[vSb[<S>-L>S>-L<S>-L]]",
-		          "[vSb[<S>-L>S>-L<S>-L>S>-L]]",
-		          "[vSb[<S>-L]]",
-		          "[vSb[<S>-L<S>-L]]",
-		          "[vSb[<S>-L<S>-L<S>-L]]",
-		          "[vSb[<S>-L<S>-L<S>-L<S>-L]]",
-	     }},
 
-	     { 'L', new string[] {
-		          "L",        // Leaf
-		               // Leaf Drop
-	     }},
-	     // ========== Apical Bud System ==========
-	         { 'A', new string[] { // Apical bud. Must contain a B and an A. When adding this to plant rulesets, iterate over them to add stems and turns and branch variety ie (B becomes [B]B, l, b, T, CT or DT or ET)
-	     "SA",       // Continue growing
-	     "B^A",
-	     "BS^A",
-	     "SB^A",
-	     "S[B]^SA",
-	     //double branch structures
-	     "S[<B][>B]^A", //two branches
-	     "S[<<B]>B]]^A", //nested branches
-	     "S[<B]S[>B]^A", //branches along stem
-	     "S[<B]S[<B]^A", //branches along stem
+	     //public static Dictionary<char, string> currentRules = new Dictionary<char, string>();
 
-	     "S[<B][>C]^A", //two branches
-	     "S[<<B]>C]]^A", //nested branches
-	     "S[<B]S[>C]^A", //branches along stem
-	     "S[<B]S[<C]^A", //branches along stem
-	     "S[<C][>B]^A", //two branches
-	     "S[<<C]>B]]^A", //nested branches
-	     "S[<C]S[>B]^A", //branches along stem
-	     "S[<C]S[<B]^A", //branches along stem
-
-	     "S[<B][>D]^A", //two brandhes
-	     "S[<<B]>D]]^A", //nested brandhes
-	     "S[<B]S[>D]^A", //brandhes along stem
-	     "S[<B]S[<D]^A", //brandhes along stem
-	     "S[<D][>B]^A", //two brandhes
-	     "S[<<D]>B]]^A", //nested brandhes
-	     "S[<D]S[>B]^A", //brandhes along stem
-	     "S[<D]S[<B]^A", //brandhes along stem
-
-	     "S[<B][>E]^A", //two branehes
-	     "S[<<B]>E]]^A", //nestee branehes
-	     "S[<B]S[>E]^A", //branehes along stem
-	     "S[<B]S[<E]^A", //branehes along stem
-	     "S[<E][>B]^A", //two branehes
-	     "S[<<E]>B]]^A", //nestee branehes
-	     "S[<E]S[>B]^A", //branehes along stem
-	     "S[<E]S[<B]^A", //branehes along stem
-
-	     "S[<E][>C]^A", //two eranches
-	     "S[<<E]>C]]^A", //nested eranches
-	     "S[<E]S[>C]^A", //eranches along stem
-	     "S[<E]S[<C]^A", //eranches along stem
-	     "S[<C][>E]^A", //two eranches
-	     "S[<<C]>E]]^A", //nested eranches
-	     "S[<C]S[>E]^A", //eranches along stem
-	     "S[<C]S[<E]^A", //eranches along stem
-
-	     "S[<E][>D]^A", //two erandhes
-	     "S[<<E]>D]]^A", //nested erandhes
-	     "S[<E]S[>D]^A", //erandhes along stem
-	     "S[<E]S[<D]^A", //erandhes along stem
-	     "S[<D][>E]^A", //two erandhes
-	     "S[<<D]>E]]^A", //nested erandhes
-	     "S[<D]S[>E]^A", //erandhes along stem
-	     "S[<D]S[<E]^A", //erandhes along stem
-
-	     "S[<C][>E]^A", //two cranehes
-	     "S[<<C]>E]]^A", //nestee cranehes
-	     "S[<C]S[>E]^A", //cranehes along stem
-	     "S[<C]S[<E]^A", //cranehes along stem
-	     "S[<E][>C]^A", //two cranehes
-	     "S[<<E]>C]]^A", //nestee cranehes
-	     "S[<E]S[>C]^A", //cranehes along stem
-	     "S[<E]S[<C]^A", //cranehes along stem
-	     //triple branch structures
-	     "S[vB][B^A][^B]", //three branches
-	     "S[<<B][<B][>B]^A", //three branches
-	     "S[[[B]B]B]^A", //nested branches
-	     "S/[/<[/<[B]B]B]^A", //nested branches
-	     "S[[B]B][B]^A",
-	     "S[B][[B]B]^A",
-	     "S[B]B]]S[B]^A",
-	     "S[B]S[B]B]]^A",
-	     "S[[[SB]SB]SB]^A",
-
-	     "S[vB][C^A][^D]", //three branches
-	     "S[<<B][<C][>D]^A", //three branches
-	     "S<[<[<[B]C]D]^A", //nested branches
-	     "S/[/<[/<[<B]^C]>D]^A", //nested branches
-	     "S[[<B]^C][>D]^A",
-	     "S[B][[C]D]^A",
-	     "S[B]C]]S[D]^A",
-	     "S[B]S[C]D]]^A",
-	     "S[[[SB]SC]SD]^A",
-
-	     //four branch structures
-	     "S[<B][^B][vB][>B]^A", //four branches
-	     "S[<[<B]B][>[>B]B]^A", //nested branches
-	     "S[B][[B]B][B]^A", //alternating nested branches
-
-	     //five branch structures
-	     "S[B][B][B][B][B]^A", //five branches
-	     "S[[B]B][[B]B][B]^A", //nested branches
-	     "S[B][[B]B][[B]B]^A", //alternating nested branches
-	     "S[[[B]B]B][B][B]^A", //alternating nested branches
-	     "S[[[B]B]B][[B[B]^A", //alternating nested branches
-
-	     	     "S/A",       // Continue growing
-	     "/B^A",
-	     "/BS^A",
-	     "/SB^A",
-	     "/S[B]^SA",
-	     //double branch structures
-	     "/S[B][B]^A", //two branches
-	     "/S[B]B]]^A", //nested branches
-	     "/S[B]S[B]^A", //branches along stem
-	     //triple branch structures
-	     "/S[B][B][B]^A", //three branches
-	     "/S/[/[/[B]B]B]^A", //nested branches
-	     "/S[[B]B][B]^A",
-	     "/S[B][[B]B]^A",
-	     "/S[B]B]]S[B]^A",
-	     "/S[B]S[B]B]]^A",
-	     "/S[/[/[SB]SB]SB]^A",
-	       	     //four branch structures
-	     "/S[B][B][B][B]^A", //four branches
-	     "/S[[B]B][[B]B]^A", //nested branches
-	     "/S[B][[B]B][B]^A", //alternating nested branches
-
-
-	     //five branch structures
-	     "/S[B][B][B][B][B]^A", //five branches
-	     "/S[[B]B][[B]B][B]^A", //nested branches
-	     "/S[B][[B]B][[B]B]^A", //alternating nested branches
-	     "/S[[[B]B]B][B][B]^A", //alternating nested branches
-	     "/S[[[B]B]B][[B[B]^A", //alternating nested branches
-	         }},
-
-	             { 'a', new string[] { // Axillary bud
-        "a<S",
-        "a/S",
-        "aT",
-        "b",// 
-    }},
-
-    { 'T', new string[] { // Terminal buds .Dictates structure for flowers and leaves
-	         //basic structures
-	         "lbT",
-	         "blT",
-	     "[l][b]T",
-	     "[[b]l]T",
-	     "[[l]b]T",
-	     //double structures
-	     "[[l][b]][[l][b]]T",
-	     "[[b]l][[b]l]T",
-	     "[[l]b][[l]b]T",
-	     "SlbT",
-	     "SblT",
-	     "S[l][b]T",
-	     "S[[b]l]T",
-	     "S[[l]b]T",
-	     //double structures
-	     "S[[l][b]][[l][b]]T",
-	     "S[[b]l][[b]l]T",
-	     "S[[l]b][[l]b]T",
-
-	     "<SlbT",
-	     "<SblT",
-	     "<S[l][b]T",
-	     "<S[[b]l]T",
-	     "<S[[l]b]T",
-	     //double structures
-	     "<S[[l][b]][[l][b]]T",
-	     "<S[[b]l][[b]l]T",
-	     "<S[[l]b][[l]b]T",
-
-	     ">S[lb][lb]^T", //two lbranches
-	     ">S[lb]lb]]^T", //nested lbranches
-	     ">S[lb]S[lb]^T", //lbranches along stem
-	     //triple lbranch structures
-	     ">S[lb][lb][lb]^T", //three lbranches
-	     ">S[[[lb]lb]lb]^T", //nested lbranches
-	     ">S[[lb]lb][lb]^T",
-	     ">S[lb][[lb]lb]^T",
-	     ">S[lb]lb]]S[lb]^T",
-	     ">S[lb]S[lb]lb]]^T",
-	     ">S[[[Slb]Slb]Slb]^T",
-
-	     //four lbranch structures
-	     ">S[lb][lb][lb][lb]^T", //four lbranches
-	     ">S[[lb]lb][[lb]lb]^T", //nested lbranches
-	     ">S[lb][[lb]lb][lb]^T", //alternating nested lbranches
-
-	     //five lbranch structures
-	     ">S[lb][lb][lb][lb][lb]^T", //five lbranches
-	     ">S[[lb]lb][[lb]lb][lb]^T", //nested lbranches
-	     ">S[lb][[lb]lb][[lb]lb]^T", //alternating nested lbranches
-	     ">S[[[lb]lb]lb][lb][lb]^T", //alternating nested lbranches
-	     ">S[[[lb]lb]lb][[lb[lb]^T", //alternating nested lbranches
-    }},
-    
-	     // ========== Branching System ==========
-	     { 'B', new string[] {
-	     "aST",
-	     //single branch structures
-	     "a[T]T",
-	     "aS[T]T",
-	     //two branch structures
-	     "a[T][T]T",
-	     "a[[T]T]T",
-	     "a[T[T]]T",
-	     "aS[<T]S[<T]T",
-	     "aS/[<T]/S[>T]T",
-	     "aS[<T[<T]]T",
-	     //three branch structures
-	     "aS[<T][>T][<^T]T",
-	     "aS[<T]S[<T]S[<T]T",
-	     "aS[<T]/S[<T]/S[<T]T",
-	     "aS[<T[<T[<T]]]T",
-	     //complex branch structures
-	     "a<S[>CT]/S[^DT]ST",
-	     "a<S[+[T]/C/D/E]T", //spiral
-	     "a<S[+[T]/C/[T]/CT]T", //spiral
-
-	     ">aS[T][T]T", //two branches
-	     ">aS[T]T]]T", //nested branches
-	     ">aS[T]S[T]T", //branches along stem
-	     //triple branch structures
-	     ">aS[T][T][T]T", //three branches
-	     ">aS[[[T]T]T]T", //nested branches
-	     ">aS[[T]T][T]T",
-	     ">aS[T][[T]T]T",
-	     ">aS[T]T]]S[T]T",
-	     ">aS[T]S[T]T]]T",
-	     ">aS[[[ST]ST]ST]T",
-
-	     //four branch structures
-	     ">aS[T][T][T][T]T", //four branches
-	     ">aS[[T]T][[T]T]T", //nested branches
-	     ">aS[T][[T]T][T]T", //alternating nested branches
-
-	     //five branch structures
-	     ">aS[T][T][T][T][T]T", //five branches
-	     ">aS[[T]T][[T]T][T]T", //nested branches
-	     ">aS[T][[T]T][[T]T]T", //alternating nested branches
-	     ">aS[[[T]T]T][T][T]T", //alternating nested branches
-	     ">aS[[[T]T]T][[T[T]T", //alternating nested branches
-
-	     }},
-
-     { 'C', new string[] { // treated as a stem segment
-	         "D",
-	         "E",
-	     "SS",
-	     "S/S",
-	     "SvS",
-	     "S<S",
-	     "SS[B]",
-	     "S[B]S",
-	     "S[B]SC",
-	         "S[B][CT]S",
-	         "S[B][CT][DT][ET]S",
-	          "aST",
-	     //single branch structures
-	     "a[T]T",
-	     "aS[T]T",
-	     //two branch structures
-	     "a[T][T]T",
-	     "a[[T]T]T",
-	     "a[T[T]]T",
-	     "aS[<T]S[<T]T",
-	     "aS/[<T]/S[>T]T",
-	     "aS[<T[<T]]T",
-	     //three branch structures
-	     "aS[<T][>T][<^T]T",
-	     "aS[<T]S[<T]S[<T]T",
-	     "aS[<T]/S[<T]/S[<T]T",
-	     "aS[<T[<T[<T]]]T",
-	     //complex branch structures
-	     "a<S[>CT]/S[^DT]ST",
-	     "a<S[+[T]/C/D/ET]T", //spiral
-	     "a<S[+[T]/C/[T]/CT]T", //spiral
-
-	     ">aS[T][T]T", //two branches
-	     ">aS[T]T]]T", //nested branches
-	     ">aS[T]S[T]T", //branches along stem
-	     //triple branch structures
-	     ">aS[T][T][T]T", //three branches
-	     ">aS[[[T]T]T]T", //nested branches
-	     ">aS[[T]T][T]T",
-	     ">aS[T][[T]T]T",
-	     ">aS[T]T]]S[T]T",
-	     ">aS[T]S[T]T]]T",
-	     ">aS[[[ST]ST]ST]T",
-
-	     //four branch structures
-	     ">aS[T][T][T][T]T", //four branches
-	     ">aS[[T]T][[T]T]T", //nested branches
-	     ">aS[T][[T]T][T]T", //alternating nested branches
-
-	     //five branch structures
-	     ">aS[T][T][T][T][T]T", //five branches
-	     ">aS[[T]T][[T]T][T]T", //nested branches
-	     ">aS[T][[T]T][[T]T]T", //alternating nested branches
-	     ">aS[[[T]T]T][T][T]T", //alternating nested branches
-	     ">aS[[[T]T]T][[T[T]T", //alternating nested branches
-    }},
-
-    { 'D', new string[] { // threated as a stem segment
-	         "C",
-	         "E",
-	     "SS",
-	     "S/S",
-	     "SvS",
-	     "S<S",
-	     "SS[B]",
-	     "S[B]S",
-	     "S[B]SC",
-	         "S[B][CT]S",
-	         "S[B][CT][DT][ET]S",
-	          "aST",
-	     //single branch structures
-	     "a[T]T",
-	     "aS[T]T",
-	     //two branch structures
-	     "a[T][T]T",
-	     "a[[T]T]T",
-	     "a[T[T]]T",
-	     "aS[<T]S[<T]T",
-	     "aS/[<T]/S[>T]T",
-	     "aS[<T[<T]]T",
-	     //three branch structures
-	     "aS[<T][>T][<^T]T",
-	     "aS[<T]S[<T]S[<T]T",
-	     "aS[<T]/S[<T]/S[<T]T",
-	     "aS[<T[<T[<T]]]T",
-	     //complex branch structures
-	     "a<S[>CT]/S[^DT]ST",
-	     "a<S[+[T]/C/D/ET]T", //spiral
-	     "a<S[+[T]/C/[T]/CT]T", //spiral
-
-	     ">aS[T][T]T", //two branches
-	     ">aS[T]T]]T", //nested branches
-	     ">aS[T]S[T]T", //branches along stem
-	     //triple branch structures
-	     ">aS[T][T][T]T", //three branches
-	     ">aS[[[T]T]T]T", //nested branches
-	     ">aS[[T]T][T]T",
-	     ">aS[T][[T]T]T",
-	     ">aS[T]T]]S[T]T",
-	     ">aS[T]S[T]T]]T",
-	     ">aS[[[ST]ST]ST]T",
-
-	     //four branch structures
-	     ">aS[T][T][T][T]T", //four branches
-	     ">aS[[T]T][[T]T]T", //nested branches
-	     ">aS[T][[T]T][T]T", //alternating nested branches
-
-	     //five branch structures
-	     ">aS[T][T][T][T][T]T", //five branches
-	     ">aS[[T]T][[T]T][T]T", //nested branches
-	     ">aS[T][[T]T][[T]T]T", //alternating nested branches
-	     ">aS[[[T]T]T][T][T]T", //alternating nested branches
-	     ">aS[[[T]T]T][[T[T]T", //alternating nested branches
-    }},
-
-		          { 'E', new string[] { // threated as a stem segment
-	         "C",
-	         "D",
-	     "SS",
-	     "S/S",
-	     "SvS",
-	     "S<S",
-	     "SS[B]",
-	     "S[B]S",
-	     "S[B]SC",
-	         "S[B][CT]S",
-	         "S[B][CT][DT][ET]S",
-	          "aST",
-	     //single branch structures
-	     "a[T]T",
-	     "aS[T]T",
-	     //two branch structures
-	     "a[T][T]T",
-	     "a[[T]T]T",
-	     "a[T[T]]T",
-	     "aS[<T]S[<T]T",
-	     "aS/[<T]/S[>T]T",
-	     "aS[<T[<T]]T",
-	     //three branch structures
-	     "aS[<T][>T][<^T]T",
-	     "aS[<T]S[<T]S[<T]T",
-	     "aS[<T]/S[<T]/S[<T]T",
-	     "aS[<T[<T[<T]]]T",
-	     //complex branch structures
-	     "a<S[>CT]/S[^DT]ST",
-	     "a<S[+[T]/C/D/ET]T", //spiral
-	     "a<S[+[T]/C/[T]/CT]T", //spiral
-
-	     ">aS[T][T]T", //two branches
-	     ">aS[T]T]]T", //nested branches
-	     ">aS[T]S[T]T", //branches along stem
-	     //triple branch structures
-	     ">aS[T][T][T]T", //three branches
-	     ">aS[[[T]T]T]T", //nested branches
-	     ">aS[[T]T][T]T",
-	     ">aS[T][[T]T]T",
-	     ">aS[T]T]]S[T]T",
-	     ">aS[T]S[T]T]]T",
-	     ">aS[[[ST]ST]ST]T",
-
-	     //four branch structures
-	     ">aS[T][T][T][T]T", //four branches
-	     ">aS[[T]T][[T]T]T", //nested branches
-	     ">aS[T][[T]T][T]T", //alternating nested branches
-
-	     //five branch structures
-	     ">aS[T][T][T][T][T]T", //five branches
-	     ">aS[[T]T][[T]T][T]T", //nested branches
-	     ">aS[T][[T]T][[T]T]T", //alternating nested branches
-	     ">aS[[[T]T]T][T][T]T", //alternating nested branches
-	     ">aS[[[T]T]T][[T[T]T", //alternating nested branches
-    }},
-	     // ========== Direction Modifiers ==========
-	     { '>', new string[] {
-		          ">",        // Small right turn
-
-	     }},
-
-	     { '<', new string[] {
-		          "<",        // Small left turn
-
-	     }},
-
-	     { 'v', new string[] {
-		          "v",        // Downward adjustment
-	     }},
-    
-	     // ========== Reproductive Structures ==========
-	     { 'c', new string[] {
-		          "SAL",        // Simple cotyledon
-		          "Svv+++>>L------<<<<L+++>>^^A",     // Opposite cotyledons
-		          //"LL",
-		          // "L"
-	     }},
-
-	     { 's', new string[] {
-		          "r-S[BT]c",     // Basic seed
-		          "r-S<[[<B]>[>B]]c",
-		          "r-S[[<B]>[>B]vBSc]",
-		          "r-[B<BT]c",
-		          "r-[BT]c",
-		          "r-[[B]<[B]T]c",
-		          "r-[[<B[>B]]T]c",
-			   "r^c",
-        "r^Sc",
-        "r^SSc"
-
-	     }},
-
-	     { 'b', new string[] {
-		          "f",        // Bud to flower
-		          "+lf",        // Bud with leaf
-		          "+[<Slf]",       // Bud with stem
-		          "+[<Slf][>Slf]",
-		          "+l[>Sf][>>Sf]",
-		          "+[[Sl]Sf]",
-		          "+l[Sf]/[>>Sf]/[<Sf]/[<<Sf]",
-		          "+lS[Sf]>S[Sf]<S[Sf]>S[Sf]",
-		          "+lS[Sf]>S[Sf]<S[Sf]>S[Sf]",
-		          "+<lS[Sf]>S[Sf]<S[Sf]>S[Sf]",
-		          "+[l>Sf]",
-		          "B[>Slf]",
-	     }},
-
-	     { 'f', new string[] {
-		          //"f",        // Flower
-		          "F",        // Fruit
-		          "FF",      // double fruit
-		          "vSF",      // fruit with stem
-	     }},
-
-	     { 'F', new string[] {
-		          "f",        // Fruit
-		          //"b",
-		          //"bl",       // Fruit with flower
-		          "l",       // Fruit with leaf
-
-	     }},
-    
-	     // ========== Root System ==========
-	     { 'r', new string[] {
-		          "r",        // Primary root
-
-	     }}
-		          };
-
+	     public LSystem_Ruleset rulesets;
 	     // Private fields
 	     private Plant plant;
 	     private Vector3 position;
@@ -768,6 +139,7 @@ public class LSystem : MonoBehaviour
 				{
 				case 'S': // Draw stem segment
 				ProcessStemSegment(ref currentState, ref currentLinePoints, ref currentLineWidths);
+				plant.Stems.AddStemLengths(1);
 				break;
 
 				case '[': // Save state and start new branch
@@ -793,6 +165,7 @@ public class LSystem : MonoBehaviour
 				          // Finalize current branch line
 				if (currentLinePoints.Count > 1)
 				{
+
 					     CreateLineRendererFromPoints(currentLinePoints, currentLineWidths, currentState.depth);
 				}
 
@@ -853,6 +226,7 @@ public class LSystem : MonoBehaviour
 				case 'L': // Create leaf
 				CreateLeaf(currentState.position, currentState.direction, currentState.currentWidth);
 				leafCount++;
+				plant.Leaves.AddorRemoveLeaves(1);
 				break;
 
 				case 'f': // Create flower
@@ -861,6 +235,7 @@ public class LSystem : MonoBehaviour
 
 				case 'F': // Create fruit
 				CreateFruit(currentState.position, currentState.direction, currentState.currentWidth);
+				plant.Fruits.FruitCount++;
 				break;
 
 				case 'B': // Branch indicator (just a marker, doesn't draw)
@@ -942,8 +317,8 @@ public class LSystem : MonoBehaviour
 		          lr.endColor = plant.Stems.StemColor;
 		          lr.material = new Material(Shader.Find("Sprites/Default"));
 		          lr.material.color = plant.Stems.StemColor;
-		          lr.numCornerVertices = 5;
-		          lr.numCapVertices = 5;
+		          lr.numCornerVertices = 3;
+		          lr.numCapVertices = 3;
 
 		          // Create width curve
 		          AnimationCurve widthCurveLR = new AnimationCurve();
@@ -1009,7 +384,7 @@ public class LSystem : MonoBehaviour
 		          leaf.transform.position = position;
 
 		          LineRenderer lr = leaf.AddComponent<LineRenderer>();
-		          float leafSize = Mathf.Max(0.0001f, branchWidth) * Mathf.Sqrt(plant.Leaves.SurfaceArea) * 2f;
+		          float leafSize = Mathf.Max(0.0005f, branchWidth) * Mathf.Sqrt(plant.Leaves.SurfaceArea) * 2f;
 
 		          Vector3 perpendicular = Vector3.Cross(direction, Vector3.forward).normalized;
 
@@ -1021,11 +396,15 @@ public class LSystem : MonoBehaviour
 		          lr.positionCount = 3;
 		          lr.SetPositions(leafPoints);
 		          lr.startWidth = leafSize * 0.3f;
+		          // lr.alignment = LineAlignment.TransformZ;
 		          lr.endWidth = leafSize * 0.1f;
-		          lr.startColor = plant.Leaves.LeafColor;
+		          lr.widthCurve.AddKey(1, leafSize * 0.5f);
+		          lr.startColor = Color.Lerp(plant.Leaves.LeafColor, plant.Stems.StemColor, .3f);
 		          lr.endColor = plant.Leaves.LeafColor;
 		          lr.material = new Material(Shader.Find("Sprites/Default"));
 		          lr.material.color = plant.Leaves.LeafColor;
+
+
 	     }
 
 	     // Flower creation
@@ -1039,10 +418,10 @@ public class LSystem : MonoBehaviour
 		          flower.transform.position = position;
 
 		          LineRenderer lr = flower.AddComponent<LineRenderer>();
-		          float size = plant.Flowers.Size / 5f;
+		          float size = plant.Flowers.Size;
 
 		          // Simple circle for flower
-		          int segments = 8;
+		          int segments = 5;
 		          lr.positionCount = segments + 1;
 		          lr.loop = true;
 
@@ -1063,7 +442,42 @@ public class LSystem : MonoBehaviour
 		          lr.material.color = plant.Flowers.FlowerColor;
 	     }
 
-	     // Fruit creation
+	     //  // Fruit creation
+	     //  private void CreateFruit(Vector3 position, Vector3 direction, float branchWidth)
+	     //  {
+	     //        if (plant?.Fruits == null)
+	     //return;
+
+	     //        GameObject fruit = new GameObject("Fruit");
+	     //        fruit.transform.SetParent(plantContainer.transform);
+	     //        fruit.transform.position = position;
+
+
+	     //        LineRenderer lr = fruit.AddComponent<LineRenderer>();
+	     //        float radius = plant.Fruits.Size;
+
+	     //        // Simple circle for fruit
+	     //        int segments = 8;
+	     //        lr.positionCount = segments + 1;
+	     //        lr.loop = true;
+
+	     //        for (int i = 0; i <= segments; i++)
+	     //        {
+	     //float angle = i * Mathf.PI * 2f / segments;
+	     //lr.SetPosition(i, position + new Vector3(
+	     //    Mathf.Cos(angle) * radius,
+	     //    Mathf.Sin(angle) * radius,
+	     //    0
+	     //));
+	     //        }
+
+	     //        lr.startWidth = lr.endWidth = radius * 0.3f;
+	     //        lr.startColor = plant.Fruits.FruitColor;
+	     //        lr.endColor = plant.Fruits.FruitColor;
+	     //        lr.material = new Material(Shader.Find("Sprites/Default"));
+	     //        lr.material.color = plant.Fruits.FruitColor;
+	     //  }
+	     // Fruit creation with 3D sphere mesh
 	     private void CreateFruit(Vector3 position, Vector3 direction, float branchWidth)
 	     {
 		          if (plant?.Fruits == null)
@@ -1073,29 +487,96 @@ public class LSystem : MonoBehaviour
 		          fruit.transform.SetParent(plantContainer.transform);
 		          fruit.transform.position = position;
 
-		          LineRenderer lr = fruit.AddComponent<LineRenderer>();
-		          float radius = (plant.Flowers.Size + plant.Stems.Diameter) / 10f;
+		          // Rotate to face the direction of the branch
+		          if (direction != Vector3.zero)
+				fruit.transform.rotation = Quaternion.LookRotation(direction);
 
-		          // Simple circle for fruit
-		          int segments = 12;
-		          lr.positionCount = segments + 1;
-		          lr.loop = true;
+		          // Add mesh components
+		          MeshFilter meshFilter = fruit.AddComponent<MeshFilter>();
+		          MeshRenderer meshRenderer = fruit.AddComponent<MeshRenderer>();
 
-		          for (int i = 0; i <= segments; i++)
-		          {
-				float angle = i * Mathf.PI * 2f / segments;
-				lr.SetPosition(i, position + new Vector3(
-				    Mathf.Cos(angle) * radius,
-				    Mathf.Sin(angle) * radius,
-				    0
-				));
-		          }
+		          // Create sphere mesh
+		          float radius = plant.Fruits.Size;
+		          Mesh sphereMesh = CreateSimpleSphereMesh(radius);
 
-		          lr.startWidth = lr.endWidth = radius * 0.3f;
-		          lr.startColor = plant.Fruits.FruitColor;
-		          lr.endColor = plant.Fruits.FruitColor;
-		          lr.material = new Material(Shader.Find("Sprites/Default"));
-		          lr.material.color = plant.Fruits.FruitColor;
+		          meshFilter.mesh = sphereMesh;
+
+		          // Set material and color
+		          Material fruitMaterial = new Material(Shader.Find("Standard"));
+		          fruitMaterial.color = plant.Fruits.FruitColor;
+		          meshRenderer.material = fruitMaterial;
+
+		          // Optional: Add collider if needed for interaction
+		          SphereCollider collider = fruit.AddComponent<SphereCollider>();
+		          collider.radius = radius;
+		          collider.isTrigger = true; // Make it a trigger if you want interaction without physics
+	     }
+	     // Simpler sphere for lower performance cost
+	     private Mesh CreateSimpleSphereMesh(float radius, int segments = 8)
+	     {
+		          Mesh mesh = new Mesh();
+
+		          // Create vertices in a cube and normalize to sphere
+		          // This creates a more uniform distribution than UV sphere
+		          List<Vector3> vertices = new List<Vector3>();
+		          List<int> triangles = new List<int>();
+
+		          // Create an icosphere (approximation)
+		          float t = (1f + Mathf.Sqrt(5f)) / 2f;
+
+		          // Icosahedron vertices (12 vertices)
+		          vertices.Add(new Vector3(-1, t, 0).normalized * radius);
+		          vertices.Add(new Vector3(1, t, 0).normalized * radius);
+		          vertices.Add(new Vector3(-1, -t, 0).normalized * radius);
+		          vertices.Add(new Vector3(1, -t, 0).normalized * radius);
+
+		          vertices.Add(new Vector3(0, -1, t).normalized * radius);
+		          vertices.Add(new Vector3(0, 1, t).normalized * radius);
+		          vertices.Add(new Vector3(0, -1, -t).normalized * radius);
+		          vertices.Add(new Vector3(0, 1, -t).normalized * radius);
+
+		          vertices.Add(new Vector3(t, 0, -1).normalized * radius);
+		          vertices.Add(new Vector3(t, 0, 1).normalized * radius);
+		          vertices.Add(new Vector3(-t, 0, -1).normalized * radius);
+		          vertices.Add(new Vector3(-t, 0, 1).normalized * radius);
+
+		          // Icosahedron triangles (20 faces)
+		          triangles.AddRange(new int[] { 0, 11, 5 });
+		          triangles.AddRange(new int[] { 0, 5, 1 });
+		          triangles.AddRange(new int[] { 0, 1, 7 });
+		          triangles.AddRange(new int[] { 0, 7, 10 });
+		          triangles.AddRange(new int[] { 0, 10, 11 });
+
+		          triangles.AddRange(new int[] { 1, 5, 9 });
+		          triangles.AddRange(new int[] { 5, 11, 4 });
+		          triangles.AddRange(new int[] { 11, 10, 2 });
+		          triangles.AddRange(new int[] { 10, 7, 6 });
+		          triangles.AddRange(new int[] { 7, 1, 8 });
+
+		          triangles.AddRange(new int[] { 3, 9, 4 });
+		          triangles.AddRange(new int[] { 3, 4, 2 });
+		          triangles.AddRange(new int[] { 3, 2, 6 });
+		          triangles.AddRange(new int[] { 3, 6, 8 });
+		          triangles.AddRange(new int[] { 3, 8, 9 });
+
+		          triangles.AddRange(new int[] { 4, 9, 5 });
+		          triangles.AddRange(new int[] { 2, 4, 11 });
+		          triangles.AddRange(new int[] { 6, 2, 10 });
+		          triangles.AddRange(new int[] { 8, 6, 7 });
+		          triangles.AddRange(new int[] { 9, 8, 1 });
+
+		          mesh.vertices = vertices.ToArray();
+		          mesh.triangles = triangles.ToArray();
+
+		          // Calculate normals (perpendicular to surface)
+		          Vector3[] normals = new Vector3[vertices.Count];
+		          for (int i = 0; i < vertices.Count; i++)
+				normals[i] = vertices[i].normalized;
+
+		          mesh.normals = normals;
+		          mesh.RecalculateBounds();
+
+		          return mesh;
 	     }
 
 	     /// <summary>
@@ -1115,10 +596,10 @@ public class LSystem : MonoBehaviour
 		          for (int i = 0; i < iterations; i++)
 		          {
 				float scale = Mathf.Pow(iterationScaleFactor, i);
-				currentString = LSystem_Utilities.ExpandString(currentString, random, scale, plant.Rules);
+				currentString = LSystem_Utilities.ExpandString(currentString, random, scale, plant.Rules.rules);
 		          }
 
-		          Debug.Log($"Generated L-System string ({iterations} iterations): {currentString}");
+		          //Debug.Log($"Generated L-System string ({iterations} iterations): {currentString}");
 		          return currentString;
 	     }
 

@@ -127,81 +127,25 @@ public class PepoPopManager : MonoBehaviour
 
 		          }
 	     }
-	     public float PairMamas(int attempts = 5)
-	     {
-		          bool match = false;
-		          int i = 0;
-		          int f = 0; //failed to find a match.
-		          foreach (var mum in mamas)
-		          {
-				float attemptsTotal = attempts + mum.personality.Conscientiousness.value + mum.personality.Extraversion.value;
-				if ((mum.lovers == 0 || !mum.ssd.isMonogamous) && mum.womb != null)
-				{
-					     foreach (var guy in papas)
-					     {
-						          if (!PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.lover]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.spouse]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.offspring]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.parent]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.kin]).Contains(guy) && !PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.incompatible]).Contains(guy) && i <= attemptsTotal)
-						          {//check if we're related by an int of our average conscientousness scores
-								float c = (mum.personality.Conscientiousness.value + guy.personality.Conscientiousness.value) / 2;
-								if (guy.isAlive && !PepoSystemMatchmaking.AreRelated(mum, guy, ((int)c)))
-								{
-
-									     if (PepoSystemMatchmaking.AmIAttracted(mum, guy, (int)mum.personality.Conscientiousness.value))
-									     {
-										          //if his agreeableness is below 7 we check if he likes me back
-										          RelationshipType type = RelationshipType.lover;
-										          //if we both have a security value above 8 and we don't have a spouse already we make us spouses
-										          if (mum.values[5].value >= 7 && guy.values[5].value >= 7 && mum.RelationshipLibrary[RelationshipType.spouse].Count == 0 && guy.RelationshipLibrary[RelationshipType.spouse].Count == 0)
-										          {
-												type = RelationshipType.spouse;
-										          }
-										          {
-												if (guy.personality.Agreeableness.value < 8)
-												{
-													     if (PepoSystemMatchmaking.AmIAttracted(guy, mum, (int)guy.personality.Conscientiousness.value))
-													     {
-														          PepoFactoryBonds.MutualRelationship(mum, guy, type);
-														          match = true;
-														          break;
-													     }
-												}
-												else
-												{
-													     //he likes me back automatically
-													     PepoFactoryBonds.MutualRelationship(mum, guy, type);
-													     match = true;
-													     break;
-												}
-										          }
-
-									     }
-									     else
-									     {
-										          //add him to my list of kin
-										          PepoFactoryBonds.MutualRelationship(mum, guy, RelationshipType.kin);
-										          i++;
-									     }
-								}
-						          }
-						          if (!match)
-						          {
-								f++;
-						          }
-					     }
-				}
-				i = 0;
-		          }
-		          return f;
-	     }
 
 	     private List<PepoData> ProcessGeneration()
 	     {
 		          var newGeneration = new List<PepoData>();
 		          List<PepoData> losses = new List<PepoData>();
+		          //run introductions
+		          foreach (var pep in Pepos.population)
+		          {
+				foreach (var p in PepoUtilitiesInteractions.MakeAcquaintences(pep, PepoUtilitiesPopulation.RemovePeposFromList(PepoUtilitiesPopulation.OthersInMyRoles(pep, Pepos), PepoUtilitiesBonds.ShipsToPepos(pep.RelationshipLibrary[RelationshipType.acquaintence])), generationSteps * 365 * 8))
+				{
+					     PepoUtilitiesBonds.AddRelation(pep, p, RelationshipType.peer);
+				}
+		          }
+		          //run interactions
 
 		          if (mamas.Count > 0 && papas.Count > 0)
 		          {
 				//if half of the mamas are unpaired, we bring in new people
-				if (PairMamas() > (mamas.Count / 2))
+				if (PepoUtilitiesPopulation.PairLovers(mamas, Pepos, 10) > (mamas.Count / 2))
 				{
 					     for (int i = 0; i < immigrantCount; i++)
 					     {
@@ -236,12 +180,15 @@ public class PepoPopManager : MonoBehaviour
 				//if mum is not nill and has potential baby daddies and is fertile and not already pregnant
 				if (mum != null && (mum.ssd.potBabyDaddies.Count >= 1 || mum.lovers >= 1) && mum.ssd.isFertile && mum.womb.Count <= 0)
 				{
-					     mum.ssd.potBabyDaddies.AddRange(PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.lover]));
-					     bool multipleBirth = Random.value < multipleBirthChance;
-					     bool identicalTwins = Random.value < identicalTwinsChance;
-					     int numSiblings = Random.Range(0, maxSiblings);
-					     mum.InitialisePregnancy(multipleBirth ? numSiblings : 1, null, identicalTwins);
-					     mum.ssd.isFertile = false; // Set fertility to false after conceiving
+					     mum.ssd.potBabyDaddies.AddRange(PepoUtilitiesPopulation.GetImpregnatingPepos(PepoUtilitiesBonds.ShipsToPepos(mum.RelationshipLibrary[RelationshipType.lover])));
+					     if (mum.ssd.potBabyDaddies.Count > 0)
+					     {
+						          bool multipleBirth = Random.value < multipleBirthChance;
+						          bool identicalTwins = Random.value < identicalTwinsChance;
+						          int numSiblings = Random.Range(0, maxSiblings);
+						          mum.InitialisePregnancy(multipleBirth ? numSiblings : 1, null, identicalTwins);
+						          mum.ssd.isFertile = false; // Set fertility to false after conceiving
+					     }
 				}
 				mums.RemoveAt(m); // Remove the processed mum to avoid reprocessing
 		          }

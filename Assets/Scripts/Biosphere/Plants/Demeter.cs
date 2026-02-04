@@ -19,6 +19,7 @@ public class Demeter : MonoBehaviour
 	     [Tooltip("Bounds for random plant placement")]
 	     public Vector2 xBounds = new Vector2(-8.33f, 8.33f);
 	     public Vector2 yBounds = new Vector2(-4.45f, 4.45f);
+	     public List<Vector2> claimedSpots;
 
 	     // Plant collections
 	     public List<Plant> AllPlants { get; private set; } = new List<Plant>();
@@ -41,8 +42,6 @@ public class Demeter : MonoBehaviour
 
 	     public void InitializePlants(List<TileData> locations)
 	     {
-
-
 		          Debug.Log($"InitializePlants called with initialPlantCount: {initialPlantCount}");
 		          BuildPlantDictionaries(locations);
 		          Debug.Log($"Demeter initialized with {AllPlants.Count} total plants, {ActivePlants.Count} active.");
@@ -53,18 +52,6 @@ public class Demeter : MonoBehaviour
 	     /// </summary>
 	     public Vector3 GetRandomPosition()
 	     {
-		          //get aposition that isn't already occupied by another plant.
-		          //        List<Vector3> spots = tileManager.FindPlantPositions();
-		          //        if (spots.Count > 0)
-		          //        {
-		          //foreach (var plant in PlantMap.Values)
-		          //{
-		          //	     if (spots.Contains(plant))
-		          //	     {
-		          //		          spots.Remove(plant);
-		          //	     }
-		          //}
-		          //        }
 		          return new Vector3(
 	         Random.Range(xBounds.x, xBounds.y), 0,
 	         Random.Range(yBounds.x, yBounds.y)
@@ -104,7 +91,6 @@ public class Demeter : MonoBehaviour
 		          PlantCurrentStage.Add(newPlant, "Seedling");
 		          newPlant.CurrentTile = tile;
 		          ActivatePlant(newPlant, plantPosition, index);
-
 	     }
 
 	     /// <summary>
@@ -112,7 +98,7 @@ public class Demeter : MonoBehaviour
 	     /// </summary>
 	     private void ActivatePlant(Plant plant, Vector3 position, int index)
 	     {
-		          Debug.Log($"ActivatePlant called for plant {index} at {position}");
+		          //  Debug.Log($"ActivatePlant called for plant {index} at {position}");
 
 		          // Create parent GameObject for all growth stages
 		          GameObject plantContainer = new GameObject($"Plant_{index}");
@@ -122,13 +108,13 @@ public class Demeter : MonoBehaviour
 		          // Add LSystem component
 		          plant.lSystem = plantContainer.AddComponent<LSystem>();
 
-		          Debug.Log($"LSystem component created: {plant.lSystem != null}");
+		          //  Debug.Log($"LSystem component created: {plant.lSystem != null}");
 
 		          // Initialize LSystem with the plant
-		          Debug.Log("Calling Initialize...");
+		          //  Debug.Log("Calling Initialize...");
 		          plant.lSystem.Initialize(plant, position);
 
-		          Debug.Log($"Initialize complete. Checking LSystem state...");
+		          //  Debug.Log($"Initialize complete. Checking LSystem state...");
 
 		          // Check if initialization was successful
 		          if (plant.lSystem == null)
@@ -136,10 +122,17 @@ public class Demeter : MonoBehaviour
 				Debug.LogError("LSystem failed to initialize!");
 				return;
 		          }
+		          else
+		          {
+				//iterate randomly between 3 and 7
+				plant.axiom = plant.lSystem.GenerateLSystem(plant.axiom, Random.Range(3, 9));
+				plant.lSystem.axiom = plant.axiom;
+				plant.lSystem.DrawPlant(plant.axiom, plantContainer);
+		          }
 
 		          // Add to active plants
 		          ActivePlants.Add(plant, plantContainer);
-		          Debug.Log($"Activated plant {index} at {position}");
+		          //    Debug.Log($"Activated plant {index} at {position}");
 	     }
 
 	     /// <summary>
@@ -271,6 +264,9 @@ public class Demeter : MonoBehaviour
 		          if (ActivePlants.TryGetValue(plant, out GameObject plantObj))
 		          {
 				Destroy(plantObj);
+				//add the plants mass to the soil organic matter of the tile it's on
+				plant.CurrentTile.composition.organicMaterial.ChangeMass(plant.CurrentTile.composition.organicMass + Plant_Utilities.CalculateDryMass(plant));
+				plant.CurrentTile.composition.water.ChangeMass(plant.CurrentTile.composition.organicMass + Plant_Utilities.CalculateWaterMass(plant));
 				ActivePlants.Remove(plant);
 				PlantCurrentStage.Remove(plant);
 		          }

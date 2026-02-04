@@ -6,1007 +6,1740 @@ public static class PepoLibraryRoles
 	     // security, conformity, tradition, benevolence, universalism 
 	     // Range: -1 (harmful) to +7 (live daily)
 	     // Personality traits: 0-10 with 5 being neutral
-	     public static List<PepoDataRoles> HunterGatherer = new List<PepoDataRoles>() {
-		          new PepoDataRoles(
-    "law speaker",
-    "Memorizes and recounts the band's traditional laws and precedents.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Honesty", 7f, 10f),
-	         new PepoRolePrerequisite("tradition", 3f, 7f),
-	         new PepoRolePrerequisite("stability", 2f, 7f),
-	         new PepoRolePrerequisite("dependability", 3f, 7f),
-	         new PepoRolePrerequisite("Age", 35f, 80f),
-    }, 0.01f, 0.02f,
-    new List<string>() {
-	         "mediator"
-    }
-),
-		          new PepoDataRoles(
-    "councillor",
-    "Elder or advisor who helps make major decisions for the band.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-	         new PepoRolePrerequisite("stability", 4f, 7f),
-	         new PepoRolePrerequisite("tradition", 4f, 7f),
-	         new PepoRolePrerequisite("Agreeableness", 4f, 8f),
-	         new PepoRolePrerequisite("Age", 30f, 80f),
-    }, 0.05f, 0.1f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "challenger",
-    "Formally questions leaders and decisions to test their merit.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Honesty", 7f, 10f),
-	         new PepoRolePrerequisite("Extraversion", 5f, 10f),
-	         new PepoRolePrerequisite("dominance", 3f, 7f),
-	         new PepoRolePrerequisite("curiosity", 4f, 7f),
-	         new PepoRolePrerequisite("Age", 25f, 70f),
-    }, 0f, 0.01f,
-    new List<string>() {
-	         "councillor"
-    }
-),
-		          new PepoDataRoles(
-    "scout",
-    "Explores and reconnoiters new areas for resources and threats.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Openness", 5f, 10f),
-	         new PepoRolePrerequisite("curiosity", 2f, 7f),
-	         new PepoRolePrerequisite("autonomy", 3f, 7f),
-	         new PepoRolePrerequisite("vitality", 5f, 7f),
-	         new PepoRolePrerequisite("Age", 12f, 50f),
-    }, 0.1f, 0.15f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "runner",
-    "Courier and messenger for the band over long distances.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("vitality", 3f, 7f),
-	         new PepoRolePrerequisite("dependability", 2f, 7f),
-	         new PepoRolePrerequisite("accomplishment", 3f, 7f),
-	         new PepoRolePrerequisite("autonomy", 3f, 7f),
-	         new PepoRolePrerequisite("Age", 11f, 50f),
-    }, 0.02f, 0.05f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "fisher",
-    "Catches fish using various methods (spear, net, line).",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Conscientiousness", 4f, 8f),
-	         new PepoRolePrerequisite("vitality", 3f, 7f),
-	         new PepoRolePrerequisite("stability", 3f, 7f),
-	         new PepoRolePrerequisite("excitement", 0f, 5f),
-	         new PepoRolePrerequisite("Age", 8f, 120f),
-    }, 0.02f, 0.05f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "ceremony leader",
-    "Leads major rites of passage and seasonal rituals.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Extraversion", 6f, 10f),
-	         new PepoRolePrerequisite("tradition", 5f, 7f),
-	         new PepoRolePrerequisite("cohesion", 2f, 7f),
-	         new PepoRolePrerequisite("Emotionality", 5f, 10f),
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-    }, 0.01f, 0.02f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "hunt leader",
-    "Plans and leads hunting expeditions.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Extraversion", 6f, 10f),
-	         new PepoRolePrerequisite("dominance", 4f, 7f),
-	         new PepoRolePrerequisite("dependability", 2f, 7f),
-	         new PepoRolePrerequisite("accomplishment", 4f, 7f),
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-    }, 0.02f, 0.03f,
-    new List<string>() {
-	         "animal tracker",
-	         "scout",
-	         "solo hunter"
-    }
-),
-		          new PepoDataRoles(
-    "midwife",
-    "Manages pregnancy, childbirth, and postnatal care.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("caring", 5f, 7f),
-	         new PepoRolePrerequisite("compassion", 3f, 7f),
-	         new PepoRolePrerequisite("stability", 2f, 7f),
-	         new PepoRolePrerequisite("dependability", 3f, 7f),
-	         new PepoRolePrerequisite("Emotionality", 5f, 10f),
-    }, 0.02f, 0.05f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "solo hunter",
-    "Hunts small to medium game alone with stealth and skill.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("autonomy", 3f, 7f),
-	         new PepoRolePrerequisite("vitality", 3f, 7f),
-	         new PepoRolePrerequisite("accomplishment", 3f, 7f),
-	         new PepoRolePrerequisite("safety", 2f, 5f),
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-	         new PepoRolePrerequisite("Age", 16f, 50f),
-    }, 0.05f, 0.1f,
-    new List<string>() {
-	         "aimer",
-	         "striker",
-	         "thrower",
-	         "animal tracker"
-    }
-),
-		          new PepoDataRoles(
-    "healer",
-    "Holistic practitioner treating illness and injury with multiple methods.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Conscientiousness", 7f, 10f),
-	         new PepoRolePrerequisite("caring", 3f, 7f),
-	         new PepoRolePrerequisite("compassion", 3f, 7f),
-	         new PepoRolePrerequisite("dependability", 3f, 7f),
-	         new PepoRolePrerequisite("Openness", 5f, 8f),
-	         new PepoRolePrerequisite("Emotionality", 4f, 8f),
-    }, 0.02f, 0.05f,
-    new List<string>() {
-	         "bonesetter",
-	         "midwife",
-	         "plant identifier",
-	         "mushroom identifier"
-    }
-),
-		          new PepoDataRoles(
-    "linguist",
-    "Learns and speaks the languages of neighboring bands.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Openness", 7f, 10f),
-	         new PepoRolePrerequisite("curiosity", 3f, 7f),
-	         new PepoRolePrerequisite("tolerance", 5f, 7f),
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-	         new PepoRolePrerequisite("Extraversion", 4f, 10f),
-    }, 0.01f, 0.02f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "gatherer",
-    "Collects plant foods, eggs, shellfish, and other staples.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Openness", 4f, 8f),
-	         new PepoRolePrerequisite("curiosity", 4f, 7f),
-	         new PepoRolePrerequisite("vitality", 3f, 7f),
-	         new PepoRolePrerequisite("preservation", 4f, 7f),
-	         new PepoRolePrerequisite("Conscientiousness", 4f, 8f),
-    }, 0.3f, 0.5f,
-    new List<string>() {
-	         "scout",
-	         "plant identifier"
-    }
-),
-		          new PepoDataRoles(
-    "enforcer",
-    "Upholds the band's decisions and rules through physical authority.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("dominance", 4f, 7f),
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-	         new PepoRolePrerequisite("obedience", 4f, 7f),
-	         new PepoRolePrerequisite("cohesion", 3f, 7f),
-	         new PepoRolePrerequisite("Extraversion", 4f, 8f),
-	         new PepoRolePrerequisite("Honesty", 6f, 10f),
-	         new PepoRolePrerequisite("Age", 18f, 50f),
-    }, 0.01f, 0.02f,
-    new List<string>() {
-	         "councillor",
-	         "law speaker"
-    }
-),
-		          new PepoDataRoles(
-    "trader",
-    "Facilitates the exchange of goods and ideas between bands.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Extraversion", 5f, 10f),
-	         new PepoRolePrerequisite("Agreeableness", 5f, 10f),
-	         new PepoRolePrerequisite("accumulation", 3f, 7f),
-	         new PepoRolePrerequisite("Honesty", 5f, 10f),
-	         new PepoRolePrerequisite("curiosity", 4f, 7f),
-	         new PepoRolePrerequisite("Age", 20f, 60f),
-    }, 0.005f, 0.01f,
-    new List<string>() {
-	         "envoy",
-	         "linguist"
-    }
-),
-		          new PepoDataRoles(
-    "envoy",
-    "Represents the band in formal interactions with other groups.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Extraversion", 5f, 10f),
-	         new PepoRolePrerequisite("Agreeableness", 5f, 10f),
-	         new PepoRolePrerequisite("tolerance", 5f, 7f),
-	         new PepoRolePrerequisite("Honesty", 5f, 10f),
-	         new PepoRolePrerequisite("curiosity", 4f, 7f),
-	         new PepoRolePrerequisite("Age", 20f, 60f),
-    }, 0.005f, 0.01f,
-    new List<string>() {
-	         "runner",
-	         "mediator"
-    }
-),
-		          new PepoDataRoles(
-    "boundary patrol",
-    "Monitors the band's territory for intruders and threats.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("dependability", 3f, 7f),
-	         new PepoRolePrerequisite("safety", 2f, 7f),
-	         new PepoRolePrerequisite("stability", 3f, 7f),
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-	         new PepoRolePrerequisite("vitality", 4f, 7f),
-	         new PepoRolePrerequisite("Extraversion", 0f, 7f),
-    }, 0.05f, 0.1f,
-    new List<string>() {
-	         "scout"
-    }
-),
-		          new PepoDataRoles(
-    "matchmaker",
-    "Fosters alliances and relationships through strategic partnerships.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Extraversion", 5f, 10f),
-	         new PepoRolePrerequisite("Agreeableness", 6f, 10f),
-	         new PepoRolePrerequisite("Emotionality", 4f, 8f),
-	         new PepoRolePrerequisite("cohesion", 4f, 7f),
-	         new PepoRolePrerequisite("compassion", 3f, 7f),
-    }, 0f, 0.01f,
-    new List<string>() {
-	         "mediator",
-	         "councillor"
-    }
-),
-		          new PepoDataRoles(
-    "butcher",
-    "Expertly and efficiently processes carcasses, honoring the animal.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-	         new PepoRolePrerequisite("vitality", 4f, 7f),
-	         new PepoRolePrerequisite("tradition", 3f, 7f),
-	         new PepoRolePrerequisite("preservation", 4f, 7f),
-	         new PepoRolePrerequisite("Emotionality", 2f, 6f),
-    }, 0.03f, 0.05f,
-    new List<string>() {
-	         "solo hunter",
-	         "team hunter"
-    }
-),
-		          new PepoDataRoles(
-    "animal tracker",
-    "Reads and interprets animal signs for hunting.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Openness", 5f, 10f),
-	         new PepoRolePrerequisite("curiosity", 4f, 7f),
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 8f),
-	         new PepoRolePrerequisite("autonomy", 4f, 7f),
-	         new PepoRolePrerequisite("excitement", 0f, 5f),
-    }, 0.05f, 0.1f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "driving animals",
-    "Directs game herds into traps or ambushes.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("accumulation", 3f, 7f),
-	         new PepoRolePrerequisite("dominance", 3f, 7f),
-	         new PepoRolePrerequisite("accomplishment", 3f, 7f),
-	         new PepoRolePrerequisite("Extraversion", 3f, 10f),
-	         new PepoRolePrerequisite("preservation", -1f, 5f),
-    }, 0.02f, 0.05f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "sky reader",
-    "Predicts weather and short-term climate patterns.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Openness", 5f, 10f),
-	         new PepoRolePrerequisite("curiosity", 2f, 7f),
-	         new PepoRolePrerequisite("Conscientiousness", 4f, 7f),
-	         new PepoRolePrerequisite("stability", 3f, 7f),
-	         new PepoRolePrerequisite("excitement", -1f, 4f),
-    }, 0.02f, 0.05f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "firekeeper",
-    "Master of creating, maintaining, and transporting fire.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Conscientiousness", 7f, 10f),
-	         new PepoRolePrerequisite("preservation", 3f, 7f),
-	         new PepoRolePrerequisite("stability", 1f, 7f),
-	         new PepoRolePrerequisite("dependability", 1f, 7f),
-	         new PepoRolePrerequisite("excitement", -1f, 4f),
-    }, 0.02f, 0.05f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "ancestor communer",
-    "Acts as a conduit to the wisdom and will of ancestors.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Emotionality", 6f, 10f),
-	         new PepoRolePrerequisite("tradition", 5f, 7f),
-	         new PepoRolePrerequisite("preservation", 3f, 7f),
-	         new PepoRolePrerequisite("Age", 40f, 120f),
-    }, 0.01f, 0.02f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "striker",
-    "Expert in close-quarter combat (club, spear).",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("vitality", 3f, 7f),
-	         new PepoRolePrerequisite("dominance", 3f, 6f),
-	         new PepoRolePrerequisite("accomplishment", 3f, 7f),
-	         new PepoRolePrerequisite("Age", 14f, 75f),
-    }, 0.05f, 0.1f,
-    new List<string>() {
-	         "aimer"
-    }
-),
-		          new PepoDataRoles(
-    "diver",
-    "Dives for shellfish, crustaceans, and other aquatic resources.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("vitality", 3f, 7f),
-	         new PepoRolePrerequisite("excitement", 4f, 7f),
-	         new PepoRolePrerequisite("autonomy", 4f, 7f),
-	         new PepoRolePrerequisite("Age", 14f, 45f),
-    }, 0.01f, 0.03f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "climber",
-    "Specialist in climbing trees or cliffs for food or vantage.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("vitality", 3f, 7f),
-	         new PepoRolePrerequisite("excitement", 4f, 7f),
-	         new PepoRolePrerequisite("autonomy", 4f, 7f),
-	         new PepoRolePrerequisite("Age", 12f, 40f),
-    }, 0.02f, 0.05f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "mediator",
-    "Resolves interpersonal disputes and conflicts.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Agreeableness", 7f, 10f),
-	         new PepoRolePrerequisite("Emotionality", 5f, 8f),
-	         new PepoRolePrerequisite("tolerance", 2f, 7f),
-	         new PepoRolePrerequisite("Honesty", 6f, 10f),
-    }, 0.02f, 0.03f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "musician",
-    "Creates and plays instruments for ritual and entertainment.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Openness", 6f, 10f),
-	         new PepoRolePrerequisite("curiosity", 1f, 7f),
-	         new PepoRolePrerequisite("cohesion", 3f, 7f),
-	         new PepoRolePrerequisite("Emotionality", 5f, 10f),
-    }, 0.02f, 0.05f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "star reader",
-    "Uses celestial bodies for navigation and marking time.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Openness", 6f, 10f),
-	         new PepoRolePrerequisite("curiosity", 3f, 7f),
-	         new PepoRolePrerequisite("tradition", 3f, 7f),
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-    }, 0.01f, 0.02f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "bee whisperer",
-    "Safely harvests honey and wax from wild bees.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Emotionality", 5f, 8f),
-	         new PepoRolePrerequisite("tolerance", 2f, 7f),
-	         new PepoRolePrerequisite("preservation", 4f, 7f),
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-    }, 0.01f, 0.02f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "painter",
-    "Creates cave paintings, body art, and object decoration.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Openness", 6f, 10f),
-	         new PepoRolePrerequisite("curiosity", 5f, 7f),
-	         new PepoRolePrerequisite("excitement", 4f, 7f),
-	         new PepoRolePrerequisite("Emotionality", 5f, 10f),
-    }, 0.01f, 0.03f,
-    new List<string>() {
-	         "dye maker"
-    }
-),
-		          new PepoDataRoles(
-    "pathfinder",
-    "Identifies routes between places. Master of navigation and territory.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Openness", 6f, 10f),
-	         new PepoRolePrerequisite("curiosity", 2f, 7f),
-	         new PepoRolePrerequisite("autonomy", 4f, 7f),
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-    }, 0.005f, 0.01f,
-    new List<string>() {
-	         "scout",
-	         "land reader",
-	         "star reader"
-    }
-),
-		          new PepoDataRoles(
-    "team hunter",
-    "Leads and executes complex group hunts for large game.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("cohesion", 2f, 7f),
-	         new PepoRolePrerequisite("Agreeableness", 5f, 8f),
-	         new PepoRolePrerequisite("dominance", 2f, 7f),
-	         new PepoRolePrerequisite("Extraversion", 5f, 10f),
-    }, 0.03f, 0.05f,
-    new List<string>() {
-	         "hunt leader",
-	         "coordinator"
-    }
-),
-		          new PepoDataRoles(
-    "storyteller",
-    "Keeps the history, myths, and identity of the band alive.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Extraversion", 6f, 10f),
-	         new PepoRolePrerequisite("Openness", 6f, 10f),
-	         new PepoRolePrerequisite("tradition", 1f, 7f),
-	         new PepoRolePrerequisite("Emotionality", 5f, 10f),
-    }, 0.02f, 0.05f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "trapper",
-    "Designs, sets, and maintains traps for game.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-	         new PepoRolePrerequisite("Openness", 4f, 10f),
-	         new PepoRolePrerequisite("stability", 3f, 7f),
-	         new PepoRolePrerequisite("autonomy", 5f, 7f),
-    }, 0.02f, 0.05f,
-    new List<string>() {
-	         "animal tracker"
-    }
-),
-		          new PepoDataRoles(
-    "nature communer",
-    "Connects with the natural world for spiritual insight.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Emotionality", 7f, 10f),
-	         new PepoRolePrerequisite("Openness", 6f, 10f),
-	         new PepoRolePrerequisite("curiosity", 4f, 7f),
-	         new PepoRolePrerequisite("preservation", 5f, 7f),
-    }, 0.01f, 0.02f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "jokester",
-    "Uses humor to relieve tension, critique, and entertain.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Extraversion", 5f, 10f),
-	         new PepoRolePrerequisite("excitement", 4f, 7f),
-	         new PepoRolePrerequisite("cohesion", 3f, 7f),
-	         new PepoRolePrerequisite("Emotionality", 4f, 8f),
-    }, 0.01f, 0.03f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "dancer",
-    "Leads and performs ritual and social dances.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("excitement", 3f, 7f),
-	         new PepoRolePrerequisite("Emotionality", 5f, 10f),
-	         new PepoRolePrerequisite("cohesion", 4f, 7f),
-	         new PepoRolePrerequisite("Extraversion", 4f, 8f),
-    }, 0.05f, 0.1f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
+	     public static List<PepoDataRoles> HunterGatherer = new List<PepoDataRoles>() {new PepoDataRoles(
     "dream interpreter",
     "Interprets dreams for spiritual guidance and decision-making.",
     "Hunter Gatherer Era",
     new List<PepoRolePrerequisite>()
     {
-	         new PepoRolePrerequisite("Openness", 7f, 10f),
-	         new PepoRolePrerequisite("Emotionality", 6f, 10f),
-	         new PepoRolePrerequisite("curiosity", 4f, 7f),
-	         new PepoRolePrerequisite("Extraversion", 4f, 8f),
-    }, 0.01f, 0.02f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "clay worker",
-    "Creates unfired pottery, figurines, and hearths.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Openness", 5f, 10f),
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-	         new PepoRolePrerequisite("accomplishment", 4f, 7f),
-	         new PepoRolePrerequisite("curiosity", 4f, 7f),
-    }, 0.02f, 0.05f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "plant identifier",
-    "Expert on edible, medicinal, and poisonous flora.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Openness", 6f, 10f),
-	         new PepoRolePrerequisite("curiosity", 3f, 7f),
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 8f),
-	         new PepoRolePrerequisite("preservation", 4f, 7f),
-    }, 0.05f, 0.1f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "meat preserver",
-    "Preserves meat for long-term storage.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
-	         new PepoRolePrerequisite("preservation", 5f, 7f),
-	         new PepoRolePrerequisite("dependability", 3f, 7f),
-	         new PepoRolePrerequisite("safety", 4f, 7f),
-    }, 0.02f, 0.05f,
-    new List<string>() {
-	         "food smoker",
-	         "food salter"
-    }
-),
-		          new PepoDataRoles(
-    "fermenter",
-    "Creates fermented foods and beverages.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
-	         new PepoRolePrerequisite("Openness", 5f, 10f),
-	         new PepoRolePrerequisite("curiosity", 3f, 7f),
-	         new PepoRolePrerequisite("indulgence", 4f, 7f),
-    }, 0.02f, 0.05f,
-    new List<string>() {
-	         "plant identifier"
-    }
-),
-		          new PepoDataRoles(
-    "dye maker",
-    "Creates pigments and dyes for decoration.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Openness", 5f, 10f),
-	         new PepoRolePrerequisite("curiosity", 2f, 7f),
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-	         new PepoRolePrerequisite("preservation", 3f, 7f),
+        new PepoRolePrerequisite("Openness", 7f, 10f),
+        new PepoRolePrerequisite("Emotionality", 6f, 10f),
+        new PepoRolePrerequisite("curiosity", 4f, 7f),
+        new PepoRolePrerequisite("Extraversion", 4f, 8f),
     }, 0.01f, 0.02f,
     new List<string>() {
-	         "plant identifier"
+        "innovator",
+        "councillor"
     }
 ),
-		          new PepoDataRoles(
-    "carer",
-    "Tends to the elderly, young, and infirm.",
+new PepoDataRoles(
+    "game maker",
+    "Creates games and play for leisure and skill development.",
     "Hunter Gatherer Era",
     new List<PepoRolePrerequisite>()
     {
-	         new PepoRolePrerequisite("caring", 3f, 7f),
-	         new PepoRolePrerequisite("compassion", 2f, 7f),
-	         new PepoRolePrerequisite("Emotionality", 5f, 8f),
-	         new PepoRolePrerequisite("dependability", 3f, 7f),
-    }, 0.05f, 0.1f,
-    new List<string>() // No prerequisites
+        new PepoRolePrerequisite("excitement", 4f, 7f),
+        new PepoRolePrerequisite("indulgence", 3f, 6f),
+        new PepoRolePrerequisite("cohesion", 3f, 6f),
+        new PepoRolePrerequisite("Openness", 5f, 9f),
+    }, 0.001f, 0.005f,
+    new List<string>() {
+        "entertainer"
+    }
 ),
-		          new PepoDataRoles(
-    "mushroom identifier",
-    "Expert on edible, medicinal, and poisonous fungi.",
+new PepoDataRoles(
+    "linguist",
+    "Learns and speaks the languages of neighboring bands.",
     "Hunter Gatherer Era",
     new List<PepoRolePrerequisite>()
     {
-	         new PepoRolePrerequisite("Openness", 6f, 10f),
-	         new PepoRolePrerequisite("curiosity", 3f, 7f),
-	         new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
-	         new PepoRolePrerequisite("safety", 3f, 7f),
+        new PepoRolePrerequisite("Openness", 7f, 10f),
+        new PepoRolePrerequisite("curiosity", 3f, 7f),
+        new PepoRolePrerequisite("tolerance", 5f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("Extraversion", 4f, 10f),
+    }, 0.01f, 0.02f,
+    new List<string>() {
+        "trader"
+    }
+),
+new PepoDataRoles(
+    "musician",
+    "Creates and plays instruments for ritual and entertainment.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Openness", 6f, 10f),
+        new PepoRolePrerequisite("curiosity", 1f, 7f),
+        new PepoRolePrerequisite("cohesion", 3f, 7f),
+        new PepoRolePrerequisite("Emotionality", 5f, 10f),
     }, 0.02f, 0.05f,
     new List<string>() // No prerequisites
 ),
-		          new PepoDataRoles(
-    "shelter builder",
-    "Constructs and maintains dwellings and communal structures.",
+new PepoDataRoles(
+    "painter",
+    "Creates cave paintings, body art, and object decoration.",
     "Hunter Gatherer Era",
     new List<PepoRolePrerequisite>()
     {
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-	         new PepoRolePrerequisite("safety", 4f, 7f),
-	         new PepoRolePrerequisite("stability", 3f, 7f),
-	         new PepoRolePrerequisite("accomplishment", 3f, 7f),
-    }, 0.05f, 0.1f,
-    new List<string>() // No prerequisites
+        new PepoRolePrerequisite("Openness", 6f, 10f),
+        new PepoRolePrerequisite("curiosity", 5f, 7f),
+        new PepoRolePrerequisite("excitement", 4f, 7f),
+        new PepoRolePrerequisite("Emotionality", 5f, 10f),
+    }, 0.01f, 0.03f,
+    new List<string>() {
+        "dye maker"
+    }
 ),
-		          new PepoDataRoles(
-    "bonesetter",
-    "Sets fractures and treats joint/muscle injuries.",
+new PepoDataRoles(
+    "ancestor communer",
+    "Acts as a conduit to the wisdom and will of ancestors.",
     "Hunter Gatherer Era",
     new List<PepoRolePrerequisite>()
     {
-	         new PepoRolePrerequisite("Conscientiousness", 7f, 10f),
-	         new PepoRolePrerequisite("caring", 2f, 7f),
-	         new PepoRolePrerequisite("stability", 3f, 7f),
-	         new PepoRolePrerequisite("Emotionality", 3f, 7f),
+        new PepoRolePrerequisite("Emotionality", 6f, 10f),
+        new PepoRolePrerequisite("tradition", 5f, 7f),
+        new PepoRolePrerequisite("preservation", 3f, 7f),
+        new PepoRolePrerequisite("Age", 12f, 200f),
     }, 0.01f, 0.02f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "teacher",
-    "Passes down skills, knowledge, and cultural norms to the young.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Openness", 5f, 10f),
-	         new PepoRolePrerequisite("caring", 2f, 7f),
-	         new PepoRolePrerequisite("dependability", 3f, 7f),
-	         new PepoRolePrerequisite("cohesion", 3f, 7f),
-    }, 0.1f, 0.15f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "coordinator",
-    "Organizes daily tasks and labor for the band.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Extraversion", 5f, 10f),
-	         new PepoRolePrerequisite("Agreeableness", 4f, 8f),
-	         new PepoRolePrerequisite("dependability", 2f, 7f),
-	         new PepoRolePrerequisite("accomplishment", 3f, 7f),
-    }, 0.02f, 0.03f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "aimer",
-    "Expert with projectile weapons (bow, atlatl).",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-	         new PepoRolePrerequisite("dependability", 2f, 7f),
-	         new PepoRolePrerequisite("accomplishment", 2f, 7f),
-	         new PepoRolePrerequisite("dominance", 1f, 7f),
-    }, 0.05f, 0.1f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "net maker",
-    "Weaves nets for fishing, trapping, and carrying.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
-	         new PepoRolePrerequisite("dependability", 2f, 7f),
-	         new PepoRolePrerequisite("excitement", -1f, 4f),
-    }, 0.03f, 0.05f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "food smoker",
-    "Smokes meat and fish to preserve them.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
-	         new PepoRolePrerequisite("preservation", 5f, 7f),
-	         new PepoRolePrerequisite("excitement", -1f, 4f),
-    }, 0.03f, 0.05f,
     new List<string>() {
-	         "firekeeper"
+        "storyteller",
+        "councillor",
+        "grief tender"
     }
 ),
-		          new PepoDataRoles(
-    "weaver",
-    "Creates textiles, mats, and complex fiber constructions.",
+new PepoDataRoles(
+    "grief tender",
+    "Holds space for and guides the community through loss.",
     "Hunter Gatherer Era",
     new List<PepoRolePrerequisite>()
     {
-	         new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
-	         new PepoRolePrerequisite("Openness", 5f, 8f),
-	         new PepoRolePrerequisite("excitement", -1f, 4f),
-    }, 0.03f, 0.05f,
+        new PepoRolePrerequisite("Honesty", 3f, 9f),
+        new PepoRolePrerequisite("Agreeableness", 6f, 10f),
+        new PepoRolePrerequisite("Emotionality", 4f, 9f),
+        new PepoRolePrerequisite("dependability", 2f, 7f),
+        new PepoRolePrerequisite("caring", 2f, 7f),
+        new PepoRolePrerequisite("compassion", 2f, 7f),
+    }, 0.02f, 0.05f,
     new List<string>() {
-	         "cordage maker"
+        "carer",
+        "mediator"
     }
 ),
-		          new PepoDataRoles(
-    "basketmaker",
-    "Weaves baskets and containers for storage and transport.",
+new PepoDataRoles(
+    "martyr",
+    "Willingly suffers or dies for a cause or the band.",
     "Hunter Gatherer Era",
     new List<PepoRolePrerequisite>()
     {
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-	         new PepoRolePrerequisite("Openness", 4f, 7f),
-	         new PepoRolePrerequisite("excitement", -1f, 4f),
-    }, 0.05f, 0.1f,
+        new PepoRolePrerequisite("tradition", 5f, 7f),
+        new PepoRolePrerequisite("preservation", 4f, 7f),
+        new PepoRolePrerequisite("humility", 5f, 7f),
+        new PepoRolePrerequisite("cohesion", 4f, 7f),
+    }, 0.001f, 0.005f,
     new List<string>() {
-	         "weaver"
+        "councillor"
     }
 ),
-		          new PepoDataRoles(
-    "tanner",
-    "Processes animal hides into usable leather.",
+new PepoDataRoles(
+    "nature communer",
+    "Connects with the natural world for spiritual insight.",
     "Hunter Gatherer Era",
     new List<PepoRolePrerequisite>()
     {
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-	         new PepoRolePrerequisite("preservation", 2f, 7f),
-	         new PepoRolePrerequisite("tolerance", 3f, 7f),
+        new PepoRolePrerequisite("Emotionality", 7f, 10f),
+        new PepoRolePrerequisite("Openness", 6f, 10f),
+        new PepoRolePrerequisite("curiosity", 4f, 7f),
+        new PepoRolePrerequisite("preservation", 5f, 7f),
+        new PepoRolePrerequisite("Age", 9f, 200f),
+    }, 0.01f, 0.02f,
+    new List<string>() {
+        "animal tracker",
+        "plant identifier"
+    }
+),
+new PepoDataRoles(
+    "sacrifice",
+    "Ritually killed or offered for the band's well-being.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("tradition", 5f, 7f),
+        new PepoRolePrerequisite("preservation", 4f, 7f),
+        new PepoRolePrerequisite("humility", 5f, 7f),
+        new PepoRolePrerequisite("obedience", 6f, 7f),
+    }, 0.001f, 0.005f,
+    new List<string>() {
+        "shaman"
+    }
+),
+new PepoDataRoles(
+    "spirit guide",
+    "Helps others navigate spiritual experiences.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Emotionality", 6f, 10f),
+        new PepoRolePrerequisite("compassion", 4f, 7f),
+        new PepoRolePrerequisite("preservation", 3f, 6f),
+        new PepoRolePrerequisite("tolerance", 4f, 7f),
+    }, 0.001f, 0.005f,
+    new List<string>() {
+        "vision quester",
+        "dream interpreter"
+    }
+),
+new PepoDataRoles(
+    "vision quester",
+    "Seeks spiritual visions through isolation and ordeal.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Emotionality", 7f, 10f),
+        new PepoRolePrerequisite("autonomy", 5f, 7f),
+        new PepoRolePrerequisite("curiosity", 4f, 7f),
+        new PepoRolePrerequisite("preservation", 3f, 7f),
+        new PepoRolePrerequisite("vitality", 4f, 7f),
+    }, 0.02f, 0.05f,
+    new List<string>() {
+        "mushroom identifier"
+    }
+),
+new PepoDataRoles(
+    "champion",
+    "Represents the band in contests or duels.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("dominance", 3f, 7f),
+        new PepoRolePrerequisite("accomplishment", 3f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 4f, 10f),
+        new PepoRolePrerequisite("Age", 18f, 45f),
+        new PepoRolePrerequisite("Agreeableness", 0f, 7f),
+    }, 0.001f, 0.005f,
+    new List<string>() {
+        "game maker"
+    }
+),
+new PepoDataRoles(
+    "dancer",
+    "Leads and performs ritual and social dances.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("excitement", 2f, 7f),
+        new PepoRolePrerequisite("Emotionality", 5f, 10f),
+        new PepoRolePrerequisite("Age", 6f, 80f),
+        new PepoRolePrerequisite("Extraversion", 7f, 10f),
+        new PepoRolePrerequisite("indulgence", 2f, 7f),
     }, 0.05f, 0.1f,
+    new List<string>() {
+        "musician"
+    }
+),
+new PepoDataRoles(
+    "hermit",
+    "Prefers solitude, away from the band.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Extraversion", 0f, 3f),
+        new PepoRolePrerequisite("Openness", 0f, 3f),
+        new PepoRolePrerequisite("autonomy", 3f, 7f),
+    }, 0.005f, 0.01f,
+    new List<string>() {
+        "challenger"
+    }
+),
+new PepoDataRoles(
+    "pilgrim",
+    "Travels to sacred sites for spiritual growth.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("tradition", 4f, 7f),
+        new PepoRolePrerequisite("preservation", 3f, 6f),
+        new PepoRolePrerequisite("humility", 4f, 7f),
+        new PepoRolePrerequisite("autonomy", 2f, 7f),
+        new PepoRolePrerequisite("Extraversion", 0f, 7f),
+    }, 0.001f, 0.005f,
+    new List<string>() {
+        "pathfinder"
+    }
+),
+new PepoDataRoles(
+    "ceremony leader",
+    "Leads major rites of passage and seasonal rituals.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Extraversion", 6f, 10f),
+        new PepoRolePrerequisite("tradition", 5f, 7f),
+        new PepoRolePrerequisite("cohesion", 2f, 7f),
+        new PepoRolePrerequisite("Emotionality", 5f, 10f),
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+    }, 0.01f, 0.02f,
+    new List<string>() {
+        "storyteller",
+        "councillor"
+    }
+),
+new PepoDataRoles(
+    "entertainer",
+    "Synthesizes various arts for celebration and leisure.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Extraversion", 5f, 10f),
+        new PepoRolePrerequisite("excitement", 2f, 7f),
+        new PepoRolePrerequisite("indulgence", 2f, 7f),
+        new PepoRolePrerequisite("cohesion", 2f, 7f),
+    }, 0.02f, 0.05f,
+    new List<string>() {
+        "jokester",
+        "singer",
+        "dancer"
+    }
+),
+new PepoDataRoles(
+    "heretic",
+    "Challenges established spiritual beliefs and practices.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("autonomy", 5f, 7f),
+        new PepoRolePrerequisite("excitement", 3f, 6f),
+        new PepoRolePrerequisite("tolerance", 2f, 5f),
+        new PepoRolePrerequisite("tradition", -1f, 3f),
+        new PepoRolePrerequisite("Age", 18f, 50f),
+    }, 0.001f, 0.005f,
+    new List<string>() {
+        "taboo breaker"
+    }
+),
+new PepoDataRoles(
+    "jokester",
+    "Uses humor to relieve tension, critique, and entertain.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Extraversion", 5f, 10f),
+        new PepoRolePrerequisite("excitement", 4f, 7f),
+        new PepoRolePrerequisite("cohesion", 3f, 7f),
+        new PepoRolePrerequisite("Emotionality", 4f, 8f),
+    }, 0.01f, 0.03f,
     new List<string>() // No prerequisites
 ),
-		          new PepoDataRoles(
+new PepoDataRoles(
     "singer",
     "Leads songs for ceremony, ritual, and collective work.",
     "Hunter Gatherer Era",
     new List<PepoRolePrerequisite>()
     {
-	         new PepoRolePrerequisite("Emotionality", 6f, 10f),
-	         new PepoRolePrerequisite("indulgence", 1f, 7f),
-	         new PepoRolePrerequisite("Extraversion", 4f, 10f),
+        new PepoRolePrerequisite("Emotionality", 6f, 10f),
+        new PepoRolePrerequisite("excitement", 1f, 7f),
+        new PepoRolePrerequisite("Extraversion", 7f, 10f),
+        new PepoRolePrerequisite("Age", 4f, 120f),
+        new PepoRolePrerequisite("indulgence", 2f, 7f),
     }, 0.02f, 0.05f,
     new List<string>() // No prerequisites
 ),
-		          new PepoDataRoles(
-    "thrower",
-    "Expert in the use of thrown weapons (spears, rocks).",
+new PepoDataRoles(
+    "storyteller",
+    "Keeps the history, myths, and identity of the band alive.",
     "Hunter Gatherer Era",
     new List<PepoRolePrerequisite>()
     {
-	         new PepoRolePrerequisite("vitality", 3f, 7f),
-	         new PepoRolePrerequisite("accomplishment", 3f, 7f),
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-    }, 0.05f, 0.1f,
-    new List<string>() {
-	         "aimer"
-    }
-),
-		          new PepoDataRoles(
-    "land reader",
-    "Interprets terrain, geology, and resources.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Openness", 5f, 10f),
-	         new PepoRolePrerequisite("curiosity", 2f, 7f),
-	         new PepoRolePrerequisite("preservation", 4f, 7f),
+        new PepoRolePrerequisite("Extraversion", 6f, 10f),
+        new PepoRolePrerequisite("Openness", 6f, 10f),
+        new PepoRolePrerequisite("tradition", 1f, 7f),
+        new PepoRolePrerequisite("Emotionality", 5f, 10f),
+        new PepoRolePrerequisite("Age", 14f, 200f),
     }, 0.02f, 0.05f,
     new List<string>() // No prerequisites
 ),
-		          new PepoDataRoles(
-    "stone knapper",
-    "The foundational skill of shaping stone into tools.",
+new PepoDataRoles(
+    "taboo breaker",
+    "Intentionally violates taboos for personal gain or to test boundaries.",
     "Hunter Gatherer Era",
     new List<PepoRolePrerequisite>()
     {
-	         new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
-	         new PepoRolePrerequisite("Openness", 4f, 7f),
-	         new PepoRolePrerequisite("accomplishment", 4f, 7f),
-    }, 0.1f, 0.15f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
-    "woodcarver",
-    "Crafts items from wood (bowls, handles, tools).",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-	         new PepoRolePrerequisite("Openness", 5f, 10f),
-	         new PepoRolePrerequisite("accomplishment", 4f, 7f),
-    }, 0.03f, 0.05f,
+        new PepoRolePrerequisite("excitement", 5f, 7f),
+        new PepoRolePrerequisite("autonomy", 5f, 7f),
+        new PepoRolePrerequisite("tradition", -1f, 3f),
+        new PepoRolePrerequisite("cohesion", -1f, 4f),
+    }, 0.001f, 0.005f,
     new List<string>() {
-	         "stone knapper"
+        "taboo setter"
     }
 ),
-		          new PepoDataRoles(
-    "soap maker",
-    "Makes cleansing agents from fats and ashes.",
+new PepoDataRoles(
+    "food safety",
+    "Ensures food is safe for consumption, preventing illness.",
     "Hunter Gatherer Era",
     new List<PepoRolePrerequisite>()
     {
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-	         new PepoRolePrerequisite("preservation", 3f, 7f),
-	         new PepoRolePrerequisite("safety", 4f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("Openness", 5f, 8f),
+        new PepoRolePrerequisite("autonomy", -1f, 5f),
+        new PepoRolePrerequisite("vitality", 2f, 7f),
+        new PepoRolePrerequisite("safety", 2f, 7f),
+        new PepoRolePrerequisite("stability", 2f, 7f),
+        new PepoRolePrerequisite("obedience", 2f, 7f),
     }, 0.01f, 0.02f,
     new List<string>() {
-	         "firekeeper",
-	         "clay worker",
+        "healer",
+        "meat preserver"
     }
 ),
-		          new PepoDataRoles(
-    "adhesive maker",
-    "Produces glues and tar from natural materials.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Conscientiousness", 7f, 10f),
-	         new PepoRolePrerequisite("Openness", 5f, 8f),
-	         new PepoRolePrerequisite("curiosity", 5f, 7f),
-    }, 0.01f, 0.02f,
-    new List<string>() {
-	         "plant identifier",
-	         "shelter builder",
-	         "toolmaker"
-    }
-),
-		          new PepoDataRoles(
-    "cordage maker",
-    "Creates string, rope, and cord from plant fibers and sinew.",
-    "Hunter Gatherer Era",
-    new List<PepoRolePrerequisite>()
-    {
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-	         new PepoRolePrerequisite("humility", 5f, 7f),
-	         new PepoRolePrerequisite("dependability", 3f, 7f),
-    }, 0.05f, 0.1f,
-    new List<string>() // No prerequisites
-),
-		          new PepoDataRoles(
+new PepoDataRoles(
     "food salter",
     "Uses salt (where available) to preserve food.",
     "Hunter Gatherer Era",
     new List<PepoRolePrerequisite>()
     {
-	         new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
-	         new PepoRolePrerequisite("preservation", 5f, 7f),
-	         new PepoRolePrerequisite("dependability", 3f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
+        new PepoRolePrerequisite("preservation", 5f, 7f),
+        new PepoRolePrerequisite("dependability", 3f, 7f),
     }, 0.01f, 0.02f,
     new List<string>() {
-	         "scout"
+        "scout",
+        "innovator",
+        "butcher"
     }
 ),
-		          new PepoDataRoles(
+new PepoDataRoles(
+    "food smoker",
+    "Smokes meat and fish to preserve them.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
+        new PepoRolePrerequisite("preservation", 5f, 7f),
+        new PepoRolePrerequisite("excitement", -1f, 4f),
+    }, 0.03f, 0.05f,
+    new List<string>() {
+        "firekeeper"
+    }
+),
+new PepoDataRoles(
+    "meat preserver",
+    "Preserves meat for long-term storage using multiple methods.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
+        new PepoRolePrerequisite("preservation", 5f, 7f),
+        new PepoRolePrerequisite("dependability", 3f, 7f),
+        new PepoRolePrerequisite("safety", 4f, 7f),
+    }, 0.02f, 0.05f,
+    new List<string>() {
+        "food smoker",
+        "food salter"
+    }
+),
+new PepoDataRoles(
+    "trapper",
+    "Designs, sets, and maintains traps for game.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("Openness", 4f, 10f),
+        new PepoRolePrerequisite("stability", 3f, 7f),
+        new PepoRolePrerequisite("autonomy", 5f, 7f),
+    }, 0.02f, 0.05f,
+    new List<string>() {
+        "animal tracker"
+    }
+),
+new PepoDataRoles(
+    "food worshipper",
+    "Leads rituals of gratitude for food and honored prey.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("tradition", 5f, 7f),
+        new PepoRolePrerequisite("Emotionality", 6f, 10f),
+        new PepoRolePrerequisite("cohesion", 4f, 7f),
+        new PepoRolePrerequisite("preservation", 3f, 7f),
+    }, 0.01f, 0.02f,
+    new List<string>() {
+        "meat preserver",
+        "ceremony leader"
+    }
+),
+new PepoDataRoles(
+    "butcher",
+    "Expertly and efficiently processes carcasses, honoring the animal.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("vitality", 4f, 7f),
+        new PepoRolePrerequisite("tradition", 3f, 7f),
+        new PepoRolePrerequisite("preservation", 4f, 7f),
+        new PepoRolePrerequisite("Emotionality", 2f, 6f),
+    }, 0.03f, 0.05f,
+    new List<string>() {
+        "solo hunter",
+        "team hunter"
+    }
+),
+new PepoDataRoles(
+    "diver",
+    "Dives for shellfish, crustaceans, and other aquatic resources.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("vitality", 3f, 7f),
+        new PepoRolePrerequisite("excitement", 4f, 7f),
+        new PepoRolePrerequisite("autonomy", 4f, 7f),
+        new PepoRolePrerequisite("Age", 14f, 45f),
+    }, 0.01f, 0.03f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "fisher",
+    "Catches fish using various methods (spear, net, line).",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 4f, 8f),
+        new PepoRolePrerequisite("vitality", 3f, 7f),
+        new PepoRolePrerequisite("stability", 3f, 7f),
+        new PepoRolePrerequisite("excitement", 0f, 5f),
+        new PepoRolePrerequisite("Age", 8f, 100f),
+    }, 0.02f, 0.05f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "solo hunter",
+    "Hunts small to medium game alone with stealth and skill.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("autonomy", 3f, 7f),
+        new PepoRolePrerequisite("vitality", 3f, 7f),
+        new PepoRolePrerequisite("accomplishment", 3f, 7f),
+        new PepoRolePrerequisite("safety", 2f, 5f),
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("Age", 16f, 70f),
+    }, 0.05f, 0.1f,
+    new List<string>() {
+        "aimer",
+        "striker",
+        "thrower",
+        "animal tracker"
+    }
+),
+new PepoDataRoles(
+    "team hunter",
+    "Participates in and executes complex group hunts for large game.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("cohesion", 2f, 7f),
+        new PepoRolePrerequisite("Agreeableness", 5f, 8f),
+        new PepoRolePrerequisite("dominance", 2f, 7f),
+        new PepoRolePrerequisite("Extraversion", 5f, 10f),
+    }, 0.03f, 0.05f,
+    new List<string>() {
+        "hunt leader"
+    }
+),
+new PepoDataRoles(
+    "bonesetter",
+    "Sets fractures and treats joint/muscle injuries.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 7f, 10f),
+        new PepoRolePrerequisite("caring", 2f, 7f),
+        new PepoRolePrerequisite("stability", 3f, 7f),
+        new PepoRolePrerequisite("Emotionality", 2f, 7f),
+    }, 0.01f, 0.02f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "healer",
+    "Holistic practitioner treating illness and injury with multiple methods.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 7f, 10f),
+        new PepoRolePrerequisite("caring", 3f, 7f),
+        new PepoRolePrerequisite("compassion", 3f, 7f),
+        new PepoRolePrerequisite("dependability", 3f, 7f),
+        new PepoRolePrerequisite("Openness", 5f, 8f),
+        new PepoRolePrerequisite("Emotionality", 4f, 8f),
+    }, 0.02f, 0.05f,
+    new List<string>() {
+        "bonesetter",
+        "midwife",
+        "plant identifier"
+    }
+),
+new PepoDataRoles(
+    "midwife",
+    "Manages pregnancy, childbirth, and postnatal care.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("caring", 5f, 7f),
+        new PepoRolePrerequisite("compassion", 3f, 7f),
+        new PepoRolePrerequisite("stability", 2f, 7f),
+        new PepoRolePrerequisite("dependability", 3f, 7f),
+        new PepoRolePrerequisite("Emotionality", 5f, 10f),
+    }, 0.02f, 0.05f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "pathfinder",
+    "Identifies routes between places. Master of navigation and territory.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Openness", 6f, 10f),
+        new PepoRolePrerequisite("curiosity", 2f, 7f),
+        new PepoRolePrerequisite("autonomy", 4f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+    }, 0.005f, 0.01f,
+    new List<string>() {
+        "scout",
+        "land reader",
+        "star reader"
+    }
+),
+new PepoDataRoles(
+    "mediator",
+    "Resolves interpersonal disputes and conflicts.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Agreeableness", 7f, 10f),
+        new PepoRolePrerequisite("Emotionality", 5f, 8f),
+        new PepoRolePrerequisite("tolerance", 2f, 7f),
+        new PepoRolePrerequisite("Honesty", 6f, 10f),
+    }, 0.02f, 0.03f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "shaman",
+    "Spiritual healer and guide, communicates with the spirit world.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Emotionality", 7f, 10f),
+        new PepoRolePrerequisite("tradition", 5f, 7f),
+        new PepoRolePrerequisite("preservation", 4f, 7f),
+        new PepoRolePrerequisite("compassion", 4f, 7f),
+    }, 0.001f, 0.005f,
+    new List<string>() {
+        "vision quester",
+        "spirit guide"
+    }
+),
+new PepoDataRoles(
+    "taboo setter",
+    "Identifies and proclaims prohibitions to maintain spiritual/social order.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Emotionality", 4f, 10f),
+        new PepoRolePrerequisite("Extraversion", 4f, 10f),
+        new PepoRolePrerequisite("Agreeableness", 0f, 7f),
+        new PepoRolePrerequisite("Openness", 0f, 7f),
+        new PepoRolePrerequisite("curiosity", -1f, 4f),
+        new PepoRolePrerequisite("obedience", 3f, 7f),
+        new PepoRolePrerequisite("cohesion", 3f, 7f),
+    }, 0.005f, 0.01f,
+    new List<string>() {
+        "morale keeper",
+        "challenger",
+        "inspirer"
+    }
+),
+new PepoDataRoles(
+    "boundary marker",
+    "Establishes and maintains territorial markers.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Openness", 0f, 7f),
+        new PepoRolePrerequisite("dominance", 2f, 7f),
+        new PepoRolePrerequisite("accumulation", 2f, 7f),
+        new PepoRolePrerequisite("stability", 2f, 7f),
+    }, 0.001f, 0.005f,
+    new List<string>() {
+        "councillor"
+    }
+),
+new PepoDataRoles(
+    "patrol",
+    "Monitors the band's territory for intruders and threats.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("dependability", 3f, 7f),
+        new PepoRolePrerequisite("safety", 2f, 7f),
+        new PepoRolePrerequisite("stability", 3f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("vitality", 4f, 7f),
+        new PepoRolePrerequisite("Extraversion", 0f, 7f),
+    }, 0.05f, 0.1f,
+    new List<string>() {
+        "scout",
+        "boundary marker"
+    }
+),
+new PepoDataRoles(
+    "caretaker",
+    "Tends to sacred sites or communal property.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("preservation", 5f, 7f),
+        new PepoRolePrerequisite("dependability", 4f, 7f),
+        new PepoRolePrerequisite("tradition", 3f, 6f),
+        new PepoRolePrerequisite("humility", 4f, 7f),
+    }, 0.001f, 0.005f,
+    new List<string>() {
+        "boundary marker"
+    }
+),
+new PepoDataRoles(
+    "enforcer",
+    "Upholds the band's decisions and rules through physical authority.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("dominance", 4f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("obedience", 4f, 7f),
+        new PepoRolePrerequisite("cohesion", 3f, 7f),
+        new PepoRolePrerequisite("Extraversion", 4f, 8f),
+        new PepoRolePrerequisite("Honesty", 6f, 10f),
+    }, 0.01f, 0.02f,
+    new List<string>() {
+        "councillor",
+        "law speaker"
+    }
+),
+new PepoDataRoles(
+    "guard",
+    "Watches over prisoners or valuable resources.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("dependability", 5f, 7f),
+        new PepoRolePrerequisite("obedience", 4f, 7f),
+        new PepoRolePrerequisite("safety", 4f, 7f),
+        new PepoRolePrerequisite("Age", 15f, 80f),
+    }, 0.001f, 0.005f,
+    new List<string>() {
+        "enforcer",
+        "boundary marker"
+    }
+),
+new PepoDataRoles(
+    "nomad",
+    "Wanders from place to place, not tied to one band.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("autonomy", 5f, 7f),
+        new PepoRolePrerequisite("excitement", 4f, 7f),
+        new PepoRolePrerequisite("vitality", 4f, 7f),
+        new PepoRolePrerequisite("tolerance", 3f, 6f),
+    }, 0.001f, 0.005f,
+    new List<string>() {
+        "pathfinder",
+        "challenger"
+    }
+),
+new PepoDataRoles(
+    "prisoner",
+    "Captive from another band, may be enslaved or held for exchange.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("safety", 1f, 7f),
+        new PepoRolePrerequisite("Agreeableness", 1f, 10f),
+        new PepoRolePrerequisite("obedience", 5f, 7f),
+        new PepoRolePrerequisite("preservation", 3f, 6f),
+    }, 0.001f, 0.005f,
+    new List<string>() {
+        "shelter builder",
+        "guard",
+        "law speaker"
+    }
+),
+new PepoDataRoles(
+    "advisor",
+    "Provides counsel to leaders and the band.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
+        new PepoRolePrerequisite("tradition", 4f, 7f),
+        new PepoRolePrerequisite("stability", 4f, 7f),
+        new PepoRolePrerequisite("dependability", 5f, 7f),
+    }, 0.001f, 0.005f,
+    new List<string>() {
+        "councillor"
+    }
+),
+new PepoDataRoles(
+    "advocate",
+    "Speaks for the interests of the voiceless or marginalized in the band.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Extraversion", 4f, 10f),
+        new PepoRolePrerequisite("Agreeableness", 2f, 8f),
+        new PepoRolePrerequisite("Conscientiousness", 2f, 10f),
+        new PepoRolePrerequisite("Openness", 2f, 8f),
+    }, 0.01f, 0.02f,
+    new List<string>() {
+        "mediator",
+        "councillor"
+    }
+),
+new PepoDataRoles(
+    "carer",
+    "Tends to the elderly, young, and infirm.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("caring", 3f, 7f),
+        new PepoRolePrerequisite("compassion", 2f, 7f),
+        new PepoRolePrerequisite("Emotionality", 5f, 8f),
+        new PepoRolePrerequisite("dependability", 3f, 7f),
+    }, 0.05f, 0.1f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "challenger",
+    "Formally questions leaders and decisions to test their merit.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Honesty", 7f, 10f),
+        new PepoRolePrerequisite("Extraversion", 5f, 10f),
+        new PepoRolePrerequisite("dominance", 3f, 7f),
+        new PepoRolePrerequisite("curiosity", 4f, 7f),
+    }, 0f, 0.01f,
+    new List<string>() {
+        "innovator",
+        "councillor"
+    }
+),
+new PepoDataRoles(
+    "commander",
+    "Takes ultimate authority in times of conflict or crisis.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Extraversion", 3f, 10f),
+        new PepoRolePrerequisite("autonomy", 2f, 5f),
+        new PepoRolePrerequisite("dominance", 2f, 7f),
+        new PepoRolePrerequisite("obedience", 2f, 7f),
+        new PepoRolePrerequisite("cohesion", 2f, 7f),
+    }, 0.005f, 0.01f,
+    new List<string>() {
+        "hunt leader",
+        "councillor"
+    }
+),
+new PepoDataRoles(
+    "councillor",
+    "Elder or advisor who helps make major decisions for the band.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("stability", 4f, 7f),
+        new PepoRolePrerequisite("tradition", 4f, 7f),
+        new PepoRolePrerequisite("Agreeableness", 4f, 8f),
+    }, 0.05f, 0.1f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "curriculum setter",
+    "Determines what knowledge and skills are essential to teach the next generation.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Extraversion", 4f, 10f),
+        new PepoRolePrerequisite("Agreeableness", 2f, 8f),
+        new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
+        new PepoRolePrerequisite("Openness", 2f, 8f),
+        new PepoRolePrerequisite("accomplishment", 3f, 7f),
+        new PepoRolePrerequisite("stability", 3f, 7f),
+        new PepoRolePrerequisite("cohesion", 3f, 7f),
+    }, 0.005f, 0.01f,
+    new List<string>() {
+        "teacher",
+        "councillor"
+    }
+),
+new PepoDataRoles(
+    "envoy",
+    "Represents the band in formal interactions with other groups.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Extraversion", 5f, 10f),
+        new PepoRolePrerequisite("Agreeableness", 5f, 10f),
+        new PepoRolePrerequisite("tolerance", 5f, 7f),
+        new PepoRolePrerequisite("Honesty", 5f, 10f),
+        new PepoRolePrerequisite("curiosity", 4f, 7f),
+        new PepoRolePrerequisite("Age", 12f, 68f),
+    }, 0.005f, 0.01f,
+    new List<string>() {
+        "runner",
+        "mediator"
+    }
+),
+new PepoDataRoles(
+    "hunt leader",
+    "Plans and leads hunting expeditions.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Extraversion", 6f, 10f),
+        new PepoRolePrerequisite("dominance", 4f, 7f),
+        new PepoRolePrerequisite("dependability", 2f, 7f),
+        new PepoRolePrerequisite("accomplishment", 4f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+    }, 0.02f, 0.03f,
+    new List<string>() {
+        "animal tracker",
+        "scout",
+        "solo hunter",
+        "coordinator"
+    }
+),
+new PepoDataRoles(
+    "law speaker",
+    "Memorizes and recounts the band's traditional laws and precedents.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("tradition", 3f, 7f),
+        new PepoRolePrerequisite("obedience", 3f, 7f),
+        new PepoRolePrerequisite("stability", 2f, 7f),
+        new PepoRolePrerequisite("dependability", 3f, 7f),
+        new PepoRolePrerequisite("Age", 14f, 200f),
+    }, 0.01f, 0.02f,
+    new List<string>() {
+        "mediator",
+        "councillor"
+    }
+),
+new PepoDataRoles(
+    "matchmaker",
+    "Fosters alliances and relationships through strategic partnerships.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Extraversion", 5f, 10f),
+        new PepoRolePrerequisite("Agreeableness", 6f, 10f),
+        new PepoRolePrerequisite("Emotionality", 4f, 8f),
+        new PepoRolePrerequisite("cohesion", 4f, 7f),
+        new PepoRolePrerequisite("compassion", 3f, 7f),
+    }, 0f, 0.01f,
+    new List<string>() {
+        "mediator",
+        "councillor"
+    }
+),
+new PepoDataRoles(
+    "poll taker",
+    "Gauges community sentiment on important matters before decisions.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Extraversion", 4f, 10f),
+        new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
+        new PepoRolePrerequisite("Openness", 6f, 10f),
+        new PepoRolePrerequisite("curiosity", 3f, 7f),
+        new PepoRolePrerequisite("stability", 3f, 7f),
+        new PepoRolePrerequisite("obedience", 1f, 7f),
+        new PepoRolePrerequisite("cohesion", 3f, 7f),
+    }, 0.005f, 0.01f,
+    new List<string>() {
+        "councillor",
+        "mediator"
+    }
+),
+new PepoDataRoles(
+    "teacher",
+    "Passes down skills, knowledge, and cultural norms to the young.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Extraversion", 2f, 10f),
+        new PepoRolePrerequisite("Openness", 5f, 10f),
+        new PepoRolePrerequisite("caring", 2f, 7f),
+        new PepoRolePrerequisite("dependability", 3f, 7f),
+        new PepoRolePrerequisite("cohesion", 3f, 7f),
+    }, 0.1f, 0.15f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "trader",
+    "Facilitates the exchange of goods and ideas between bands.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Extraversion", 5f, 10f),
+        new PepoRolePrerequisite("Agreeableness", 5f, 10f),
+        new PepoRolePrerequisite("accumulation", 3f, 7f),
+        new PepoRolePrerequisite("Honesty", 5f, 10f),
+        new PepoRolePrerequisite("curiosity", 4f, 7f),
+    }, 0.005f, 0.01f,
+    new List<string>() {
+        "envoy",
+        "linguist"
+    }
+),
+new PepoDataRoles(
+    "animal tracker",
+    "Reads and interprets animal signs for hunting.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Openness", 5f, 10f),
+        new PepoRolePrerequisite("curiosity", 4f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 5f, 8f),
+        new PepoRolePrerequisite("autonomy", 4f, 7f),
+        new PepoRolePrerequisite("excitement", 0f, 5f),
+    }, 0.05f, 0.1f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "firekeeper",
+    "Master of creating, maintaining, and transporting fire.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 7f, 10f),
+        new PepoRolePrerequisite("preservation", 3f, 7f),
+        new PepoRolePrerequisite("stability", 1f, 7f),
+        new PepoRolePrerequisite("dependability", 1f, 7f),
+        new PepoRolePrerequisite("excitement", -1f, 4f),
+    }, 0.02f, 0.05f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "innovator",
+    "Discovers new roles, tasks, and uses for materials.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Openness", 7f, 10f),
+        new PepoRolePrerequisite("curiosity", 3f, 7f),
+        new PepoRolePrerequisite("autonomy", 3f, 7f),
+    }, 0.005f, 0.01f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "land reader",
+    "Interprets terrain, geology, and resources.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Openness", 5f, 10f),
+        new PepoRolePrerequisite("curiosity", 2f, 7f),
+        new PepoRolePrerequisite("preservation", 4f, 7f),
+    }, 0.02f, 0.05f,
+    new List<string>() {
+        "scout"
+    }
+),
+new PepoDataRoles(
+    "mushroom identifier",
+    "Expert on edible, medicinal, and poisonous fungi.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Openness", 6f, 10f),
+        new PepoRolePrerequisite("curiosity", 3f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
+        new PepoRolePrerequisite("safety", 3f, 7f),
+    }, 0.02f, 0.05f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "plant identifier",
+    "Expert on edible, medicinal, and poisonous flora.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Openness", 6f, 10f),
+        new PepoRolePrerequisite("curiosity", 3f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 5f, 8f),
+        new PepoRolePrerequisite("preservation", 4f, 7f),
+    }, 0.05f, 0.1f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "sky reader",
+    "Predicts weather and short-term climate patterns.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Openness", 5f, 10f),
+        new PepoRolePrerequisite("curiosity", 2f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 4f, 7f),
+        new PepoRolePrerequisite("stability", 3f, 7f),
+        new PepoRolePrerequisite("excitement", -1f, 4f),
+    }, 0.02f, 0.05f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "star reader",
+    "Uses celestial bodies for navigation and marking time.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Openness", 6f, 10f),
+        new PepoRolePrerequisite("curiosity", 3f, 7f),
+        new PepoRolePrerequisite("tradition", 3f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+    }, 0.01f, 0.02f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "social smoother",
+    "Ensures social harmony during collective tasks and movements.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Agreeableness", 6f, 10f),
+        new PepoRolePrerequisite("cohesion", 5f, 7f),
+        new PepoRolePrerequisite("tolerance", 4f, 7f),
+        new PepoRolePrerequisite("Emotionality", 5f, 9f),
+        new PepoRolePrerequisite("safety", 3f, 6f),
+    }, 0.02f, 0.03f,
+    new List<string>() {
+        "mediator",
+        "coordinator"
+    }
+),
+new PepoDataRoles(
+    "attacker",
+    "Specializes in offensive actions during conflicts.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Honesty", 0f, 7f),
+        new PepoRolePrerequisite("Emotionality", 0f, 6f),
+        new PepoRolePrerequisite("Extraversion", 4f, 10f),
+        new PepoRolePrerequisite("Conscientiousness", 3f, 7f),
+        new PepoRolePrerequisite("dominance", 2f, 7f),
+        new PepoRolePrerequisite("safety", -1f, 3f),
+    }, 0.05f, 0.1f,
+    new List<string>() {
+        "striker",
+        "thrower"
+    }
+),
+new PepoDataRoles(
+    "climber",
+    "Specialist in climbing trees or cliffs for food or vantage.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("vitality", 3f, 7f),
+        new PepoRolePrerequisite("excitement", 4f, 7f),
+        new PepoRolePrerequisite("autonomy", 4f, 7f),
+        new PepoRolePrerequisite("Age", 12f, 40f),
+    }, 0.02f, 0.05f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "defender",
+    "Specializes in defensive actions to protect the band's people and assets.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Honesty", 3f, 10f),
+        new PepoRolePrerequisite("Extraversion", 3f, 10f),
+        new PepoRolePrerequisite("Conscientiousness", 4f, 10f),
+        new PepoRolePrerequisite("dominance", 2f, 6f),
+        new PepoRolePrerequisite("safety", 1f, 5f),
+        new PepoRolePrerequisite("stability", 1f, 7f),
+        new PepoRolePrerequisite("dependability", 1f, 7f),
+    }, 0.05f, 0.1f,
+    new List<string>() {
+        "protector",
+        "enforcer"
+    }
+),
+new PepoDataRoles(
+    "gatherer",
+    "Collects plant foods, eggs, shellfish, and other staples.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Openness", 4f, 8f),
+        new PepoRolePrerequisite("curiosity", 4f, 7f),
+        new PepoRolePrerequisite("vitality", 3f, 7f),
+        new PepoRolePrerequisite("preservation", 4f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 4f, 8f),
+    }, 0.3f, 0.5f,
+    new List<string>() {
+        "scout",
+        "plant identifier"
+    }
+),
+new PepoDataRoles(
+    "runner",
+    "Courier and messenger for the band over long distances.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("vitality", 3f, 7f),
+        new PepoRolePrerequisite("dependability", 2f, 7f),
+        new PepoRolePrerequisite("accomplishment", 3f, 7f),
+        new PepoRolePrerequisite("autonomy", 3f, 7f),
+        new PepoRolePrerequisite("Age", 11f, 50f),
+    }, 0.02f, 0.05f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "scout",
+    "Explores and reconnoiters new areas for resources and threats.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Openness", 5f, 10f),
+        new PepoRolePrerequisite("curiosity", 2f, 7f),
+        new PepoRolePrerequisite("autonomy", 3f, 7f),
+        new PepoRolePrerequisite("vitality", 5f, 7f),
+        new PepoRolePrerequisite("Age", 12f, 50f),
+    }, 0.1f, 0.15f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
     "water gatherer",
     "Ensures a clean and reliable water supply.",
     "Hunter Gatherer Era",
     new List<PepoRolePrerequisite>()
     {
-	         new PepoRolePrerequisite("dependability", 3f, 7f),
-	         new PepoRolePrerequisite("preservation", 4f, 7f),
-	         new PepoRolePrerequisite("Conscientiousness", 4f, 8f),
+        new PepoRolePrerequisite("dependability", 3f, 7f),
+        new PepoRolePrerequisite("preservation", 4f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 4f, 8f),
     }, 0.05f, 0.1f,
     new List<string>() // No prerequisites
 ),
-		          new PepoDataRoles(
+new PepoDataRoles(
+    "apprentice",
+    "Learning from a master of any role.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Agreeableness", 3f, 10f),
+        new PepoRolePrerequisite("Openness", 2f, 10f),
+        new PepoRolePrerequisite("Conscientiousness", 3f, 10f),
+        new PepoRolePrerequisite("autonomy", -1f, 5f),
+        new PepoRolePrerequisite("tradition", 0f, 7f),
+        new PepoRolePrerequisite("stability", 0f, 7f),
+        new PepoRolePrerequisite("obedience", 0f, 7f),
+    }, 0.1f, 0.3f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "coordinator",
+    "Organizes daily tasks and labor for the band.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Extraversion", 5f, 10f),
+        new PepoRolePrerequisite("Agreeableness", 4f, 8f),
+        new PepoRolePrerequisite("dependability", 2f, 7f),
+        new PepoRolePrerequisite("accomplishment", 3f, 7f),
+    }, 0.02f, 0.03f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "secret collecter",
+    "Gathers and safeguards secret knowledge (e.g., hidden paths, taboos).",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Honesty", 0f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
+        new PepoRolePrerequisite("safety", 4f, 7f),
+        new PepoRolePrerequisite("curiosity", 4f, 7f),
+    }, 0.001f, 0.005f,
+    new List<string>() {
+        "challenger"
+    }
+),
+new PepoDataRoles(
+    "server",
+    "Distributes food and resources. Serves community needs.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Honesty", 6f, 10f),
+        new PepoRolePrerequisite("Extraversion", 4f, 10f),
+        new PepoRolePrerequisite("Agreeableness", 3f, 9f),
+        new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
+        new PepoRolePrerequisite("accumulation", -1f, 5f),
+        new PepoRolePrerequisite("stability", 3f, 7f),
+        new PepoRolePrerequisite("dependability", 3f, 7f),
+    }, 0.05f, 0.1f,
+    new List<string>() {
+        "carer",
+        "coordinator"
+    }
+),
+new PepoDataRoles(
+    "adhesive maker",
+    "Produces glues and tar from natural materials.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 7f, 10f),
+        new PepoRolePrerequisite("Openness", 5f, 8f),
+        new PepoRolePrerequisite("curiosity", 5f, 7f),
+    }, 0.01f, 0.02f,
+    new List<string>() {
+        "plant identifier"
+    }
+),
+new PepoDataRoles(
+    "bee whisperer",
+    "Safely harvests honey and wax from wild bees.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Emotionality", 0f, 8f),
+        new PepoRolePrerequisite("excitement", 2f, 7f),
+        new PepoRolePrerequisite("preservation", 4f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+    }, 0.01f, 0.02f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "clay worker",
+    "Creates unfired pottery, figurines, and hearths.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Openness", 5f, 10f),
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("accomplishment", 4f, 7f),
+        new PepoRolePrerequisite("curiosity", 4f, 7f),
+    }, 0.02f, 0.05f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "dye maker",
+    "Creates pigments and dyes for decoration.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Openness", 5f, 10f),
+        new PepoRolePrerequisite("curiosity", 2f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("preservation", 3f, 7f),
+    }, 0.01f, 0.02f,
+    new List<string>() {
+        "plant identifier"
+    }
+),
+new PepoDataRoles(
+    "fermenter",
+    "Creates fermented foods and beverages.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
+        new PepoRolePrerequisite("Openness", 5f, 10f),
+        new PepoRolePrerequisite("curiosity", 3f, 7f),
+        new PepoRolePrerequisite("indulgence", 4f, 7f),
+    }, 0.02f, 0.05f,
+    new List<string>() {
+        "plant identifier",
+        "food safety"
+    }
+),
+new PepoDataRoles(
+    "soap maker",
+    "Makes cleansing agents from fats and ashes.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("preservation", 3f, 7f),
+        new PepoRolePrerequisite("safety", 4f, 7f),
+    }, 0.01f, 0.02f,
+    new List<string>() {
+        "firekeeper",
+        "clay worker"
+    }
+),
+new PepoDataRoles(
+    "stone knapper",
+    "The foundational skill of shaping stone into tools.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
+        new PepoRolePrerequisite("Openness", 4f, 7f),
+        new PepoRolePrerequisite("accomplishment", 4f, 7f),
+    }, 0.1f, 0.15f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "weaver",
+    "Creates textiles, mats, and complex fiber constructions.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
+        new PepoRolePrerequisite("Openness", 5f, 8f),
+        new PepoRolePrerequisite("excitement", -1f, 4f),
+    }, 0.03f, 0.05f,
+    new List<string>() {
+        "cordage maker"
+    }
+),
+new PepoDataRoles(
+    "woodcarver",
+    "Crafts items from wood (bowls, handles, tools).",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("Openness", 5f, 10f),
+        new PepoRolePrerequisite("accomplishment", 4f, 7f),
+    }, 0.03f, 0.05f,
+    new List<string>() {
+        "stone knapper"
+    }
+),
+new PepoDataRoles(
+    "mark maker",
+    "Creates personal/ritual marks that carry emotional weight (tattoos, scarification).",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Emotionality", 6f, 10f),
+        new PepoRolePrerequisite("tradition", 4f, 7f),
+        new PepoRolePrerequisite("preservation", 3f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("humility", 4f, 7f),
+    }, 0.01f, 0.02f,
+    new List<string>() {
+        "painter",
+        "clay worker"
+    }
+),
+new PepoDataRoles(
+    "basketmaker",
+    "Weaves baskets and containers for storage and transport.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("Openness", 4f, 7f),
+        new PepoRolePrerequisite("excitement", -1f, 4f),
+    }, 0.05f, 0.1f,
+    new List<string>() {
+        "weaver"
+    }
+),
+new PepoDataRoles(
+    "cordage maker",
+    "Creates string, rope, and cord from plant fibers and sinew.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("humility", 5f, 7f),
+        new PepoRolePrerequisite("dependability", 3f, 7f),
+    }, 0.05f, 0.1f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
     "garment maker",
     "Crafts clothing and footwear from hides and fibers.",
     "Hunter Gatherer Era",
     new List<PepoRolePrerequisite>()
     {
-	         new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
-	         new PepoRolePrerequisite("Openness", 4f, 7f),
-	         new PepoRolePrerequisite("dependability", 3f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("Openness", 4f, 7f),
+        new PepoRolePrerequisite("dependability", 3f, 7f),
     }, 0.05f, 0.1f,
     new List<string>() {
-	         "tanner",
-	         "cordage maker"
+        "tanner",
+        "cordage maker"
     }
 ),
-		          new PepoDataRoles(
+new PepoDataRoles(
+    "net maker",
+    "Weaves nets for fishing, trapping, and carrying.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
+        new PepoRolePrerequisite("dependability", 2f, 7f),
+        new PepoRolePrerequisite("excitement", -1f, 4f),
+    }, 0.03f, 0.05f,
+    new List<string>() {
+        "cordage maker"
+    }
+),
+new PepoDataRoles(
+    "shelter builder",
+    "Constructs and maintains dwellings and communal structures.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("safety", 4f, 7f),
+        new PepoRolePrerequisite("stability", 3f, 7f),
+        new PepoRolePrerequisite("accomplishment", 3f, 7f),
+    }, 0.05f, 0.1f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "tanner",
+    "Processes animal hides into usable leather.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("preservation", 2f, 7f),
+        new PepoRolePrerequisite("tolerance", 3f, 7f),
+    }, 0.05f, 0.1f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
     "toolmaker",
     "Crafts and repairs essential stone and bone tools.",
     "Hunter Gatherer Era",
     new List<PepoRolePrerequisite>()
     {
-	         new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
-	         new PepoRolePrerequisite("accomplishment", 3f, 7f),
-	         new PepoRolePrerequisite("Openness", 4f, 8f),
+        new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
+        new PepoRolePrerequisite("accomplishment", 3f, 7f),
+        new PepoRolePrerequisite("Openness", 4f, 8f),
     }, 0.05f, 0.1f,
     new List<string>() {
-	         "stone knapper"
+        "stone knapper"
     }
 ),
-		          new PepoDataRoles(
-    "apprentice",
-    "learning from someone",
+new PepoDataRoles(
+    "communal crafter",
+    "Organizes and leads group crafting sessions for bonding and production.",
     "Hunter Gatherer Era",
     new List<PepoRolePrerequisite>()
     {
-    }, 0.1f, 0.3f,
+        new PepoRolePrerequisite("Extraversion", 4f, 10f),
+        new PepoRolePrerequisite("Agreeableness", 3f, 10f),
+        new PepoRolePrerequisite("Conscientiousness", 4f, 10f),
+        new PepoRolePrerequisite("autonomy", -1f, 5f),
+        new PepoRolePrerequisite("accomplishment", 2f, 7f),
+        new PepoRolePrerequisite("stability", 2f, 7f),
+        new PepoRolePrerequisite("cohesion", 2f, 7f),
+    }, 0.02f, 0.05f,
+    new List<string>() {
+        "basketmaker",
+        "weaver"
+    }
+),
+new PepoDataRoles(
+    "analyst",
+    "Studies past actions and outcomes to improve future tactics.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
+        new PepoRolePrerequisite("curiosity", 5f, 7f),
+        new PepoRolePrerequisite("accomplishment", 4f, 7f),
+        new PepoRolePrerequisite("stability", 3f, 6f),
+        new PepoRolePrerequisite("obedience", 2f, 5f),
+        new PepoRolePrerequisite("Age", 25f, 60f),
+    }, 0.01f, 0.02f,
     new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "driving animals",
+    "Directs game herds into traps or ambushes.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("accumulation", 3f, 7f),
+        new PepoRolePrerequisite("dominance", 3f, 7f),
+        new PepoRolePrerequisite("accomplishment", 3f, 7f),
+        new PepoRolePrerequisite("Extraversion", 3f, 10f),
+        new PepoRolePrerequisite("preservation", -1f, 5f),
+    }, 0.02f, 0.05f,
+    new List<string>() {
+        "animal tracker",
+        "analyst",
+        "land reader"
+    }
+),
+new PepoDataRoles(
+    "material scientist",
+    "Experiments with and develops new materials (e.g., alloys, ceramics).",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("curiosity", 6f, 7f),
+        new PepoRolePrerequisite("accomplishment", 5f, 7f),
+        new PepoRolePrerequisite("Openness", 7f, 10f),
+        new PepoRolePrerequisite("preservation", 3f, 6f),
+    }, 0.001f, 0.005f,
+    new List<string>() {
+        "innovator",
+        "clay worker",
+        "adhesive maker,"
+    }
+),
+new PepoDataRoles(
+    "planner",
+    "Develops detailed strategies for complex endeavors (hunts, migrations).",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 7f, 10f),
+        new PepoRolePrerequisite("stability", 4f, 7f),
+        new PepoRolePrerequisite("accumulation", 3f, 6f),
+        new PepoRolePrerequisite("dependability", 4f, 7f),
+        new PepoRolePrerequisite("tradition", 2f, 5f),
+    }, 0.01f, 0.02f,
+    new List<string>() {
+        "analyst",
+        "pathfinder"
+    }
+),
+new PepoDataRoles(
+    "specialist",
+    "Develops deep expertise in a unique tactical niche (e.g., night hunting).",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
+        new PepoRolePrerequisite("accomplishment", 5f, 7f),
+        new PepoRolePrerequisite("autonomy", 4f, 7f),
+        new PepoRolePrerequisite("safety", 3f, 6f),
+        new PepoRolePrerequisite("excitement", 2f, 5f),
+    }, 0.005f, 0.01f,
+    new List<string>() {
+        "innovator",
+        "communal crafter"
+    }
+),
+new PepoDataRoles(
+    "morale keeper",
+    "Maintains the band's spirit and will during conflict or hardship.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Extraversion", 5f, 10f),
+        new PepoRolePrerequisite("excitement", 4f, 7f),
+        new PepoRolePrerequisite("cohesion", 5f, 7f),
+        new PepoRolePrerequisite("Emotionality", 6f, 10f),
+        new PepoRolePrerequisite("vitality", 3f, 7f),
+    }, 0.01f, 0.02f,
+    new List<string>() {
+        "inspirer",
+        "grief tender"
+    }
+),
+new PepoDataRoles(
+    "aimer",
+    "Expert with projectile weapons (bow, atlatl).",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+        new PepoRolePrerequisite("dependability", 2f, 7f),
+        new PepoRolePrerequisite("accomplishment", 2f, 7f),
+        new PepoRolePrerequisite("dominance", 1f, 7f),
+    }, 0.05f, 0.1f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "striker",
+    "Expert in close-quarter combat (club, spear).",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("vitality", 3f, 7f),
+        new PepoRolePrerequisite("dominance", 3f, 6f),
+        new PepoRolePrerequisite("accomplishment", 3f, 7f),
+        new PepoRolePrerequisite("Age", 14f, 75f),
+    }, 0.05f, 0.1f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "thrower",
+    "Expert in the use of thrown weapons (spears, rocks).",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("vitality", 3f, 7f),
+        new PepoRolePrerequisite("accomplishment", 3f, 7f),
+        new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
+    }, 0.05f, 0.1f,
+    new List<string>() // No prerequisites
+),
+new PepoDataRoles(
+    "inspirer",
+    "Boosts courage and resolve before and during critical actions.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Extraversion", 4f, 10f),
+        new PepoRolePrerequisite("Agreeableness", 3f, 8f),
+        new PepoRolePrerequisite("Openness", 5f, 10f),
+        new PepoRolePrerequisite("curiosity", 3f, 7f),
+        new PepoRolePrerequisite("excitement", 3f, 7f),
+        new PepoRolePrerequisite("accumulation", 3f, 7f),
+        new PepoRolePrerequisite("cohesion", 4f, 7f),
+    }, 0.01f, 0.02f,
+    new List<string>() {
+        "storyteller",
+        "singer"
+    }
+),
+new PepoDataRoles(
+    "knowledge keeper",
+    "Preserves and transmits tactical lore, battle stories, and survival wisdom.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Extraversion", 3f, 8f),
+        new PepoRolePrerequisite("Conscientiousness", 2f, 10f),
+        new PepoRolePrerequisite("curiosity", -1f, 5f),
+        new PepoRolePrerequisite("stability", 3f, 7f),
+        new PepoRolePrerequisite("tradition", 3f, 7f),
+        new PepoRolePrerequisite("dependability", 3f, 7f),
+    }, 0.01f, 0.02f,
+    new List<string>() {
+        "storyteller",
+        "teacher"
+    }
+),
+new PepoDataRoles(
+    "protector",
+    "Uses social authority and presence to shield the vulnerable in conflict.",
+    "Hunter Gatherer Era",
+    new List<PepoRolePrerequisite>()
+    {
+        new PepoRolePrerequisite("Honesty", 5f, 10f),
+        new PepoRolePrerequisite("Extraversion", 4f, 10f),
+        new PepoRolePrerequisite("Conscientiousness", 6f, 10f),
+        new PepoRolePrerequisite("dominance", 4f, 7f),
+        new PepoRolePrerequisite("stability", 3f, 7f),
+        new PepoRolePrerequisite("caring", 2f, 7f),
+        new PepoRolePrerequisite("dependability", 2f, 7f),
+    }, 0.02f, 0.05f,
+    new List<string>() {
+        "enforcer",
+        "carer"
+    }
 ) };
 
 
@@ -1106,7 +1839,7 @@ public static class PepoLibraryRoles
 
 	     //       // FIRE MANAGEMENT
 	     //       new PepoDataRoles(
-	     //           "Fire tender",
+	     //           "fire tender",
 	     //           "maintaining and controlling the group's fire.",
 	     //           "Hunter-Gatherer Era",
 	     //           new List<PepoRolePrerequisite>()
@@ -1150,7 +1883,7 @@ public static class PepoLibraryRoles
 
 	     //       // OBSERVATION/PREDICTION ROLES
 	     //       new PepoDataRoles(
-	     //           "Weather interpreter",
+	     //           "sky reader",
 	     //           "predicting weather patterns and seasonal changes.",
 	     //           "Hunter-Gatherer Era",
 	     //           new List<PepoRolePrerequisite>()
@@ -1399,7 +2132,7 @@ public static class PepoLibraryRoles
 	     // new PepoRolePrerequisite("Openness", 6f, 10f),
 	     // new PepoRolePrerequisite("Agreeableness", 4f, 10f)
 	     //           }, 0.01f, 0.03f,
-	     //           new List<string>() { "Fire tender" } // Requires centrality at hearth
+	     //           new List<string>() { "fire tender" } // Requires centrality at hearth
 	     //           ),
 
 	     //       // SPIRITUAL INTERPRETATION
@@ -1445,7 +2178,7 @@ public static class PepoLibraryRoles
 	     // new PepoRolePrerequisite("Openness", 5f, 10f),
 	     // new PepoRolePrerequisite("Honesty", 5f, 10f)
 	     //           }, 0.01f, 0.03f,
-	     //           new List<string>() { "Hearth Story-Weaver", "Weather interpreter" } // Requires knowledge AND wisdom roles
+	     //           new List<string>() { "Hearth Story-Weaver", "sky reader" } // Requires knowledge AND wisdom roles
 	     //           ),
 
 	     //       // MUSICAL TRADITION
@@ -1504,7 +2237,7 @@ public static class PepoLibraryRoles
 	     // new PepoRolePrerequisite("Conscientiousness", 5f, 10f),
 	     // new PepoRolePrerequisite("Extraversion", 4f, 9f)
 	     //           }, 0.005f, 0.01f,
-	     //           new List<string>() { "Medicinal forager", "Fire tender" } // Requires healing AND ritual knowledge
+	     //           new List<string>() { "Medicinal forager", "fire tender" } // Requires healing AND ritual knowledge
 	     //           ),
 
 	     //       // CLAY SOURCING
@@ -1521,19 +2254,7 @@ public static class PepoLibraryRoles
 	     //           new List<string>() { "Scout" } // Requires exploration skills
 	     //           ),
 
-	     //       // WATER SOURCING
-	     //       new PepoDataRoles(
-	     //           "Water finder",
-	     //           "locating water sources and ensuring clean water supply.",
-	     //           "Hunter-Gatherer Era",
-	     //           new List<PepoRolePrerequisite>()
-	     //           {
-	     // new PepoRolePrerequisite("security", 4f, 7f),
-	     // new PepoRolePrerequisite("Openness", 6f, 10f),
-	     // new PepoRolePrerequisite("Conscientiousness", 5f, 10f)
-	     //           }, 0.01f, 0.02f,
-	     //           new List<string>() { "Scout", "Weather interpreter" } // Requires terrain AND weather knowledge
-	     //           ),
+
 
 	     //       // TERRITORIAL DEFENSE
 	     //       new PepoDataRoles(
@@ -1694,7 +2415,7 @@ public static class PepoLibraryRoles
 	     // new PepoRolePrerequisite("Openness", 7f, 10f),
 	     // new PepoRolePrerequisite("Conscientiousness", 6f, 10f)
 	     //           }, 0.01f, 0.02f,
-	     //           new List<string>() { "Weather interpreter", "Animal tracker" } // Requires weather AND tracking knowledge
+	     //           new List<string>() { "sky reader", "Animal tracker" } // Requires weather AND tracking knowledge
 	     //           ),
 
 	     //       new PepoDataRoles(
@@ -1826,7 +2547,7 @@ public static class PepoLibraryRoles
 
         // TERRITORIAL MARKING
         new PepoDataRoles(
-            "Boundary Marker",
+            "boundary marker",
             "marking and maintaining territorial boundaries.",
             "Early Agrarian Era",
             new List<PepoRolePrerequisite>()
@@ -1839,23 +2560,6 @@ public static class PepoLibraryRoles
 	 new PepoRolePrerequisite("Extraversion", 2f, 6f)
             }, 0.001f, 0.005f,
             new List<string>() { "Boundary Scout" } // Formalization of boundary monitoring
-            ),
-
-        // FIRE CONTINUITY (carried over from HG)
-        new PepoDataRoles(
-            "Fire Tender", // Same name, but in new era
-            "maintaining community fires and communal hearths.",
-            "Early Agrarian Era",
-            new List<PepoRolePrerequisite>()
-            {
-	 new PepoRolePrerequisite("security", 4f, 7f),
-	 new PepoRolePrerequisite("conformity", 3f, 7f),
-	 new PepoRolePrerequisite("tradition", 3f, 7f),
-	 new PepoRolePrerequisite("Conscientiousness", 7f, 10f),
-	 new PepoRolePrerequisite("Extraversion", 2f, 6f),
-	 new PepoRolePrerequisite("Honesty", 5f, 8f)
-            }, 0.005f, 0.01f,
-            new List<string>() { "Fire tender" } // Continuation from HG era
             ),
 
         // CONSTRUCTION SPECIALIZATION
@@ -1908,7 +2612,7 @@ public static class PepoLibraryRoles
 
         // FISHING SPECIALIZATION
         new PepoDataRoles(
-            "Fisher",
+            "fisher",
             "fishing in rivers, lakes, and coastal waters.",
             "Early Agrarian Era",
             new List<PepoRolePrerequisite>()
@@ -1952,7 +2656,7 @@ public static class PepoLibraryRoles
 	 new PepoRolePrerequisite("Extraversion", 4f, 8f),
 	 new PepoRolePrerequisite("Agreeableness", 4f, 7f)
             }, 0.1f, 0.2f,
-            new List<string>() { "Trapper", "Animal tracker" } // Requires animal knowledge
+            new List<string>() { "trapper", "Animal tracker" } // Requires animal knowledge
             ),
 
         // TRADE SPECIALIZATION
@@ -2037,7 +2741,7 @@ public static class PepoLibraryRoles
 	 new PepoRolePrerequisite("Openness", 4f, 8f),
 	 new PepoRolePrerequisite("Extraversion", 2f, 6f)
             }, 0.01f, 0.03f,
-            new List<string>() { "Food forager", "Weather interpreter" } // Requires plant AND seasonal knowledge
+            new List<string>() { "Food forager", "sky reader" } // Requires plant AND seasonal knowledge
             ),
 
         // ARTISTIC EXPRESSION
@@ -2120,9 +2824,21 @@ public static class PepoLibraryRoles
 	 new PepoRolePrerequisite("Openness", 4f, 7f),
 	 new PepoRolePrerequisite("Extraversion", 2f, 6f)
             }, 0.02f, 0.03f,
-            new List<string>() { "Water finder", "Arable Farmer" } // Requires water finding AND settlement needs
+            new List<string>() { "water finder", "Arable Farmer" } // Requires water finding AND settlement needs
             ),
 
+	            new PepoDataRoles(
+		 "water finder",
+		 "locating water sources and ensuring clean water supply.",
+		 "Hunter-Gatherer Era",
+		 new List<PepoRolePrerequisite>()
+		 {
+	      new PepoRolePrerequisite("security", 4f, 7f),
+	      new PepoRolePrerequisite("Openness", 6f, 10f),
+	      new PepoRolePrerequisite("Conscientiousness", 5f, 10f)
+		 }, 0.01f, 0.02f,
+		 new List<string>() { "scout", "sky reader", "land reader" } // Requires terrain AND weather knowledge
+	                ),
         // HYGIENE SPECIALIZATION
         new PepoDataRoles(
             "Soap Maker",
@@ -2154,7 +2870,7 @@ public static class PepoLibraryRoles
 	 new PepoRolePrerequisite("Agreeableness", 4f, 7f),
 	 new PepoRolePrerequisite("Openness", 2f, 5f)
             }, 0.005f, 0.01f,
-            new List<string>() { "Boundary Marker", "Arable Farmer" } // Requires boundaries AND farming
+            new List<string>() { "boundary marker", "Arable Farmer" } // Requires boundaries AND farming
             ),
 
         // PASTURE MANAGEMENT
@@ -2171,7 +2887,7 @@ public static class PepoLibraryRoles
 	 new PepoRolePrerequisite("Extraversion", 5f, 8f),
 	 new PepoRolePrerequisite("Openness", 2f, 5f)
             }, 0.005f, 0.01f,
-            new List<string>() { "Boundary Marker", "Pastoral Farmer" } // Requires boundaries AND herding
+            new List<string>() { "boundary marker", "Pastoral Farmer" } // Requires boundaries AND herding
             ),
 
         // CONSTRUCTION SPECIALIZATION
@@ -2204,7 +2920,7 @@ public static class PepoLibraryRoles
 	 new PepoRolePrerequisite("Agreeableness", 5f, 8f),
 	 new PepoRolePrerequisite("Extraversion", 2f, 6f)
             }, 0.002f, 0.005f,
-            new List<string>() { "Carpenter", "Pathkeeper", "Fisher" } // Requires boat building, path knowledge, AND water skills
+            new List<string>() { "Carpenter", "Pathkeeper", "fisher" } // Requires boat building, path knowledge, AND water skills
             ),
 
         // CERAMICS TECHNOLOGY
@@ -2221,7 +2937,7 @@ public static class PepoLibraryRoles
 	 new PepoRolePrerequisite("Openness", 5f, 9f),
 	 new PepoRolePrerequisite("Honesty", 5f, 8f)
             }, 0.01f, 0.02f,
-            new List<string>() { "Clay collector", "Fire tender" } // Requires clay AND fire knowledge
+            new List<string>() { "Clay collector", "fire tender" } // Requires clay AND fire knowledge
             ),
 
         // CONSTRUCTION MATERIALS
@@ -2271,7 +2987,7 @@ public static class PepoLibraryRoles
 	 new PepoRolePrerequisite("Conscientiousness", 6f, 9f),
 	 new PepoRolePrerequisite("Agreeableness", 4f, 7f)
             }, 0.005f, 0.01f,
-            new List<string>() { "Dispute Mediator", "Boundary Marker" } // Requires conflict resolution AND boundary knowledge
+            new List<string>() { "Dispute Mediator", "boundary marker" } // Requires conflict resolution AND boundary knowledge
             ),
 
         // SOCIAL REGULATION
@@ -2305,7 +3021,7 @@ public static class PepoLibraryRoles
 	 new PepoRolePrerequisite("Openness", 2f, 5f),
 	 new PepoRolePrerequisite("Extraversion", 2f, 6f)
             }, 0.005f, 0.01f,
-            new List<string>() { "Drainage Digger", "Fire Tender" } // Requires waste management AND fire for sanitation
+            new List<string>() { "Drainage Digger", "fire Tender" } // Requires waste management AND fire for sanitation
             ),
 
         // LABOR ORGANIZATION
@@ -2370,7 +3086,7 @@ public static class PepoLibraryRoles
 	 new PepoRolePrerequisite("Openness", 2f, 5f),
 	 new PepoRolePrerequisite("Extraversion", 2f, 6f)
             }, 0.005f, 0.01f,
-            new List<string>() { "Fire Tender" } // Requires fire management
+            new List<string>() { "fire Tender" } // Requires fire management
             ),
 
         // EMOTIONAL SUPPORT
@@ -2387,7 +3103,7 @@ public static class PepoLibraryRoles
 	 new PepoRolePrerequisite("Extraversion", 5f, 9f),
 	 new PepoRolePrerequisite("Extraversion", 1f, 5f)
             }, 0.04f, 0.1f,
-            new List<string>() { "Fire Tender", "Memory Keeper" } // Requires hearth presence AND discretion
+            new List<string>() { "fire Tender", "Memory Keeper" } // Requires hearth presence AND discretion
             ),
 
         // TOOL MAINTENANCE
@@ -2785,7 +3501,7 @@ public static class PepoLibraryRoles
 	 new PepoRolePrerequisite("Emotionality", 2f, 6f),
 	 new PepoRolePrerequisite("Conscientiousness", 3f, 7f)
             }, 0.005f, 0.02f,
-            new List<string>() { "Trapper", "Scout" } // Requires hunting AND stealth skills
+            new List<string>() { "trapper", "scout" } // Requires hunting AND stealth skills
             )
     };
 }

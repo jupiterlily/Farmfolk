@@ -120,7 +120,7 @@ public static class PepoLibraryValues
 		          //humility
 		          Value Humility = new Value(); //14
 		          Humility.name = "humility";
-		          Humility.opposite = "arrogance";
+		          Humility.opposite = "pride";
 		          Humility.descriptor = "remaining modest and knowing one's place";
 		          Humility.location = (330f * Mathf.PI / 180f);
 		          list.Add(Humility);

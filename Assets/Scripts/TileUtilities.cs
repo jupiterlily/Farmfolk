@@ -11,16 +11,16 @@ public static class TileUtilities
 		          Color organicColor = Constants.ORGANIC_COLOR;
 
 		          // Volume fractions
-		          float sandVol = sc.sand / Constants.SAND_DENSITY;
-		          float siltVol = sc.silt / Constants.SILT_DENSITY;
-		          float clayVol = sc.clay / Constants.CLAY_DENSITY;
+		          float sandVol = sc.sand.Mass / Constants.SAND_DENSITY;
+		          float siltVol = sc.silt.Mass / Constants.SILT_DENSITY;
+		          float clayVol = sc.clay.Mass / Constants.CLAY_DENSITY;
 		          float totalVol = sandVol + siltVol + clayVol;
 
 		          // Base blended color
 		          Color baseColor = (sandColor * sandVol + siltColor * siltVol + clayColor * clayVol) / totalVol;
 
 		          // Organic matter influence - remap 0–10% to 0–0.4 strength roughly
-		          float organicFactor = Mathf.Clamp01(sc.organicMatter / 25f);
+		          float organicFactor = Mathf.Clamp01(sc.organicMaterial.Mass / 25f);
 		          Color withOM = Color.Lerp(baseColor, organicColor, organicFactor);
 
 		          // Moisture-based saturation (already computed)

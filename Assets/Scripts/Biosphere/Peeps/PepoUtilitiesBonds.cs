@@ -277,7 +277,6 @@ public class PepoUtilitiesBonds
 	     }
 
 	     // Now define all the modifier calculation functions:
-
 	     private static float CalculateConfidenceModifier(PepoData me)
 	     {
 		          // Base confidence influenced by Honesty and Agreeableness
@@ -292,7 +291,7 @@ public class PepoUtilitiesBonds
 				float strength = (value.value - 5f) / 5f;
 				switch (value.descriptor)
 				{
-				case "Security":
+				case "safety":
 				modifier -= strength * 0.1f;
 				break; // Security-conscious = less trusting
 				}
@@ -313,16 +312,16 @@ public class PepoUtilitiesBonds
 				float strength = (value.value - 5f) / 5f;
 				switch (value.descriptor)
 				{
-				case "Power":
+				case "dominance":
 				modifier -= strength * 0.2f;
 				break; // Power-seeking = high authority
-				case "Conformity":
+				case "cohesion":
 				modifier += strength * 0.1f;
 				break; // Conformist = accept authority
-				case "Agency":
+				case "autonomy":
 				modifier -= strength * 0.15f;
 				break; // Autonomous = resist authority
-				case "Universalism":
+				case "tolerance":
 				modifier -= strength * 0.1f;
 				break; // Egalitarian = resist hierarchy
 				}
@@ -344,16 +343,16 @@ public class PepoUtilitiesBonds
 				float strength = (value.value - 5f) / 5f;
 				switch (value.descriptor)
 				{
-				case "Power":
+				case "dominance":
 				modifier += strength * 0.15f;
 				break;
-				case "Achievement":
+				case "accomplishment":
 				modifier += strength * 0.1f;
 				break;
-				case "Agency":
+				case "autonomy":
 				modifier += strength * 0.1f;
 				break; // Autonomous people seek influence
-				case "Conformity":
+				case "cohesion":
 				modifier -= strength * 0.1f;
 				break; // Conformists don't seek personal influence
 				}
@@ -375,19 +374,19 @@ public class PepoUtilitiesBonds
 				float strength = (value.value - 5f) / 5f;
 				switch (value.descriptor)
 				{
-				case "Benevolence":
+				case "dependability":
 				modifier += strength * 0.2f;
 				break; // Helpful = high obligation
-				case "Conformity":
+				case "cohesion":
 				modifier += strength * 0.15f;
 				break; // Rule-following = high obligation
-				case "Tradition":
+				case "tradition":
 				modifier += strength * 0.1f;
 				break; // Traditional = feel obligation
-				case "Power":
+				case "dominance":
 				modifier -= strength * 0.15f;
 				break; // Power-seeking = resist obligation
-				case "Agency":
+				case "autonomy":
 				modifier -= strength * 0.1f;
 				break; // Autonomous = resist obligation
 				}
@@ -409,16 +408,16 @@ public class PepoUtilitiesBonds
 				float strength = (value.value - 5f) / 5f;
 				switch (value.descriptor)
 				{
-				case "Fairness":
-				modifier += strength * 0.15f;
+				case "compassion":
+				modifier -= strength * 0.15f;
 				break;
-				case "Benevolence":
+				case "caring":
 				modifier -= strength * 0.1f;
 				break; // Benevolent give without expecting return
-				case "Power":
+				case "dominance":
 				modifier += strength * 0.1f;
 				break; // Power-seekers take without reciprocating
-				case "Hedonism":
+				case "indulgence":
 				modifier += strength * 0.08f;
 				break; // Hedonists focus on receiving
 				}
@@ -439,10 +438,10 @@ public class PepoUtilitiesBonds
 				float strength = (value.value - 5f) / 5f;
 				switch (value.descriptor)
 				{
-				case "Stimulation":
+				case "excitement":
 				modifier += strength * 0.1f;
 				break; // Seek intense experiences
-				case "Security":
+				case "safety":
 				modifier -= strength * 0.08f;
 				break; // Security-conscious = guarded
 				}
@@ -462,13 +461,13 @@ public class PepoUtilitiesBonds
 				float strength = (value.value - 5f) / 5f;
 				switch (value.descriptor)
 				{
-				case "Hedonism":
+				case "indulgence":
 				modifier += strength * 0.15f;
 				break; // Pleasure-seeking = romantic
-				case "Stimulation":
+				case "excitement":
 				modifier += strength * 0.1f;
 				break; // Seek intense experiences
-				case "Achievement":
+				case "accomplishment":
 				modifier -= strength * 0.08f;
 				break; // Achievement-focused = less romantic
 				}
@@ -487,16 +486,16 @@ public class PepoUtilitiesBonds
 				float strength = (value.value - 5f) / 5f;
 				switch (value.descriptor)
 				{
-				case "Hedonism":
+				case "indulgence":
 				modifier += strength * 0.2f;
 				break; // Pleasure-seeking = high desire
-				case "Stimulation":
+				case "excitement":
 				modifier += strength * 0.15f;
 				break; // Seek intense experiences
-				case "Tradition":
+				case "tradition":
 				modifier -= strength * 0.1f;
 				break; // Traditional = restrained desire
-				case "Conformity":
+				case "cohesion":
 				modifier -= strength * 0.08f;
 				break; // Conformist = restrained desire
 				}
@@ -516,13 +515,13 @@ public class PepoUtilitiesBonds
 				float strength = (value.value - 5f) / 5f;
 				switch (value.descriptor)
 				{
-				case "Benevolence":
+				case "dependability":
 				modifier -= strength * 0.15f;
 				break; // Helpful = less animosity
-				case "Universalism":
+				case "tolerance":
 				modifier -= strength * 0.1f;
 				break; // Tolerant = less animosity
-				case "Security":
+				case "safety":
 				modifier += strength * 0.08f;
 				break; // Insecure = more animosity
 				}
@@ -542,13 +541,13 @@ public class PepoUtilitiesBonds
 				float strength = (value.value - 5f) / 5f;
 				switch (value.descriptor)
 				{
-				case "Benevolence":
+				case "tolerance":
 				modifier += strength * 0.15f;
 				break; // Helpful = affectionate
-				case "Hedonism":
+				case "indulgenge":
 				modifier += strength * 0.1f;
 				break; // Pleasure-seeking = affectionate
-				case "Achievement":
+				case "dominance":
 				modifier -= strength * 0.08f;
 				break; // Achievement-focused = less affectionate
 				}
@@ -567,16 +566,16 @@ public class PepoUtilitiesBonds
 				float strength = (value.value - 5f) / 5f;
 				switch (value.descriptor)
 				{
-				case "Universalism":
+				case "tolerance":
 				modifier += strength * 0.15f;
 				break; // Inclusive = high affiliation
-				case "Benevolence":
+				case "caring":
 				modifier += strength * 0.1f;
 				break; // Helpful = high affiliation
-				case "Conformity":
+				case "cohesion":
 				modifier += strength * 0.1f;
 				break; // Conformist = group affiliation
-				case "Agency":
+				case "autonomy":
 				modifier -= strength * 0.08f;
 				break; // Autonomous = less affiliation
 				}
@@ -596,13 +595,13 @@ public class PepoUtilitiesBonds
 				float strength = (value.value - 5f) / 5f;
 				switch (value.descriptor)
 				{
-				case "Security":
+				case "stability":
 				modifier += strength * 0.15f;
 				break; // Security-seeking = high attachment
-				case "Stimulation":
+				case "excitement":
 				modifier -= strength * 0.1f;
 				break; // Novelty-seeking = less attachment
-				case "Agency":
+				case "autonomy":
 				modifier -= strength * 0.08f;
 				break; // Autonomous = less attachment
 				}
@@ -610,7 +609,6 @@ public class PepoUtilitiesBonds
 
 		          return Mathf.Clamp(modifier, 0.4f, 1.8f);
 	     }
-
 	     //take a list of pepos and return it in an ordered list based on total power (influence + recipricocity - obligation - authority). this tells me who i have the most power over
 	     public static List<PepoData> OrderByPower(List<PepoRelationshipData> relationships)
 	     {
@@ -626,7 +624,6 @@ public class PepoUtilitiesBonds
 			          .Select(kvp => kvp.Key)
 			          .ToList();
 	     }
-
 	     //take alist of relationship data and return a float to tell me how much power I have over my whole social circle
 	     public static float TotalPower(List<PepoRelationshipData> relationships)
 	     {
@@ -637,7 +634,6 @@ public class PepoUtilitiesBonds
 		          }
 		          return total;
 	     }
-
 	     //take alist of pepos and return it in an ordered list based on how much power they have over me (authority + obligation - influence - reciprocity)
 	     public static List<PepoData> OrderByPowerOverMe(List<PepoRelationshipData> relationships)
 	     {

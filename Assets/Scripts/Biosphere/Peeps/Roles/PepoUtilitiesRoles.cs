@@ -314,7 +314,6 @@ public class PepoUtilitiesRoles
 	     }
 
 
-
 	     //take a list of PepoDataRoles and a list of strings and see if those strings match PepoDataRoles.roleName
 	     //  public static bool PrecursorRolesExist(List<PepoDataRoles> roles, List<string> precursors)
 	     //  {

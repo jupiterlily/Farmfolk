@@ -4,10 +4,12 @@ using UnityEngine;
 
 public class PepoData
 {
-	     public QualitativeAspect[] pepoName = new QualitativeAspect[2] { new QualitativeAspect() { name = "forename", value = "John" }, new QualitativeAspect() { name = "surname", value = "Doe" } };
+	     public QualitativeAspect[] pepoName = new QualitativeAspect[2] { new QualitativeAspect("forename", "John"), new QualitativeAspect("surname", "Doe") };
 	     public string forename => pepoName[0].value;
 	     public string surname => pepoName[pepoName.Length - 1].value;
 	     public string fullname => PepoUtilities.GetFullName(this);
+
+	     public PepoPortrait portrait;
 	     //latitute, longitude, altitude
 	     public Vector3 currentLocation = Vector3.zero;
 	     public Vector3 homeLocation = Vector3.zero;
@@ -102,6 +104,12 @@ public class Aspect
 public class QualitativeAspect : Aspect
 {
 	     public string value;
+
+	     public QualitativeAspect(string Name, string Value)
+	     {
+		          value = "undefined";
+		          name = "undefined";
+	     }
 }
 public class NumericalAspect : Aspect
 {

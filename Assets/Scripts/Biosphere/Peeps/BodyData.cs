@@ -409,18 +409,40 @@ public class BodyData
 public class CosmeticFeatures
 {
 	     //We should have a dictionary that we can run through and reference
-	     public Dictionary<NumericalAspect, int> pepoGrooming = new Dictionary<NumericalAspect, int>();
+	     public Dictionary<string, int> pepoGrooming = new Dictionary<string, int>();
 
 	     // Facial hair (for those with genetic capacity)
-	     public int stubbleLevel = 0; // 0-5: clean shaven - heavy stubble
-	     public int moustacheStyle = 0; // 0: none, 1-14 different styles
+	     // public int stubbleLevel = 0; // 0-5: clean shaven - heavy stubble
+	     //  public int moustacheStyle = 0; // 0: none, 1-14 different styles
 
 	     // Other cosmetics
-	     public bool wearsMakeup = false;
+	     //  public bool wearsMakeup = false;
+
+	     //hair
 
 	     // Constructor - initializes with genetic defaults
 	     public CosmeticFeatures()
 	     {
+		          pepoGrooming.Add("Stubble", -1);
+		          pepoGrooming.Add("Moustache", -1);
+		          pepoGrooming.Add("Beard", -1);
+
+		          pepoGrooming.Add("HairUp", -1);
+		          pepoGrooming.Add("HairBack", -1);
+		          pepoGrooming.Add("HairTendrils", -1);
+		          pepoGrooming.Add("HairFront", -1);
+
+		          pepoGrooming.Add("Eyeshadow", -1);
+		          pepoGrooming.Add("Eyeliner", -1);
+		          pepoGrooming.Add("BlushHue", -1);
+		          pepoGrooming.Add("BlushSat", -1);
+		          pepoGrooming.Add("BlushValue", -1);
+		          pepoGrooming.Add("BlushOpacity", -1);
+
+		          pepoGrooming.Add("LipstickHue", -1);
+		          pepoGrooming.Add("LipstickSat", -1);
+		          pepoGrooming.Add("LipstickValue", -1);
+		          pepoGrooming.Add("LipstickOpacity", -1);
 	     }
 
 	     /// <summary>
@@ -432,8 +454,8 @@ public class CosmeticFeatures
 		          // Only initialize facial hair for XY individuals (biological males)
 		          if (pepo.body.paternalChromosome.sexChromosome == "XX")
 		          {
-				stubbleLevel = 0;
-				moustacheStyle = 0;
+				pepo.body.cosmeticFeatures.pepoGrooming["Stubble"] = 0;
+				pepo.body.cosmeticFeatures.pepoGrooming["Moustache"] = 0;
 				return;
 		          }
 
@@ -444,17 +466,17 @@ public class CosmeticFeatures
 				// 70% chance to have some stubble if presenting masculine
 				if (Random.value < 0.7f)
 				{
-					     stubbleLevel = Random.Range(1, 6);
+					     pepo.body.cosmeticFeatures.pepoGrooming["Stubble"] = Random.Range(1, 6);
 					     // 60% chance of having a moustache if they have stubble
-					     if (stubbleLevel >= 2 && Random.value < 0.6f)
+					     if (pepo.body.cosmeticFeatures.pepoGrooming["Stubble"] >= 2 && Random.value < 0.6f)
 					     {
-						          moustacheStyle = Random.Range(1, 16); // 1-15 moustache styles
+						          pepo.body.cosmeticFeatures.pepoGrooming["Moustache"] = Random.Range(1, 16); // 1-15 moustache styles
 					     }
 				}
 				else
 				{
 					     //might still have a moustache even if no stubble
-					     moustacheStyle = (Random.value < 0.3f) ? Random.Range(1, 16) : 0;
+					     pepo.body.cosmeticFeatures.pepoGrooming["Moustache"] = (Random.value < 0.3f) ? Random.Range(1, 16) : 0;
 				}
 
 		          }
@@ -491,8 +513,8 @@ public class CosmeticFeatures
 				{
 					     if (pepo.ssd.presentsMasc && pepo.body.paternalChromosome.sexChromosome == "XY")
 					     {
-						          int style = relative.body.cosmeticFeatures.moustacheStyle;
-						          int stubble = relative.body.cosmeticFeatures.stubbleLevel;
+						          int style = relative.body.cosmeticFeatures.pepoGrooming["Moustache"];
+						          int stubble = relative.body.cosmeticFeatures.pepoGrooming["Stubble"];
 						          if (style > 0)
 						          {
 								if (styleCounts.ContainsKey(style))
@@ -519,7 +541,7 @@ public class CosmeticFeatures
 		          // Randomly determine stubble based on grooming
 		          if (Random.value < grooming * 0.3f) // 30% chance per update cycle if low conscientiousness
 		          {
-				stubbleLevel = Mathf.Min(3, stubbleLevel + Random.Range(0, 2));
+				pepo.body.cosmeticFeatures.pepoGrooming["Stubble"] = Mathf.Min(3, pepo.body.cosmeticFeatures.pepoGrooming["Stubble"] + Random.Range(0, 2));
 		          }
 		          else
 		          {
@@ -554,7 +576,7 @@ public class CosmeticFeatures
 								maxStubble = kvp.Key;
 						          }
 					     }
-					     stubbleLevel = maxStubble;
+					     pepo.body.cosmeticFeatures.pepoGrooming["Stubble"] = maxStubble;
 				}
 				if (moustachePref.Count > 0)
 				{
@@ -568,17 +590,221 @@ public class CosmeticFeatures
 								maxStyle = kvp.Key;
 						          }
 					     }
-					     moustacheStyle = maxStyle;
+					     pepo.body.cosmeticFeatures.pepoGrooming["Moustache"] = maxStyle;
 
 				}
 				// Facial hair styles influenced by personality and experimentation
 				if (experimentation > 0.6f && pepo.values.Find(v => v.name == "autonomy").value > 5 && Random.value < 0.3f)
 				{
-					     stubbleLevel = Random.Range(0, 6); // Try different levels
-					     moustacheStyle = Random.Range(0, 16); // Try different styles
+					     pepo.body.cosmeticFeatures.pepoGrooming["Stubble"] = Random.Range(0, 6); // Try different levels
+					     pepo.body.cosmeticFeatures.pepoGrooming["Moustache"] = Random.Range(0, 16); // Try different styles
 				}
 		          }
 	     }
+
+	     public void UpdateHair(PepoData pepo)
+	     {
+		          if (pepo.personality == null)
+				return;
+
+		          float grooming = (10f - pepo.personality.Conscientiousness.value) / 10f;
+		          float experimentation = pepo.personality.Openness.value / 10f;
+		          //people who value conformity and tradition will copy their facial hair from their peers, kin, father and mentor figures.
+		          //traditionalists weigh more heavily on kin and mentor figures.
+		          //conformists will pick the most common style.
+		          //create a mode of facial hair from a list of pepos.
+		          List<PepoData> pepoPool = PepoUtilitiesBonds.ShipsToPepos(pepo.RelationshipLibrary[RelationshipType.kin]);
+		          pepoPool.AddRange(PepoUtilitiesBonds.ShipsToPepos(pepo.RelationshipLibrary[RelationshipType.mentor]));
+		          pepoPool.AddRange(PepoUtilitiesBonds.ShipsToPepos(pepo.RelationshipLibrary[RelationshipType.peer]));
+		          pepoPool.AddRange(PepoUtilitiesBonds.ShipsToPepos(pepo.RelationshipLibrary[RelationshipType.parent]));
+		          pepoPool.AddRange(PepoUtilitiesBonds.ShipsToPepos(pepo.RelationshipLibrary[RelationshipType.friend]));
+
+		          List<PepoData> filteredPepoPool = new List<PepoData>();
+		          foreach (var relative in pepoPool)
+		          {
+				//filter by pepos with the same hair texture
+				if (relative.body.cosmeticFeatures != null)
+				{
+					     if (relative.body.expressedChromosomes != null)
+					     {
+						          int hairTexture = relative.body.GetExpressedTrait(18);
+						          if (hairTexture == pepo.body.GetExpressedTrait(18))
+						          {
+								filteredPepoPool.Add(relative);
+						          }
+					     }
+				}
+		          }
+		          pepoPool = filteredPepoPool;
+		          //dictionary of styles and their counts
+		          Dictionary<int, int> HairUp = new Dictionary<int, int>();
+		          Dictionary<int, int> HairBack = new Dictionary<int, int>();
+		          Dictionary<int, int> HairTendrils = new Dictionary<int, int>();
+		          Dictionary<int, int> HairFront = new Dictionary<int, int>();
+		          foreach (var relative in pepoPool)
+		          {
+				if (relative.body.cosmeticFeatures != null)
+				{
+					     if (relative.ssd.presentsMasc == pepo.ssd.presentsMasc || relative.ssd.presentsFemme == pepo.ssd.presentsFemme)
+					     {
+						          int hairUp = relative.body.cosmeticFeatures.pepoGrooming["HairUp"];
+						          int hairBack = relative.body.cosmeticFeatures.pepoGrooming["HairBack"];
+						          int hairTendrils = relative.body.cosmeticFeatures.pepoGrooming["HairTendrils"];
+						          int hairFront = relative.body.cosmeticFeatures.pepoGrooming["HairFront"];
+						          if (hairUp > 0)
+						          {
+								if (HairUp.ContainsKey(hairUp))
+								{
+									     HairUp[hairUp]++;
+								}
+								else
+								{
+									     HairUp[hairUp] = 1;
+								}
+						          }
+						          if (hairBack > 0)
+						          {
+								if (HairBack.ContainsKey(hairBack))
+								{
+									     HairBack[hairBack]++;
+								}
+								else
+								{
+									     HairBack[hairBack] = 1;
+								}
+						          }
+						          if (hairTendrils > 0)
+						          {
+								if (HairTendrils.ContainsKey(hairTendrils))
+								{
+									     HairTendrils[hairTendrils]++;
+								}
+								else
+								{
+									     HairTendrils[hairTendrils] = 1;
+								}
+						          }
+						          if (hairFront > 0)
+						          {
+								if (HairFront.ContainsKey(hairFront))
+								{
+									     HairFront[hairFront]++;
+								}
+								else
+								{
+									     HairFront[hairFront] = 1;
+								}
+						          }
+					     }
+				}
+		          }
+		          //values determine what styles they pick from. conformists will pick common styles, self directed will pick unusual styles, stimulation seekers will change styles often.
+		          // Randomly determine stubble based on grooming
+
+		          if (Random.value > grooming * 0.3f) // 30% chance per update cycle if low conscientiousness
+		          {
+				//set to desired level based on grooming
+				Dictionary<int, int> HairUpPref = new Dictionary<int, int>();
+				Dictionary<int, int> HairBackPref = new Dictionary<int, int>();
+				Dictionary<int, int> HairTendrilsPref = new Dictionary<int, int>();
+				Dictionary<int, int> HairFrontPref = new Dictionary<int, int>();
+				//weight styles based on personal values. traditionalists and conformists will prefer common styles, self-directed and stimulation seekers will prefer uncommon styles.
+				foreach (var kvp in HairUp)
+				{
+					     //weight by conformity and tradition
+					     HairUpPref.Add(kvp.Key, (int)(kvp.Value * (pepo.values.Find(v => v.name == "cohesion").value) + pepo.values.Find(v => v.name == "tradition").value));
+					     //counterweight by self-direction and stimulation
+					     HairUpPref[kvp.Key] -= (int)(kvp.Value * (pepo.values.Find(v => v.name == "autonomy").value) + pepo.values.Find(v => v.name == "excitement").value);
+				}
+				foreach (var kvp in HairBack)
+				{
+					     //weight by conformity and tradition
+					     HairBackPref.Add(kvp.Key, (int)(kvp.Value * (pepo.values.Find(v => v.name == "cohesion").value) + pepo.values.Find(v => v.name == "tradition").value));
+					     //counterweight by self-direction and stimulation
+					     HairBackPref[kvp.Key] -= (int)(kvp.Value * (pepo.values.Find(v => v.name == "autonomy").value) + pepo.values.Find(v => v.name == "excitement").value);
+				}
+				foreach (var kvp in HairTendrils)
+				{
+					     //weight by conformity and tradition
+					     HairTendrilsPref.Add(kvp.Key, (int)(kvp.Value * (pepo.values.Find(v => v.name == "cohesion").value) + pepo.values.Find(v => v.name == "tradition").value));
+					     //counterweight by self-direction and stimulation
+					     HairTendrilsPref[kvp.Key] -= (int)(kvp.Value * (pepo.values.Find(v => v.name == "autonomy").value) + pepo.values.Find(v => v.name == "excitement").value);
+				}
+				foreach (var kvp in HairFront)
+				{
+					     //weight by conformity and tradition
+					     HairFrontPref.Add(kvp.Key, (int)(kvp.Value * (pepo.values.Find(v => v.name == "cohesion").value) + pepo.values.Find(v => v.name == "tradition").value));
+					     //counterweight by self-direction and stimulation
+					     HairFrontPref[kvp.Key] -= (int)(kvp.Value * (pepo.values.Find(v => v.name == "autonomy").value) + pepo.values.Find(v => v.name == "excitement").value);
+				}
+				//choose the styles with the highest weight
+				if (HairUpPref.Count > 0)
+				{
+					     int maxHairUp = -1;
+					     int maxCount = -1;
+					     foreach (var kvp in HairUpPref)
+					     {
+						          if (kvp.Value > maxCount)
+						          {
+								maxCount = kvp.Value;
+								maxHairUp = kvp.Key;
+						          }
+					     }
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] = maxHairUp;
+				}
+				if (HairBackPref.Count > 0)
+				{
+					     int maxHairBack = -1;
+					     int maxCount = -1;
+					     foreach (var kvp in HairBackPref)
+					     {
+						          if (kvp.Value > maxCount)
+						          {
+								maxCount = kvp.Value;
+								maxHairBack = kvp.Key;
+						          }
+					     }
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] = maxHairBack;
+				}
+				if (HairTendrilsPref.Count > 0)
+				{
+					     int maxHairTendrils = -1;
+					     int maxCount = -1;
+					     foreach (var kvp in HairTendrilsPref)
+					     {
+						          if (kvp.Value > maxCount)
+						          {
+								maxCount = kvp.Value;
+								maxHairTendrils = kvp.Key;
+						          }
+					     }
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] = maxHairTendrils;
+				}
+				if (HairFrontPref.Count > 0)
+				{
+					     int maxHairFront = -1;
+					     int maxCount = -1;
+					     foreach (var kvp in HairFrontPref)
+					     {
+						          if (kvp.Value > maxCount)
+						          {
+								maxCount = kvp.Value;
+								maxHairFront = kvp.Key;
+						          }
+					     }
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] = maxHairFront;
+				}
+				// Facial hair styles influenced by personality and experimentation
+				if (experimentation > 0.6f && pepo.values.Find(v => v.name == "autonomy").value > 5 && Random.value < 0.3f)
+				{
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] = Random.Range(0, HairUpPref.Count); // Try different levels
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] = Random.Range(0, HairBackPref.Count); // Try different styles
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] = Random.Range(0, HairTendrilsPref.Count); // Try different levels
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] = Random.Range(0, HairFrontPref.Count); // Try different styles
+				}
+		          }
+	     }
+
 }
 
 [System.Serializable]

@@ -1,9 +1,10 @@
 using System.Collections.Generic;
 using UnityEngine;
-public class BlockData
+public abstract class BlockData
 {
-	     public Vector3[,] Corners; //bottom layer and top layer. Allow for different shapes
+	     public Vector3[,] Corners; //bottom layer and top layer. Allows forvariation in shapes
 
+	     // public char cubeFace; //(T, B, N, S, E, W) the top, bottom, north south east or west face at initilisation
 	     public Vector2Int gridRef; //grid reference for the block
 	     public float longitude; //longitude in degrees
 	     public float latitude; //latitude in degrees
@@ -53,7 +54,7 @@ public class BlockData
 
 	     public Layer[] layers; //layers of matter in the block
 }
-public class Layer : BlockData
+public abstract class Layer : BlockData
 {
 	     public int layerHeight; //height of the layer as a percentage of the block height
 	     public float temperature; //temperature in Celsius of matter in the layer
@@ -96,12 +97,18 @@ public class Gas : Layer //can be both liquid and gas will be used by rendering 
 	     public List<Matter> liquidDroplets; // liquid droplets in the gas
 }
 
-public class Matter
+public abstract class Matter
 {
 	     //matter and energy composition of the block
 	     public List<EnergyData> energyComposition; // energy stored in the matter, mass and temperature can be derived from this
 	     public List<Compound> composition; // the composition of the matter in the block used to handle mixtures
+	     public float mass => thermalEnergy.Mass;
 	     public float density; // in kg/m3
+
+	     public ChemicalEnergy chemicalEnergy;
+	     public LatentEnergy latentEnergy;
+	     public MechanicalEnergy mechanicalEnergy;
+	     public ThermalEnergy thermalEnergy;
 }
 
 public class Compound : Matter
@@ -115,6 +122,8 @@ public class Compound : Matter
 	     public float specificHeatCapacity; // in J/(kg*K) amount of energy required to raise 1 kg of the compound by 1 Kelvin
 	     public float thermalConductivity; // in W/(m*K) ability to conduct heat
 	     public float electricalConductivity; // in S/m ability to conduct electricity
+
+	     public ChemicalEnergy energy;
 
 	     public Dictionary<Element, int> ParseMoleculeString(string molecule)
 	     {
@@ -161,23 +170,10 @@ public class Compound : Matter
 		          }
 		          return elementDict;
 	     }
-}
-public class Element : Compound
-{
-	     public string symbol;
-	     public float atomicNumber; // number of protons
-	     public float atomicMass; // in amu     
-	     public float atomicRadius; // in pm
 
-	     //constructor for element takes strings and floats name, symbol, atomic number, atomic mass, specific heat capacity, thermal conductivity, electrical conductivity and initialises the element including base class Compound and Matter
-	     public Element(string Name, string Symbol, float AtNo, float AtMass, float SHC, float TC, float EC, float meltPoint, float boilPoint, string molecule, float latentFusion, float latentVaporisation, float bondEnergyKj)
+	     public Compound(string Name, string Symbol, float AtNo, float AtMass, float SHC, float TC, float EC, float meltPoint, float boilPoint, string molecule, float latentFusion, float latentVaporisation, float bondEnergyKj)
 	     {
 		          name = Name;
-
-		          symbol = Symbol;
-
-		          atomicNumber = AtNo;
-		          atomicMass = AtMass;
 
 		          specificHeatCapacity = SHC;
 		          thermalConductivity = TC;
@@ -193,6 +189,23 @@ public class Element : Compound
 		          //initialise chemical energy calculating it from atomic mass for total moles
 		          float chemicalEnergyJoules = bondEnergyKj * 1000; // placeholder calculation
 		          energyComposition.Add(new ChemicalEnergy(chemicalEnergyJoules));
+	     }
+}
+public class Element
+{
+	     public string name;
+	     public string symbol;
+	     public float atomicNumber; // number of protons
+	     public float atomicMass; // in amu     
+	     public float atomicRadius; // in pm
+
+	     //constructor for element takes strings and floats name, symbol, atomic number, atomic mass, specific heat capacity, thermal conductivity, electrical conductivity and initialises the element including base class Compound and Matter
+	     public Element(string Name, string Symbol, float AtNo, float AtMass)
+	     {
+		          symbol = Symbol;
+
+		          atomicNumber = AtNo;
+		          atomicMass = AtMass;
 	     }
 
 

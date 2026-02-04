@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class PepoUIUtilities
 {
 
-	     public static GameObject CreatePortrait(PepoData pepo, List<Sprite> fHairBack, List<Sprite> fHairFront, List<Sprite> mHairBack, List<Sprite> mHairFront, List<Sprite> uHairBack, List<Sprite> uHairFront, List<Sprite> heads, List<Sprite> eyeColours, List<Sprite> mascEyes, List<Sprite> femmeEyes, List<Sprite> noses, List<Sprite> topLips, List<Sprite> bottomLips, List<Sprite> freckles, List<Sprite> brows, List<Sprite> stubbleSprites, List<Sprite> moustaches)
+	     public static GameObject CreatePortrait(PepoData pepo, List<Sprite> sHairUp, List<Sprite> sHairBack, List<Sprite> sHairTendrils, List<Sprite> sHairFront, List<Sprite> wHairUp, List<Sprite> wHairBack, List<Sprite> wHairTendrils, List<Sprite> wHairFront, List<Sprite> cHairUp, List<Sprite> cHairBack, List<Sprite> cHairTendrils, List<Sprite> cHairFront, List<Sprite> kHairUp, List<Sprite> kHairBack, List<Sprite> kHairTendrils, List<Sprite> kHairFront, List<Sprite> heads, List<Sprite> eyeColours, List<Sprite> mascEyes, List<Sprite> femmeEyes, List<Sprite> noses, List<Sprite> topLips, List<Sprite> bottomLips, List<Sprite> freckles, List<Sprite> brows, List<Sprite> stubbleSprites, List<Sprite> moustaches)
 	     {
 		          GameObject portrait = new GameObject("Portrait");
 		          RectTransform rt = portrait.AddComponent<RectTransform>();
@@ -25,31 +25,120 @@ public class PepoUIUtilities
 		          float browHeightOffset = GetHeightOffset(pepo.body, 22); // browHeight trait	
 
 		          Color hairColor = UIUtilities.GetPepoColors(pepo.body)[0];
+		          Color eyeColor = UIUtilities.GetPepoColors(pepo.body)[1];
+		          Color skinColor = UIUtilities.GetPepoColors(pepo.body)[2];
+		          Color mouthColor = UIUtilities.GetPepoColors(pepo.body)[3];
 
 		          if (pepo.age > 30f)
 		          {
 				hairColor = Color.Lerp(hairColor, Color.white, Mathf.Clamp01((pepo.age - 40f) / 60f));
 		          }
 		          //for stubble, lerp between hair colour and transparent based on stubble level (0-5)
-		          Color stubbleColor = Color.Lerp(hairColor, Color.clear, 1f - (pepo.body.cosmeticFeatures.stubbleLevel / 5f));
+		          Color stubbleColor = Color.Lerp(hairColor, Color.clear, 1f - (pepo.body.cosmeticFeatures.pepoGrooming["Stubble"] / 5f));
 
-		          CreateLayeredSprite(portrait.transform, GetHairBackSprite(pepo, fHairBack, fHairFront, mHairBack, mHairFront, uHairBack, uHairFront), "HairBack", 1, hairColor);
-		          CreateLayeredSprite(portrait.transform, GetHeadSprite(pepo, heads), "Head", 2, UIUtilities.GetPepoColors(pepo.body)[2]);
+		          PortraitLayer HairUp = null;
+		          PortraitLayer HairBack = null;
+		          PortraitLayer HairTendrils = null;
+		          PortraitLayer HairFront = null;
+
+		          if (pepo.body.expressedChromosomes[18].value == 1)
+		          {
+				if (pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] == -1)
+				{
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] = Random.Range(0, sHairUp.Count);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] = Random.Range(0, sHairBack.Count);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] = Random.Range(0, sHairTendrils.Count);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] = Random.Range(0, sHairFront.Count);
+				}
+				HairUp = new PortraitLayer(sHairUp[pepo.body.cosmeticFeatures.pepoGrooming["HairUp"]], "HairUp", hairColor, Vector2.zero);
+				HairBack = new PortraitLayer(sHairBack[pepo.body.cosmeticFeatures.pepoGrooming["HairBack"]], "HairBack", hairColor, Vector2.zero);
+				HairTendrils = new PortraitLayer(sHairTendrils[pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"]], "HairTendrils", hairColor, Vector2.zero);
+				HairFront = new PortraitLayer(sHairFront[pepo.body.cosmeticFeatures.pepoGrooming["HairFront"]], "HairFront", hairColor, Vector2.zero);
+		          }
+		          else if (pepo.body.expressedChromosomes[18].value == 2)
+		          {
+				if (pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] == -1)
+				{
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] = Random.Range(0, wHairUp.Count);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] = Random.Range(0, wHairBack.Count);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] = Random.Range(0, wHairTendrils.Count);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] = Random.Range(0, wHairFront.Count);
+				}
+				HairUp = new PortraitLayer(wHairUp[pepo.body.cosmeticFeatures.pepoGrooming["HairUp"]], "HairUp", hairColor, Vector2.zero);
+				HairBack = new PortraitLayer(wHairBack[pepo.body.cosmeticFeatures.pepoGrooming["HairBack"]], "HairBack", hairColor, Vector2.zero);
+				HairTendrils = new PortraitLayer(wHairTendrils[pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"]], "HairTendrils", hairColor, Vector2.zero);
+				HairFront = new PortraitLayer(wHairFront[pepo.body.cosmeticFeatures.pepoGrooming["HairFront"]], "HairFront", hairColor, Vector2.zero);
+		          }
+		          else if (pepo.body.expressedChromosomes[18].value == 3)
+		          {
+				if (pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] == -1)
+				{
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] = Random.Range(0, cHairUp.Count);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] = Random.Range(0, cHairBack.Count);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] = Random.Range(0, cHairTendrils.Count);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] = Random.Range(0, cHairFront.Count);
+				}
+				HairUp = new PortraitLayer(cHairUp[pepo.body.cosmeticFeatures.pepoGrooming["HairUp"]], "HairUp", hairColor, Vector2.zero);
+				HairBack = new PortraitLayer(cHairBack[pepo.body.cosmeticFeatures.pepoGrooming["HairBack"]], "HairBack", hairColor, Vector2.zero);
+				HairTendrils = new PortraitLayer(cHairTendrils[pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"]], "HairTendrils", hairColor, Vector2.zero);
+				HairFront = new PortraitLayer(cHairFront[pepo.body.cosmeticFeatures.pepoGrooming["HairFront"]], "HairFront", hairColor, Vector2.zero);
+
+		          }
+		          else if (pepo.body.expressedChromosomes[18].value == 4)
+		          {
+				if (pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] == -1)
+				{
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] = Random.Range(0, kHairUp.Count);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] = Random.Range(0, kHairBack.Count);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] = Random.Range(0, kHairTendrils.Count);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] = Random.Range(0, kHairFront.Count);
+				}
+				HairUp = new PortraitLayer(kHairUp[pepo.body.cosmeticFeatures.pepoGrooming["HairUp"]], "HairUp", hairColor, Vector2.zero);
+				HairBack = new PortraitLayer(kHairBack[pepo.body.cosmeticFeatures.pepoGrooming["HairBack"]], "HairBack", hairColor, Vector2.zero);
+				HairTendrils = new PortraitLayer(kHairTendrils[pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"]], "HairTendrils", hairColor, Vector2.zero);
+				HairFront = new PortraitLayer(kHairFront[pepo.body.cosmeticFeatures.pepoGrooming["HairFront"]], "HairFront", hairColor, Vector2.zero);
+		          }
 
 
-		          CreateLayeredSprite(portrait.transform, GetNoseSprite(pepo, noses), "Nose", 4, UIUtilities.GetPepoColors(pepo.body)[2], noseHeightOffset);
 
-		          //freckles
+		          PortraitLayer Head = new PortraitLayer(GetHeadSprite(pepo, heads), "Head", skinColor, Vector2.zero);
+		          PortraitLayer Nose = new PortraitLayer(GetNoseSprite(pepo, noses), "Nose", skinColor, new Vector2(0, noseHeightOffset));
+
+		          PortraitLayer Stubble = new PortraitLayer(GetStubbleSprite(pepo, stubbleSprites), "Stubble", stubbleColor, Vector2.zero);
+		          PortraitLayer Eyebrows = new PortraitLayer(GetBrowSprite(pepo, brows), "Eyebrows", hairColor, new Vector2(0, browHeightOffset));
+
+		          PortraitLayer EyeColour = new PortraitLayer(GetEyeColourSprite(pepo, eyeColours), "EyeColour", eyeColor, new Vector2(0, eyeHeightOffset));
+		          PortraitLayer EyeShape = new PortraitLayer(GetEyeSprite(pepo, mascEyes, femmeEyes), "EyeShape", Color.white, new Vector2(0, eyeHeightOffset));
+
+		          //  PortraitLayer Beard = new PortraitLayer(GetMoustacheSprite(pepo, beards), "Beard", hairColor, Vector2.zero);
+		          PortraitLayer BottomLip = new PortraitLayer(GetMouthSprite(pepo, bottomLips, false), "BottomLip", mouthColor, new Vector2(0, mouthHeightOffset));
+		          PortraitLayer TopLip = new PortraitLayer(GetMouthSprite(pepo, topLips, true), "TopLip", mouthColor, new Vector2(0, mouthHeightOffset));
+		          PortraitLayer Moustache = new PortraitLayer(GetMoustacheSprite(pepo, moustaches), "Moustache", hairColor, new Vector2(0, mouthHeightOffset + noseHeightOffset));
+
+
+
+		          pepo.portrait = new PepoPortrait(new List<PortraitLayer> { HairUp, HairBack, Head, Nose, Stubble, Eyebrows, EyeColour, EyeShape, BottomLip, TopLip, Moustache, HairTendrils, HairFront });
+
+		          foreach (var layer in pepo.portrait.layers)
+		          {
+				CreateLayeredSprite(portrait.transform, layer.sprite, layer.layerName, layer.sortingOrder, layer.color, layer.positionOffset.y);
+		          }
+
+		          //CreateLayeredSprite(portrait.transform, GetHairBackSprite(pepo, fHairBack, fHairFront, mHairBack, mHairFront, uHairBack, uHairFront), "HairBack", 1, hairColor);
+
+		          //        CreateLayeredSprite(portrait.transform, GetHeadSprite(pepo, heads), "Head", 2, UIUtilities.GetPepoColors(pepo.body)[2]);
+		          //        CreateLayeredSprite(portrait.transform, GetNoseSprite(pepo, noses), "Nose", 4, UIUtilities.GetPepoColors(pepo.body)[2], noseHeightOffset);
+		          //        //freckles
 		          AddFrecklesSprite(pepo, freckles, portrait.transform);
-		          CreateLayeredSprite(portrait.transform, GetStubbleSprite(pepo, stubbleSprites), "Stubble", 4, stubbleColor);
-		          //brows. use hair colour
-		          CreateLayeredSprite(portrait.transform, GetBrowSprite(pepo, brows), "Brows", 3, hairColor, eyeHeightOffset + browHeightOffset);
-		          CreateLayeredSprite(portrait.transform, GetEyeColourSprite(pepo, eyeColours), "EyeColour", 3, UIUtilities.GetPepoColors(pepo.body)[1], eyeHeightOffset);
-		          CreateLayeredSprite(portrait.transform, GetEyeSprite(pepo, mascEyes, femmeEyes), "Eyes", 4, Color.white, eyeHeightOffset);
-		          //do bottom lip then top lip
-		          CreateLayeredSprite(portrait.transform, GetMouthSprite(pepo, bottomLips, false), "Bottom Lip", 5, UIUtilities.GetPepoColors(pepo.body)[3], mouthHeightOffset);
-		          CreateLayeredSprite(portrait.transform, GetMouthSprite(pepo, topLips, true), "Top Lip", 5, UIUtilities.GetPepoColors(pepo.body)[3], mouthHeightOffset);
-		          CreateLayeredSprite(portrait.transform, GetMoustacheSprite(pepo, moustaches), "Moustache", 6, hairColor, mouthHeightOffset + noseHeightOffset);
+		          //CreateLayeredSprite(portrait.transform, GetStubbleSprite(pepo, stubbleSprites), "Stubble", 4, stubbleColor);
+		          ////brows. use hair colour
+		          //CreateLayeredSprite(portrait.transform, GetBrowSprite(pepo, brows), "Brows", 3, hairColor, eyeHeightOffset + browHeightOffset);
+		          //CreateLayeredSprite(portrait.transform, GetEyeColourSprite(pepo, eyeColours), "EyeColour", 3, UIUtilities.GetPepoColors(pepo.body)[1], eyeHeightOffset);
+		          //CreateLayeredSprite(portrait.transform, GetEyeSprite(pepo, mascEyes, femmeEyes), "Eyes", 4, Color.white, eyeHeightOffset);
+		          ////do bottom lip then top lip
+		          //CreateLayeredSprite(portrait.transform, GetMouthSprite(pepo, bottomLips, false), "Bottom Lip", 5, UIUtilities.GetPepoColors(pepo.body)[3], mouthHeightOffset);
+		          //CreateLayeredSprite(portrait.transform, GetMouthSprite(pepo, topLips, true), "Top Lip", 5, UIUtilities.GetPepoColors(pepo.body)[3], mouthHeightOffset);
+		          //CreateLayeredSprite(portrait.transform, GetMoustacheSprite(pepo, moustaches), "Moustache", 6, hairColor, mouthHeightOffset + noseHeightOffset);
 
 		          // NEW: Add stubble/facial hair if applicable
 		          //AddFacialHairSprite(pepo, stubbleSprites, moustaches, portrait.transform, hairColor);
@@ -60,7 +149,7 @@ public class PepoUIUtilities
 		          {
 				return portrait;
 		          }
-		          CreateLayeredSprite(portrait.transform, GetHairFrontSprite(pepo, fHairBack, fHairFront, mHairBack, mHairFront, uHairBack, uHairFront), "HairFront", 6, hairColor);
+		          //CreateLayeredSprite(portrait.transform, GetHairFrontSprite(pepo, fHairBack, fHairFront, mHairBack, mHairFront, uHairBack, uHairFront), "HairFront", 6, hairColor);
 		          //if they're above acertain age put in the wrinkle sprites for eyes, 
 
 		          return portrait;
@@ -164,15 +253,24 @@ public class PepoUIUtilities
 		          spriteObj.transform.SetParent(parent, false);
 
 		          RectTransform rt = spriteObj.AddComponent<RectTransform>();
-		          rt.anchorMin = Vector2.zero;
-		          rt.anchorMax = Vector2.one;
-		          rt.sizeDelta = Vector2.zero;
 
-		          // Apply height offset by adjusting the anchored position
-		          if (heightOffset != 0f)
-		          {
-				rt.anchoredPosition = new Vector2(0f, heightOffset);
-		          }
+		          // Set anchors and pivot to center
+		          rt.anchorMin = new Vector2(0.5f, 0.5f);
+		          rt.anchorMax = new Vector2(0.5f, 0.5f);
+		          rt.pivot = new Vector2(0.5f, 0.5f);
+
+		          // Get sprite dimensions
+		          float spriteWidth = sprite.rect.width;
+		          float spriteHeight = sprite.rect.height;
+
+		          // Determine the larger dimension to maintain square proportions
+		          float targetSize = Mathf.Max(spriteWidth, spriteHeight);
+
+		          // Set size to the larger dimension (makes it square)
+		          rt.sizeDelta = new Vector2(targetSize, targetSize);
+
+		          // Apply height offset
+		          rt.anchoredPosition = new Vector2(0f, heightOffset);
 
 		          Image image = spriteObj.AddComponent<Image>();
 		          image.sprite = sprite;
@@ -221,30 +319,30 @@ public class PepoUIUtilities
 				Debug.LogWarning("null cosmetic features");
 				return;
 		          }
-		          if (pepo.body.cosmeticFeatures.stubbleLevel == 0)
+		          if (pepo.body.cosmeticFeatures.pepoGrooming["Stubble"] == 0)
 		          {
 				Debug.LogWarning($"No stubble for{pepo.fullname}");
 		          }
-		          if (pepo.body.cosmeticFeatures.moustacheStyle == 0)
+		          if (pepo.body.cosmeticFeatures.pepoGrooming["Moustache"] == 0)
 		          {
 				Debug.LogWarning($"No moustache for{pepo.fullname}");
 		          }
 
 		          CosmeticFeatures cosmetics = pepo.body.cosmeticFeatures;
-		          Debug.LogWarning($"Adding facial hair for {pepo.fullname}: Stubble Level {cosmetics.stubbleLevel}, Moustache Style {cosmetics.moustacheStyle}");
+		          Debug.LogWarning($"Adding facial hair for {pepo.fullname}: Stubble Level {cosmetics.pepoGrooming["Stubble"]}, Moustache Style {cosmetics.pepoGrooming["Moustache"]}");
 		          // Add stubble if present
-		          if (cosmetics.stubbleLevel > 0 && stubbleSprites != null && stubbleSprites.Count > 0)
+		          if (cosmetics.pepoGrooming["Stubble"] > 0 && stubbleSprites != null && stubbleSprites.Count > 0)
 		          {
-				Debug.LogWarning($"Adding stubble level {cosmetics.stubbleLevel} for {pepo.fullname}");
+				Debug.LogWarning($"Adding stubble level {cosmetics.pepoGrooming["Stubble"]} for {pepo.fullname}");
 				//stubble sprite is determined by head shape. theyre in the same order. Sprite becomes more opaque with higher levels
 				int stubbleIndex = pepo.body.GetExpressedTrait(0); // headShape trait
 				stubbleIndex = Mathf.Clamp(stubbleIndex - 1, 0, stubbleSprites.Count - 1);
 				Sprite stubbleSprite = stubbleSprites[stubbleIndex];
 
-				Color stubbleColor = new Color(hairColor.r, hairColor.g, hairColor.b, pepo.body.cosmeticFeatures.stubbleLevel / 5);
+				Color stubbleColor = new Color(hairColor.r, hairColor.g, hairColor.b, pepo.body.cosmeticFeatures.pepoGrooming["Stubble"] / 5);
 				CreateLayeredSprite(parent, stubbleSprite, "Stubble", 4, stubbleColor);
 		          }
-		          int moustacheIndex = cosmetics.moustacheStyle;
+		          int moustacheIndex = cosmetics.pepoGrooming["Moustache"];
 		          // Add moustache if present
 		          if (moustacheIndex > 0 && moustaches != null && moustaches.Count > 0)
 		          {
@@ -259,7 +357,7 @@ public class PepoUIUtilities
 	     {
 		          if (pepo?.body?.cosmeticFeatures == null || moustaches == null || moustaches.Count == 0)
 				return null;
-		          int moustacheIndex = pepo.body.cosmeticFeatures.moustacheStyle;
+		          int moustacheIndex = pepo.body.cosmeticFeatures.pepoGrooming["Moustache"];
 		          if (moustacheIndex <= 0 || moustacheIndex >= moustaches.Count)
 				return null;
 		          return moustaches[moustacheIndex];

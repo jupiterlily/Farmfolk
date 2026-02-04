@@ -530,7 +530,7 @@ MonoBehaviour:
   pepoPanel: {fileID: 1748989352}
   pepoPopManager: {fileID: 1440901001}
   pepoUI: {fileID: 0}
-  mascEyes:
+  pepoEyes:
   - {fileID: 1383118253, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
   - {fileID: 716536150, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
   - {fileID: -199263036, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
@@ -542,7 +542,7 @@ MonoBehaviour:
   - {fileID: 227789004, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
   - {fileID: 966248770, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
   - {fileID: 49091839, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
-  femmeEyes:
+  linerEyes:
   - {fileID: 23376585, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
   - {fileID: -911724878, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
   - {fileID: -1656952136, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
@@ -626,18 +626,138 @@ MonoBehaviour:
   - {fileID: 1317708157, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
   - {fileID: -1924353089, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
   - {fileID: 2101562842, guid: 98d399df727d10044b10d814e4c1cbb3, type: 3}
-  uHairBack:
+  HairUp_1:
   - {fileID: 0}
-  uHhairFront:
+  - {fileID: 1832372601, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
+  - {fileID: 1447573784, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
+  - {fileID: -1621693347, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
+  - {fileID: -162976138, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
+  - {fileID: 169623582, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
+  - {fileID: -648771049, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
+  HairBack_1:
   - {fileID: 0}
-  mHairBack:
+  - {fileID: -825963489, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1937694078, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 1961909093, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -588822615, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  HairTendrils_1:
   - {fileID: 0}
-  mHairFront:
+  - {fileID: 1216588767, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -855320343, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -324223556, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -2045676734, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -524976294, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  HairFringe_1:
+  - {fileID: 1205278042, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 2003951317, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 529172737, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 596704269, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 1373802613, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1590650253, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 1894273301, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -151249193, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  HairUp_2:
   - {fileID: 0}
-  fHairBack:
+  - {fileID: 196292624, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
+  - {fileID: 1752297386, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
+  - {fileID: 22120921, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
+  HairBack_2:
   - {fileID: 0}
-  fHairFront:
+  - {fileID: 1674807873, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -13168062, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -988476810, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 1432098852, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1742379294, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 208382617, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -125516672, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  HairTendrils_2:
   - {fileID: 0}
+  - {fileID: 1216588767, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -855320343, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -584572588, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -517835396, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -324223556, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -19620011, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -2045676734, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1192668536, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -524976294, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1334824979, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -908107390, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1051615581, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  HairFringe_2:
+  - {fileID: -513776289, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 1777574748, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 455345970, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 1099298015, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -796536779, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 222465101, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  HairUp_3:
+  - {fileID: 0}
+  - {fileID: 22120921, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
+  - {fileID: 1228319256, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
+  HairBack_3:
+  - {fileID: 0}
+  - {fileID: -1822944673, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 923430363, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 1432098852, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 3274882, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  HairTendrils_3:
+  - {fileID: 0}
+  - {fileID: -517835396, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -369539587, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1192668536, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 74498607, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -496969828, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1050004858, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 272910976, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1334824979, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -908107390, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1051615581, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -685816981, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 670846381, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1718760156, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  HairFringe_3:
+  - {fileID: -1412238458, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -713290677, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 5015106, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 1134022298, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  HairUp_4:
+  - {fileID: 0}
+  - {fileID: 2122630946, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
+  - {fileID: -1541117204, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
+  - {fileID: -1926265829, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
+  - {fileID: 1640155478, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
+  - {fileID: -1171122686, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
+  HairBack_4:
+  - {fileID: 0}
+  - {fileID: 2046876590, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 923430363, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1648944127, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 871507666, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 28797262, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -125516672, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1699364217, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -616452297, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 2140129682, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  HairTendrils_4:
+  - {fileID: 0}
+  - {fileID: -369539587, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -496969828, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1050004858, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 272910976, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -685816981, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 670846381, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1718760156, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  HairFringe_4:
+  - {fileID: 806680471, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 575037392, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1141985906, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -904729572, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 439281439, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 1972340030, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 515872662, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 905070778, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 1985779591, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   brows:
   - {fileID: 0}
   - {fileID: -2147003862, guid: 6e9d8d24942b94944b982cea032bf9d4, type: 3}
@@ -684,6 +804,8 @@ MonoBehaviour:
   - {fileID: 748200095, guid: 78522c1a1fae63b44aa120d7980754f3, type: 3}
   - {fileID: 1629097844, guid: 78522c1a1fae63b44aa120d7980754f3, type: 3}
   - {fileID: 885512102, guid: 78522c1a1fae63b44aa120d7980754f3, type: 3}
+  - {fileID: 1137903054, guid: 78522c1a1fae63b44aa120d7980754f3, type: 3}
+  - {fileID: -387658418, guid: 78522c1a1fae63b44aa120d7980754f3, type: 3}
 --- !u!1 &1091395968
 GameObject:
   m_ObjectHideFlags: 0
@@ -789,12 +911,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1281192154}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalRotation: {x: -0.40821788, y: 0.23456968, z: -0.10938163, w: 0.8754261}
+  m_LocalPosition: {x: -54.976242, y: 10.487876, z: 29.722078}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 0}
+  m_Father: {fileID: 1765547149}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1298356019
 GameObject:
@@ -885,6 +1007,7 @@ GameObject:
   - component: {fileID: 1440900999}
   - component: {fileID: 1440901000}
   - component: {fileID: 1440901001}
+  - component: {fileID: 1440901002}
   m_Layer: 0
   m_Name: World
   m_TagString: Untagged
@@ -904,21 +1027,21 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce010db710ee9f949b8eeb00988dc2e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  worldsise: {x: 50, y: 50}
+  worldsise: {x: 30, y: 80}
   grid:
-    tileWidth: 0
+    tileWidth: 1
     XGrid: 0
     YGrid: 0
     originPoint: {x: 0, y: 0, z: 0}
   tilePrefab: {fileID: 32131678100906441, guid: 6e88acb7a37c709409c366a8413542f1, type: 3}
-  atmosphericMoisture: 1
-  airTemp: 1
+  atmosphericMoisture: 800000
+  airTemp: -20
   totalWater: 0
   totalSoil: 0
   totalSand: 0
   totalSilt: 0
   totalClay: 0
-  totalOrganicMatter: 0
+  totalOrganicMaterial: 0
   demeter: {fileID: 1956233986128766911, guid: bc8a76db48a4b1a4ab671cc8f9e3423a, type: 3}
 --- !u!4 &1440900998
 Transform:
@@ -978,9 +1101,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fa2202a81ca9dc4eb5b2fc7d684a014, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialPepos: 450
-  generationSteps: 20
-  maxPepos: 700
+  initialPepos: 350
+  generationSteps: 15
+  maxPepos: 400
   minPopulationThreshold: 15
   immigrantCount: 3
   multipleBirthChance: 0.02
@@ -995,6 +1118,40 @@ MonoBehaviour:
   amountOfPeopleToHaveExisted: 0
   generations: 0
   uiManager: {fileID: 628422715}
+--- !u!114 &1440901002
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1440900996}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bab3bd6723f4aa2458a7a19da4a6dfc4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  width: 0
+  height: 0
+  waterLevel: 0
+  rockLevel: 0
+  sandLevel: 0
+  grassLevel: 0
+  lavaLevel: 0
+  farmlandLevel: 0
+  pondChance: 0
+  lavaChance: 0
+  farmlandChance: 0
+  sedimentationRate: 0
+  erosionRate: 0
+  upliftRate: 0
+  maxUpliftHeight: 0
+  waterPrefab: {fileID: 0}
+  rockPrefab: {fileID: 0}
+  sandPrefab: {fileID: 0}
+  grassPrefab: {fileID: 0}
+  lavaPrefab: {fileID: 0}
+  farmlandPrefab: {fileID: 0}
+  pondPrefab: {fileID: 0}
 --- !u!1 &1659974253
 GameObject:
   m_ObjectHideFlags: 0
@@ -1289,7 +1446,8 @@ Transform:
   m_LocalPosition: {x: 61.180405, y: 16.026955, z: 3.984911}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
-  m_Children: []
+  m_Children:
+  - {fileID: 1281192157}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 50, y: -30, z: 0}
 --- !u!1 &1811460304
@@ -1413,13 +1571,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1934204563}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.09655312, y: 0.7004838, z: -0.09655312, w: 0.7004838}
+  m_LocalRotation: {x: 0.030843573, y: 0.7064338, z: -0.030843573, w: 0.7064338}
   m_LocalPosition: {x: 10, y: 1.53, z: 15}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 15.696, y: 90, z: 0}
+  m_LocalEulerAnglesHint: {x: 5, y: 90, z: 0}
 --- !u!1 &1936633666
 GameObject:
   m_ObjectHideFlags: 0
@@ -1563,4 +1721,3 @@ SceneRoots:
   - {fileID: 1440900998}
   - {fileID: 1091395970}
   - {fileID: 628422714}
-  - {fileID: 1281192157}

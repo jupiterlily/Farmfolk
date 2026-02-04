@@ -66,22 +66,22 @@ public static class PepoUtilitiesValues
 	     // Helper methods to categorize values
 	     public static bool IsOpennessValue(Value value)
 	     {
-		          return value.name == "Agency" || value.name == "Stimulation";
+		          return value.name == "tolerance" || value.name == "curiosity" || value.name == "autonomy" || value.name == "excitement";
 	     }
 
 	     public static bool IsSelfEnhancementValue(Value value)
 	     {
-		          return value.name == "Hedonism" || value.name == "Achievement" || value.name == "Power";
+		          return value.name == "vitality" || value.name == "indulgence" || value.name == "accomplishment" || value.name == "dominance" || value.name == "resources" || value.name == "status";
 	     }
 
 	     public static bool IsConservationValue(Value value)
 	     {
-		          return value.name == "Security" || value.name == "Conformity" || value.name == "Tradition";
+		          return value.name == "resources" || value.name == "status" || value.name == "safety" || value.name == "security" || value.name == "tradition" || value.name == "obedience" || value.name == "cohesion";
 	     }
 
 	     public static bool IsSelfTranscendenceValue(Value value)
 	     {
-		          return value.name == "Benevolence" || value.name == "Universalism";
+		          return value.name == "humility" || value.name == "preservation" || value.name == "compassion" || value.name == "tolerance" || value.name == "caring" || value.name == "dependability";
 	     }
 
 	     /// <summary>

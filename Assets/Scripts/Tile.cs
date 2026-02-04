@@ -36,7 +36,7 @@ public class WorldTile : MonoBehaviour
 	     public void TileVisualUpdate()
 	     {
 		          SoilUtilities.CalculateDerivedProperties(tileData.composition);
-		          float height = SoilUtilities.CalculateEffectiveVolume(tileData.composition) + (tileData.surfaceMoisture / 1000);
+		          float height = SoilUtilities.CalculateEffectiveVolume(tileData.composition) + (tileData.surfaceWater.Mass / 1000);
 		          //latitude += tileData.tileGridRef.y / 3; // Adjust latitude based on tile position for variety
 		          transform.localScale = new Vector3(tileSise, height, tileSise);
 
@@ -49,13 +49,21 @@ public class WorldTile : MonoBehaviour
 		          );
 		          Color tileColor = TileUtilities.GetSoilColor(tileData.composition);
 		          //set colour of tile based on composition and moisture
-		          if (tileData.surfaceMoisture > 300)
+		          if (tileData.surfaceWater.Mass > 300)
 		          {
-				tileColor = Color.Lerp(tileColor, Constants.DEEP_WATER_COLOR, tileData.surfaceMoisture / 100f);
+				tileColor = Color.Lerp(tileColor, Constants.DEEP_WATER_COLOR, tileData.surfaceWater.Mass / 100f);
 		          }
-		          if (tileData.surfaceMoisture > 15)
+		          if (tileData.surfaceWater.Mass > 15)
 		          {
-				tileColor = Color.Lerp(tileColor, Constants.SHALLOW_WATER_COLOR, tileData.surfaceMoisture / 100f);
+				if (tileData.surfaceWater.CurrentPhase == Phase.Liquid)
+				{
+					     tileColor = Color.Lerp(tileColor, Constants.SHALLOW_WATER_COLOR, tileData.surfaceWater.Mass / 100f);
+				}
+				else if (tileData.surfaceWater.CurrentPhase == Phase.Solid)
+				{
+					     tileColor = Color.Lerp(tileColor, Constants.ICE_COLOR, tileData.surfaceWater.Mass / 100f);
+				}
+
 		          }
 		          //convert longitude to a time of day (0-1) from -180 to 180 degrees
 		          float longitude = tileData.longitude; // -180 to 180
@@ -69,6 +77,9 @@ public class WorldTile : MonoBehaviour
 							   //blend with black based on how much light there isn't
 		          tileColor = Color.Lerp(tileColor, Color.black, (1 - lightFactor) * 0.85f); // Blend with black based on light factor
 		          GetComponent<Renderer>().material.color = tileColor;
+
+		          //get the NW corner of the mesh and set its height to the average of the North, West and Northwest tiles.
+
 	     }
 
 	     public List<WorldTile> GetNeighbors()

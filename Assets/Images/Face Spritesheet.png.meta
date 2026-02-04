@@ -296,7 +296,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Face_0
+      name: HairFront_0
       rect:
         serializedVersion: 2
         x: 448
@@ -304,7 +304,7 @@ TextureImporter:
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -359,7 +359,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Face_2
+      name: HairFront_1
       rect:
         serializedVersion: 2
         x: 640
@@ -367,7 +367,7 @@ TextureImporter:
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -2224,9 +2224,7 @@ TextureImporter:
       Face Spritesheet_6: -734300769
       Face Spritesheet_8: 539284449
       Face Spritesheet_9: -996312409
-      Face_0: -298565334
       Face_1: 1782834655
-      Face_2: 1126815130
       Face_3: 1672077734
       Face_4: -1936632090
       Face_5: 238460307
@@ -2246,6 +2244,8 @@ TextureImporter:
       Freckles_7: -517224800
       Freckles_8: 1385791923
       Freckles_9: 35545166
+      HairFront_0: -298565334
+      HairFront_1: 1126815130
       Head_0: -1915808522
       Head_1: -294115515
       Head_2: -913378593

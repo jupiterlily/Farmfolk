@@ -77,7 +77,7 @@ public static class PepoFactoryValues
 				{                                       //foreach value in the openness category, add the value normalised from openness and extraversion. subtract 5 from each. openness adds more self direction, extraversion adds more stimulation. 
 					     if (PepoUtilitiesValues.IsOpennessValue(v))
 					     {
-						          if (v.name == "Agency")
+						          if (v.name == "curiosity")
 						          {
 								v.value += (personality.Openness.value * factor) / 2;
 						          }
@@ -89,7 +89,7 @@ public static class PepoFactoryValues
 				}
 				if (personality.Extraversion.value > 5)
 				{
-					     if (v.name == "Stimulation")
+					     if (v.name == "excitement")
 					     {
 						          v.value += (personality.Extraversion.value * factor) / 2;
 					     }
@@ -101,7 +101,7 @@ public static class PepoFactoryValues
 					     if (PepoUtilitiesValues.IsSelfTranscendenceValue(v))
 					     {
 						          v.value += (personality.Agreeableness.value * factor) / 2;
-						          if (v.name == "Benevolence")
+						          if (v.name == "dependability")
 						          {
 								v.value += (personality.Agreeableness.value * factor) / 2;
 						          }
@@ -116,7 +116,7 @@ public static class PepoFactoryValues
 					     {
 						          v.value += (personality.Extraversion.value * factor);
 					     }
-					     if (v.name == "Tradition")
+					     if (v.name == "tradition")
 					     {
 						          v.value = -1;
 					     }
@@ -125,15 +125,15 @@ public static class PepoFactoryValues
 				//Conscientiousness correlates with achievement, conformity and security.
 				if (personality.Conscientiousness.value > 5)
 				{
-					     if (v.name == "Achievement")
+					     if (v.name == "accomplishment")
 					     {
 						          v.value += personality.Conscientiousness.value * factor;
 					     }
-					     if (v.name == "Conformity")
+					     if (v.name == "obedience")
 					     {
 						          v.value += personality.Conscientiousness.value * factor;
 					     }
-					     if (v.name == "Security")
+					     if (v.name == "security")
 					     {
 						          v.value += personality.Conscientiousness.value * factor;
 					     }

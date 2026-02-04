@@ -9,6 +9,6 @@ public static class MatterLibrary
 
 	     public static void initialiseElements()
 	     {
-		          //carbon, hydrogen, oxygen, nitrogen, phosphorus, sulfur, sodium, chlorine, silicon, argon, iron, copper, calcium
+		          //carbon, hydrogen, oxygen, nitrogen, phosphorus, sulfur, sodium, chlorine, silicon, argon, iron, copper, calcium, aluminium
 	     }
 }

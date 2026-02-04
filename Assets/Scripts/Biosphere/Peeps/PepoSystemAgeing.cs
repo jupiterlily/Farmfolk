@@ -23,6 +23,7 @@ public static class PepoSystemAgeing
 		          {
 				pepo.body.cosmeticFeatures.UpdateFacialHair(pepo);
 		          }
+		          pepo.body.cosmeticFeatures.UpdateHair(pepo);
 	     }
 
 	     public static void InitialisePuberty(float pubertyAge, PepoData pepo)

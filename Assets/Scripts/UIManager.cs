@@ -11,20 +11,35 @@ public class UIManager : MonoBehaviour
 
 	     private List<GameObject> currentPanels = new List<GameObject>();
 
-	     public List<Sprite> mascEyes;
-	     public List<Sprite> femmeEyes;
+	     public List<Sprite> pepoEyes;
+	     public List<Sprite> linerEyes;
 	     public List<Sprite> eyeColor;
 	     public List<Sprite> headShape;
 	     public List<Sprite> freckles;
 	     public List<Sprite> topLips;
 	     public List<Sprite> bottomLips;
 	     public List<Sprite> noseShape;
-	     public List<Sprite> uHairBack;
-	     public List<Sprite> uHhairFront;
-	     public List<Sprite> mHairBack;
-	     public List<Sprite> mHairFront;
-	     public List<Sprite> fHairBack;
-	     public List<Sprite> fHairFront;
+	     //straight hair
+	     public List<Sprite> HairUp_1;
+	     public List<Sprite> HairBack_1;
+	     public List<Sprite> HairTendrils_1;
+	     public List<Sprite> HairFringe_1;
+	     //wavy hair
+	     public List<Sprite> HairUp_2;
+	     public List<Sprite> HairBack_2;
+	     public List<Sprite> HairTendrils_2;
+	     public List<Sprite> HairFringe_2;
+	     //curly hair
+	     public List<Sprite> HairUp_3;
+	     public List<Sprite> HairBack_3;
+	     public List<Sprite> HairTendrils_3;
+	     public List<Sprite> HairFringe_3;
+	     //coily hair
+	     public List<Sprite> HairUp_4;
+	     public List<Sprite> HairBack_4;
+	     public List<Sprite> HairTendrils_4;
+	     public List<Sprite> HairFringe_4;
+
 	     public List<Sprite> brows;
 	     public List<Sprite> stubble;
 	     public List<Sprite> moustaches;
@@ -37,23 +52,38 @@ public class UIManager : MonoBehaviour
 		          // Pass sprite references to PepoUIManager
 		          if (pepoUI != null)
 		          {
-				pepoUI.mascEyes = mascEyes;
-				pepoUI.femmeEyes = femmeEyes;
+				pepoUI.mascEyes = pepoEyes;
+				pepoUI.femmeEyes = linerEyes;
 				pepoUI.headShape = headShape;
 				pepoUI.freckles = freckles;
 				pepoUI.topLips = topLips;
 				pepoUI.bottomLips = bottomLips;
 				pepoUI.noseShape = noseShape;
 				pepoUI.eyecolor = eyeColor;
-				pepoUI.uHairBack = uHairBack;
-				pepoUI.uHairFront = uHhairFront;
-				pepoUI.mHairBack = mHairBack;
-				pepoUI.mHairFront = mHairFront;
-				pepoUI.fHairBack = fHairBack;
-				pepoUI.fHairFront = fHairFront;
+
 				pepoUI.brows = brows;
 				pepoUI.stubble = stubble;
 				pepoUI.moustaches = moustaches;
+
+				pepoUI.HairUp_1 = HairUp_1;
+				pepoUI.HairBack_1 = HairBack_1;
+				pepoUI.HairTendrils_1 = HairTendrils_1;
+				pepoUI.HairFringe_1 = HairFringe_1;
+
+				pepoUI.HairUp_2 = HairUp_2;
+				pepoUI.HairBack_2 = HairBack_2;
+				pepoUI.HairTendrils_2 = HairTendrils_2;
+				pepoUI.HairFringe_2 = HairFringe_2;
+
+				pepoUI.HairUp_3 = HairUp_3;
+				pepoUI.HairBack_3 = HairBack_3;
+				pepoUI.HairTendrils_3 = HairTendrils_3;
+				pepoUI.HairFringe_3 = HairFringe_3;
+
+				pepoUI.HairUp_4 = HairUp_4;
+				pepoUI.HairBack_4 = HairBack_4;
+				pepoUI.HairTendrils_4 = HairTendrils_4;
+				pepoUI.HairFringe_4 = HairFringe_4;
 		          }
 
 		          // Initial population of UI

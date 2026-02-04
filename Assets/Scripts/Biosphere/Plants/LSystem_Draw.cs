@@ -38,15 +38,16 @@ public class LSystem_Draw : MonoBehaviour
 	     }
 
 	     //function that takes a string and aposition and draws a line according to the number of S segments and directional arrows
-	     public void DrawBranch(string axiom, Vector3 position)
+	     public GameObject DrawBranch(string axiom, Vector3 position)
 	     {
 		          if (string.IsNullOrEmpty(axiom))
 		          {
 				Debug.LogError("Cannot draw branch, axiom is null or empty.");
-				return;
+				return null;
 
 		          }
 		          // Create a new GameObject for the branch 
+		          return new GameObject() { name = axiom };
 	     }
 
 	     //create stem part
