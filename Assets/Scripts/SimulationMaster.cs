@@ -183,6 +183,7 @@ public class SimulationMaster : MonoBehaviour
 		          }
 		          SimulationConstants.UpdateTimeConstants(0, minutes, 0, 0, 0);
 		          SimulationConstants.UpdateTime(currentTimeOfDay);
+		          tileManager.AtmosphereStep(minutes / 60f);
 	     }
 
 	     // Handle the passage of hours within the simulation.

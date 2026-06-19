@@ -11,7 +11,7 @@ public class TileManager : MonoBehaviour
 	     public TileGrid grid;
 	     public GameObject tilePrefab;
 	     public WorldTile[,] tiles;
-	     int atmTileSise => (int)grid.tileWidth * 10;
+	     int atmTileSise => (int)grid.tileWidth * 3;
 	     public float atmosphericMoisture; //in liters
 	     public float airTemp;
 	     public float totalWater; //all the water in the system, in liters
@@ -20,7 +20,7 @@ public class TileManager : MonoBehaviour
 	     public float totalSilt; //total silt in the world
 	     public float totalClay; //total clay in the world
 	     public float totalOrganicMaterial; //total organic matter in the world
-
+	     public List<Sprite> leafSprites;
 	     // 3 layers, each with reduced resolution (10x tile sise)
 	     public AtmosphereTile[,,] atmosphereTiles;
 
@@ -38,12 +38,12 @@ public class TileManager : MonoBehaviour
 
 		          int atmGridX = Mathf.CeilToInt((float)worldsise.x / atmTileSise);
 		          int atmGridY = Mathf.CeilToInt((float)worldsise.y / atmTileSise);
-		          int atmLayers = 3;
+		          int atmLayers = 8;
 		          atmosphereTiles = new AtmosphereTile[atmLayers, atmGridX, atmGridY];
 
 		          for (int layer = 0; layer < atmLayers; layer++)
 		          {
-				int layorFactor = 10;
+				int layorFactor = 3;
 				for (int i = 0; i < atmGridX; i++)
 				{
 					     for (int j = 0; j < atmGridY; j++)
@@ -67,7 +67,8 @@ public class TileManager : MonoBehaviour
 					     }
 
 				}
-				layorFactor *= 10; // Increase layer height by factor of 10 for each layer, later 1 is 10m, layer 2 is 100m, layer 3 is 1km 
+				layorFactor *= 3; // Increase layer height by factor of 10 for each layer, later 1 is 10m, layer 2 is 100m, layer 3 is 1km 
+					   // Increase layer height by factor of 3 for each layer, later 1 is 3m, 2 is 9m, 3 is 27m, 4 is 81m, 5 is 243m, 6 is 729m, 7 is 2187m (2.187km) 
 		          }
 
 		          for (int i = 0; i < grid.XGrid; i++)
@@ -127,7 +128,10 @@ public class TileManager : MonoBehaviour
 				}
 		          }
 		          AllocateNeighbors();
-		          TileUpdate(1f); // Initial update
+		          AtmosphereUtilities.InitializeHadleyCellWinds(atmosphereTiles, this);
+		          AtmosphereUtilities.FinalizePressurePatterns(atmosphereTiles);
+		          //  AtmosphereStep(10f); // Initial atmosphere update
+		          TileUpdate(0.5f); // Initial update
 		          WakeDemeter();
 
 	     }
@@ -140,6 +144,7 @@ public class TileManager : MonoBehaviour
 		          demeter.tileManager = this;
 		          demeter.xBounds = new Vector2(0, worldsise.x);
 		          demeter.yBounds = new Vector2(0, worldsise.y);
+		          demeter.leafSprites = leafSprites;
 		          //go through tile data and find tiles that have no surface water but some soil moisture.
 		          List<TileData> plantPositions = FindPlantPositions();
 		          // Set the plant count and initialize
@@ -153,7 +158,7 @@ public class TileManager : MonoBehaviour
 		          foreach (var tile in tiles)
 		          {
 				TileData data = tile.tileData;
-				if (data.composition.water.Mass > 5f && data.surfaceWater.Mass < 10f && data.composition.organicMaterial.Mass > 10f)
+				if (data.composition.water.Mass > 5f && data.surfaceWater.Mass < 10f && (data.composition.organicMaterial.Mass > 1f || data.composition.clay.Mass > 1f || data.composition.silt.Mass > 1f || data.composition.sand.Mass > 1f))
 				{
 					     plantPositions.Add(data);
 				}
@@ -165,27 +170,43 @@ public class TileManager : MonoBehaviour
 	     /// </summary>
 	     public void TileUpdate(float hours)
 	     {
+		          //AtmosphereStep(hours);
+		          // Fourth: Apply precipitation from atmosphere to surface
+		          ApplyPrecipitationToSurface(hours);
+
+		          // Fifth: Update each tile's soil and hydrosphere
+		          UpdateAllTiles(hours);
+
+		          // Sixth: Validate conservation
+		          UpdateTotals();
+	     }
+	     public void AtmosphereStep(float hours)
+	     {
+		          // First: Update atmospheric wind dynamics
+		          AtmosphereUtilities.UpdateAtmosphericWind(atmosphereTiles, hours);
+
+		          // Second: Apply atmospheric advection (transports properties based on updated wind)
 		          AtmosphereUtilities.ApplyAtmosphericAdvection(atmosphereTiles, hours);
-		          // First: Run atmospheric simulation
+
+		          // Third: Run atmospheric simulation (thermal mixing, etc.)
 		          foreach (var tile in atmosphereTiles)
 		          {
-
+				float distance = atmTileSise * tile.layerHeight;
+				List<ThermalEnergy> toMix = new List<ThermalEnergy>(tile.energy);
 				if (tile.above == null)
 				{
-					     List<ThermalEnergy> toMix = new List<ThermalEnergy>(tile.energy);
+
 					     toMix.AddRange(tile.below.energy);
-					     ThermalEnergyUtilities.MixTemperaturesByConduction(toMix, hours, atmTileSise * tile.layerHeight);
+					     ThermalEnergyUtilities.MixTemperaturesByConduction(toMix, hours, atmTileSise, distance);
 					     toMix.Clear();
-					     toMix = tile.below.energy;
+					     toMix.AddRange(tile.below.energy);
 					     toMix.AddRange(tile.below.below.energy);
-					     ThermalEnergyUtilities.MixTemperaturesByConduction(toMix, hours, atmTileSise * tile.layerHeight);
+					     ThermalEnergyUtilities.MixTemperaturesByConduction(toMix, hours, atmTileSise, distance);
 					     float radiativeLoss = AtmosphereUtilities.CalculateRadiativeCooling(tile, hours);
-					     //tile.energy.ForEach(e => e.ExtractEnergy(radiativeLoss / tile.energy.Count));
 					     foreach (var material in tile.energy)
 					     {
 						          if (radiativeLoss <= 0)
 								break;
-						          //extract energy until radiative loss =0
 						          radiativeLoss -= material.ExtractEnergy(radiativeLoss);
 					     }
 				}
@@ -194,24 +215,14 @@ public class TileManager : MonoBehaviour
 				{
 					     if (neighbor != null)
 					     {
-						          List<ThermalEnergy> toMix = new List<ThermalEnergy>(tile.energy);
+
 						          toMix.AddRange(neighbor.energy);
-						          ThermalEnergyUtilities.MixTemperaturesByConduction(toMix, hours, atmTileSise * tile.layerHeight);
+						          ThermalEnergyUtilities.MixTemperaturesByConduction(toMix, hours, atmTileSise, distance);
 					     }
 				}
-				ThermalEnergyUtilities.MixTemperaturesByConduction(tile.energy, hours, atmTileSise * tile.layerHeight);
+				//ThermalEnergyUtilities.MixTemperaturesByConduction(toMix, hours, atmTileSise, distance);
 		          }
-
-		          // Second: Apply precipitation from atmosphere to surface
-		          ApplyPrecipitationToSurface(hours);
-
-		          // Third: Update each tile's soil and hydrosphere
-		          UpdateAllTiles(hours);
-
-		          // Fourth: Validate conservation
-		          UpdateTotals();
 	     }
-
 	     /// <summary>
 	     /// Applies precipitation from atmosphere tiles to surface tiles
 	     /// </summary>
@@ -411,7 +422,8 @@ public class TileManager : MonoBehaviour
 		          if (data == null)
 				return;
 		          float albedo = 0;
-		          Color.RGBToHSV(tiles[data.tileGridRef.x, data.tileGridRef.y].GetComponent<Renderer>().material.color, out albedo, out albedo, out albedo);
+		          UnityEngine.Color color = tilePrefab.GetComponent<Renderer>().sharedMaterial.color;
+		          albedo = 0.299f * color.r + 0.587f * color.g + 0.114f * color.b;
 		          data.composition.albedo = albedo;
 
 		          solarRadiation *= albedo; //adjust solar radiation based on albedo
@@ -654,7 +666,10 @@ public class TileManager : MonoBehaviour
 	     {
 		          float waterSum = 0f;
 		          SoilComposition soilSum = new SoilComposition();
-
+		          totalSand = 0f;
+		          totalSilt = 0f;
+		          totalClay = 0f;
+		          totalOrganicMaterial = 0f;
 		          // Sum water from all world tiles
 		          for (int i = 0; i < worldsise.x; i++)
 		          {
@@ -682,6 +697,12 @@ public class TileManager : MonoBehaviour
 					     {
 						          waterSum += atmosphereTiles[layer, i, j].waterVapor.Mass;
 						          waterSum += atmosphereTiles[layer, i, j].cloudWaterContent.Mass;
+						          waterSum += atmosphereTiles[layer, i, j].iceParticles.Mass;
+						          totalSand += atmosphereTiles[layer, i, j].sand.Mass;
+						          totalSilt
+								+= atmosphereTiles[layer, i, j].silt.Mass;
+						          totalClay += atmosphereTiles[layer, i, j].clay.Mass;
+						          totalOrganicMaterial += atmosphereTiles[layer, i, j].organicMaterial.Mass;
 					     }
 				}
 		          }
@@ -729,12 +750,10 @@ public class TileManager : MonoBehaviour
 
 					     float totalEvaporation = 0f;
 					     for (int i = startX; i < endX; i++)
-					     {
 						          for (int j = startY; j < endY; j++)
 						          {
 
 						          }
-					     }
 					     //here we need to update the surface layer moisture and temperature and ensure that we 					     
 
 				}
@@ -863,7 +882,7 @@ public class TileManager : MonoBehaviour
 						          // Fixed: Check cloudWaterContent.Mass exists
 						          if (atmo.cloudWaterContent != null && atmo.cloudWaterContent.Mass > 0)
 						          {
-								Gizmos.color = new Color(1f, 1f, 1f, Mathf.Clamp01(atmo.cloudWaterContent.Mass / 10f));
+								Gizmos.color = new UnityEngine.Color(1f, 1f, 1f, Mathf.Clamp01(atmo.cloudWaterContent.Mass / 10f));
 								float cloudSise = Mathf.Clamp(atmo.cloudWaterContent.Mass / 1000f, 0.1f, 5f);
 								Gizmos.DrawSphere(pos + new Vector3(0, 2, 0), cloudSise);
 						          }
@@ -898,6 +917,156 @@ public class TileManager : MonoBehaviour
 					     }
 				}
 		          }
+
+		          // DrawSurfaceWaterFlow();
+	     }
+
+	     /// <summary>
+	     /// Draws water flow visualization between surface tiles
+	     /// Arrow thickness = flow volume, length = flow speed, color = temperature
+	     /// </summary>
+	     //  private void DrawSurfaceWaterFlow()
+	     //  {
+	     //        if (tiles == null || tiles.Length == 0)
+	     //return;
+
+	     //        float maxFlowRate = 0.1f;
+	     //        float maxFlowSpeed = 0.1f;
+	     //        float minTemp = -40f;
+	     //        float maxTemp = 100f;
+
+	     //        // First pass: find min/max for normalization
+	     //        for (int x = 0; x < worldsise.x; x++)
+	     //        {
+	     //for (int y = 0; y < worldsise.y; y++)
+	     //{
+	     //	     WorldTile tile = tiles[x, y];
+	     //	     if (tile == null)
+	     //		          continue;
+
+	     //	     TileData data = tile.tileData;
+	     //	     var neighbors = tile.GetNeighbors();
+
+	     //	     foreach (var neighbor in neighbors)
+	     //	     {
+	     //		          if (neighbor == null)
+	     //				continue;
+
+	     //		          float heightDiff = data.volume - neighbor.tileData.volume;
+	     //		          if (heightDiff <= 0)
+	     //				continue; // Only show downhill flow
+
+	     //		          float gradient = Mathf.Clamp01(heightDiff);
+	     //		          float flowRate = data.surfaceWater.Mass * gradient;
+
+	     //		          maxFlowRate = Mathf.Max(maxFlowRate, flowRate);
+
+	     //		          // Estimate flow speed from gradient (m/s)
+	     //		          float flowSpeed = Mathf.Sqrt(gradient * Constants.GRAVITY_ACCELERATION);
+	     //		          maxFlowSpeed = Mathf.Max(maxFlowSpeed, flowSpeed);
+	     //	     }
+	     //}
+	     //        }
+
+	     //        // Second pass: draw flow arrows
+	     //        for (int x = 0; x < worldsise.x; x++)
+	     //        {
+	     //for (int y = 0; y < worldsise.y; y++)
+	     //{
+	     //	     WorldTile tile = tiles[x, y];
+	     //	     if (tile == null)
+	     //		          continue;
+
+	     //	     TileData data = tile.tileData;
+	     //	     Vector3 tilePos = new Vector3(x, 1f, y);
+	     //	     var neighbors = tile.GetNeighbors();
+
+	     //	     foreach (var neighbor in neighbors)
+	     //	     {
+	     //		          if (neighbor == null)
+	     //				continue;
+
+	     //		          float heightDiff = data.volume - neighbor.tileData.volume;
+	     //		          if (heightDiff <= 0)
+	     //				continue; // Only show downhill flow
+
+	     //		          Vector3 neighborPos = new Vector3(neighbor.tileData.tileGridRef.x, 1f, neighbor.tileData.tileGridRef.y);
+	     //		          Vector3 flowDirection = (neighborPos - tilePos).normalized;
+
+	     //		          float gradient = Mathf.Clamp01(heightDiff);
+	     //		          float flowRate = data.surfaceWater.Mass * gradient;
+	     //		          float normalizedFlowRate = maxFlowRate > 0.1f ? flowRate / maxFlowRate : 0f;
+
+	     //		          // Flow speed based on gradient and water mass
+	     //		          float flowSpeed = Mathf.Sqrt(gradient * Constants.GRAVITY_ACCELERATION);
+	     //		          float normalizedSpeed = maxFlowSpeed > 0.1f ? flowSpeed / maxFlowSpeed : 0f;
+
+	     //		          // Arrow length proportional to flow speed
+	     //		          float arrowLength = 0.2f + normalizedSpeed * 0.8f;
+
+	     //		          // Arrow endpoint
+	     //		          Vector3 arrowEnd = tilePos + flowDirection * arrowLength;
+
+	     //		          // Temperature color
+	     //		          float waterTemp = data.surfaceWater.Temperature;
+	     //		          float tempCelsius = waterTemp - 273.15f;
+	     //		          Gizmos.color = GetWaterFlowTemperatureColor(tempCelsius, minTemp, maxTemp);
+
+	     //		          // Draw line with thickness represented by arrow width
+	     //		          Gizmos.DrawLine(tilePos, arrowEnd);
+
+	     //		          // Draw arrow head
+	     //		          float arrowHeadSize = 0.1f + normalizedFlowRate * 0.2f;
+	     //		          DrawArrow(tilePos, arrowEnd, arrowHeadSize);
+
+	     //		          // Draw flow amount indicator (optional: small sphere at midpoint)
+	     //		          if (flowRate > 0.5f) // Only show significant flows
+	     //		          {
+	     //				Vector3 midPoint = Vector3.Lerp(tilePos, arrowEnd, 0.5f);
+	     //				float flowIndicatorSize = Mathf.Clamp01(normalizedFlowRate) * 0.3f;
+
+	     //				if (flowIndicatorSize > 0.05f)
+	     //				{
+	     //					     Gizmos.color = new Color(
+	     //					         Gizmos.color.r,
+	     //					         Gizmos.color.g,
+	     //					         Gizmos.color.b,
+	     //					         0.7f
+	     //					     );
+	     //					     Gizmos.DrawSphere(midPoint, flowIndicatorSize);
+	     //				}
+	     //		          }
+	     //	     }
+	     //}
+	     //        }
+	     //  }
+
+	     /// <summary>
+	     /// Gets temperature-based color for water flow visualization
+	     /// </summary>
+	     private UnityEngine.Color GetWaterFlowTemperatureColor(float tempC, float minTemp, float maxTemp)
+	     {
+		          float normalized = Mathf.Clamp01((tempC - minTemp) / (maxTemp - minTemp));
+
+		          // Cold: blue -> Hot: red
+		          if (normalized <= 0.333f)
+		          {
+				// Map [0, 0.333] to [0,1] for Lerp from Blue to Cyan
+				float t = normalized / 0.333f;
+				return UnityEngine.Color.Lerp(UnityEngine.Color.blue, UnityEngine.Color.cyan, t);
+		          }
+		          else if (normalized <= 0.666f)
+		          {
+				// Map [0.333, 0.666] to [0,1] for Lerp from Cyan to Yellow
+				float t = (normalized - 0.333f) / (0.666f - 0.333f); // which is (normalized - 0.333f) / 0.333f
+				return UnityEngine.Color.Lerp(UnityEngine.Color.cyan, UnityEngine.Color.yellow, t);
+		          }
+		          else
+		          {
+				// Map [0.666, 1] to [0,1] for Lerp from Yellow to Red
+				float t = (normalized - 0.666f) / (1f - 0.666f); // which is (normalized - 0.666f) / 0.334f
+				return UnityEngine.Color.Lerp(UnityEngine.Color.yellow, UnityEngine.Color.red, t);
+		          }
 	     }
 
 	     // Helper method to draw direction arrows
@@ -920,38 +1089,38 @@ public class TileManager : MonoBehaviour
 	     }
 
 	     // Color utilities for visualization
-	     Color GetHumidityColor(float relativeHumidity)
+	     UnityEngine.Color GetHumidityColor(float relativeHumidity)
 	     {
 		          // Blue gradient for humidity (fixed: clamp input)
 		          float clamped = Mathf.Clamp01(relativeHumidity);
-		          return Color.Lerp(
-				new Color(0.7f, 0.7f, 1f, 0.5f),    // Light blue (dry)
-				new Color(0f, 0f, 1f, 0.8f),        // Dark blue (humid)
+		          return UnityEngine.Color.Lerp(
+				new UnityEngine.Color(0.7f, 0.7f, 1f, 0.5f),    // Light blue (dry)
+				new UnityEngine.Color(0f, 0f, 1f, 0.8f),        // Dark blue (humid)
 				clamped
 		          );
 	     }
 
-	     Color GetWindColor(float windSpeed, float maxWindSpeed)
+	     UnityEngine.Color GetWindColor(float windSpeed, float maxWindSpeed)
 	     {
 		          // Red-yellow gradient for wind speed (fixed: handle zero maxWindSpeed)
 		          if (maxWindSpeed < 0.001f)
-				return Color.yellow;
+				return UnityEngine.Color.yellow;
 
 		          float normalisedSpeed = Mathf.Clamp01(windSpeed / maxWindSpeed);
-		          return Color.Lerp(
-				Color.yellow,
-				Color.red,
+		          return UnityEngine.Color.Lerp(
+				UnityEngine.Color.yellow,
+				UnityEngine.Color.red,
 				normalisedSpeed
 		          );
 	     }
 
-	     Color GetTemperatureColor(float tempC)
+	     UnityEngine.Color GetTemperatureColor(float tempC)
 	     {
 		          // Blue-red gradient for temperature (fixed: handle out-of-range temps)
 		          float normalisedTemp = Mathf.Clamp01(Mathf.InverseLerp(-20f, 40f, tempC));
-		          return Color.Lerp(
-				Color.blue,
-				Color.red,
+		          return UnityEngine.Color.Lerp(
+				UnityEngine.Color.blue,
+				UnityEngine.Color.red,
 				normalisedTemp
 		          );
 	     }

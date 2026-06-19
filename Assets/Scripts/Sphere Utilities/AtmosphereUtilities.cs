@@ -7,157 +7,6 @@ public static class AtmosphereUtilities
 	     /// <summary>
 	     /// Simulates atmospheric processes using a conservative finite-volume approach
 	     /// </summary>
-	     //  public static void SimulateAtmosphere(AtmosphereTile[,,] atmosphereTiles, float hours)
-	     //  {
-	     //        int layers = atmosphereTiles.GetLength(0);
-	     //        int width = atmosphereTiles.GetLength(1);
-	     //        int height = atmosphereTiles.GetLength(2);
-
-	     //        // Store initial energy state for conservation check
-	     //        float initialTotalEnergy = CalculateTotalEnergy(atmosphereTiles);
-	     //        float initialTotalWater = CalculateTotalWater(atmosphereTiles);
-
-	     //        // Use floats but with proper scaling to avoid precision issues
-	     //        float[,,] newTemps = new float[layers, width, height];
-	     //        float[,,] newVapor = new float[layers, width, height];
-	     //        float[,,] newCloudWater = new float[layers, width, height];
-	     //        float[,,] newLiquidWater = new float[layers, width, height];
-	     //        Vector3[,,] newWinds = new Vector3[layers, width, height];
-
-	     //        // First: Calculate all temperature changes WITHOUT water phase changes
-	     //        for (int layer = 0; layer < layers; layer++)
-	     //        {
-	     //for (int x = 0; x < width; x++)
-	     //{
-	     //	     for (int y = 0; y < height; y++)
-	     //	     {
-	     //		          AtmosphereTile current = atmosphereTiles[layer, x, y];
-
-	     //		          // 1. Adiabatic change - ensure small values
-	     //		          float adiabaticChange = CalculateAdiabaticChange(current, layer, layers) * hours;
-
-	     //		          // 2. Radiative change - ensure small values
-	     //		          float radiativeChange = CalculateRadiativeChange(current, layer, layers, hours);
-
-	     //		          // Apply temperature changes
-	     //		          newTemps[layer, x, y] = current.temperature + adiabaticChange + radiativeChange;
-
-	     //		          // Copy water values
-	     //		          newVapor[layer, x, y] = current.waterVapor.Mass;
-	     //		          newCloudWater[layer, x, y] = current.cloudWaterContent.Mass;
-	     //		          newLiquidWater[layer, x, y] = current.liquidWater.Mass;
-
-	     //		          // Calculate wind changes
-	     //		          Vector3 pressureForce = CalculatePressureGradientForce(atmosphereTiles, layer, x, y, width, height);
-	     //		          float latitude = (y / (float)height * 180f) - 90f;
-	     //		          Vector3 coriolisForce = CalculateCoriolisEffect(current.windVelocity, latitude);
-	     //		          float frictionCoefficient = (layer == 0) ? 0.05f : 0.01f;
-	     //		          Vector3 friction = -current.windVelocity * frictionCoefficient;
-
-	     //		          newWinds[layer, x, y] = current.windVelocity +
-	     //		              (pressureForce + coriolisForce + friction) * hours;
-	     //		          newWinds[layer, x, y] = Vector3.ClampMagnitude(newWinds[layer, x, y], 50f);
-	     //	     }
-	     //}
-	     //        }
-
-	     //        // Second: Apply conservative advection
-	     //        ApplyConservativeAdvection(
-	     //            atmosphereTiles,
-	     //            ref newTemps, ref newVapor, ref newCloudWater, ref newLiquidWater,
-	     //            newWinds, hours
-	     //        );
-
-	     //        // Third: Apply phase changes with PROPER energy scaling
-	     //        for (int layer = 0; layer < layers; layer++)
-	     //        {
-	     //for (int x = 0; x < width; x++)
-	     //{
-	     //	     for (int y = 0; y < height; y++)
-	     //	     {
-	     //		          AtmosphereTile current = atmosphereTiles[layer, x, y];
-	     //		          float volume = current.tileWidth * current.tileWidth * current.layerHeight;
-
-	     //		          // Get the advected temperature
-	     //		          float tempAfterAdvection = newTemps[layer, x, y];
-
-	     //		          // Apply phase changes with proper scaling
-	     //		          ApplyPhaseChangesWithProperScaling(
-	     //		              ref tempAfterAdvection,
-	     //		              ref newVapor[layer, x, y],
-	     //		              ref newCloudWater[layer, x, y],
-	     //		              ref newLiquidWater[layer, x, y],
-	     //		              current.pressure,
-	     //		              volume,
-	     //		              current.windSpeed,
-	     //		              hours
-	     //		          );
-
-	     //		          // Store final temperature
-	     //		          newTemps[layer, x, y] = tempAfterAdvection;
-	     //	     }
-	     //}
-	     //        }
-
-	     //        // Fourth: Apply all changes to original tiles
-	     //        for (int layer = 0; layer < layers; layer++)
-	     //        {
-	     //for (int x = 0; x < width; x++)
-	     //{
-	     //	     for (int y = 0; y < height; y++)
-	     //	     {
-	     //		          AtmosphereTile tile = atmosphereTiles[layer, x, y];
-
-	     //		          // Apply temperature with smoothing and strict bounds
-	     //		          float targetTemp = Mathf.Clamp(newTemps[layer, x, y], -100f, 100f);
-	     //		          tile.temperature = Mathf.Lerp(tile.temperature, targetTemp, 0.3f);
-
-	     //		          // Apply water components with conservation
-	     //		          float totalWaterBefore = tile.waterVapor.Mass + tile.cloudWaterContent.Mass + tile.liquidWater.Mass;
-	     //		          float totalWaterAfter = newVapor[layer, x, y] + newCloudWater[layer, x, y] + newLiquidWater[layer, x, y];
-
-	     //		          // Redistribute to maintain exact conservation
-	     //		          if (totalWaterAfter > 0)
-	     //		          {
-	     //				float ratio = totalWaterBefore / totalWaterAfter;
-	     //				tile.waterVapor = Mathf.Max(0, newVapor[layer, x, y] * ratio);
-	     //				tile.cloudWaterContent = Mathf.Max(0, newCloudWater[layer, x, y] * ratio);
-	     //				tile.liquidWater = Mathf.Max(0, newLiquidWater[layer, x, y] * ratio);
-	     //		          }
-
-	     //		          // Apply wind
-	     //		          tile.windVelocity = newWinds[layer, x, y];
-	     //		          tile.windSpeed = tile.windVelocity.magnitude;
-
-	     //		          // Recalculate pressure
-	     //		          float vaporDensity = tile.waterVapor.Mass / Mathf.Max(tile.layerHeight * tile.tileWidth * tile.tileWidth, 0.001f);
-	     //		          tile.pressure = CalculateRealisticPressure(
-	     //		              tile.temperature,
-	     //		              vaporDensity,
-	     //		              layer * tile.layerHeight,
-	     //		              tile.waterVapor.Mass
-	     //		          );
-	     //	     }
-	     //}
-	     //        }
-
-	     //        // Fifth: Validate conservation
-	     //        float finalTotalEnergy = CalculateTotalEnergy(atmosphereTiles);
-	     //        float finalTotalWater = CalculateTotalWater(atmosphereTiles);
-
-	     //        float energyError = Mathf.Abs(finalTotalEnergy - initialTotalEnergy);
-	     //        float waterError = Mathf.Abs(finalTotalWater - initialTotalWater);
-
-	     //        if (energyError > 1e6f) // If error is more than 1 MJ
-	     //        {
-	     //Debug.LogError($"Energy conservation error: {energyError} J");
-	     //        }
-
-	     //        if (waterError > 0.1f)
-	     //        {
-	     //Debug.LogWarning($"Water conservation error: {waterError} kg");
-	     //        }
-	     //  }
 
 	     /// <summary>
 	     /// Apply phase changes with PROPERLY SCALED energy calculations
@@ -686,11 +535,10 @@ public static class AtmosphereUtilities
 					     {
 						          AtmosphereTile tile = atmosphereTiles[layer, x, y];
 
-						          // Sensible heat
-						          tile.energy.ForEach(e =>
-
-
-								totalEnergy += e.StoredEnergy + e.SpecificHeat);
+						          foreach (var energy in tile.energy)
+						          {
+								totalEnergy += energy.StoredEnergy + energy.SpecificHeat;
+						          }
 					     }
 				}
 		          }
@@ -886,11 +734,7 @@ public static class AtmosphereUtilities
 				}
 		          }
 	     }
-
-
-
 	     // [Rest of the helper functions remain mostly the same, but ensure CalculateMaxWaterVapor is correct]
-
 	     public static float CalculateMaxWaterVapor(float temperature, float pressure)
 	     {
 		          // Clausius-Clapeyron equation for saturation vapor density (kg/m³)
@@ -952,32 +796,32 @@ public static class AtmosphereUtilities
 	     /// <summary>
 	     /// Calculates pressure gradient force between neighboring cells
 	     /// </summary>
-	     public static Vector3 CalculatePressureGradientForce(
-	         AtmosphereTile[,,] tiles, int layer, int x, int y, int width, int height)
-	     {
-		          Vector3 force = Vector3.zero;
-		          float currentPressure = tiles[layer, x, y].pressure;
+	     //  public static Vector3 CalculatePressureGradientForce(
+	     //      AtmosphereTile[,,] tiles, int layer, int x, int y, int width, int height)
+	     //  {
+	     //        Vector3 force = Vector3.zero;
+	     //        float currentPressure = tiles[layer, x, y].pressure;
 
-		          // Check immediate neighbors
-		          int[] dx = { -1, 1, 0, 0 };
-		          int[] dy = { 0, 0, -1, 1 };
+	     //        // Check immediate neighbors
+	     //        int[] dx = { -1, 1, 0, 0 };
+	     //        int[] dy = { 0, 0, -1, 1 };
 
-		          for (int i = 0; i < 4; i++)
-		          {
-				int nx = (x + dx[i] + width) % width;
-				int ny = (y + dy[i] + height) % height;
+	     //        for (int i = 0; i < 4; i++)
+	     //        {
+	     //int nx = (x + dx[i] + width) % width;
+	     //int ny = (y + dy[i] + height) % height;
 
-				float neighborPressure = tiles[layer, nx, ny].pressure;
-				float pressureDiff = currentPressure - neighborPressure; // From high to low
+	     //float neighborPressure = tiles[layer, nx, ny].pressure;
+	     //float pressureDiff = currentPressure - neighborPressure; // From high to low
 
-				// Force = pressure gradient / density (simplified)
-				// Negative because air flows from high to low pressure
-				Vector3 direction = new Vector3(dx[i], 0, dy[i]).normalized;
-				force += direction * pressureDiff / Constants.AIR_DENSITY; // Scaling factor
-		          }
+	     //// Force = pressure gradient / density (simplified)
+	     //// Negative because air flows from high to low pressure
+	     //Vector3 direction = new Vector3(dx[i], 0, dy[i]).normalized;
+	     //force += direction * pressureDiff / Constants.AIR_DENSITY; // Scaling factor
+	     //        }
 
-		          return force;
-	     }
+	     //        return force;
+	     //  }
 
 	     /// <summary>
 	     /// Coriolis effect calculation varying with latitude
@@ -1109,5 +953,450 @@ public static class AtmosphereUtilities
 	     {
 		          double density = CalculateAirDensity(temperature, pressure);
 		          return density * volume;
+	     }
+
+	     /// <summary>
+	     /// Updates wind velocity for all atmosphere tiles based on pressure gradients, Coriolis effect, and friction
+	     /// </summary>
+	     public static void UpdateAtmosphericWind(AtmosphereTile[,,] atmosphereTiles, float hours)
+	     {
+		          int layers = atmosphereTiles.GetLength(0);
+		          int width = atmosphereTiles.GetLength(1);
+		          int height = atmosphereTiles.GetLength(2);
+
+		          float timeStepSeconds = hours * 3600f;
+
+		          // Update wind for each tile
+		          for (int layer = 0; layer < layers; layer++)
+		          {
+				for (int x = 0; x < width; x++)
+				{
+					     for (int y = 0; y < height; y++)
+					     {
+						          AtmosphereTile current = atmosphereTiles[layer, x, y];
+						          if (current == null)
+								continue;
+
+						          // 1. Calculate pressure gradient force
+						          Vector3 pressureForce = CalculatePressureGradientForce(atmosphereTiles, layer, x, y, width, height);
+
+						          // 2. Calculate Coriolis effect (latitude-dependent)
+						          float latitude = (y / (float)height * 180f) - 90f;
+						          Vector3 coriolisForce = CalculateCoriolisEffect(current.windVelocity, latitude);
+
+						          // 3. Apply friction (stronger at surface layer)
+						          float frictionCoefficient = (layer == 0) ? 0.05f : 0.01f;
+						          Vector3 friction = -current.windVelocity * frictionCoefficient;
+
+						          // 4. Update wind velocity
+						          Vector3 acceleration = (pressureForce + coriolisForce + friction) / Constants.AIR_DENSITY;
+						          current.windVelocity += acceleration * timeStepSeconds;
+
+						          // 5. Apply speed limit (prevent unrealistic wind speeds)
+						          float maxWindSpeed = 50f; // m/s (180 km/h)
+						          current.windVelocity = Vector3.ClampMagnitude(current.windVelocity, maxWindSpeed);
+
+						          // 6. Update wind speed magnitude
+						          current.windSpeed = current.windVelocity.magnitude;
+
+						          // 7. Add small random perturbations to prevent stagnation
+						          current.windVelocity += UnityEngine.Random.insideUnitSphere * 0.01f;
+					     }
+				}
+		          }
+	     }
+
+	     /// <summary>
+	     /// Calculates pressure gradient force - drives wind from high to low pressure
+	     /// </summary>
+	     private static Vector3 CalculatePressureGradientForce(
+	         AtmosphereTile[,,] tiles, int layer, int x, int y, int width, int height)
+	     {
+		          Vector3 force = Vector3.zero;
+		          AtmosphereTile currentTile = tiles[layer, x, y];
+		          float currentPressure = currentTile.pressure;
+
+		          if (currentPressure <= 0)
+				return force;
+
+		          // Use the pre-stored neighbors
+		          // Assuming horizontalNeighbors is an array of 4 elements in the order: [North, East, South, West]
+		          if (currentTile.horizontalNeighbors == null || currentTile.horizontalNeighbors.Length != 4)
+		          {
+				Debug.LogError("Horizontal neighbors array is not properly initialized!");
+				return force;
+		          }
+
+		          // Process each neighbor with its corresponding direction
+		          // North
+		          if (currentTile.horizontalNeighbors[0] != null)
+		          {
+				float pressureDiff = currentPressure - currentTile.horizontalNeighbors[0].pressure;
+				force += Vector3.forward * (pressureDiff / Constants.AIR_DENSITY);
+		          }
+
+		          // East
+		          if (currentTile.horizontalNeighbors[1] != null)
+		          {
+				float pressureDiff = currentPressure - currentTile.horizontalNeighbors[1].pressure;
+				force += Vector3.right * (pressureDiff / Constants.AIR_DENSITY);
+		          }
+
+		          // South
+		          if (currentTile.horizontalNeighbors[2] != null)
+		          {
+				float pressureDiff = currentPressure - currentTile.horizontalNeighbors[2].pressure;
+				force += Vector3.back * (pressureDiff / Constants.AIR_DENSITY);
+		          }
+
+		          // West
+		          if (currentTile.horizontalNeighbors[3] != null)
+		          {
+				float pressureDiff = currentPressure - currentTile.horizontalNeighbors[3].pressure;
+				force += Vector3.left * (pressureDiff / Constants.AIR_DENSITY);
+		          }
+
+		          return force;
+	     }
+
+	     /// <summary>
+	     /// Latitude-based cell definitions
+	     /// Hadley cells: ±0° to ±30°
+	     /// Ferrel cells: ±30° to ±60°
+	     /// Polar cells: ±60° to ±90°
+	     /// </summary>
+	     private const float HADLEY_CELL_BOUNDARY = 30f;
+	     private const float FERREL_CELL_BOUNDARY = 60f;
+	     private const float POLAR_CELL_BOUNDARY = 90f;
+
+	     // Trade wind characteristics
+	     private const float TRADE_WIND_SPEED = 5f;          // m/s
+	     private const float WESTERLY_WIND_SPEED = 7f;       // m/s
+	     private const float POLAR_WIND_SPEED = 4f;          // m/s
+
+	     // Vertical motion (positive = upward)
+	     private const float HADLEY_EQUATORIAL_UPDRAFT = 0.2f;   // m/s at equator
+	     private const float HADLEY_SUBTROPICAL_DOWNDRAFT = -0.15f; // m/s at 30°
+	     private const float FERREL_VERTICAL_UPDRAFT = 0.1f;   // m/s
+	     private const float POLAR_SUBSIDENCE = -0.08f;      // m/s
+
+	     // Temperature gradients (K per meter)
+	     private const float EQUATORIAL_SURFACE_TEMP = 298f;  // ~25°C in Kelvin
+	     private const float SUBTROPICAL_SURFACE_TEMP = 290f; // ~17°C
+	     private const float TEMPERATE_SURFACE_TEMP = 280f;   // ~7°C
+	     private const float POLAR_SURFACE_TEMP = 260f;       // -13°C
+
+	     /// <summary>
+	     /// Initializes Hadley cell wind patterns for all atmosphere tiles
+	     /// </summary>
+	     public static void InitializeHadleyCellWinds(AtmosphereTile[,,] atmosphereTiles, TileManager tileManager)
+	     {
+		          int layers = atmosphereTiles.GetLength(0);
+		          int width = atmosphereTiles.GetLength(1);
+		          int height = atmosphereTiles.GetLength(2);
+
+		          for (int layer = 0; layer < layers; layer++)
+		          {
+				for (int x = 0; x < width; x++)
+				{
+					     for (int y = 0; y < height; y++)
+					     {
+						          AtmosphereTile tile = atmosphereTiles[layer, x, y];
+						          if (tile == null)
+								continue;
+
+						          // Calculate latitude from grid position
+						          // X axis represents latitude: 0 = South Pole (-90°), max = North Pole (+90°)
+						          float latitude = tileManager.GetLatitude(x, y);
+
+						          // Initialize wind pattern based on latitude
+						          Vector3 wind = CalculateHadleyCellWind(latitude, layer, layers);
+						          tile.windVelocity = wind;
+						          tile.windSpeed = wind.magnitude;
+
+						          // Initialize temperature based on latitude and layer
+						          float temperature = CalculateHadleyCellTemperature(latitude, layer, layers);
+						          tile.nitrogen.AddEnergy((temperature - 273.15f) * tile.nitrogen.SpecificHeat);
+
+						          // Initialize humidity and pressure
+						          InitializeHadleyCellPressure(tile, latitude, layer, layers);
+						          InitializeHadleyCellHumidity(tile, latitude, layer);
+
+						          Debug.Log($"Initialized tile ({x},{y},{layer}): Lat={latitude:F1}°, Wind={wind.magnitude:F2}m/s, Temp={temperature - 273.15f:F1}°C");
+					     }
+				}
+		          }
+	     }
+
+	     /// <summary>
+	     /// Calculates realistic wind velocity based on Hadley cell circulation
+	     /// </summary>
+	     private static Vector3 CalculateHadleyCellWind(float latitude, int layer, int maxLayers)
+	     {
+		          float normalizedLatitude = Mathf.Abs(latitude);
+		          float hemisphere = Mathf.Sign(latitude);
+		          Vector3 wind = Vector3.zero;
+
+		          // Layer interpolation (upper layers have stronger winds)
+		          float layerFactor = Mathf.Lerp(0.5f, 1.5f, (float)layer / (maxLayers - 1));
+
+		          if (normalizedLatitude <= HADLEY_CELL_BOUNDARY)
+		          {
+				// HADLEY CELL: Trade winds
+				// Trade winds: 0-30°N and 0-30°S
+				// Direction: Easterlies (from east) due to Coriolis effect
+				float windSpeed = TRADE_WIND_SPEED * layerFactor;
+
+				// Add slight latitude gradient (weaker at equator, stronger at boundaries)
+				float latitudeGradient = Mathf.Sin(normalizedLatitude * Mathf.Deg2Rad);
+				windSpeed *= 0.7f + 0.3f * latitudeGradient;
+
+				// Coriolis-induced direction (from east in tropics)
+				// Positive latitude = Northern Hemisphere (wind from NE)
+				// Negative latitude = Southern Hemisphere (wind from SE)
+				wind.x = windSpeed * hemisphere * 0.866f;  // ~√3/2 for 60° angle
+				wind.z = -windSpeed * 0.5f;                 // Equatorward component
+		          }
+		          else if (normalizedLatitude <= FERREL_CELL_BOUNDARY)
+		          {
+				// FERREL CELL: Westerlies
+				// Westerlies: 30-60°N and 30-60°S
+				// Direction: From west (westerlies), stronger than trade winds
+				float windSpeed = WESTERLY_WIND_SPEED * layerFactor;
+
+				// Strengthen away from Hadley boundary
+				float distanceFromBoundary = (normalizedLatitude - HADLEY_CELL_BOUNDARY) / (FERREL_CELL_BOUNDARY - HADLEY_CELL_BOUNDARY);
+				windSpeed *= 0.8f + 0.4f * Mathf.Cos(distanceFromBoundary * Mathf.PI);
+
+				// Westerly direction (from west)
+				wind.x = -windSpeed * hemisphere * 0.866f; // From west
+				wind.z = windSpeed * 0.5f;                  // Poleward component
+		          }
+		          else
+		          {
+				// POLAR CELL: Polar easterlies
+				// Polar easterlies: 60-90°N and 60-90°S
+				// Direction: From east, but weak
+				float windSpeed = POLAR_WIND_SPEED * layerFactor;
+
+				// Weaken near pole
+				float distanceToPole = (POLAR_CELL_BOUNDARY - normalizedLatitude) / (POLAR_CELL_BOUNDARY - FERREL_CELL_BOUNDARY);
+				windSpeed *= distanceToPole;
+
+				// Easterly direction (from east)
+				wind.x = windSpeed * hemisphere * 0.866f;
+				wind.z = windSpeed * 0.5f;                  // Slight equatorward component
+		          }
+
+		          // Add vertical component (updrafts/downdrafts match Hadley circulation)
+		          wind.y = CalculateVerticalVelocity(latitude, layer, maxLayers);
+
+		          return wind;
+	     }
+
+	     /// <summary>
+	     /// Calculates vertical velocity (updrafts/downdrafts) based on circulation cell
+	     /// </summary>
+	     private static float CalculateVerticalVelocity(float latitude, int layer, int maxLayers)
+	     {
+		          float normalizedLatitude = Mathf.Abs(latitude);
+		          float verticalVelocity = 0f;
+
+		          if (normalizedLatitude <= 5f)
+		          {
+				// ITCZ (Intertropical Convergence Zone): Strong updrafts at equator
+				verticalVelocity = HADLEY_EQUATORIAL_UPDRAFT;
+		          }
+		          else if (normalizedLatitude <= HADLEY_CELL_BOUNDARY)
+		          {
+				// Hadley subsidence (downdraft) from 5° to 30°
+				// Strongest at ~30°
+				float normalizedPosition = (normalizedLatitude - 5f) / (HADLEY_CELL_BOUNDARY - 5f);
+				verticalVelocity = Mathf.Lerp(HADLEY_EQUATORIAL_UPDRAFT * 0.3f, HADLEY_SUBTROPICAL_DOWNDRAFT, normalizedPosition);
+		          }
+		          else if (normalizedLatitude <= FERREL_CELL_BOUNDARY)
+		          {
+				// Ferrel cell uplift (convergence at ~60°)
+				float normalizedPosition = (normalizedLatitude - HADLEY_CELL_BOUNDARY) / (FERREL_CELL_BOUNDARY - HADLEY_CELL_BOUNDARY);
+				verticalVelocity = Mathf.Lerp(HADLEY_SUBTROPICAL_DOWNDRAFT, FERREL_VERTICAL_UPDRAFT, normalizedPosition);
+		          }
+		          else
+		          {
+				// Polar cell subsidence
+				verticalVelocity = POLAR_SUBSIDENCE;
+		          }
+
+		          // Reduce vertical motion in upper layers (less pronounced aloft)
+		          float layerFactor = Mathf.Lerp(1f, 0.3f, (float)layer / (maxLayers - 1));
+		          return verticalVelocity * layerFactor;
+	     }
+
+	     /// <summary>
+	     /// Calculates temperature profile based on latitude and altitude
+	     /// </summary>
+	     private static float CalculateHadleyCellTemperature(float latitude, int layer, int maxLayers)
+	     {
+		          float normalizedLatitude = Mathf.Abs(latitude);
+		          float baseSurfaceTemp;
+
+		          // Determine base surface temperature by latitude
+		          if (normalizedLatitude <= HADLEY_CELL_BOUNDARY)
+		          {
+				// Tropical: warm
+				baseSurfaceTemp = EQUATORIAL_SURFACE_TEMP;
+		          }
+		          else if (normalizedLatitude <= FERREL_CELL_BOUNDARY)
+		          {
+				// Temperate: cool
+				baseSurfaceTemp = Mathf.Lerp(SUBTROPICAL_SURFACE_TEMP, TEMPERATE_SURFACE_TEMP,
+				    (normalizedLatitude - HADLEY_CELL_BOUNDARY) / (FERREL_CELL_BOUNDARY - HADLEY_CELL_BOUNDARY));
+		          }
+		          else
+		          {
+				// Polar: cold
+				baseSurfaceTemp = POLAR_SURFACE_TEMP;
+		          }
+
+		          // Apply lapse rate (temperature decreases with altitude)
+		          // Dry adiabatic lapse rate: ~9.8 K/km
+		          float dryLapseRate = 9.8f / 1000f; // K/m
+		          float altitude = layer * 10f * Mathf.Pow(10f, layer); // Rough altitude estimation
+		          float temperatureAtLayer = baseSurfaceTemp - (dryLapseRate * altitude);
+
+		          return Mathf.Clamp(temperatureAtLayer, 200f, 320f); // Realistic bounds (Kelvin)
+	     }
+
+	     /// <summary>
+	     /// Initializes pressure distribution matching barometric formula with latitude variations
+	     /// </summary>
+	     private static void InitializeHadleyCellPressure(AtmosphereTile tile, float latitude, int layer, int maxLayers)
+	     {
+		          float normalizedLatitude = Mathf.Abs(latitude);
+
+		          // Base pressure follows barometric formula
+		          float altitude = layer * 10f * Mathf.Pow(10f, layer);
+		          float seaLevelPressure = 101325f;
+
+		          // Pressure decreases with altitude
+		          float pressureAtLayer = seaLevelPressure * Mathf.Exp(-altitude / 8435f); // Scale height ~8.4 km
+
+		          // Latitude adjustments
+		          if (normalizedLatitude <= HADLEY_CELL_BOUNDARY)
+		          {
+				// Low pressure at ITCZ (equator)
+				pressureAtLayer *= Mathf.Lerp(0.98f, 1.0f, normalizedLatitude / HADLEY_CELL_BOUNDARY);
+		          }
+		          else if (normalizedLatitude <= FERREL_CELL_BOUNDARY)
+		          {
+				// High pressure at subtropical ridge (~30°)
+				float distanceFromRidge = Mathf.Abs(normalizedLatitude - 30f);
+				pressureAtLayer *= 1.0f + 0.01f * (1f - distanceFromRidge / 30f);
+		          }
+		          else
+		          {
+				// Low pressure at subpolar low (~60°)
+				pressureAtLayer *= 0.97f;
+		          }
+
+		          tile.pressure = Mathf.Clamp(pressureAtLayer, 100f, 110000f);
+	     }
+
+	     /// <summary>
+	     /// Initializes humidity based on latitude and vertical motion
+	     /// </summary>
+	     private static void InitializeHadleyCellHumidity(AtmosphereTile tile, float latitude, int layer)
+	     {
+		          float normalizedLatitude = Mathf.Abs(latitude);
+		          float baseHumidity = 0.5f; // 50% base
+
+		          // ITCZ (equator): High humidity due to evaporation and convergence
+		          if (normalizedLatitude <= 5f)
+		          {
+				baseHumidity = Mathf.Lerp(0.8f, 0.7f, (normalizedLatitude + 5f) / 10f); // 70-80% RH
+		          }
+		          // Hadley subsidence zones (15-30°): Low humidity due to descent and warming
+		          else if (normalizedLatitude <= HADLEY_CELL_BOUNDARY)
+		          {
+				float inSubsidenceZone = (normalizedLatitude - 5f) / (HADLEY_CELL_BOUNDARY - 5f);
+				baseHumidity = Mathf.Lerp(0.7f, 0.3f, inSubsidenceZone); // 70% → 30% RH
+		          }
+		          // Ferrel convergence: Moderate humidity
+		          else if (normalizedLatitude <= FERREL_CELL_BOUNDARY)
+		          {
+				baseHumidity = 0.6f; // ~60% RH
+		          }
+		          // Polar: Lower humidity (cold air holds less moisture)
+		          else
+		          {
+				baseHumidity = 0.4f; // ~40% RH
+		          }
+
+		          // Adjust for layer (upper layers drier)
+		          float layerAdjustment = Mathf.Pow(0.8f, layer);
+		          baseHumidity *= layerAdjustment;
+
+		          // Calculate actual water vapor mass based on temperature and relative humidity
+		          float saturationMass = AtmosphereUtilities.CalculateSaturationWaterMass(
+		              tile.nitrogen.Temperature - 273.15f,
+		              tile.pressure,
+		              tile.tileWidth * tile.tileWidth * tile.layerHeight
+		          );
+
+		          float waterVaporMass = saturationMass * baseHumidity;
+		          tile.waterVapor.ChangeMass(waterVaporMass);
+
+		          // Initialize some cloud water in convergence zones
+		          if (normalizedLatitude <= 5f || (normalizedLatitude > HADLEY_CELL_BOUNDARY && normalizedLatitude <= FERREL_CELL_BOUNDARY))
+		          {
+				float cloudMass = waterVaporMass * 0.1f; // 10% of vapor as clouds
+				tile.cloudWaterContent.ChangeMass(cloudMass);
+		          }
+	     }
+
+	     /// <summary>
+	     /// Applies realistic pressure patterns to match observed subtropical ridges and subpolar lows
+	     /// </summary>
+	     public static void FinalizePressurePatterns(AtmosphereTile[,,] atmosphereTiles)
+	     {
+		          int layers = atmosphereTiles.GetLength(0);
+		          int width = atmosphereTiles.GetLength(1);
+		          int height = atmosphereTiles.GetLength(2);
+
+		          // Smooth pressure field to ensure geostrophic balance
+		          for (int layer = 0; layer < layers; layer++)
+		          {
+				for (int iteration = 0; iteration < 3; iteration++)
+				{
+					     for (int x = 0; x < width; x++)
+					     {
+						          for (int y = 0; y < height; y++)
+						          {
+								AtmosphereTile tile = atmosphereTiles[layer, x, y];
+								if (tile?.horizontalNeighbors == null)
+									     continue;
+
+								// Average with neighbors
+								float neighborPressureSum = 0f;
+								int neighborCount = 0;
+
+								foreach (var neighbor in tile.horizontalNeighbors)
+								{
+									     if (neighbor != null)
+									     {
+										          neighborPressureSum += neighbor.pressure;
+										          neighborCount++;
+									     }
+								}
+
+								if (neighborCount > 0)
+								{
+									     // Gentle smoothing (10% adjustment per iteration)
+									     float avgNeighborPressure = neighborPressureSum / neighborCount;
+									     tile.pressure = Mathf.Lerp(tile.pressure, avgNeighborPressure, 0.1f);
+								}
+						          }
+					     }
+				}
+		          }
 	     }
 }

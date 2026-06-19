@@ -44,6 +44,6 @@ public class PepoRoleTask
 	     public string name;
 	     public string description;
 	     public float hours;
-	     public PepoResource yield;
+	     public ResourceData yield;
 
 }

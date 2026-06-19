@@ -62,8 +62,8 @@ public static class PepoRoleSystem
 					     {
 						          foreach (PepoData pepo in pepos.roleAssignments[role])
 						          {
-								PhysicalResource Water = new PhysicalResource("water", 5000, 1000, 1000, "for thirsty boys", false, 0, 0, Vector3.zero);
-								pepo.resources.AddorRemoveResource(ResourceLibrary.PhysicalResources()[0]);
+								//PhysicalResource Water = new PhysicalResource("water", 5000, 1000, 1000, "for thirsty boys", false, 0, 0, Vector3.zero);
+								//pepo.resources.AddorRemoveResource(ResourceLibrary.PhysicalResources()[0]);
 						          }
 					     }
 				}

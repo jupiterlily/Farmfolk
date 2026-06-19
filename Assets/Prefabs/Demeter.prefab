@@ -47,7 +47,19 @@ MonoBehaviour:
   tileManager: {fileID: 0}
   NightTint: {x: 0.5, y: 0.9, z: 0.2}
   HydrationTint: {x: 0, y: 0.9, z: 1}
+  leafSprites:
+  - {fileID: -381146040, guid: ab09c0ecc28180b41b5c9f8fd54dc0a7, type: 3}
+  - {fileID: 1420910639, guid: ab09c0ecc28180b41b5c9f8fd54dc0a7, type: 3}
+  - {fileID: -1939731002, guid: ab09c0ecc28180b41b5c9f8fd54dc0a7, type: 3}
+  - {fileID: -1327838185, guid: ab09c0ecc28180b41b5c9f8fd54dc0a7, type: 3}
+  - {fileID: 1557021794, guid: ab09c0ecc28180b41b5c9f8fd54dc0a7, type: 3}
+  - {fileID: -255928770, guid: ab09c0ecc28180b41b5c9f8fd54dc0a7, type: 3}
+  - {fileID: -1485000749, guid: ab09c0ecc28180b41b5c9f8fd54dc0a7, type: 3}
+  - {fileID: 433459224, guid: ab09c0ecc28180b41b5c9f8fd54dc0a7, type: 3}
+  - {fileID: 229283133, guid: ab09c0ecc28180b41b5c9f8fd54dc0a7, type: 3}
+  - {fileID: 310757709, guid: ab09c0ecc28180b41b5c9f8fd54dc0a7, type: 3}
   initialPlantCount: 10
   activationRadius: 50
   xBounds: {x: -8.33, y: 8.33}
   yBounds: {x: -4.45, y: 4.45}
+  claimedSpots: []

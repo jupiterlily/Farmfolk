@@ -10,6 +10,7 @@ public class Demeter : MonoBehaviour
 	     public Vector3 NightTint = new Vector3(0.5f, 0.9f, 0.2f);
 	     public Vector3 HydrationTint = new Vector3(0.0f, 0.9f, 1.0f);
 
+	     public List<Sprite> leafSprites;
 
 	     [Header("Plant Generation Settings")]
 	     [Tooltip("Number of plants to create initially")]
@@ -89,7 +90,7 @@ public class Demeter : MonoBehaviour
 		          PlantMap.Add(newPlant, plantPosition);
 		          AllPlants.Add(newPlant);
 		          PlantCurrentStage.Add(newPlant, "Seedling");
-		          newPlant.CurrentTile = tile;
+		          newPlant.OriginTile = tile;
 		          ActivatePlant(newPlant, plantPosition, index);
 	     }
 
@@ -113,7 +114,7 @@ public class Demeter : MonoBehaviour
 		          // Initialize LSystem with the plant
 		          //  Debug.Log("Calling Initialize...");
 		          plant.lSystem.Initialize(plant, position);
-
+		          plant.lSystem.leafSprite = leafSprites[plant.Leaves.LeafGrouping];
 		          //  Debug.Log($"Initialize complete. Checking LSystem state...");
 
 		          // Check if initialization was successful
@@ -200,10 +201,10 @@ public class Demeter : MonoBehaviour
 		          return stageName switch
 		          {
 				"Seedling" => 3,      // Initial growth
-				"Juvenile" => 3,      // Additional iterations
-				"Established" => 3,   // Additional iterations
-				"Mature" => 3,        // Additional iterations
-				"Ancient" => 3,       // Additional iterations
+				"Juvenile" => 4,      // Additional iterations
+				"Established" => 5,   // Additional iterations
+				"Mature" => 6,        // Additional iterations
+				"Ancient" => 7,       // Additional iterations
 				_ => 1 // Default case
 		          };
 	     }
@@ -264,9 +265,10 @@ public class Demeter : MonoBehaviour
 		          if (ActivePlants.TryGetValue(plant, out GameObject plantObj))
 		          {
 				Destroy(plantObj);
-				//add the plants mass to the soil organic matter of the tile it's on
-				plant.CurrentTile.composition.organicMaterial.ChangeMass(plant.CurrentTile.composition.organicMass + Plant_Utilities.CalculateDryMass(plant));
-				plant.CurrentTile.composition.water.ChangeMass(plant.CurrentTile.composition.organicMass + Plant_Utilities.CalculateWaterMass(plant));
+				//add the plants mass to the soil organic matter of the tile it's on. although I want to spread the organic matter around a random 4 surrounding tiles instead of dumping it all in one tile.
+				float plantMass = Plant_Utilities.CalculateDryMass(plant);
+				plant.OriginTile.composition.organicMaterial.ChangeMass(plant.OriginTile.composition.organicMass + Plant_Utilities.CalculateDryMass(plant));
+				plant.OriginTile.composition.water.ChangeMass(plant.OriginTile.composition.organicMass + Plant_Utilities.CalculateWaterMass(plant));
 				ActivePlants.Remove(plant);
 				PlantCurrentStage.Remove(plant);
 		          }

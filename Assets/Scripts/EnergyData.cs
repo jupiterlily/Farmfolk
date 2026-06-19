@@ -85,7 +85,7 @@ public class ThermalEnergy : EnergyData
 	     {
 		          get; private set;
 	     } // Current phase transition temp
-
+	       //Density
 	     private float sensibleEnergy; // Energy that affects temperature
 	     private float latentEnergy; // Energy stored in phase bonds
 
@@ -123,17 +123,11 @@ public class ThermalEnergy : EnergyData
 
 	     public override void AddEnergy(float joules)
 	     {
-		          float remainingEnergy = joules;
+		          sensibleEnergy += joules;
+		          UpdateTemperature();
 
-		          // Handle phase changes first
-		          remainingEnergy = ProcessPhaseChange(remainingEnergy);
-
-		          // Add remaining as sensible heat
-		          if (remainingEnergy > 0)
-		          {
-				sensibleEnergy += remainingEnergy;
-				UpdateTemperature();
-		          }
+		          // Only check phase change ONCE, don't let it recursively trigger
+		          CheckPhaseChangeOnHeating();
 
 		          UpdateTotalEnergy();
 	     }
@@ -143,133 +137,116 @@ public class ThermalEnergy : EnergyData
 		          float toExtract = Mathf.Min(maxJoules, StoredEnergy);
 		          float extracted = 0;
 
-		          // First extract from latent energy if at phase transition
-		          if (IsAtPhaseTransition())
+		          // Extract from sensible energy first
+		          float sensibleToExtract = Mathf.Min(toExtract, sensibleEnergy);
+		          sensibleEnergy -= sensibleToExtract;
+		          extracted += sensibleToExtract;
+
+		          UpdateTemperature();
+		          // If we still need more energy, extract from latent
+		          toExtract -= sensibleToExtract;
+		          if (toExtract > 0)
 		          {
 				float latentToExtract = Mathf.Min(toExtract, latentEnergy);
 				latentEnergy -= latentToExtract;
 				extracted += latentToExtract;
-				toExtract -= latentToExtract;
 		          }
-
-		          // Then extract from sensible energy
-		          if (toExtract > 0)
-		          {
-				float sensibleToExtract = Mathf.Min(toExtract, sensibleEnergy);
-				sensibleEnergy -= sensibleToExtract;
-				extracted += sensibleToExtract;
-				toExtract -= sensibleToExtract;
-
-				// Update temperature after sensible energy change
-				UpdateTemperature();
-
-				// Check for reverse phase change due to cooling
-				if (toExtract > 0 && IsAtPhaseTransition())
-				{
-					     // Can potentially extract more by reversing phase change
-					     float reversePhaseEnergy = GetReversePhaseChangeEnergy(toExtract);
-					     if (reversePhaseEnergy > 0)
-					     {
-						          latentEnergy -= reversePhaseEnergy;
-						          extracted += reversePhaseEnergy;
-						          toExtract -= reversePhaseEnergy;
-						          CheckPhaseChangeOnCooling();
-					     }
-				}
-		          }
-
+		          // Only check phase change ONCE
+		          CheckPhaseChangeOnCooling();
 		          StoredEnergy -= extracted;
 		          return extracted;
 	     }
 
-	     private float ProcessPhaseChange(float energyToAdd)
+	     private void CheckPhaseChangeOnHeating()
 	     {
-		          float remainingEnergy = energyToAdd;
-
-		          // Check if we're at a phase transition temperature
-		          if (IsAtPhaseTransition())
+		          // Melting: Solid -> Liquid (when temp rises above melting point)
+		          if (CurrentPhase == Phase.Solid && Temperature >= MeltingPoint)
 		          {
-				float phaseChangeEnergyNeeded = GetPhaseChangeEnergyToNextPhase();
+				// Melting absorbs latent heat (endothermic)
+				float meltingEnergy = Mass * LatentHeatFusion;
 
-				if (phaseChangeEnergyNeeded > 0 && remainingEnergy >= phaseChangeEnergyNeeded)
+				// Only proceed if we have enough sensible energy
+				if (sensibleEnergy >= meltingEnergy)
 				{
-					     // Energy goes into latent heat, not temperature
-					     latentEnergy += phaseChangeEnergyNeeded;
-					     remainingEnergy -= phaseChangeEnergyNeeded;
-
-					     // Change phase
-					     CurrentPhase = GetNextPhase();
+					     sensibleEnergy -= meltingEnergy;
+					     latentEnergy += meltingEnergy;
+					     CurrentPhase = Phase.Liquid;
 					     UpdatePhaseTransitionTemperature();
+					     // DON'T call UpdateTemperature() here - temperature stays at MeltingPoint
+					     // The temperature is HELD at the transition point during phase change
+				}
+				else
+				{
+
+					     Temperature = MeltingPoint;
 				}
 		          }
-
-		          return remainingEnergy;
-	     }
-
-	     private bool IsAtPhaseTransition()
-	     {
-		          float tolerance = 0.1f;
-
-		          if (CurrentPhase == Phase.Solid)
-				return Mathf.Abs(Temperature - 273f) < tolerance;
-		          else if (CurrentPhase == Phase.Liquid)
-				return Mathf.Abs(Temperature - 373f) < tolerance;
-
-		          return false;
-	     }
-
-	     private float GetPhaseChangeEnergyToNextPhase()
-	     {
-		          return CurrentPhase switch
+		          // Vaporization: Liquid -> Gas (when temp rises above boiling point)
+		          else if (CurrentPhase == Phase.Liquid && Temperature >= BoilingPoint)
 		          {
-				Phase.Solid => Mass * LatentHeatFusion,
-				Phase.Liquid => Mass * LatentHeatVaporization,
-				_ => 0f
-		          };
-	     }
+				// Vaporization absorbs latent heat (endothermic)
+				float vaporizationEnergy = Mass * LatentHeatVaporization;
 
-	     private Phase GetNextPhase()
-	     {
-		          return CurrentPhase switch
-		          {
-				Phase.Solid => Phase.Liquid,
-				Phase.Liquid => Phase.Gas,
-				_ => CurrentPhase
-		          };
-	     }
+				if (sensibleEnergy >= vaporizationEnergy)
+				{
+					     sensibleEnergy -= vaporizationEnergy;
+					     latentEnergy += vaporizationEnergy;
+					     CurrentPhase = Phase.Gas;
+					     UpdatePhaseTransitionTemperature();
+					     // Temperature stays at BoilingPoint during vaporization
+				}
+				else
+				{
+					     // Not enough energy to complete vaporization - stay at boiling point
 
-	     private float GetReversePhaseChangeEnergy(float availableEnergy)
-	     {
-		          if (CurrentPhase == Phase.Liquid && Temperature <= 273f)
-				return Mathf.Min(availableEnergy, Mass * LatentHeatFusion);
-		          else if (CurrentPhase == Phase.Gas && Temperature <= 373f)
-				return Mathf.Min(availableEnergy, Mass * LatentHeatVaporization);
-
-		          return 0f;
+					     Temperature = BoilingPoint;
+				}
+		          }
 	     }
 
 	     private void CheckPhaseChangeOnCooling()
 	     {
-		          if (CurrentPhase == Phase.Liquid && Temperature < 273f && latentEnergy >= Mass * LatentHeatFusion)
+		          // Freezing: Liquid -> Solid (when temp drops below melting point)
+		          if (CurrentPhase == Phase.Liquid && Temperature < MeltingPoint)
 		          {
-				// Freezing
+				// Freezing releases latent heat (exothermic)
+				float freezingEnergy = Mass * LatentHeatFusion;
+
+				latentEnergy -= freezingEnergy;
+				sensibleEnergy += freezingEnergy;
 				CurrentPhase = Phase.Solid;
-				latentEnergy -= Mass * LatentHeatFusion;
 				UpdatePhaseTransitionTemperature();
+				// Temperature rises back to MeltingPoint due to latent heat release
+				UpdateTemperature();
 		          }
-		          else if (CurrentPhase == Phase.Gas && Temperature < 373f && latentEnergy >= Mass * LatentHeatVaporization)
+		          // Condensation: Gas -> Liquid (when temp drops below boiling point)
+		          else if (CurrentPhase == Phase.Gas && Temperature < BoilingPoint)
 		          {
-				// Condensation
+				// Condensation releases latent heat (exothermic)
+				float condensationEnergy = Mass * LatentHeatVaporization;
+
+				latentEnergy -= condensationEnergy;
+				sensibleEnergy += condensationEnergy;
 				CurrentPhase = Phase.Liquid;
-				latentEnergy -= Mass * LatentHeatVaporization;
 				UpdatePhaseTransitionTemperature();
+				UpdateTemperature();
 		          }
 	     }
 
 	     private void UpdateTemperature()
 	     {
 		          if (Mass > 0 && SpecificHeat > 0)
-				Temperature = sensibleEnergy / (Mass * SpecificHeat);
+		          {
+				// Clamp temperature at phase transition points
+				float newTemp = sensibleEnergy / (Mass * SpecificHeat);
+
+				if (CurrentPhase == Phase.Solid)
+					     Temperature = Mathf.Min(newTemp, MeltingPoint);
+				else if (CurrentPhase == Phase.Liquid)
+					     Temperature = Mathf.Clamp(newTemp, MeltingPoint, BoilingPoint);
+				else // Gas
+					     Temperature = Mathf.Max(newTemp, BoilingPoint);
+		          }
 	     }
 
 	     private void UpdateTotalEnergy()
@@ -287,36 +264,66 @@ public class ThermalEnergy : EnergyData
 		          UpdateTotalEnergy();
 	     }
 
-	     public void TransferMassTo(ThermalEnergy target, float kgToTransfer)
+	     public void TransferMassTo(ThermalEnergy target, float kgToTransfer, List<ThermalEnergy> energyRelease = null)
 	     {
 		          if (target == null || kgToTransfer <= 0)
 				return;
 
-		          // Calculate ratio of mass to transfer
+		          if (kgToTransfer > Mass)
+				kgToTransfer = Mass;
+
 		          float transferRatio = kgToTransfer / Mass;
 
-		          // Transfer sensible energy proportionally
-		          float sensibleToTransfer = sensibleEnergy * transferRatio;
-		          sensibleEnergy -= sensibleToTransfer;
+		          // Calculate proportional energy to move
+		          float energyToTransfer = (sensibleEnergy + latentEnergy) * transferRatio;
 
-		          // Transfer latent energy proportionally
-		          float latentToTransfer = latentEnergy * transferRatio;
-		          latentEnergy -= latentToTransfer;
-
-		          // Add to target
-		          target.sensibleEnergy += sensibleToTransfer;
-		          target.latentEnergy += latentToTransfer;
-
-		          // Update masses
+		          // Remove mass and energy from source
 		          ChangeMass(Mass - kgToTransfer);
-		          target.ChangeMass(target.Mass + kgToTransfer);
+		          float extracted = ExtractEnergy(energyToTransfer);
 
-		          // Update temperatures
+		          // Try to add to target
+		          float beforeEnergy = target.StoredEnergy;
+		          target.ChangeMass(target.Mass + kgToTransfer);
+		          target.AddEnergy(extracted);
+
+		          // If target couldn't absorb all (phase clamp), push excess to overflow
+		          float absorbed = target.StoredEnergy - beforeEnergy;
+		          float excess = extracted - absorbed;
+		          if (excess > 0)
+		          {
+				if (energyRelease != null)
+				{
+					     foreach (var e in energyRelease)
+						          e.AddEnergy(excess / energyRelease.Count);
+				}
+				else
+				{
+					     AddEnergy(excess);
+				}
+
+		          }
+		          if (excess < 0)
+		          {
+				if (energyRelease != null)
+				{
+					     foreach (var e in energyRelease)
+						          e.ExtractEnergy(excess / energyRelease.Count);
+				}
+				else
+				{
+					     target.ExtractEnergy(excess);
+				}
+
+		          }
+
+		          // Final consistency updates
 		          UpdateTemperature();
-		          target.UpdateTemperature();
 		          UpdateTotalEnergy();
+		          target.UpdateTemperature();
 		          target.UpdateTotalEnergy();
 	     }
+
+
 
 	     internal int Count()
 	     {

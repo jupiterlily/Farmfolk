@@ -1,6 +1,5 @@
 using System.Collections.Generic;
 using UnityEngine;
-using static ResourceCondition;
 
 // ===== BASE ACTION SYSTEM =====
 
@@ -62,104 +61,104 @@ public interface ICondition
 	     bool IsMet(PepoData pepo);
 }
 
-public class ResourceCondition : ICondition
-{
-	     public string ResourceName
-	     {
-		          get;
-	     }
-	     public float RequiredAmount
-	     {
-		          get;
-	     }
-	     public ComparisonType Comparison
-	     {
-		          get;
-	     }
+//public class ResourceCondition : ICondition
+//{
+//	     public string ResourceName
+//	     {
+//		          get;
+//	     }
+//	     public float RequiredAmount
+//	     {
+//		          get;
+//	     }
+//	     public ComparisonType Comparison
+//	     {
+//		          get;
+//	     }
 
-	     public enum ComparisonType
-	     {
-		          AtLeast, AtMost, Exactly
-	     }
+//	     public enum ComparisonType
+//	     {
+//		          AtLeast, AtMost, Exactly
+//	     }
 
-	     public ResourceCondition(string resourceName, float amount, ComparisonType comparison)
-	     {
-		          ResourceName = resourceName;
-		          RequiredAmount = amount;
-		          Comparison = comparison;
-	     }
+//	     public ResourceCondition(string resourceName, float amount, ComparisonType comparison)
+//	     {
+//		          ResourceName = resourceName;
+//		          RequiredAmount = amount;
+//		          Comparison = comparison;
+//	     }
 
-	     public string Description => $"{ResourceName} {GetComparisonString()} {RequiredAmount}";
+//	     public string Description => $"{ResourceName} {GetComparisonString()} {RequiredAmount}";
 
-	     private string GetComparisonString()
-	     {
-		          return Comparison switch
-		          {
-				ComparisonType.AtLeast => "?",
-				ComparisonType.AtMost => "?",
-				ComparisonType.Exactly => "=",
-				_ => ""
-		          };
-	     }
+//	     private string GetComparisonString()
+//	     {
+//		          return Comparison switch
+//		          {
+//				ComparisonType.AtLeast => "?",
+//				ComparisonType.AtMost => "?",
+//				ComparisonType.Exactly => "=",
+//				_ => ""
+//		          };
+//	     }
 
-	     public bool IsMet(PepoData pepo)
-	     {
+//	   //  public bool IsMet(PepoData pepo)
+//	   //  {
 
-		          // Find resource in pepo's resources
-		          var resource = pepo.resources.inventory?.Find(r => r.name == ResourceName || r.category.Contains(ResourceName));
-		          if (resource == null)
-				return false;
+//		  //        // Find resource in pepo's resources
+//		  //        var resource = pepo.resources.inventory?.Find(r => r.name == ResourceName || r.category.Contains(ResourceName));
+//		  //        if (resource == null)
+//				//return false;
 
-		          return Comparison switch
-		          {
-				ComparisonType.AtLeast => resource.count >= RequiredAmount,
-				ComparisonType.AtMost => resource.count <= RequiredAmount,
-				ComparisonType.Exactly => Mathf.Approximately(resource.count, RequiredAmount),
-				_ => false
-		          };
-	     }
-}
+//		  //        return Comparison switch
+//		  //        {
+//				//ComparisonType.AtLeast => resource.count >= RequiredAmount,
+//				//ComparisonType.AtMost => resource.count <= RequiredAmount,
+//				//ComparisonType.Exactly => Mathf.Approximately(resource.count, RequiredAmount),
+//				//_ => false
+//		  //        };
+//	   //  }
+//}
 
-public class AspectCondition : ICondition
-{
-	     public string AspectName
-	     {
-		          get;
-	     }
-	     public float RequiredValue
-	     {
-		          get;
-	     }
-	     public ComparisonType Comparison
-	     {
-		          get;
-	     }
+//public class AspectCondition : ICondition
+//{
+//	     public string AspectName
+//	     {
+//		          get;
+//	     }
+//	     public float RequiredValue
+//	     {
+//		          get;
+//	     }
+//	     public ComparisonType Comparison
+//	     {
+//		          get;
+//	     }
 
-	     public AspectCondition(string aspectName, float value, ComparisonType comparison)
-	     {
-		          AspectName = aspectName;
-		          RequiredValue = value;
-		          Comparison = comparison;
-	     }
+//	     public AspectCondition(string aspectName, float value, ComparisonType comparison)
+//	     {
+//		          AspectName = aspectName;
+//		          RequiredValue = value;
+//		          Comparison = comparison;
+//	     }
 
-	     public string Description => $"{AspectName} {GetComparisonString()} {RequiredValue}";
+//	     public string Description => $"{AspectName} {GetComparisonString()} {RequiredValue}";
 
-	     private string GetComparisonString() => Comparison switch
-	     {
-		          ComparisonType.AtLeast => "?",
-		          ComparisonType.AtMost => "?",
-		          ComparisonType.Exactly => "=",
-		          _ => ""
-	     };
+//	     private string GetComparisonString() => Comparison switch
+//	     {
+//		          ComparisonType.AtLeast => "?",
+//		          ComparisonType.AtMost => "?",
+//		          ComparisonType.Exactly => "=",
+//		          _ => ""
+//	     };
 
-	     public bool IsMet(PepoData pepo)
-	     {
-		          // This is trickier - we need a way to get aspects from PepoData
-		          // For now, let's assume we can find them somehow
-		          // You'll need to implement this based on your aspect structure
-		          return true; // Placeholder
-	     }
-}
+//	     public bool IsMet(PepoData pepo)
+//	     {
+//		          // This is trickier - we need a way to get aspects from PepoData
+//		          // For now, let's assume we can find them somehow
+//		          // You'll need to implement this based on your aspect structure
+//		          return true; // Placeholder
+//	     }
+//}
 
 public class LocationCondition : ICondition
 {
@@ -188,49 +187,49 @@ public class LocationCondition : ICondition
 
 // ===== EFFECTS =====
 
-public class ResourceEffect : IEffect
-{
-	     public string ResourceName
-	     {
-		          get;
-	     }
-	     public float ChangeAmount
-	     {
-		          get;
-	     }
-	     public bool IsAbsolute
-	     {
-		          get;
-	     } // If true, sets to exact value instead of adding
+//public class ResourceEffect : IEffect
+//{
+//	     public string ResourceName
+//	     {
+//		          get;
+//	     }
+//	     public float ChangeAmount
+//	     {
+//		          get;
+//	     }
+//	     public bool IsAbsolute
+//	     {
+//		          get;
+//	     } // If true, sets to exact value instead of adding
 
-	     public ResourceEffect(string resourceName, float amount, bool absolute = false)
-	     {
-		          ResourceName = resourceName;
-		          ChangeAmount = amount;
-		          IsAbsolute = absolute;
-	     }
+//	     public ResourceEffect(string resourceName, float amount, bool absolute = false)
+//	     {
+//		          ResourceName = resourceName;
+//		          ChangeAmount = amount;
+//		          IsAbsolute = absolute;
+//	     }
 
-	     public void Apply(PepoData target)
-	     {
-		          //if i already have the resource, change it, else add it.
-		          if (target.resources.inventory.Exists(r => r.name == ResourceName || r.category.Contains(ResourceName)))
-		          {
-				var resource = target.resources.inventory.Find(r => r.name == ResourceName || r.category.Contains(ResourceName));
-				if (IsAbsolute)
-				{
-					     resource.count = (int)ChangeAmount;
-				}
-				else
-				{
-					     resource.count += (int)ChangeAmount;
-				}
-		          }
-		          else
-		          {
-				//var newResource = new ResourceData { name = ResourceName, count = (int)ChangeAmount, description = $"{ResourceName} added by action." };
-		          }
-	     }
-}
+//	   //  public void Apply(PepoData target)
+//	   //  {
+//		  //        //if i already have the resource, change it, else add it.
+//		  //        if (target.resources.inventory.Exists(r => r.name == ResourceName || r.category.Contains(ResourceName)))
+//		  //        {
+//				//var resource = target.resources.inventory.Find(r => r.name == ResourceName || r.category.Contains(ResourceName));
+//				//if (IsAbsolute)
+//				//{
+//				//	     resource.count = (int)ChangeAmount;
+//				//}
+//				//else
+//				//{
+//				//	     resource.count += (int)ChangeAmount;
+//				//}
+//		  //        }
+//		  //        else
+//		  //        {
+//				////var newResource = new ResourceData { name = ResourceName, count = (int)ChangeAmount, description = $"{ResourceName} added by action." };
+//		  //        }
+//	   //  }
+//}
 
 public class MoodEffect : IEffect
 {

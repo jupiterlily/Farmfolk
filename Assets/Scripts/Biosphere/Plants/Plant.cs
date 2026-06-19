@@ -36,15 +36,26 @@ public class Plant
 	     {
 		          get; private set;
 	     }
-	     public float WaterLiters { get; private set; } = 100; //water in the plant in liters
+	     // public float WaterLiters { get; private set; } = 100; //water in the plant in liters
 	     public float TranspirationModifier { get; private set; } = 1;
 	     private MetabolicPathways metabolicPathways = new MetabolicPathways();
 	     public LSystem lSystem; //gets added and  instantiated with the plant
-	     public TileData CurrentTile; //gets assigned when the plant is placed
+	     public TileData OriginTile; //gets assigned when the plant is placed
+			   //dictionary of tiles that the plant is in, with the tile as the key and the amount of roots in that tile as the value
+	     public Dictionary<TileData, float> RootTiles = new Dictionary<TileData, float>();
+	     public ThermalEnergy storedWater = new ThermalEnergy(100, 1, 334000, 2260000, 20); //water in the plant in liters
 	     public GameObject PlantObject; //gets added and instantiated with the plant
 	     public Plant()
 	     {
-		          Leaves = new LeafProperties(UnityEngine.Random.Range(1, 50), Mathf.FloorToInt(UnityEngine.Random.Range(1, 5)), UnityEngine.Random.Range(0.5f, 1), 1f, Mathf.FloorToInt((UnityEngine.Random.Range(1, 3))));
+		          Leaves = new LeafProperties(
+        UnityEngine.Random.Range(0.01f, 0.8f),        // SurfaceArea: 0.01-0.2 m² (100-2000 cm²)
+        UnityEngine.Random.Range(0.03f, 1.2f),        // LeafLength: 5-20 cm (0.05-0.2 m)
+        UnityEngine.Random.Range(0.0002f, 0.0005f),   // LeafThickness: 0.2-0.5 mm
+        Mathf.FloorToInt(UnityEngine.Random.Range(0, 20)),
+        UnityEngine.Random.Range(0.5f, 1),
+        1f,
+        Mathf.FloorToInt(UnityEngine.Random.Range(1, 3))
+    );
 		          Roots = new RootProperties();
 		          Stems = new StemProperties(Leaves.LeafColor);
 		          Flowers = new FlowerProperties();
@@ -53,7 +64,7 @@ public class Plant
 		          float colourSeed = UnityEngine.Random.value;
 
 		          //flip a coin to decide which is flower s and which is fruits
-		          if (colourSeed >= 0.75f)
+		          if (colourSeed >= 0.8f)
 		          {
 				Color leafComplementary = new Color(1 - Leaves.LeafColor.r, 1 - Leaves.LeafColor.g, 1 - Leaves.LeafColor.b);
 				Color stemComplementary = new Color(1 - Stems.StemColor.r, 1 - Stems.StemColor.g, 1 - Stems.StemColor.b);
@@ -68,7 +79,7 @@ public class Plant
 					     Fruits.FruitColor = leafComplementary;
 				}
 		          }
-		          else if (colourSeed >= 0.5f && colourSeed < 0.75f)
+		          else if (colourSeed >= 0.6f && colourSeed < 0.8f)
 		          {
 				Color midColor = new Color((Leaves.LeafColor.r + Stems.StemColor.r) / 2,
 					            (Leaves.LeafColor.g + Stems.StemColor.g) / 2,
@@ -85,7 +96,7 @@ public class Plant
 					     Fruits.FruitColor = midColor;
 				}
 		          }
-		          else if (colourSeed >= 0.25f && colourSeed < 0.5f)
+		          else if (colourSeed >= 0.4f && colourSeed < 0.6f)
 		          {
 				// Get distance between leaf and stem colors in RGB space
 				float distanceR = Mathf.Abs(Leaves.LeafColor.r - Stems.StemColor.r);
@@ -130,7 +141,7 @@ public class Plant
 					     Fruits.FruitColor = stemColorMinus;
 				}
 		          }
-		          else // colourSeed <= 0.25f
+		          else if (colourSeed >= 0.2f && colourSeed < 0.4f)
 		          {
 				// For this case, we can do something else - maybe random colors or other scheme
 				// Here's one option: create analogous colors (colors next to each other on the color wheel)
@@ -255,7 +266,7 @@ public class Plant
 		          }
 	     }
 
-	     public GameObject InstantiatePlant()
+	     public GameObject InstantiatePlant(List<Sprite> LeafSprites)
 	     {
 		          GameObject plantObject = new GameObject("Plant");
 		          PlantObject = plantObject;
@@ -266,6 +277,10 @@ public class Plant
 		          // Provide per-instance rules and axiom to the component
 		          lSystem.Initialize(this, plantObject.transform.position);
 
+		          if (LeafSprites != null && LeafSprites.Count > 0)
+		          {
+				lSystem.leafSprite = LeafSprites[Leaves.LeafGrouping];
+		          }
 		          // Draw immediately if desired (or let Demeter create stages)
 		          lSystem.DrawPlant(axiom, plantObject);
 
@@ -274,8 +289,16 @@ public class Plant
 
 	     public Plant(Plant parent1, Plant parent2, MetabolicCompounds metabolism)
 	     {
-
-		          Leaves = new LeafProperties(UnityEngine.Random.Range(1, 50), Mathf.FloorToInt(UnityEngine.Random.Range(1, 5)), UnityEngine.Random.Range(0.5f, 1), 1f, Mathf.FloorToInt((UnityEngine.Random.Range(1, 3))));
+		          //this is wrong, we should be chosing a random mix of properties from each parent
+		          Leaves = new LeafProperties(
+        Random.value > 0.5f ? parent1.Leaves.SurfaceArea : parent2.Leaves.SurfaceArea,        // SurfaceArea: 0.01-0.2 m² (100-2000 cm²)
+        Random.value > 0.5f ? parent1.Leaves.LeafLength : parent2.Leaves.LeafLength,        // LeafLength: 5-20 cm (0.05-0.2 m)
+        Random.value > 0.5f ? parent1.Leaves.LeafThickness : parent2.Leaves.LeafThickness,   // LeafThickness: 0.2-0.5 mm
+        Random.value > 0.5f ? parent1.Leaves.LeafGrouping : parent2.Leaves.LeafGrouping,
+        Random.value > 0.5f ? parent1.Leaves.ChloroplastDensity : parent2.Leaves.ChloroplastDensity,
+        1f,
+        Mathf.FloorToInt(UnityEngine.Random.Range(1, 3))
+    );
 		          Roots = new RootProperties();
 		          Stems = new StemProperties(Leaves.LeafColor);
 		          Flowers = new FlowerProperties();
@@ -307,14 +330,13 @@ public class Plant
 		          int totalLeafEfficiency = Mathf.FloorToInt((lightIntensity / 100) * (Leaves.NumberOfLeaves * Leaves.SurfaceArea) * Leaves.ChloroplastDensity);
 		          Photosynthesis(totalLeafEfficiency);
 		          Respiration(duration);
+		          Transpire(OriginTile, lightIntensity, duration);
 	     }
 	     public void Photosynthesis(int watts)
 	     {
 		          Debug.Log($"Photosynthesis with {watts} watts.");
 		          if (!isDead)
 		          {
-
-
 				if (watts > 0)
 				{
 					     MyBiochemistry = metabolicPathways.LightReactions(watts, MyBiochemistry);
@@ -347,6 +369,42 @@ public class Plant
 				}
 		          }
 	     }
+
+	     //transpiration. move water from soil tiles that roots are in. take it to plant stores and then push to atmosphere based on leaf surface area, number of leaves, and a transpiration modifier that can be affected by genetics and environment. also calculate how much water is available in the plant and if it runs out, the plant dies
+	     public void Transpire(TileData currentTile, float lightIntensity, int seconds)
+	     {
+
+		          if (!isDead)
+		          {
+				float transpirationRate = 0;
+				float stomatalConductance = CalculateTranspirationRate(lightIntensity) * seconds;
+				float vapourPressureDifference = (currentTile.atmosphereTile.temperature + 273.15f) * currentTile.atmosphereTile.RelativeHumidity / 100;
+				float atmosphericPressure = currentTile.atmosphereTile.pressure;
+
+				transpirationRate = stomatalConductance * vapourPressureDifference / atmosphericPressure;
+
+				//if there is enough water in the soil for transpiration, send it to the atmosphere and set the plants metabolic levels of water to 1,000,000 (we can get more complex later by having water in the plant affect metabolism and growth, but for now we just want to make sure the plant has enough water for photosynthesis and growth)
+				if (currentTile.composition.water.Mass >= transpirationRate)
+				{
+					     currentTile.composition.water.TransferMassTo(currentTile.atmosphereTile.waterVapor, transpirationRate * 0.98f);
+					     float stored = transpirationRate * 0.2f;
+					     storedWater.TransferMassTo(currentTile.composition.water, stored);
+					     Debug.Log($"Plant at {currentTile.tileGridRef}: Transpiration for {seconds} seconds with light intensity: {lightIntensity}. {transpirationRate} litres transpired");
+					     //we also need to use the latent heat of vaporisation to cool the atmosphere.
+					     currentTile.atmosphereTile.waterVapor.ExtractEnergy(transpirationRate * 0.98f * currentTile.atmosphereTile.waterVapor.LatentHeatVaporization);
+				}
+				else
+				{
+					     Debug.Log($"Plant at {currentTile.tileGridRef}: Transpiration for {seconds} seconds with light intensity: {lightIntensity}. {currentTile.composition.water.Mass} litres transpired");
+					     float waterExtracted = currentTile.composition.water.Mass;
+					     currentTile.composition.water.TransferMassTo(currentTile.atmosphereTile.waterVapor, currentTile.composition.water.Mass);
+					     currentTile.atmosphereTile.waterVapor.ExtractEnergy(waterExtracted * currentTile.atmosphereTile.waterVapor.LatentHeatVaporization);
+				}
+
+
+		          }
+	     }
+
 	     public void Grow(float growthAmount, Organs organ)
 	     {
 		          if (!isDead)
@@ -361,5 +419,6 @@ public class Plant
 		          Plant seed = this;
 		          return seed;
 	     }
+
 }
 

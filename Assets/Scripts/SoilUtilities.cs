@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+ï»¿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -99,42 +99,142 @@ public static class SoilUtilities
 		          float omFactor = 0.2f * (1f - organicMaterial / Constants.ORGANIC_DENSITY);
 		          return Mathf.Clamp01(sandFactor + clayFactor + omFactor);
 	     }
+	     //  public static void ApplySurfaceErosion(TileData source, TileData target, float gradient, float waterMoved)
+	     //  {
+	     //        // Apply erosion and sediment transfer between tiles based on surface water movement
+	     //        var sc = source.composition;
+	     //        var tc = target.composition;
+
+	     //        sc.erodibility = CalculateErodibility(sc.sand.Mass, sc.clay.Mass, sc.organicMaterial.Mass);
+
+	     //        float erosionFactor = gradient * sc.erodibility * 0.05f;
+	     //        float sedimentMass = erosionFactor * waterMoved;
+
+	     //        float fineTotal = sc.silt.Mass + sc.clay.Mass;
+	     //        if (fineTotal > 0f && sedimentMass > 0f)
+	     //        {
+	     //float siltRatio = sc.silt.Mass / fineTotal;
+	     //float clayRatio = sc.clay.Mass / fineTotal;
+
+	     //float siltMoved = sedimentMass * siltRatio;
+	     //float clayMoved = sedimentMass * clayRatio;
+
+	     //siltMoved = Mathf.Min(siltMoved, sc.silt.Mass);
+	     //clayMoved = Mathf.Min(clayMoved, sc.clay.Mass);
+
+	     //float organicMoved = sedimentMass * 0.1f;
+	     //organicMoved = Mathf.Min(organicMoved, sc.organicMaterial.Mass);
+
+	     //ThermalEnergyUtilities.TransferMassAndEnergy(sc.silt, tc.silt, siltMoved);
+	     //ThermalEnergyUtilities.TransferMassAndEnergy(sc.clay, tc.clay, clayMoved);
+	     //ThermalEnergyUtilities.TransferMassAndEnergy(sc.organicMaterial, tc.organicMaterial, organicMoved);
+
+	     //float erosionVolume = sedimentMass / sc.bulkDensity;
+	     //source.volume -= erosionVolume;
+	     //target.volume += erosionVolume;
+
+	     //RecalculateTilePhysics(source);
+	     //RecalculateTilePhysics(target);
+	     //        }
+	     //  }
+	     public static float CalculateFlowVelocityDarcyWeisbach(float waterDepth, float gradient, float frictionFactor = 0.05f)
+	     {
+		          // Darcy-Weisbach equation for open channel flow
+		          // v = âˆš(8g * R * S / f)
+		          // where:
+		          // g = gravitational acceleration (9.81 m/sÂ²)
+		          // R = hydraulic radius â‰ˆ water depth for overland flow
+		          // S = slope gradient
+		          // f = Darcy-Weisbach friction factor
+
+		          if (waterDepth <= 0.001f || gradient <= 0f)
+				return 0f;
+
+		          float g = 9.81f;
+		          float velocity = Mathf.Sqrt((8f * g * waterDepth * gradient) / frictionFactor);
+
+		          return Mathf.Min(velocity, 10f);
+	     }
 	     public static void ApplySurfaceErosion(TileData source, TileData target, float gradient, float waterMoved)
 	     {
+		          float flowVelocity = CalculateFlowVelocityDarcyWeisbach(source.surfaceWater.Mass / 100, gradient);
 		          // Apply erosion and sediment transfer between tiles based on surface water movement
 		          var sc = source.composition;
 		          var tc = target.composition;
+
+		          // Calculate flow competence (ability to transport different particle sizes)
+		          // Flow velocity determines what size particles can be transported
+		          float criticalVelocitySand = 0.3f; // m/s - velocity needed to move sand
+		          float criticalVelocitySilt = 0.1f;  // m/s - velocity needed to move silt
+		          float criticalVelocityClay = 0.05f; // m/s - velocity needed to move clay
 
 		          sc.erodibility = CalculateErodibility(sc.sand.Mass, sc.clay.Mass, sc.organicMaterial.Mass);
 
 		          float erosionFactor = gradient * sc.erodibility * 0.05f;
 		          float sedimentMass = erosionFactor * waterMoved;
 
-		          float fineTotal = sc.silt.Mass + sc.clay.Mass;
-		          if (fineTotal > 0f && sedimentMass > 0f)
+		          // Determine which particle sizes can be transported based on flow velocity
+		          float sandTransportFactor = Mathf.Clamp01((flowVelocity - criticalVelocitySand) / criticalVelocitySand);
+		          float siltTransportFactor = Mathf.Clamp01((flowVelocity - criticalVelocitySilt) / criticalVelocitySilt);
+		          float clayTransportFactor = Mathf.Clamp01((flowVelocity - criticalVelocityClay) / criticalVelocityClay);
+
+		          // Organic matter is typically easier to transport
+		          float organicTransportFactor = Mathf.Clamp01(flowVelocity / criticalVelocityClay);
+
+		          // Calculate how much of each particle size can be moved
+		          float totalAvailableMass = sc.sand.Mass + sc.silt.Mass + sc.clay.Mass + sc.organicMaterial.Mass;
+
+		          if (totalAvailableMass > 0f && sedimentMass > 0f)
 		          {
-				float siltRatio = sc.silt.Mass / fineTotal;
-				float clayRatio = sc.clay.Mass / fineTotal;
+				// Distribute sediment transport across all particle sizes based on availability and transportability
+				float sandFraction = sc.sand.Mass / totalAvailableMass * sandTransportFactor;
+				float siltFraction = sc.silt.Mass / totalAvailableMass * siltTransportFactor;
+				float clayFraction = sc.clay.Mass / totalAvailableMass * clayTransportFactor;
+				float organicFraction = sc.organicMaterial.Mass / totalAvailableMass * organicTransportFactor;
 
-				float siltMoved = sedimentMass * siltRatio;
-				float clayMoved = sedimentMass * clayRatio;
+				float totalTransportFactor = sandFraction + siltFraction + clayFraction + organicFraction;
 
-				siltMoved = Mathf.Min(siltMoved, sc.silt.Mass);
-				clayMoved = Mathf.Min(clayMoved, sc.clay.Mass);
+				if (totalTransportFactor > 0f)
+				{
+					     // Normalize fractions
+					     sandFraction /= totalTransportFactor;
+					     siltFraction /= totalTransportFactor;
+					     clayFraction /= totalTransportFactor;
+					     organicFraction /= totalTransportFactor;
 
-				float organicMoved = sedimentMass * 0.1f;
-				organicMoved = Mathf.Min(organicMoved, sc.organicMaterial.Mass);
+					     float sandMoved = sedimentMass * sandFraction;
+					     float siltMoved = sedimentMass * siltFraction;
+					     float clayMoved = sedimentMass * clayFraction;
+					     float organicMoved = sedimentMass * organicFraction;
 
-				ThermalEnergyUtilities.TransferMassAndEnergy(sc.silt, tc.silt, siltMoved);
-				ThermalEnergyUtilities.TransferMassAndEnergy(sc.clay, tc.clay, clayMoved);
-				ThermalEnergyUtilities.TransferMassAndEnergy(sc.organicMaterial, tc.organicMaterial, organicMoved);
+					     // Ensure we don't move more than what's available
+					     sandMoved = Mathf.Min(sandMoved, sc.sand.Mass);
+					     siltMoved = Mathf.Min(siltMoved, sc.silt.Mass);
+					     clayMoved = Mathf.Min(clayMoved, sc.clay.Mass);
+					     organicMoved = Mathf.Min(organicMoved, sc.organicMaterial.Mass);
 
-				float erosionVolume = sedimentMass / sc.bulkDensity;
-				source.volume -= erosionVolume;
-				target.volume += erosionVolume;
+					     // Transfer all particle sizes that can be moved
+					     if (sandMoved > 0f)
+						          ThermalEnergyUtilities.TransferMassAndEnergy(sc.sand, tc.sand, sandMoved);
 
-				RecalculateTilePhysics(source);
-				RecalculateTilePhysics(target);
+					     if (siltMoved > 0f)
+						          ThermalEnergyUtilities.TransferMassAndEnergy(sc.silt, tc.silt, siltMoved);
+
+					     if (clayMoved > 0f)
+						          ThermalEnergyUtilities.TransferMassAndEnergy(sc.clay, tc.clay, clayMoved);
+
+					     if (organicMoved > 0f)
+						          ThermalEnergyUtilities.TransferMassAndEnergy(sc.organicMaterial, tc.organicMaterial, organicMoved);
+
+					     float totalMoved = sandMoved + siltMoved + clayMoved + organicMoved;
+					     float erosionVolume = totalMoved / sc.bulkDensity;
+
+					     source.volume -= erosionVolume;
+					     target.volume += erosionVolume;
+
+					     RecalculateTilePhysics(source);
+					     RecalculateTilePhysics(target);
+				}
 		          }
 	     }
 	     static float CalculateHorizontalPermeability(float sandPct, float clayPct, float porosity)
@@ -190,7 +290,7 @@ public static class SoilUtilities
 
 	     public static void UpdateSoilTemperature(TileData data, float hours)
 	     {
-		          List<ThermalEnergy> energyData = data.composition.energy;
+		          ThermalEnergy[] energyData = data.composition.energy;
 		          energyData.OrderByDescending(v => v.Mass);
 		          if (data.surfaceWater.Mass > 1f)
 		          {
@@ -204,10 +304,6 @@ public static class SoilUtilities
 		          }
 		          //distribute heat between all the components within the soil.
 		          ThermalEnergyUtilities.MixTemperaturesByPhase(data.composition.energy);
-
-
-
-
 	     }
 	     //  public static float PassHeatFromSoil(TileData data, float hours, TileManager tileManager)
 	     //  {
@@ -223,7 +319,7 @@ public static class SoilUtilities
 	     //        float totalAirMass = airMassPerTile * tileManager.worldsise.x * tileManager.worldsise.y;
 
 	     //        // 1. Calculate heat transfer between soil and air
-	     //        float heatTransferCoefficient = 10f; // W/m2·K (typical for soil-air interface)
+	     //        float heatTransferCoefficient = 10f; // W/m2Â·K (typical for soil-air interface)
 	     //        float temperatureDifference = data.soilTemperature - tileManager.airTemp;
 	     //        float heatFlowRate = heatTransferCoefficient * temperatureDifference; // Watts per m2
 
@@ -306,8 +402,8 @@ public static class SoilUtilities
 	     //  }
 
 	     public static void RedistributeWaterLateral(WorldTile tile, float hours)
-	     {
-		          // Helper to calculate total water for a tile + neighbors
+	     {//this is water movement within the soil.
+	      // Helper to calculate total water for a tile + neighbors
 		          float GetTotalWater(WorldTile t)
 		          {
 				float total = t.tileData.composition.water.Mass;
@@ -425,12 +521,12 @@ public static class SoilUtilities
     float hours)
 	     {
 		          // Physical constants
-		          const float waterDensity = 1000f; // kg/m³
+		          const float waterDensity = 1000f; // kg/mÂ³
 		          float soilSpecificHeat = GetSoilHeatCapacity(td.composition);
 		          float latentHeat = GetLatentHeat(td.soilTemperature); // Temperature-dependent
 
 		          // Convert inputs
-		          float solarRadiation = solarRadiationWatts * 3600 * hours; // J/m²
+		          float solarRadiation = solarRadiationWatts * 3600 * hours; // J/mÂ²
 		          float soilTempK = td.soilTemperature + 273.15f;
 
 		          // 1. Calculate net radiation (improved)
@@ -463,7 +559,7 @@ public static class SoilUtilities
 				     5000f;
 		          }
 
-		          // 5. Penman-Monteith evaporation (kg/m²/s)
+		          // 5. Penman-Monteith evaporation (kg/mÂ²/s)
 		          float numerator = 0.408f * netRadiation +
 			           (900f / (td.soilTemperature + 273f)) * windSpeed * vaporPressureDeficit;
 		          float denominator = 0.408f * (1 + 0.34f * windSpeed) +
@@ -512,7 +608,7 @@ public static class SoilUtilities
 	     private static float GetLatentHeat(float temperature)
 	     {
 		          // Temperature-dependent latent heat (J/kg)
-		          // Linear approximation between 0°C and 100°C
+		          // Linear approximation between 0Â°C and 100Â°C
 		          return Mathf.Lerp(2.5e6f, 2.26e6f, Mathf.Clamp01((temperature + 10f) / 110f));
 	     }
 

@@ -15,7 +15,7 @@ public static class Plant_Utilities
 	     public static float CalculateDryMass(Plant plant)
 	     {
 		          float dryMassGrams = 0f;
-		          dryMassGrams += plant.Leaves.LeafOrgan.CalculateDryMass(plant.Leaves.NumberOfLeaves * plant.Leaves.SurfaceArea * plant.Leaves.LeafThickness * plant.Leaves.LeafLength);
+		          dryMassGrams += plant.Leaves.LeafOrgan.CalculateDryMass(plant.Leaves.NumberOfLeaves * plant.Leaves.SurfaceArea / plant.Leaves.LeafLength * plant.Leaves.LeafThickness * plant.Leaves.LeafLength);
 		          dryMassGrams += plant.Stems.StemOrgan.CalculateDryMass(plant.Stems.Volume);
 		          dryMassGrams += plant.Fruits.FruitOrgan.CalculateDryMass(plant.Fruits.FruitCount * MathF.PI * (MathF.Pow(plant.Fruits.Size, 3) / 6f));
 		          return dryMassGrams / 1000f;
@@ -24,11 +24,26 @@ public static class Plant_Utilities
 	     public static float CalculateWaterMass(Plant plant)
 	     {
 		          float waterMassGrams = 0f;
-		          waterMassGrams += plant.Leaves.LeafOrgan.CalculateWaterMass(plant.Leaves.NumberOfLeaves * plant.Leaves.SurfaceArea * plant.Leaves.LeafThickness * plant.Leaves.LeafLength);
+		          waterMassGrams += plant.Leaves.LeafOrgan.CalculateWaterMass(plant.Leaves.NumberOfLeaves * plant.Leaves.SurfaceArea / plant.Leaves.LeafLength * plant.Leaves.LeafThickness * plant.Leaves.LeafLength);
 		          waterMassGrams += plant.Stems.StemOrgan.CalculateWaterMass(plant.Stems.Volume);
 		          waterMassGrams += plant.Fruits.FruitOrgan.CalculateWaterMass(plant.Fruits.FruitCount * MathF.PI * (MathF.Pow(plant.Fruits.Size, 3) / 6f));
 		          return waterMassGrams / 1000f;
 	     }
+
+	     public static MetabolicCompounds CalcualteTotalMetabolicCost(Plant plant, int leaves, int flowers, int fruits, int stems)
+	     {
+		          MetabolicCompounds comp = new MetabolicCompounds();
+		          //get fruit volume, get leaf volume, get stem volume, get 
+		          float leafVolume = leaves * plant.Leaves.SurfaceArea / plant.Leaves.LeafLength * plant.Leaves.LeafThickness * plant.Leaves.LeafLength;
+		          float stemVolume = stems * plant.Stems.Length * plant.Stems.Diameter * plant.Stems.Diameter;
+		          float fruitVolume = fruits * MathF.PI * (MathF.Pow(plant.Fruits.Size, 3) / 6f);
+
+		          MetabolicCostReport leafReport = plant.Leaves.LeafOrgan.CalculateGrowthMetabolism(leafVolume);
+		          MetabolicCostReport stemReport = plant.Stems.StemOrgan.CalculateGrowthMetabolism(stemVolume);
+		          MetabolicCostReport fruitReport = plant.Fruits.FruitOrgan.CalculateGrowthMetabolism(fruitVolume);
+		          return comp;
+	     }
+
 }
 
 public static class OrganUtilities

@@ -67,7 +67,7 @@ public static class ThermalEnergyUtilities
 
 	     /// <summary>Transfer mass and associated thermal energy</summary>
 	     public static void TransferMassAndEnergy(ThermalEnergy source, ThermalEnergy sink,
-			              float massToTransfer)
+		 float massToTransfer)
 	     {
 		          if (source == null || sink == null || massToTransfer <= 0)
 				return;
@@ -77,8 +77,8 @@ public static class ThermalEnergyUtilities
 				return;
 
 		          // Calculate energy proportional to mass being transferred
-		          float energyPerKg = source.StoredEnergy / source.Mass;
-		          float energyToTransfer = energyPerKg * actualTransfer;
+		          // float energyPerKg = source.StoredEnergy / source.Mass;
+		          //float energyToTransfer = energyPerKg * actualTransfer;
 
 		          // Transfer energy
 		          //    source.ExtractEnergy(energyToTransfer);
@@ -108,9 +108,9 @@ public static class ThermalEnergyUtilities
 	     /// This conserves total energy while equalizing temperatures within each phase group
 	     /// </summary>
 	     /// <param name="thermalEnergies">List of ThermalEnergy objects to mix</param>
-	     public static void MixTemperaturesByPhase(List<ThermalEnergy> thermalEnergies)
+	     public static void MixTemperaturesByPhase(ThermalEnergy[] thermalEnergies)
 	     {
-		          if (thermalEnergies == null || thermalEnergies.Count <= 1)
+		          if (thermalEnergies == null || thermalEnergies.Length <= 1)
 				return;
 
 		          // Group by phase
@@ -266,10 +266,10 @@ public static class ThermalEnergyUtilities
 	     /// <summary>
 	     /// Mixes temperatures using pairwise conduction between all objects in a phase group
 	     /// More realistic but slower - good for small groups
-	     /// </summary>
+	     // </summary>
 	     public static void MixTemperaturesByConduction(List<ThermalEnergy> thermalEnergies,
-				       float timeStep,
-				       float widthByHeight = 1f)
+	          float timeStep,
+	          float area = 1f, float distance = 1f)
 	     {
 		          if (thermalEnergies == null || thermalEnergies.Count <= 1)
 				return;
@@ -306,7 +306,7 @@ public static class ThermalEnergyUtilities
 						          if (tempDiff > 0)
 						          {
 								// Simplified: assume unit area and distance with mixing factor
-								float heatFlow = hot.ThermalConductivity * widthByHeight * tempDiff * timeStep;
+								float heatFlow = hot.ThermalConductivity * area * (tempDiff / distance) * timeStep;
 								EnergyTransferUtilities.TransferEnergy(hot, cold, heatFlow);
 						          }
 					     }
@@ -316,25 +316,25 @@ public static class ThermalEnergyUtilities
 	     /// <summary>
 	     /// Mixes all ThermalEnergy objects in an AtmosphereTile using energy transfer
 	     /// </summary>
-	     public static void MixAtmosphereTileTemperatures(AtmosphereTile atmosphere)
-	     {
-		          if (atmosphere == null)
-				return;
+	     //  public static void MixAtmosphereTileTemperatures(AtmosphereTile atmosphere)
+	     //  {
+	     //        if (atmosphere == null)
+	     //return;
 
-		          // Collect all thermal energies
-		          List<ThermalEnergy> allEnergies = new List<ThermalEnergy>();
+	     //        // Collect all thermal energies
+	     //        ThermalEnergy[] allEnergies = ThermalEnergy[];
 
-		          if (atmosphere.AtmosphericEnergy != null)
-				allEnergies.AddRange(atmosphere.AtmosphericEnergy);
+	     //        if (atmosphere.AtmosphericEnergy != null)
+	     //allEnergies.AddRange(atmosphere.AtmosphericEnergy);
 
-		          if (atmosphere.WaterEnergy != null)
-				allEnergies.AddRange(atmosphere.WaterEnergy);
+	     //        if (atmosphere.WaterEnergy != null)
+	     //allEnergies.AddRange(atmosphere.WaterEnergy);
 
-		          if (atmosphere.AerosolisedEnergy != null)
-				allEnergies.AddRange(atmosphere.AerosolisedEnergy);
+	     //        if (atmosphere.AerosolisedEnergy != null)
+	     //allEnergies.AddRange(atmosphere.AerosolisedEnergy);
 
-		          MixTemperaturesByPhase(allEnergies);
-	     }
+	     //        MixTemperaturesByPhase(allEnergies);
+	     //  }
 
 	     /// <summary>
 	     /// Mixes temperatures between two ThermalEnergy objects to achieve equilibrium
@@ -455,9 +455,9 @@ public static class ThermalEnergyUtilities
 	     /// Distributes energy evenly among ThermalEnergy objects of the same phase
 	     /// Useful for simulating rapid mixing (like stirring)
 	     /// </summary>
-	     public static void DistributeEnergyEvenly(List<ThermalEnergy> energies)
+	     public static void DistributeEnergyEvenly(ThermalEnergy[] energies)
 	     {
-		          if (energies == null || energies.Count <= 1)
+		          if (energies == null || energies.Length <= 1)
 				return;
 
 		          // Group by phase

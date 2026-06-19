@@ -14,7 +14,7 @@ public class LSystem : MonoBehaviour
 	     // Rules - kept the same as yours
 
 	     //public static Dictionary<char, string> currentRules = new Dictionary<char, string>();
-
+	     public Sprite leafSprite;
 	     public LSystem_Ruleset rulesets;
 	     // Private fields
 	     private Plant plant;
@@ -25,6 +25,9 @@ public class LSystem : MonoBehaviour
 	     // A simpler approach: store all lines to be drawn
 	     private List<BranchData> allBranches = new List<BranchData>();
 	     private GameObject plantContainer;
+
+	     //we need to dictate growth phases. germination ,vegetative, flowering, fruiting, senescence, dormant. when we switch to this rule, we change the active rules in the ruleset.
+
 
 	     // Data structure for branches
 	     private class BranchData
@@ -98,9 +101,9 @@ public class LSystem : MonoBehaviour
 		          {
 				Destroy(lr.gameObject);
 		          }
-
+		          //select leaf sprite int
 		          // Process the axiom
-		          ProcessAxiom(axiomToDraw);
+		          ProcessAxiom(axiomToDraw, leafSprite);
 
 		          // Draw all collected branches
 		          DrawAllBranches();
@@ -109,7 +112,7 @@ public class LSystem : MonoBehaviour
 	     /// <summary>
 	     /// Process the entire axiom string
 	     /// </summary>
-	     private void ProcessAxiom(string axiom)
+	     private void ProcessAxiom(string axiom, Sprite LeafSprite)
 	     {
 		          Stack<TurtleState> stateStack = new Stack<TurtleState>();
 		          TurtleState currentState = new TurtleState
@@ -222,13 +225,30 @@ public class LSystem : MonoBehaviour
 				currentState.rotation *= Quaternion.Euler(0, 0, -angle);
 				currentState.direction = currentState.rotation * Vector3.up;
 				break;
-
-				case 'L': // Create leaf
-				CreateLeaf(currentState.position, currentState.direction, currentState.currentWidth);
+				case 'J': // Create leaf
+				CreateLeaf(currentState.position, currentState.direction, currentState.currentWidth, plant.Leaves.LeafColor, plant.Leaves.LeafLength * Random.Range(0.3f, 0.7f));
 				leafCount++;
 				plant.Leaves.AddorRemoveLeaves(1);
 				break;
+				case 'K': // Create leaf
+				CreateLeafSprite(currentState.position, currentState.direction, currentState.currentWidth, plant.Leaves.LeafColor, plant.Leaves.LeafLength, leafSprite);
 
+				plant.Leaves.AddorRemoveLeaves(1);
+				break;
+				case 'L': // Create leaf
+				CreateLeafSprite(currentState.position, currentState.direction, currentState.currentWidth, new Color(plant.Leaves.LeafColor.r, plant.Leaves.LeafColor.g * 0.8f, plant.Leaves.LeafColor.b), plant.Leaves.LeafLength, leafSprite);
+				plant.Leaves.AddorRemoveLeaves(1);
+				break;
+				case 'M': // Create leaf
+				CreateLeafSprite(currentState.position, currentState.direction, currentState.currentWidth, new Color(plant.Leaves.LeafColor.r, plant.Leaves.LeafColor.g * 0.5f, plant.Leaves.LeafColor.b * 0.8f), plant.Leaves.LeafLength, leafSprite);
+				leafCount--;
+				plant.Leaves.AddorRemoveLeaves(1);
+				break;
+				case 'N': // Create leaf
+				CreateLeafSprite(currentState.position, currentState.direction, currentState.currentWidth, new Color(plant.Leaves.LeafColor.r, plant.Leaves.LeafColor.g * 0.2f, plant.Leaves.LeafColor.b * 0.6f), plant.Leaves.LeafLength, leafSprite);
+
+				plant.Leaves.AddorRemoveLeaves(1);
+				break;
 				case 'f': // Create flower
 				CreateFlower(currentState.position, currentState.direction, currentState.currentWidth);
 				break;
@@ -254,7 +274,7 @@ public class LSystem : MonoBehaviour
 				break;
 
 				default:
-				Debug.LogWarning($"Unhandled L-system symbol: '{c}'");
+				//Debug.LogWarning($"Unhandled L-system symbol: '{c}'");
 				break;
 				}
 		          }
@@ -265,7 +285,7 @@ public class LSystem : MonoBehaviour
 				CreateLineRendererFromPoints(currentLinePoints, currentLineWidths, currentState.depth);
 		          }
 
-		          Debug.Log($"Processed axiom. Leaf count = {leafCount}");
+		          //Debug.Log($"Processed axiom. Leaf count = {leafCount}");
 	     }
 
 	     /// <summary>
@@ -374,7 +394,7 @@ public class LSystem : MonoBehaviour
 	     }
 
 	     // Leaf creation
-	     private void CreateLeaf(Vector3 position, Vector3 direction, float branchWidth)
+	     private void CreateLeaf(Vector3 position, Vector3 direction, float branchWidth, Color leafColour, float leafLength)
 	     {
 		          if (plant?.Leaves == null)
 				return;
@@ -384,26 +404,59 @@ public class LSystem : MonoBehaviour
 		          leaf.transform.position = position;
 
 		          LineRenderer lr = leaf.AddComponent<LineRenderer>();
-		          float leafSize = Mathf.Max(0.0005f, branchWidth) * Mathf.Sqrt(plant.Leaves.SurfaceArea) * 2f;
 
-		          Vector3 perpendicular = Vector3.Cross(direction, Vector3.forward).normalized;
+		          // Calculate leaf base width - broader leaves should have bigger width multiplier
+		          float leafBaseWidth = plant.Leaves.LeafWidth * 0.5f;
 
-		          Vector3[] leafPoints = new Vector3[3];
-		          leafPoints[0] = position + perpendicular * (branchWidth * 0.5f); // offset so base doesn't coincide with stem center
-		          leafPoints[1] = position + (direction + perpendicular * 0.3f).normalized * leafSize * 0.5f;
-		          leafPoints[2] = position + direction.normalized * leafSize;
+		          // For broad leaves, we want the line to be VERY thick in the middle
+		          // The width multiplier controls how thick the line is
+		          float widthMultiplier = plant.Leaves.SurfaceArea * 0.2f; // Scale based on surface area
 
-		          lr.positionCount = 3;
+		          // Simple straight leaf midrib (just 2 points)
+		          Vector3[] leafPoints = new Vector3[2];
+		          leafPoints[0] = position; // Base of leaf at stem
+		          leafPoints[1] = position + direction.normalized * leafLength; // Tip of leaf
+
+		          lr.positionCount = 2;
 		          lr.SetPositions(leafPoints);
-		          lr.startWidth = leafSize * 0.3f;
-		          // lr.alignment = LineAlignment.TransformZ;
-		          lr.endWidth = leafSize * 0.1f;
-		          lr.widthCurve.AddKey(1, leafSize * 0.5f);
-		          lr.startColor = Color.Lerp(plant.Leaves.LeafColor, plant.Stems.StemColor, .3f);
-		          lr.endColor = plant.Leaves.LeafColor;
-		          lr.material = new Material(Shader.Find("Sprites/Default"));
-		          lr.material.color = plant.Leaves.LeafColor;
 
+		          // CRITICAL: Set up the width curve to make the leaf broad
+		          AnimationCurve widthCurve = new AnimationCurve();
+
+		          // At base (time 0): start with some width
+		          widthCurve.AddKey(0f, 0.1f);
+
+		          // Near base (time 0.2): quickly get to maximum width
+		          widthCurve.AddKey(0.2f, 1f);
+
+		          // In the middle (time 0.5): stay at maximum width for broad leaf
+		          widthCurve.AddKey(0.5f, 1f);
+
+		          // Start tapering (time 0.7): begin to narrow
+		          widthCurve.AddKey(0.7f, 0.8f);
+
+		          // At tip (time 1): end with zero or near-zero width
+		          widthCurve.AddKey(1f, 0f);
+
+		          lr.widthCurve = widthCurve;
+		          lr.widthMultiplier = widthMultiplier; // This makes the line thick!
+
+		          // Set colors
+		          lr.startColor = Color.Lerp(leafColour, plant.Stems.StemColor, 0.2f);
+		          lr.endColor = leafColour;
+		          lr.material = new Material(Shader.Find("Sprites/Default"));
+		          lr.material.color = leafColour;
+
+		          // Optional: Add a slight curve to the leaf by adding a middle point
+		          // Uncomment if you want a slight natural curve
+
+		          Vector3[] curvedPoints = new Vector3[3];
+		          Vector3 perpendicular = Vector3.Cross(direction, Vector3.up).normalized;
+		          curvedPoints[0] = position;
+		          curvedPoints[1] = position + direction.normalized * (leafLength * 0.5f) + perpendicular * (leafLength * 0.1f);
+		          curvedPoints[2] = position + direction.normalized * leafLength;
+		          lr.positionCount = 3;
+		          lr.SetPositions(curvedPoints);
 
 	     }
 
@@ -502,7 +555,7 @@ public class LSystem : MonoBehaviour
 		          meshFilter.mesh = sphereMesh;
 
 		          // Set material and color
-		          Material fruitMaterial = new Material(Shader.Find("Standard"));
+		          Material fruitMaterial = new Material(Shader.Find("Universal Render Pipeline/Lit"));
 		          fruitMaterial.color = plant.Fruits.FruitColor;
 		          meshRenderer.material = fruitMaterial;
 
@@ -609,6 +662,50 @@ public class LSystem : MonoBehaviour
 		          if (plantContainer != null)
 		          {
 				Destroy(plantContainer);
+		          }
+	     }
+
+	     /// <summary>
+	     /// Create a leaf using a sprite instead of LineRenderer
+	     /// Positions leaf so bottom is at stem, extends in direction vector
+	     /// </summary>
+	     public void CreateLeafSprite(Vector3 position, Vector3 direction, float branchWidth, Color leafColor, float leafLength, Sprite leafSprite)
+	     {
+		          if (plant?.Leaves == null || leafSprite == null)
+				return;
+
+		          GameObject leaf = new GameObject("Leaf");
+		          leaf.transform.SetParent(plantContainer.transform);
+
+		          // Add SpriteRenderer component BEFORE positioning
+		          SpriteRenderer spriteRenderer = leaf.AddComponent<SpriteRenderer>();
+		          spriteRenderer.sprite = leafSprite;
+		          spriteRenderer.color = leafColor;
+		          //spriteRenderer.sortingOrder = 10; // Set sorting order for proper layering
+
+		          // Get sprite dimensions for proper scaling
+		          float spriteHeight = leafSprite.bounds.size.y;
+		          float spriteWidth = leafSprite.bounds.size.x;
+
+		          // Calculate scale to match desired leaf length and width
+		          float scaleX = leafLength / Mathf.Max(spriteHeight, 0.1f);
+		          float scaleY = plant.Leaves.LeafWidth / Mathf.Max(spriteWidth, 0.1f);
+
+		          leaf.transform.localScale = new Vector3(scaleY, scaleX, 1f);
+
+		          // Normalize direction and rotate it towards up by 10-25 degrees to apply natural variation
+		          float angleOffset = Random.Range(10f, 25f);
+		          direction = Quaternion.Euler(0, 0, angleOffset) * direction;
+		          Vector3 normalizedDirection = direction.normalized;
+
+		          // Position the leaf so its bottom is at the stem position
+		          Vector3 leafOffset = normalizedDirection * (leafLength * 0.5f);
+		          leaf.transform.position = position + leafOffset;
+
+		          // Rotate to face the direction
+		          if (normalizedDirection != Vector3.zero)
+		          {
+				leaf.transform.rotation = Quaternion.FromToRotation(Vector3.up, normalizedDirection);
 		          }
 	     }
 }

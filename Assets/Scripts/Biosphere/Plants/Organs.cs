@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections.Generic;
+using UnityEngine;
 public enum OrganType
 {
 	     Root,
@@ -7,6 +8,11 @@ public enum OrganType
 	     Flower,
 	     Fruit,
 	     Seed
+}
+
+public enum Aroma
+{
+	     Peppery, Spicy, Smoky, Ashy, Alufuric, Mineral, Pungemt, Caustic, Alkaline, Astringent, Fatty, Meaty, Delicate, Mild, Nippy, Piquant, Tangy, Tart, Sour, Acrid, Floral, Fragrant, Zesty, Berries, Herbaceous, Vegetal, Grassy, Cereal, Malty, Nutty, Syrupy, Candy, Vanilla, Chocolatey, Creamy, Buttery, Oily, Leathery, Woody, Musky, Musty, Medicinal, Mentholy, Terpeney, Toasty, Earthy, Yeasty
 }
 public class Organs
 {
@@ -20,7 +26,8 @@ public class Organs
 	     public float LipidRatio;
 	     public float CelluloseRatio;
 
-	     // Density of organ tissue (g/cm³)
+	     public Dictionary<Aroma, float> flavourProfile;//
+				       // Density of organ tissue (g/cm³)
 	     private float density = 1.0f; // approx. water density
 
 	     public Organs(OrganType organType, float waterRatio, float glucoseRatio,
@@ -40,6 +47,8 @@ public class Organs
 
 		          // Calculate maintenance cost based on organ type
 		          MaintenanceCost = CalculateMaintenanceCost();
+
+
 	     }
 
 	     private float CalculateBiosynthesisCost()
@@ -109,7 +118,7 @@ public class Organs
 		          report.ProteinInStructure = ProteinRatio * density * volume;
 		          report.LipidInStructure = LipidRatio * density * volume;
 		          report.CelluloseInStructure = CelluloseRatio * density * volume;
-
+		          report.WaterRequired = WaterRatio * density * volume;
 		          // ATP cost (1 glucose ≈ 36 ATP in respiration)
 		          report.ATPCost = report.GlucoseRequired * 36f;
 
@@ -256,6 +265,21 @@ public class BiosynthesisCosts
 }
 public class LeafProperties
 {
+	     /// <summary>
+	     /// Unit system for leaf dimensions:
+	     /// - All measurements in meters
+	     /// - SurfaceArea: approximate leaf surface area (m²)
+	     /// - LeafLength: from base to tip (m)
+	     /// - LeafWidth: computed width (m)
+	     /// - LeafThickness: estimated average thickness (m)
+	     /// 
+	     /// Typical values (Earth reference):
+	     /// - Small leaves: 0.01-0.05 m² (clover, grass)
+	     /// - Medium leaves: 0.05-0.15 m² (typical broadleaf)
+	     /// - Large leaves: 0.2+ m² (hosta, banana)
+	     /// - Leaf thickness: 0.0002-0.0005 m (0.2-0.5mm)
+	     /// </summary>
+
 	     public Organs LeafOrgan
 	     {
 		          get; set;
@@ -266,9 +290,32 @@ public class LeafProperties
 		          Random.Range(0.02f, 0.05f), //protein
 		          Random.Range(0.0f, 0.01f),  //lipid
 		          Random.Range(0.2f, 0.3f)); //cellulose
-	     public float SurfaceArea { get; set; } = 0.01f; //this is technically the square root of surface area
-	     public float LeafThickness { get; set; } = 0.0001f; //in meters
-	     public float LeafLength { get; set; } = 0.1f; //in meters
+
+	     /// <summary>
+	     /// Approximate leaf surface area in m². Represents actual 2D leaf area,
+	     /// not the square root. Used for photosynthesis calculations.
+	     /// </summary>
+	     public float SurfaceArea { get; set; } = 0.02f; // ~200 cm² (medium leaf)
+
+	     /// <summary>
+	     /// Leaf thickness in meters. Typical values: 0.0002-0.0005 m (0.2-0.5 mm).
+	     /// Used for geometry and visual thickness.
+	     /// </summary>
+	     public float LeafThickness { get; set; } = 0.0003f; // 0.3mm - typical leaf thickness
+
+	     /// <summary>
+	     /// Approximate leaf length (base to tip) in meters.
+	     /// Typical values: 0.05-0.20 m (5-20 cm).
+	     /// </summary>
+	     public float LeafLength { get; set; } = 0.08f; // 8cm - typical leaf
+
+	     /// <summary>
+	     /// Approximate leaf width derived from surface area and length.
+	     /// Width ≈ SurfaceArea / LeafLength.
+	     /// For ~0.02 m² area and 0.08 m length: width ≈ 0.025 m (2.5 cm).
+	     /// </summary>
+	     public float LeafWidth => SurfaceArea / LeafLength;
+
 	     public int NumberOfLeaves { get; set; } = 1;
 	     public float ChloroplastDensity { get; set; } = 0.5f;
 	     public float StomataDensity { get; set; } = Random.Range(52f, 261f);//stomata per mm2
@@ -279,14 +326,21 @@ public class LeafProperties
 		          get; set;
 	     } = 1;
 
-	     public LeafProperties(float surfaceArea, int leavesInCluster, float chloroplastDensity, float leafHueVariety, int cotyledons)
+	     public LeafProperties(float surfaceArea, float leafLength, float leafThickness, int leavesInCluster, float chloroplastDensity, float leafHueVariety, int cotyledons)
 	     {
 		          float hueVariety = leafHueVariety / 2;
-		          SurfaceArea = surfaceArea;
+
+		          // Ensure positive dimensions (clamp to reasonable ranges)
+		          SurfaceArea = surfaceArea; // 0.001 - 1 m² range
+		          LeafLength = leafLength; // 1-50 cm range
+		          LeafThickness = leafThickness; // 0.01-2mm range
+
 		          LeafGrouping = leavesInCluster;
 		          ChloroplastDensity = chloroplastDensity;
 		          NumberOfLeaves = cotyledons;
-		          LeafColor = Color.Lerp(new Color(0.5f, chloroplastDensity, 0.5f, 1), Color.HSVToRGB(Random.Range((0.5f - hueVariety), 0.5f + hueVariety), Random.Range(0.25f, 1), Random.Range(0.25f, 1)), 0.4f);
+
+		          LeafColor = Color.Lerp(new Color(0.5f, chloroplastDensity, 0.5f, 1),
+			      Color.HSVToRGB(Random.Range((0.5f - hueVariety), 0.5f + hueVariety), Random.Range(0.25f, 1), Random.Range(0.25f, 1)), 0.4f);
 	     }
 	     public void AddorRemoveLeaves(int additionalLeaves)
 	     {
@@ -366,7 +420,7 @@ public class StemProperties
 		              Random.Range(0.0f, 0.01f),  // lipid
 		              Random.Range(0.2f, 0.3f)); // cellulose
 		          Diameter = Random.Range(0.001f, 0.25f); //in meters
-		          Length = Diameter * Random.Range(1f, 150f); // Reasonable length-to-width ratio
+		          Length = Diameter * Random.Range(1f, 50f); // Reasonable length-to-width ratio
 	     }
 	     public Color StemColor
 	     {

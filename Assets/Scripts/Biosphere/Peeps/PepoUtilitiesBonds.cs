@@ -83,7 +83,7 @@ public class PepoUtilitiesBonds
 						          //and return the relationshipData with my information about you
 						          if (rd.pepo == you)
 						          {
-								UnityEngine.Debug.Log($"[Relationship Manager]{PepoUtilities.GetFullName(me)} is already {rd.nickname}'s {rd.relationshipName}");
+								UnityEngine.Debug.Log($"[Relationship Manager]{PepoUtilities.GetFullName(me)} is already {rd.GetNickname(rd, me)}'s {rd.relationshipName}");
 								return rd;
 						          }
 					     }

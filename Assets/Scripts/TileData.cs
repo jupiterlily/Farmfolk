@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using UnityEngine;
 
 [System.Serializable]
@@ -66,14 +65,14 @@ public class TileData
 public class SoilComposition
 {
 	     // Component masses (kg/m3)
-	     public ThermalEnergy sand = new ThermalEnergy(.257f, 50, 1800000, 12500000, 1500f, 2330, 1.1f);  //kg
-	     public ThermalEnergy silt = new ThermalEnergy(.257f, 50, 1700000, 11000000, 1550f, 2650f, 2f);  //kg
-	     public ThermalEnergy clay = new ThermalEnergy(.257f, 50, 500000, 1300000, 1600f, 2980f, 2.5f);  //kg
-	     public ThermalEnergy organicMaterial = new ThermalEnergy(.257f, 50, 237500, 2250000); //kg     
-	     public ThermalEnergy water = new ThermalEnergy(10, 1, 334000, 2260000, 20);
+	     public ThermalEnergy sand = new ThermalEnergy(.257f, 753, 1800000, 12500000, 1500f, 2330, 1.1f);  //kg
+	     public ThermalEnergy silt = new ThermalEnergy(.257f, 745, 1700000, 11000000, 1550f, 2650f, 2f);  //kg
+	     public ThermalEnergy clay = new ThermalEnergy(.257f, 880, 500000, 1300000, 1600f, 2980f, 2.5f);  //kg
+	     public ThermalEnergy organicMaterial = new ThermalEnergy(.257f, 837, 237500, 2250000); //kg     
+	     public ThermalEnergy water = new ThermalEnergy(10, 4186, 334000, 2260000, 20);
 
-	     public List<ThermalEnergy> energy => new List<ThermalEnergy>() { sand, silt, clay, organicMaterial, water };
-
+	     //public List<ThermalEnergy> energy => new List<ThermalEnergy>() { sand, silt, clay, organicMaterial, water };
+	     public ThermalEnergy[] energy = new ThermalEnergy[5];
 
 	     // Derived properties
 	     public float porosity;  //
@@ -96,8 +95,14 @@ public class SoilComposition
 	     public float organicMass => organicMaterial.Mass;
 	     public float waterMass => water.Mass;
 
-	     //energy in water and substrate.
-
+	     public SoilComposition()
+	     {
+		          energy[0] = sand;
+		          energy[1] = silt;
+		          energy[2] = clay;
+		          energy[3] = organicMaterial;
+		          energy[4] = water;
+	     }
 }
 [System.Serializable]
 public class AtmosphereTile
@@ -105,7 +110,16 @@ public class AtmosphereTile
 	     public Vector2Int tileGridRef;
 	     public float tileWidth;
 	     public int layerHeight; // 10m, 100m, 1000m
-	     public float temperature => (nitrogen.Temperature); //normalise all the temperatures of the stuff within the atmosphere?
+		              //normalise all the temperatures of the stuff within the atmosphere? calculate an average using the mass of each gas as a weighting factor.
+	     public float temperature
+	     {
+		          get
+		          {
+				float totalMass = nitrogen.Mass + oxygen.Mass + carbonDioxide.Mass + waterVapor.Mass;
+				float weightedTemperature = (nitrogen.Temperature * nitrogen.Mass + oxygen.Temperature * oxygen.Mass + carbonDioxide.Temperature * carbonDioxide.Mass + waterVapor.Temperature * waterVapor.Mass) / totalMass;
+				return weightedTemperature;
+		          }
+	     }
 	     public float density; // in liters
 	     public float pressure; // in Pascals determined by temperature, 
 	     public Vector3 windVelocity;    // m/s (3D vector)
@@ -129,24 +143,33 @@ public class AtmosphereTile
 	     public AtmosphereTile below;
 	     public AtmosphereTile[] horizontalNeighbors = new AtmosphereTile[4]; //N, E, S, W
 	     public float specificHumidity => waterVapor.Mass / (oxygen.Mass + carbonDioxide.Mass + nitrogen.Mass);
-	     public List<ThermalEnergy> energy => new List<ThermalEnergy>() { waterVapor, iceParticles, cloudWaterContent, oxygen, carbonDioxide, nitrogen, sand, silt, clay, organicMaterial };
+	     public ThermalEnergy[] energy;
 	     //public float waterVapor;        // kg
-	     public List<ThermalEnergy> WaterEnergy => new List<ThermalEnergy>() { waterVapor, iceParticles, cloudWaterContent };
-	     public ThermalEnergy waterVapor = new ThermalEnergy(10, 50);
+	     public ThermalEnergy[] WaterEnergy;
+	     public ThermalEnergy waterVapor = new ThermalEnergy(10, 4186);
 	     //public float liquidWater;       // kg
-	     public ThermalEnergy iceParticles = new ThermalEnergy(10, 50);
+	     public ThermalEnergy iceParticles = new ThermalEnergy(10, 4186);
 	     //clouds
-	     public ThermalEnergy cloudWaterContent = new ThermalEnergy(10, 50); // kg
-	     public List<ThermalEnergy> AtmosphericEnergy => new List<ThermalEnergy>() { oxygen, carbonDioxide, nitrogen };
-	     public ThermalEnergy oxygen = new ThermalEnergy(.257f, 50, 13900, 213000, 54.35f, 90.15f, 0.024f);            // kg
-	     public ThermalEnergy carbonDioxide = new ThermalEnergy(.000384f, 50, 184000, 574000, 216.59f, 194.69f, 0.0168f);     // kg
-	     public ThermalEnergy nitrogen = new ThermalEnergy(.956f, 50, 25700, 199000, 63.25f, 77.65f, 0.02598f);
+	     public ThermalEnergy cloudWaterContent = new ThermalEnergy(10, 4186); // kg
 
-	     public List<ThermalEnergy> AerosolisedEnergy => new List<ThermalEnergy>() { sand, silt, clay, organicMaterial };
-	     public ThermalEnergy sand = new ThermalEnergy(.257f, 50, 1800000, 12500000, 1500f, 2330, 1.1f);  //kg
-	     public ThermalEnergy silt = new ThermalEnergy(.257f, 50, 1700000, 11000000, 1550f, 2650f, 2f);  //kg
-	     public ThermalEnergy clay = new ThermalEnergy(.257f, 50, 500000, 1300000, 1600f, 2980f, 2.5f);  //kg
-	     public ThermalEnergy organicMaterial = new ThermalEnergy(.257f, 50, 237500, 2250000); //kg     
+	     public ThermalEnergy[] AtmosphericEnergy;
+	     public ThermalEnergy oxygen = new ThermalEnergy(.257f, 918, 13900, 213000, 54.35f, 90.15f, 0.024f);            // kg
+	     public ThermalEnergy carbonDioxide = new ThermalEnergy(.000384f, 846, 184000, 574000, 216.59f, 194.69f, 0.0168f);     // kg
+	     public ThermalEnergy nitrogen = new ThermalEnergy(.956f, 1040, 25700, 199000, 63.25f, 77.65f, 0.02598f);
+
+	     public ThermalEnergy[] AerosolisedEnergy;
+	     public ThermalEnergy sand = new ThermalEnergy(.257f, 753, 1800000, 12500000, 1500f, 2330, 1.1f);  //kg
+	     public ThermalEnergy silt = new ThermalEnergy(.257f, 745, 1700000, 11000000, 1550f, 2650f, 2f);  //kg
+	     public ThermalEnergy clay = new ThermalEnergy(.257f, 880, 500000, 1300000, 1600f, 2980f, 2.5f);  //kg
+	     public ThermalEnergy organicMaterial = new ThermalEnergy(.257f, 837, 237500, 2250000); //kg      
+
+	     public AtmosphereTile()
+	     {
+		          AtmosphericEnergy = new ThermalEnergy[] { oxygen, carbonDioxide, nitrogen };
+		          WaterEnergy = new ThermalEnergy[] { waterVapor, iceParticles, cloudWaterContent };
+		          AerosolisedEnergy = new ThermalEnergy[] { sand, silt, clay, organicMaterial };
+		          energy = new ThermalEnergy[] { waterVapor, iceParticles, cloudWaterContent, oxygen, carbonDioxide, nitrogen, sand, silt, clay, organicMaterial };
+	     }
 
 }
 [System.Serializable]

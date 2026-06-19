@@ -229,7 +229,18 @@ public static class HydrosphereUtilities
 
 				if (toCondense > 0)
 				{
+					     // Transfer mass and sensible energy
 					     ThermalEnergyUtilities.TransferMassAndEnergy(atm.waterVapor, atm.cloudWaterContent, toCondense);
+
+					     // ADD: Release latent heat of condensation to atmosphere
+					     float latentHeatReleased = toCondense * atm.waterVapor.LatentHeatVaporization; // J
+
+					     // Create a thermal mass for the released energy
+					     // This warms the surrounding air
+					     if (atm.oxygen != null) // Use a gas component as the heat sink
+					     {
+						          atm.nitrogen.AddEnergy(latentHeatReleased);
+					     }
 				}
 		          }
 		          else if (relativeHumidity < 0.98f && atm.cloudWaterContent.Mass > 0)
@@ -241,8 +252,17 @@ public static class HydrosphereUtilities
 
 				if (toEvaporate > 0)
 				{
-					     // atm.cloudWaterContent.TransferMassTo(atm.waterVapor, toEvaporate);
+					     // Transfer mass and sensible energy
 					     ThermalEnergyUtilities.TransferMassAndEnergy(atm.cloudWaterContent, atm.waterVapor, toEvaporate);
+
+					     // ADD: Absorb latent heat of evaporation from atmosphere
+					     float latentHeatAbsorbed = toEvaporate * atm.cloudWaterContent.LatentHeatVaporization; // J
+
+					     // Extract this energy from the air, cooling it
+					     if (atm.oxygen != null)
+					     {
+						          atm.nitrogen.ExtractEnergy(latentHeatAbsorbed);
+					     }
 				}
 		          }
 	     }

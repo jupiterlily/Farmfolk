@@ -9,6 +9,8 @@ public static class LSystemLibrary
 	     	     { 'S', new string[] {
 	     		          // "S",       // Minimal growth
 	     		          "S",
+			          //"SS",
+			          //"S/S",
 	     	     } },
 
 	     	     // ========== <Leaf Production ==========
@@ -16,12 +18,12 @@ public static class LSystemLibrary
 	     		          // Simple leaf types
 	     		          "<L",                    // Simple alternate leaf
 	     		          "<L[S-L]",              // Leaf with petiole (stalk)
-	     		          "<[+L][-L]",           // Bifid/cleft leaf (split leaf)
+	     		          "<[+++L][---L]",           // Bifid/cleft leaf (split leaf)
 
 	     		          // Compound leaves
-	     		          "<[+L][-L][S-L]",      // Trifoliate (clover-like)
-	     		          "<[+L][-L][+L][-L]",   // Palmate compound (4 leaflets)
-	     		          "<[S-L][+L][-L]",      // Ternate compound
+	     		          "<[+++L][---L][S---L]",      // Trifoliate (clover---like)
+	     		          "<[+++L][---L][+++L][---L]",   // Palmate compound (4 leaflets)
+	     		          "<[S---L][+++L][---L]",      // Ternate compound
 
 	     		          // Pinnate arrangements
 	     		          "<L[/S<L]",            // Simple pinnate (2 leaflets)
@@ -33,38 +35,38 @@ public static class LSystemLibrary
 	     		          "[<L][vL][>L][^L]",    // Whorl of 4 (basal rosette)
 	     		          "[<L<L][vL<L][>L<L]",  // Double whorl
 
-	     		          // Scale-like/needle leaves
-	     		          "<[+L][-L]S<[+L][-L]",  // Scale-like (conifer)
+	     		          // Scale---like/needle leaves
+	     		          "<[+++L][---L]S<[+++L][---L]",  // Scale---like (conifer)
 	     		          "<L<L<L<L",            // Fascicle (pine needle cluster)
 	     		          "<[S<L][S<L][S<L]",    // Needle whorl
 
 	     		          // Lobed leaves
-	     		          "<[+L]S[-L]",           // 3-lobed (maple-like)
-	     		          "<[+L][+L]S[-L][-L]",  // 5-lobed
+	     		          "<[+++L]S[---L]",           // 3---lobed (maple---like)
+	     		          "<[+++L][+++L]S[---L][---L]",  // 5---lobed
 	     		          "<[/L<L][/L>L]",       // Deeply lobed
 
 	     		          // Leaf pairs with variations
 	     		          "[<L][>L]",            // Opposite leaves
-	     		          "[<L-S][>L-S]",        // Opposite with stem between
+	     		          "[<L---S][>L---S]",        // Opposite with stem between
 	     		          "[<L]<[>L]",           // Decussate (alternating pairs)
 
 	     		          // Compound with buds
-	     		          "<[+b-L][-b-L]",       // Buds at leaf base
-	     		          "<L[/b-S<L]",          // Bud in leaf axil
-	     		          "<[b+L][b-L]",         // Buds on both sides
+	     		          "<[+++b---L][---b---L]",       // Buds at leaf base
+	     		          "<L[/b---S<L]",          // Bud in leaf axil
+	     		          "<[b+++L][b---L]",         // Buds on both sides
 
 	     		          // Flower/fruit integration
 	     		          "<[L][b]",             // Leaf with terminal bud
-	     		          "<L[S-b]",             // Leaf with subterminal bud
+	     		          "<L[S---b]",             // Leaf with subterminal bud
 	     		          "<[b]S<L",             // Bud then leaf
 
 	     		          // Tendril modifications
-	     		          "vL[/S-b]",             // Leaf with tendril (~ = tendril symbol)
-	     		          "v[L][/S-b]",           // Leaf and separate tendril
+	     		          "vL[/S---b]",             // Leaf with tendril (~ = tendril symbol)
+	     		          "v[L][/S---b]",           // Leaf and separate tendril
 
 	     		          // Asymmetric arrangements
 	     		          "<[/S<L][/S>L]",       // Alternate pinnate
-	     		          "<[+S<L][-S>L]",       // Spiral alternate
+	     		          "<[+++S<L][---S>L]",       // Spiral alternate
 
 	     		          // Dense arrangements
 	     		          "<L<L<L<L<L<L",        // Dense alternate
@@ -72,19 +74,19 @@ public static class LSystemLibrary
 
 	     		          // Leaf size variations (using symbols for size)
 	     		          "<L<l",                // Large then small leaf (l = small leaf)
-	     		          "<[+L][-l]",           // Large and small pair
+	     		          "<[+++L][---l]",           // Large and small pair
 
 	     		          // Petiolate variations
-	     		          "[/S-<L]",             // Long petiole
-	     		          "[/S/S-<L]",           // Twisted petiole
-	     		          "[//S-<L]",            // Zigzag petiole
+	     		          "[/S---<L]",             // Long petiole
+	     		          "[/S/S---<L]",           // Twisted petiole
+	     		          "[//S---<L]",            // Zigzag petiole
 
 	     		          // Specialized forms
-	     		          "<[+L+L][-L-L]",       // Deeply divided
+	     		          "<[+++L+++L][---L---L]",       // Deeply divided
 	     		          "<[S[<L][>L]]",        // Leaf on branched stem
-	     		          "<[[+L][-L]][[+L][-L]]", // Double compound
+	     		          "<[[+++L][---L]][[+++L][---L]]", // Double compound
 
-	     		          // Water-conserving forms
+	     		          // Water---conserving forms
 	     		          "<L<L<L",              // Reduced leaves (xerophyte)
 	     		          "<[S<L]S[S<L]",        // Sparse arrangement
 
@@ -93,24 +95,44 @@ public static class LSystemLibrary
 	     		          "[<L<L<L][>L<L<L]",    // Dense clusters
 
 	     		          // Spiraled phyllotaxy
-	     		          "</L</L</L",           // 3-leaf spiral
-	     		          "</L</L</L</L</L",     // 5-leaf spiral
+	     		          "</L</L</L",           // 3---leaf spiral
+	     		          "</L</L</L</L</L",     // 5---leaf spiral
 
-	     		          "</SL</SL</SL",           // 3-leaf spiral
-	     		          "</SL</SL</SL</SL</SL",     // 5-leaf spiral
+	     		          "</SL</SL</SL",           // 3---leaf spiral
+	     		          "</SL</SL</SL</SL</SL",     // 5---leaf spiral
 
-	     		          "</SL</Sl",           // 2-leaf spiral
-	     		          "v/SL</SL</Sl",     // 3-leaf spiral    
-	     		          "v/SL</SL</SL</Sl",     // 4-leaf spiral    
-	     		          "v/SL</SL</SL</SL</Sl",     // 5-leaf spiral
+	     		          "</SL</Sl",           // 2---leaf spiral
+	     		          "v/SL</SL</Sl",     // 3---leaf spiral    
+	     		          "v/SL</SL</SL</Sl",     // 4---leaf spiral    
+	     		          "v/SL</SL</SL</SL</Sl",     // 5---leaf spiral
 
 	     		          // Mixed arrangements
-	     		          "<L[<b-L][>b-L]",      // Leaf with bud pairs
-	     		          "<[+L-S][-L-S]S<L",    // Sequential compound
+	     		          "<L[<b---L][>b---L]",      // Leaf with bud pairs
+	     		          "<[+++L---S][---L---S]S<L",    // Sequential compound
 	     	     } },
+		     { 'j', new string[] { // leaf marker
+				"J",       
+	     			       // Leaf spot
+	     	     } },
+	     	     { 'J', new string[] {    // baby leaf
+				"K",
 
-	     	     { 'L', new string[] {
-				"L",        // Leaf
+		          } },
+		     { 'K', new string[] {      // Mature Leaf
+				//"L",
+				"K",
+		          } },
+		     { 'L', new string[] {    // Yellowing Leaf 50% of original green value
+				"M",
+				"j",
+
+		          } },
+		     { 'M', new string[] {   // Orange Leaf 25% of original green value
+				"N",
+				"j",
+		          } },
+		      { 'N', new string[] {    // Red Leaf 0% of original green value
+				"j",    
 	     			       // Leaf Drop
 	     	     } },
 	     	     // ========== Apical Bud System ==========
@@ -1082,8 +1104,8 @@ public static class LSystemLibrary
 
 	     	     // ========== Reproductive Structures ==========
 	     	     { 'c', new string[] {
-				"SAL",        // Simple cotyledon
-	     		          "Svv+++>>L------<<<<L+++>>A",     // Opposite cotyledons
+				"SLA",        // Simple cotyledon
+	     		          "S[+++L][---L]A",     // Opposite cotyledons
 	     				              //"LL",
 	     				              // "L"
 	     	     } },
@@ -1105,20 +1127,9 @@ public static class LSystemLibrary
 	     		          "r-S<[[<E]>[>E]]c",
 				"r-S[[<E]>[>E]vESc]",
 
-				"r-S<[[<B]>[>C]]c",
-				"r-S<[[<B]>[>D]]c",
-				"r-S<[[<B]>[>E]]c",
-
-				"r-S<[[<C]>[>B]]c",
-				"r-S<[[<C]>[>D]]c",
-				"r-S<[[<C]>[>E]]c",
-
-				"r-S<[[<D]>[>B]]c",
-				"r-S<[[<D]>[>C]]c",
-				"r-S<[[<D]>[>E]]c",
-
-				"r-S<[[<E]>[>B]]c",
-				"r-S<[[<E]>[>C]]c",
+				"r-S<[[<B]>[>B]]c",
+				"r-S<[[<C]>[>C]]c",
+				"r-S<[[<D]>[>D]]c",
 				"r-S<[[<E]>[>E]]c",
 
 				"r-S[[<B]>[>B]vBSc]",
@@ -1141,9 +1152,9 @@ public static class LSystemLibrary
 	     		          "[S[Sf][Sf]]b",            // Branched inflorescence
 
 	     		          // Flower clusters
-	     		          "fSfSf",                   // Cluster along stem
-	     		          "f<f<f<f",                 // Dense cluster
-	     		          "</f</f</f",               // Spiral cluster
+	     		          "[fSfSf]",                   // Cluster along stem
+	     		          "[f<f<f<f]",                 // Dense cluster
+	     		          "[</f</f</f]",               // Spiral cluster
 
 	     		          // Flowers with leaves/bracts
 	     		          "[l][Sf]",                 // Leaf then flower
@@ -1151,9 +1162,11 @@ public static class LSystemLibrary
 	     		          "lS[Sf]",                  // Leaf subtending flower
 
 	     		          // Terminal flower structures
-	     		          "f",                       // Terminal flower (no pedicel)
-	     		          "Sf",                      // Terminal flower on stem
+	     		          "[f]",                       // Terminal flower (no pedicel)
+	     		          "[/Sf]",                      // Terminal flower on stem
 	     		          "[S[Sf]]",                 // Flower on branched pedicel
+			            "[b/S[Sf]]",
+			             "[/S[bSf]]",      
 
 	     		          // Compound inflorescences
 	     		          "[<[Sf]][>[Sf]]",          // Compound umbel
@@ -1163,7 +1176,7 @@ public static class LSystemLibrary
 
 	     	     { 'f', new string[] {
 				"F",                       // Mature to fruit
-	     		          "(F)",                     // Develops into large fruit
+	     		          "[-S-F]",                     // Develops into large fruit
 	     		          "[S-F]",                   // Fruit on elongated pedicel
 	     		          "vS-F",                    // Pendulous fruit
 	     		          "[<F][>F]",                // Flower produces paired fruits

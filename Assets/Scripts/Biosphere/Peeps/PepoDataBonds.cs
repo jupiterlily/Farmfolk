@@ -52,7 +52,29 @@ public class PepoRelationshipData
 	     }
 	     public void GiveNickname(string name, PepoData giver)
 	     {
-		          nickname.TryAdd(name, new List<PepoData>() { giver });
+		          //if the nickname already exists add the pepo to the list of people who call me that. Else add a new entry to the dictionary fot htat nickname.
+		          if (nickname.ContainsKey(name))
+		          {
+				nickname[name].Add(giver);
+		          }
+		          else
+		          {
+				nickname.Add(name, new List<PepoData>() { giver });
+		          }
+
+	     }
+	     public string GetNickname(PepoRelationshipData relationship, PepoData giver)
+	     {
+		          List<string> names = new List<string>();
+		          foreach (var kvp in nickname)
+		          {
+				if (kvp.Value.Contains(giver))
+				{
+					     names.Add(kvp.Key);
+				}
+		          }
+		          int index = UnityEngine.Random.Range(0, names.Count - 1);
+		          return names[index];
 	     }
 }
 public enum RelationshipType
