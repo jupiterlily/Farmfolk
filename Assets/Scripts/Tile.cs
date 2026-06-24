@@ -3,6 +3,7 @@ using UnityEngine;
 
 public class WorldTile : MonoBehaviour
 {
+	     public GameObject tileObject;
 	     public TileData tileData;
 	     float tileSise;
 	     public bool isHovered = false;

@@ -56,7 +56,7 @@ public static class TileUtilities
 		          }
 		          else
 		          {
-				xref = Random.Range(data.tileGridRef.x - 1, data.tileGridRef.x + 1);
+				xref = UnityEngine.Random.Range(data.tileGridRef.x - 1, data.tileGridRef.x + 1);
 		          }
 		          if (data.tileGridRef.y == 0)
 		          {
@@ -64,7 +64,7 @@ public static class TileUtilities
 		          }
 		          else
 		          {
-				yref = Random.Range(data.tileGridRef.y - 1, data.tileGridRef.y + 1);
+				yref = UnityEngine.Random.Range(data.tileGridRef.y - 1, data.tileGridRef.y + 1);
 		          }
 		          return grid.Map[xref, yref];
 
@@ -148,6 +148,44 @@ public static class TileUtilities
 	     public static float SignedTetrahedronVolume(Vector3 a, Vector3 b, Vector3 c, Vector3 d)
 	     {
 		          return Vector3.Dot((b - a), Vector3.Cross((c - a), (d - a))) / 6f;
+	     }
+
+	     //take a tile, a string and a float and add that to the composition of the tile.
+
+	     public static void AddMassToTileComponent(TileData tile, string mat, float kg, float temp)
+	     {
+		          if (tile == null)
+				return;
+		          if (mat == null)
+				return;
+
+		          float newMass = kg;
+		          if (mat == "sand" || mat == "Sand")
+		          {
+				newMass += tile.composition.energy[0].Mass;
+				tile.composition.energy[0].AddMass(kg, temp);
+		          }
+		          if (mat == "sand" || mat == "Sand")
+		          {
+				newMass += tile.composition.energy[1].Mass;
+				tile.composition.energy[1].AddMass(kg, temp);
+		          }
+		          if (mat == "sand" || mat == "Sand")
+		          {
+				newMass += tile.composition.energy[2].Mass;
+				tile.composition.energy[2].AddMass(kg, temp);
+		          }
+		          if (mat == "sand" || mat == "Sand")
+		          {
+				newMass += tile.composition.energy[3].Mass;
+				tile.composition.energy[3].AddMass(kg, temp);
+		          }
+		          if (mat == "sand" || mat == "Sand")
+		          {
+				newMass += tile.composition.energy[4].Mass;
+				tile.composition.energy[4].AddMass(kg, temp);
+		          }
+
 	     }
 
 }

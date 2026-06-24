@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class PepoUIUtilities
 {
 
-	     public static GameObject CreatePortrait(PepoData pepo, List<Sprite> sHairUp, List<Sprite> sHairBack, List<Sprite> sHairTendrils, List<Sprite> sHairFront, List<Sprite> wHairUp, List<Sprite> wHairBack, List<Sprite> wHairTendrils, List<Sprite> wHairFront, List<Sprite> cHairUp, List<Sprite> cHairBack, List<Sprite> cHairTendrils, List<Sprite> cHairFront, List<Sprite> kHairUp, List<Sprite> kHairBack, List<Sprite> kHairTendrils, List<Sprite> kHairFront, List<Sprite> heads, List<Sprite> eyeColours, List<Sprite> mascEyes, List<Sprite> femmeEyes, List<Sprite> noses, List<Sprite> topLips, List<Sprite> bottomLips, List<Sprite> freckles, List<Sprite> brows, List<Sprite> stubbleSprites, List<Sprite> moustaches)
+	     public static GameObject CreatePortrait(PepoData pepo, Sprite[] sHairUp, Sprite[] sHairBack, Sprite[] sHairTendrils, Sprite[] sHairFront, Sprite[] wHairUp, Sprite[] wHairBack, Sprite[] wHairTendrils, Sprite[] wHairFront, Sprite[] cHairUp, Sprite[] cHairBack, Sprite[] cHairTendrils, Sprite[] cHairFront, Sprite[] kHairUp, Sprite[] kHairBack, Sprite[] kHairTendrils, Sprite[] kHairFront, Sprite[] heads, Sprite[] eyeColours, Sprite[] mascEyes, Sprite[] femmeEyes, Sprite[] noses, Sprite[] topLips, Sprite[] bottomLips, Sprite[] freckles, Sprite[] brows, Sprite[] stubbleSprites, Sprite[] moustaches)
 	     {
 		          GameObject portrait = new GameObject("Portrait");
 		          RectTransform rt = portrait.AddComponent<RectTransform>();
@@ -45,10 +45,10 @@ public class PepoUIUtilities
 		          {
 				if (pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] == -1)
 				{
-					     pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] = Random.Range(0, sHairUp.Count);
-					     pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] = Random.Range(0, sHairBack.Count);
-					     pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] = Random.Range(0, sHairTendrils.Count);
-					     pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] = Random.Range(0, sHairFront.Count);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] = Random.Range(0, sHairUp.Length);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] = Random.Range(0, sHairBack.Length);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] = Random.Range(0, sHairTendrils.Length);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] = Random.Range(0, sHairFront.Length);
 				}
 				HairUp = new PortraitLayer(sHairUp[pepo.body.cosmeticFeatures.pepoGrooming["HairUp"]], "HairUp", hairColor, Vector2.zero);
 				HairBack = new PortraitLayer(sHairBack[pepo.body.cosmeticFeatures.pepoGrooming["HairBack"]], "HairBack", hairColor, Vector2.zero);
@@ -59,10 +59,10 @@ public class PepoUIUtilities
 		          {
 				if (pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] == -1)
 				{
-					     pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] = Random.Range(0, wHairUp.Count);
-					     pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] = Random.Range(0, wHairBack.Count);
-					     pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] = Random.Range(0, wHairTendrils.Count);
-					     pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] = Random.Range(0, wHairFront.Count);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] = Random.Range(0, wHairUp.Length);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] = Random.Range(0, wHairBack.Length);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] = Random.Range(0, wHairTendrils.Length);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] = Random.Range(0, wHairFront.Length);
 				}
 				HairUp = new PortraitLayer(wHairUp[pepo.body.cosmeticFeatures.pepoGrooming["HairUp"]], "HairUp", hairColor, Vector2.zero);
 				HairBack = new PortraitLayer(wHairBack[pepo.body.cosmeticFeatures.pepoGrooming["HairBack"]], "HairBack", hairColor, Vector2.zero);
@@ -73,10 +73,10 @@ public class PepoUIUtilities
 		          {
 				if (pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] == -1)
 				{
-					     pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] = Random.Range(0, cHairUp.Count);
-					     pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] = Random.Range(0, cHairBack.Count);
-					     pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] = Random.Range(0, cHairTendrils.Count);
-					     pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] = Random.Range(0, cHairFront.Count);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] = Random.Range(0, cHairUp.Length);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] = Random.Range(0, cHairBack.Length);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] = Random.Range(0, cHairTendrils.Length);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] = Random.Range(0, cHairFront.Length);
 				}
 				HairUp = new PortraitLayer(cHairUp[pepo.body.cosmeticFeatures.pepoGrooming["HairUp"]], "HairUp", hairColor, Vector2.zero);
 				HairBack = new PortraitLayer(cHairBack[pepo.body.cosmeticFeatures.pepoGrooming["HairBack"]], "HairBack", hairColor, Vector2.zero);
@@ -88,10 +88,10 @@ public class PepoUIUtilities
 		          {
 				if (pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] == -1 && pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] == -1)
 				{
-					     pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] = Random.Range(0, kHairUp.Count);
-					     pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] = Random.Range(0, kHairBack.Count);
-					     pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] = Random.Range(0, kHairTendrils.Count);
-					     pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] = Random.Range(0, kHairFront.Count);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairUp"] = Random.Range(0, kHairUp.Length);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairBack"] = Random.Range(0, kHairBack.Length);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairTendrils"] = Random.Range(0, kHairTendrils.Length);
+					     pepo.body.cosmeticFeatures.pepoGrooming["HairFront"] = Random.Range(0, kHairFront.Length);
 				}
 				HairUp = new PortraitLayer(kHairUp[pepo.body.cosmeticFeatures.pepoGrooming["HairUp"]], "HairUp", hairColor, Vector2.zero);
 				HairBack = new PortraitLayer(kHairBack[pepo.body.cosmeticFeatures.pepoGrooming["HairBack"]], "HairBack", hairColor, Vector2.zero);
@@ -278,21 +278,26 @@ public class PepoUIUtilities
 		          image.color = color;
 	     }
 
-	     public static List<Sprite> GetHairList(SocioSexualData ssd, bool isBackHair, List<Sprite> fHairBack, List<Sprite> fHairFront, List<Sprite> mHairBack, List<Sprite> mHairFront, List<Sprite> uHairBack, List<Sprite> uHairFront)
+	     public static Sprite[] GetHairList(SocioSexualData ssd, bool isBackHair, Sprite[] fHairBack, Sprite[] fHairFront, Sprite[] mHairBack, Sprite[] mHairFront, Sprite[] uHairBack, Sprite[] uHairFront)
 	     {
+		          int fHairCount = isBackHair ? fHairBack.Length : fHairFront.Length;
+		          int mHairCount = isBackHair ? mHairBack.Length : mHairFront.Length;
+		          int uHairCount = isBackHair ? uHairBack.Length : uHairFront.Length;
 		          // Determine which hair list to use based on gender presentation
 		          if (ssd.presentsFemme && !ssd.presentsMasc)
 		          {
-				List<Sprite> combinedHair = new List<Sprite>();
-				combinedHair.AddRange(isBackHair ? fHairBack : fHairFront);
-				combinedHair.AddRange(isBackHair ? uHairBack : uHairFront);
+				//pepos who present femme and not masc can have hair from femme and unisex categories
+				//comnbine the two arrays into one and return it
+				Sprite[] combinedHair = new Sprite[fHairCount + uHairCount];
+				combinedHair.CopyTo(isBackHair ? fHairBack : fHairFront, 0);
+				combinedHair.CopyTo(isBackHair ? uHairBack : uHairFront, fHairCount);
 				return combinedHair;
 		          }
 		          else if (ssd.presentsMasc && !ssd.presentsFemme)
 		          {
-				List<Sprite> combinedHair = new List<Sprite>();
-				combinedHair.AddRange(isBackHair ? mHairBack : mHairFront);
-				combinedHair.AddRange(isBackHair ? uHairBack : uHairFront);
+				Sprite[] combinedHair = new Sprite[mHairCount + uHairCount];
+				combinedHair.CopyTo(isBackHair ? mHairBack : mHairFront, 0);
+				combinedHair.CopyTo(isBackHair ? uHairBack : uHairFront, mHairCount);
 				return combinedHair;
 		          }
 		          else if (!ssd.presentsFemme && !ssd.presentsMasc)
@@ -303,15 +308,15 @@ public class PepoUIUtilities
 		          else
 		          {
 				//pepos who present both masc and femme can have hair from all three categories
-				List<Sprite> combinedHair = new List<Sprite>();
-				combinedHair.AddRange(isBackHair ? fHairBack : fHairFront);
-				combinedHair.AddRange(isBackHair ? mHairBack : mHairFront);
-				combinedHair.AddRange(isBackHair ? uHairBack : uHairFront);
+				Sprite[] combinedHair = new Sprite[fHairCount + mHairCount + uHairCount];
+				combinedHair.CopyTo(isBackHair ? fHairBack : fHairFront, 0);
+				combinedHair.CopyTo(isBackHair ? mHairBack : mHairFront, fHairCount);
+				combinedHair.CopyTo(isBackHair ? uHairBack : uHairFront, fHairCount + mHairCount);
 				return combinedHair;
 		          }
 	     }
 	     // NEW METHOD: Add facial hair sprites based on cosmetic choices
-	     public static void AddFacialHairSprite(PepoData pepo, List<Sprite> stubbleSprites, List<Sprite> moustaches, Transform parent, Color hairColor)
+	     public static void AddFacialHairSprite(PepoData pepo, Sprite[] stubbleSprites, Sprite[] moustaches, Transform parent, Color hairColor)
 	     {
 		          // Check if cosmetic features exist and if any facial hair is selected
 		          if (pepo?.body?.cosmeticFeatures == null)
@@ -331,12 +336,12 @@ public class PepoUIUtilities
 		          CosmeticFeatures cosmetics = pepo.body.cosmeticFeatures;
 		          Debug.LogWarning($"Adding facial hair for {pepo.fullname}: Stubble Level {cosmetics.pepoGrooming["Stubble"]}, Moustache Style {cosmetics.pepoGrooming["Moustache"]}");
 		          // Add stubble if present
-		          if (cosmetics.pepoGrooming["Stubble"] > 0 && stubbleSprites != null && stubbleSprites.Count > 0)
+		          if (cosmetics.pepoGrooming["Stubble"] > 0 && stubbleSprites != null && stubbleSprites.Length > 0)
 		          {
 				Debug.LogWarning($"Adding stubble level {cosmetics.pepoGrooming["Stubble"]} for {pepo.fullname}");
 				//stubble sprite is determined by head shape. theyre in the same order. Sprite becomes more opaque with higher levels
 				int stubbleIndex = pepo.body.GetExpressedTrait(0); // headShape trait
-				stubbleIndex = Mathf.Clamp(stubbleIndex - 1, 0, stubbleSprites.Count - 1);
+				stubbleIndex = Mathf.Clamp(stubbleIndex - 1, 0, stubbleSprites.Length - 1);
 				Sprite stubbleSprite = stubbleSprites[stubbleIndex];
 
 				Color stubbleColor = new Color(hairColor.r, hairColor.g, hairColor.b, pepo.body.cosmeticFeatures.pepoGrooming["Stubble"] / 5);
@@ -344,7 +349,7 @@ public class PepoUIUtilities
 		          }
 		          int moustacheIndex = cosmetics.pepoGrooming["Moustache"];
 		          // Add moustache if present
-		          if (moustacheIndex > 0 && moustaches != null && moustaches.Count > 0)
+		          if (moustacheIndex > 0 && moustaches != null && moustaches.Length > 0)
 		          {
 				Debug.LogWarning($"Adding moustache style {moustacheIndex} for {pepo.fullname}");
 				Sprite moustacheSprite = moustaches[moustacheIndex];
@@ -353,22 +358,22 @@ public class PepoUIUtilities
 		          }
 	     }
 	     //Get Moustache Sprite
-	     public static Sprite GetMoustacheSprite(PepoData pepo, List<Sprite> moustaches)
+	     public static Sprite GetMoustacheSprite(PepoData pepo, Sprite[] moustaches)
 	     {
-		          if (pepo?.body?.cosmeticFeatures == null || moustaches == null || moustaches.Count == 0)
+		          if (pepo?.body?.cosmeticFeatures == null || moustaches == null || moustaches.Length == 0)
 				return null;
 		          int moustacheIndex = pepo.body.cosmeticFeatures.pepoGrooming["Moustache"];
-		          if (moustacheIndex <= 0 || moustacheIndex >= moustaches.Count)
+		          if (moustacheIndex <= 0 || moustacheIndex >= moustaches.Length)
 				return null;
 		          return moustaches[moustacheIndex];
 	     }
 	     //Get stubble sprite based on head shape
-	     public static Sprite GetStubbleSprite(PepoData pepo, List<Sprite> stubbleSprites)
+	     public static Sprite GetStubbleSprite(PepoData pepo, Sprite[] stubbleSprites)
 	     {
-		          if (pepo?.body?.cosmeticFeatures == null || stubbleSprites == null || stubbleSprites.Count == 0)
+		          if (pepo?.body?.cosmeticFeatures == null || stubbleSprites == null || stubbleSprites.Length == 0)
 				return null;
 		          int stubbleIndex = pepo.body.GetExpressedTrait(0); // headShape trait
-		          stubbleIndex = Mathf.Clamp(stubbleIndex - 1, 0, stubbleSprites.Count - 1);
+		          stubbleIndex = Mathf.Clamp(stubbleIndex - 1, 0, stubbleSprites.Length - 1);
 		          return stubbleSprites[stubbleIndex];
 	     }
 
@@ -434,7 +439,7 @@ public class PepoUIUtilities
 				return null;
 
 		          Graph pepoGraph = UIUtilities.CreateHexacoGraph(pepo.personality);
-		          return RadarGraphFactory.CreateRadarGraph(pepoGraph, parent, pixelRadius, $"HexacoRadar_{pepo.forename}");
+		          return GraphFactory.CreateRadarGraph(pepoGraph, parent, pixelRadius, $"HexacoRadar_{pepo.forename}");
 	     }
 
 	     public static GameObject CreateMoodRadar(PepoData pepo, Transform parent = null, float pixelRadius = 60f)
@@ -443,7 +448,7 @@ public class PepoUIUtilities
 				return null;
 
 		          Graph pepoGraph = UIUtilities.CreateMoodGraph(pepo.mood);
-		          return RadarGraphFactory.CreateRadarGraph(pepoGraph, parent, pixelRadius, $"MoodRadar_{pepo.forename}");
+		          return GraphFactory.CreateRadarGraph(pepoGraph, parent, pixelRadius, $"MoodRadar_{pepo.forename}");
 	     }
 	     public static GameObject CreateValuesRadar(PepoData pepo, Transform parent = null, float pixelRadius = 60f)
 	     {
@@ -451,11 +456,11 @@ public class PepoUIUtilities
 				return null;
 
 		          Graph valuesGraph = UIUtilities.CreateValuesGraph(pepo.values);
-		          return RadarGraphFactory.CreateRadarGraph(valuesGraph, parent, pixelRadius, $"ValuesRadar_{pepo.forename}");
+		          return GraphFactory.CreateRadarGraph(valuesGraph, parent, pixelRadius, $"ValuesRadar_{pepo.forename}");
 	     }
 	     public static GameObject CreateCustomRadar(Graph graph, Transform parent = null, float size = 60f, string name = "CustomRadar")
 	     {
-		          return RadarGraphFactory.CreateRadarGraph(graph, parent, size, name);
+		          return GraphFactory.CreateRadarGraph(graph, parent, size, name);
 	     }
 	     public static float GetHeightOffset(BodyData body, int traitIndex)
 	     {
@@ -477,16 +482,16 @@ public class PepoUIUtilities
 		          }
 	     }
 	     // Sprite selection methods based on BodyData
-	     public static Sprite GetHeadSprite(PepoData pepo, List<Sprite> headShape)
+	     public static Sprite GetHeadSprite(PepoData pepo, Sprite[] headShape)
 	     {
-		          if (pepo?.body == null || headShape == null || headShape.Count == 0)
+		          if (pepo?.body == null || headShape == null || headShape.Length == 0)
 				return null;
 
 		          int headIndex = pepo.body.GetExpressedTrait(0); // headShape trait
-		          Sprite head = headShape[Mathf.Clamp(headIndex - 1, 0, headShape.Count - 1)];
+		          Sprite head = headShape[Mathf.Clamp(headIndex - 1, 0, headShape.Length - 1)];
 		          return head;
 	     }
-	     public static Sprite GetEyeColourSprite(PepoData pepo, List<Sprite> eyecolor)
+	     public static Sprite GetEyeColourSprite(PepoData pepo, Sprite[] eyecolor)
 	     {
 		          if (pepo?.body == null)
 				return null;
@@ -496,7 +501,7 @@ public class PepoUIUtilities
 		          {
 				return eyecolor[0];
 		          }
-		          else if (eyeColorIndex == eyecolor.Count - 1)
+		          else if (eyeColorIndex == eyecolor.Length - 1)
 		          {
 				return eyecolor[2];
 		          }
@@ -505,39 +510,39 @@ public class PepoUIUtilities
 				return eyecolor[1];
 		          }
 	     }
-	     public static Sprite GetEyeSprite(PepoData pepo, List<Sprite> mascEyes, List<Sprite> femmeEyes)
+	     public static Sprite GetEyeSprite(PepoData pepo, Sprite[] mascEyes, Sprite[] femmeEyes)
 	     {
 		          if (pepo?.body == null)
 				return null;
 
 		          int eyeShapeIndex = pepo.body.GetExpressedTrait(3); // eyeShape trait
-		          List<Sprite> eyeList = (!pepo.ssd.isFemme && !pepo.ssd.presentsFemme) ? mascEyes : femmeEyes;
-		          if (eyeList == null || eyeList.Count == 0)
+		          Sprite[] eyeList = (!pepo.ssd.isFemme && !pepo.ssd.presentsFemme) ? mascEyes : femmeEyes;
+		          if (eyeList == null || eyeList.Length == 0)
 				return null;
 
-		          return eyeList[Mathf.Clamp(eyeShapeIndex - 1, 0, eyeList.Count - 1)];
+		          return eyeList[Mathf.Clamp(eyeShapeIndex - 1, 0, eyeList.Length - 1)];
 	     }
-	     public static Sprite GetBrowSprite(PepoData pepo, List<Sprite> brows)
+	     public static Sprite GetBrowSprite(PepoData pepo, Sprite[] brows)
 	     {
-		          if (pepo?.body == null || brows == null || brows.Count == 0)
+		          if (pepo?.body == null || brows == null || brows.Length == 0)
 				return null;
 
 		          int browindex = pepo.body.GetExpressedTrait(21); // brow shape trait
-		          Sprite brow = brows[Mathf.Clamp(browindex - 1, 0, brows.Count - 1)];
+		          Sprite brow = brows[Mathf.Clamp(browindex - 1, 0, brows.Length - 1)];
 		          return brow;
 	     }
-	     public static Sprite GetNoseSprite(PepoData pepo, List<Sprite> noseShape)
+	     public static Sprite GetNoseSprite(PepoData pepo, Sprite[] noseShape)
 	     {
-		          if (pepo?.body == null || noseShape == null || noseShape.Count == 0)
+		          if (pepo?.body == null || noseShape == null || noseShape.Length == 0)
 				return null;
 
 		          int noseIndex = pepo.body.GetExpressedTrait(7); // noseShape trait
-		          return noseShape[Mathf.Clamp(noseIndex - 1, 0, noseShape.Count - 1)];
+		          return noseShape[Mathf.Clamp(noseIndex - 1, 0, noseShape.Length - 1)];
 	     }
 
-	     public static Sprite GetMouthSprite(PepoData pepo, List<Sprite> mouthShape, bool topLip)
+	     public static Sprite GetMouthSprite(PepoData pepo, Sprite[] mouthShape, bool topLip)
 	     {
-		          if (pepo?.body == null || mouthShape == null || mouthShape.Count == 0)
+		          if (pepo?.body == null || mouthShape == null || mouthShape.Length == 0)
 				return null;
 		          int mouthIndex = 0;
 		          if (topLip)
@@ -550,37 +555,37 @@ public class PepoUIUtilities
 				mouthIndex = pepo.body.GetExpressedTrait(10); // mouthShape trait
 		          }
 
-		          return mouthShape[Mathf.Clamp(mouthIndex - 1, 0, mouthShape.Count - 1)];
+		          return mouthShape[Mathf.Clamp(mouthIndex - 1, 0, mouthShape.Length - 1)];
 	     }
 
 	     // Hair selection methods based on SocioSexualData
-	     public static Sprite GetHairBackSprite(PepoData pepo, List<Sprite> fHairBack, List<Sprite> fHairFront, List<Sprite> mHairBack, List<Sprite> mHairFront, List<Sprite> uHairBack, List<Sprite> uHairFront)
+	     public static Sprite GetHairBackSprite(PepoData pepo, Sprite[] fHairBack, Sprite[] fHairFront, Sprite[] mHairBack, Sprite[] mHairFront, Sprite[] uHairBack, Sprite[] uHairFront)
 	     {
 		          if (pepo?.ssd == null || uHairBack == null)
 				return null;
 
-		          List<Sprite> hairList = GetHairList(pepo.ssd, true, fHairBack, fHairFront, mHairBack, mHairFront, uHairBack, uHairFront); // true for back hair
-		          if (hairList == null || hairList.Count == 0)
+		          Sprite[] hairList = GetHairList(pepo.ssd, true, fHairBack, fHairFront, mHairBack, mHairFront, uHairBack, uHairFront); // true for back hair
+		          if (hairList == null || hairList.Length == 0)
 				return null;
 
 		          // Use a consistent random seed based on pepo's name for consistent hair selection
-		          int hairIndex = GetStableHairIndex(pepo, hairList.Count);
+		          int hairIndex = GetStableHairIndex(pepo, hairList.Length);
 		          return hairList[hairIndex];
 	     }
 
-	     public static Sprite GetHairFrontSprite(PepoData pepo, List<Sprite> fHairBack, List<Sprite> fHairFront, List<Sprite> mHairBack, List<Sprite> mHairFront, List<Sprite> uHairBack, List<Sprite> uHairFront)
+	     public static Sprite GetHairFrontSprite(PepoData pepo, Sprite[] fHairBack, Sprite[] fHairFront, Sprite[] mHairBack, Sprite[] mHairFront, Sprite[] uHairBack, Sprite[] uHairFront)
 	     {
-		          List<Sprite> hairList = GetHairList(pepo.ssd, false, fHairBack, fHairFront, mHairBack, mHairFront, uHairBack, uHairFront); // false for front hair
-		          if (hairList == null || hairList.Count == 0)
+		          Sprite[] hairList = GetHairList(pepo.ssd, false, fHairBack, fHairFront, mHairBack, mHairFront, uHairBack, uHairFront); // false for front hair
+		          if (hairList == null || hairList.Length == 0)
 				return null;
 
 		          // Use same seed to ensure front/back hair match
-		          int hairIndex = GetStableHairIndex(pepo, hairList.Count);
+		          int hairIndex = GetStableHairIndex(pepo, hairList.Length);
 		          return hairList[hairIndex];
 	     }
-	     public static void AddFrecklesSprite(PepoData pepo, List<Sprite> freckles, Transform parent)
+	     public static void AddFrecklesSprite(PepoData pepo, Sprite[] freckles, Transform parent)
 	     {
-		          if (pepo?.body == null || freckles == null || freckles.Count == 0)
+		          if (pepo?.body == null || freckles == null || freckles.Length == 0)
 				return;
 
 		          int frecklesTrait = pepo.body.GetExpressedTrait(14);
@@ -595,8 +600,8 @@ public class PepoUIUtilities
 		          // Figure out which is expressed vs unexpressed
 		          bool isMaternalExpressed = frecklesTrait == maternalFreckles;
 
-		          int primaryFreckleIndex = Mathf.Clamp(frecklesTrait - 1, 0, freckles.Count - 1);
-		          int secondaryFreckleIndex = Mathf.Clamp((isMaternalExpressed ? paternalFreckles : maternalFreckles) - 1, 0, freckles.Count - 1);
+		          int primaryFreckleIndex = Mathf.Clamp(frecklesTrait - 1, 0, freckles.Length - 1);
+		          int secondaryFreckleIndex = Mathf.Clamp((isMaternalExpressed ? paternalFreckles : maternalFreckles) - 1, 0, freckles.Length - 1);
 
 		          bool primaryInverted = isMaternalExpressed ? maternalInverted : paternalInverted;
 		          bool secondaryInverted = isMaternalExpressed ? paternalInverted : maternalInverted;

@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
@@ -43,12 +43,12 @@ public class Plant
 	     public TileData OriginTile; //gets assigned when the plant is placed
 			   //dictionary of tiles that the plant is in, with the tile as the key and the amount of roots in that tile as the value
 	     public Dictionary<TileData, float> RootTiles = new Dictionary<TileData, float>();
-	     public ThermalEnergy storedWater = new ThermalEnergy(100, 1, 334000, 2260000, 20); //water in the plant in liters
+	     public ThermalEnergy storedWater = new ThermalEnergy(100, "liquid water", 334000, 2260000, 273, 373, 0.6089f, 20f); //water in the plant in liters
 	     public GameObject PlantObject; //gets added and instantiated with the plant
 	     public Plant()
 	     {
 		          Leaves = new LeafProperties(
-        UnityEngine.Random.Range(0.01f, 0.8f),        // SurfaceArea: 0.01-0.2 m� (100-2000 cm�)
+        UnityEngine.Random.Range(0.01f, 0.8f),        // SurfaceArea: 0.01-0.2 m² (100-2000 cm²)
         UnityEngine.Random.Range(0.03f, 1.2f),        // LeafLength: 5-20 cm (0.05-0.2 m)
         UnityEngine.Random.Range(0.0002f, 0.0005f),   // LeafThickness: 0.2-0.5 mm
         Mathf.FloorToInt(UnityEngine.Random.Range(0, 20)),
@@ -291,7 +291,7 @@ public class Plant
 	     {
 		          //this is wrong, we should be chosing a random mix of properties from each parent
 		          Leaves = new LeafProperties(
-        Random.value > 0.5f ? parent1.Leaves.SurfaceArea : parent2.Leaves.SurfaceArea,        // SurfaceArea: 0.01-0.2 m� (100-2000 cm�)
+        Random.value > 0.5f ? parent1.Leaves.SurfaceArea : parent2.Leaves.SurfaceArea,        // SurfaceArea: 0.01-0.2 m² (100-2000 cm²)
         Random.value > 0.5f ? parent1.Leaves.LeafLength : parent2.Leaves.LeafLength,        // LeafLength: 5-20 cm (0.05-0.2 m)
         Random.value > 0.5f ? parent1.Leaves.LeafThickness : parent2.Leaves.LeafThickness,   // LeafThickness: 0.2-0.5 mm
         Random.value > 0.5f ? parent1.Leaves.LeafGrouping : parent2.Leaves.LeafGrouping,
@@ -371,40 +371,57 @@ public class Plant
 	     }
 
 	     //transpiration. move water from soil tiles that roots are in. take it to plant stores and then push to atmosphere based on leaf surface area, number of leaves, and a transpiration modifier that can be affected by genetics and environment. also calculate how much water is available in the plant and if it runs out, the plant dies
+	     // ─── Transpiration (updated to use refactored ThermalEnergy) ───
 	     public void Transpire(TileData currentTile, float lightIntensity, int seconds)
 	     {
+		          if (isDead)
+				return;
 
-		          if (!isDead)
+		          // Calculate transpiration rate (litres per second)
+		          float stomatalConductance = CalculateTranspirationRate(lightIntensity) * seconds;
+		          float vapourPressureDifference = (currentTile.atmosphereTile.temperature + 273.15f) * currentTile.atmosphereTile.RelativeHumidity / 100f;
+		          float atmosphericPressure = currentTile.atmosphereTile.pressure;
+		          float transpirationRate = stomatalConductance * vapourPressureDifference / atmosphericPressure;
+
+		          // Ensure we don't transpirate more than available in soil
+		          float soilWaterAvailable = currentTile.composition.water.Mass;
+		          float waterToMove = Mathf.Min(transpirationRate, soilWaterAvailable);
+
+		          if (waterToMove > 0f)
 		          {
-				float transpirationRate = 0;
-				float stomatalConductance = CalculateTranspirationRate(lightIntensity) * seconds;
-				float vapourPressureDifference = (currentTile.atmosphereTile.temperature + 273.15f) * currentTile.atmosphereTile.RelativeHumidity / 100;
-				float atmosphericPressure = currentTile.atmosphereTile.pressure;
+				// Move water from soil to atmosphere (most of it)
+				float toAtmosphere = waterToMove * 0.98f;
+				float toPlantStore = waterToMove * 0.02f; // small amount retained in plant
 
-				transpirationRate = stomatalConductance * vapourPressureDifference / atmosphericPressure;
+				// Transfer from soil to atmosphere (latent heat of vaporization will cool)
+				currentTile.composition.water.TransferMassTo(currentTile.atmosphereTile.waterVapor, toAtmosphere);
+				// Remove latent heat from the atmosphere's water vapor to simulate cooling
+				currentTile.atmosphereTile.waterVapor.RemoveHeat(toAtmosphere * currentTile.atmosphereTile.waterVapor.LatentHeatVaporization);
 
-				//if there is enough water in the soil for transpiration, send it to the atmosphere and set the plants metabolic levels of water to 1,000,000 (we can get more complex later by having water in the plant affect metabolism and growth, but for now we just want to make sure the plant has enough water for photosynthesis and growth)
-				if (currentTile.composition.water.Mass >= transpirationRate)
+				// Transfer some water from soil to plant store
+				if (toPlantStore > 0f)
 				{
-					     currentTile.composition.water.TransferMassTo(currentTile.atmosphereTile.waterVapor, transpirationRate * 0.98f);
-					     float stored = transpirationRate * 0.2f;
-					     storedWater.TransferMassTo(currentTile.composition.water, stored);
-					     Debug.Log($"Plant at {currentTile.tileGridRef}: Transpiration for {seconds} seconds with light intensity: {lightIntensity}. {transpirationRate} litres transpired");
-					     //we also need to use the latent heat of vaporisation to cool the atmosphere.
-					     currentTile.atmosphereTile.waterVapor.ExtractEnergy(transpirationRate * 0.98f * currentTile.atmosphereTile.waterVapor.LatentHeatVaporization);
+					     currentTile.composition.water.TransferMassTo(storedWater, toPlantStore);
+				}
+
+				Debug.Log($"Plant at {currentTile.tileGridRef}: Transpired {waterToMove} litres over {seconds}s.");
+		          }
+		          else
+		          {
+				// Not enough soil water – transpirate what's left and potentially kill the plant later
+				if (soilWaterAvailable > 0f)
+				{
+					     currentTile.composition.water.TransferMassTo(currentTile.atmosphereTile.waterVapor, soilWaterAvailable);
+					     currentTile.atmosphereTile.waterVapor.RemoveHeat(soilWaterAvailable * currentTile.atmosphereTile.waterVapor.LatentHeatVaporization);
+					     Debug.Log($"Plant at {currentTile.tileGridRef}: Transpired remaining {soilWaterAvailable} litres from soil.");
 				}
 				else
 				{
-					     Debug.Log($"Plant at {currentTile.tileGridRef}: Transpiration for {seconds} seconds with light intensity: {lightIntensity}. {currentTile.composition.water.Mass} litres transpired");
-					     float waterExtracted = currentTile.composition.water.Mass;
-					     currentTile.composition.water.TransferMassTo(currentTile.atmosphereTile.waterVapor, currentTile.composition.water.Mass);
-					     currentTile.atmosphereTile.waterVapor.ExtractEnergy(waterExtracted * currentTile.atmosphereTile.waterVapor.LatentHeatVaporization);
+					     Debug.Log($"Plant at {currentTile.tileGridRef}: No soil water available for transpiration.");
+					     // Plant may die from drought – handle elsewhere
 				}
-
-
 		          }
 	     }
-
 	     public void Grow(float growthAmount, Organs organ)
 	     {
 		          if (!isDead)

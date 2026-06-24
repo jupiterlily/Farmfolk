@@ -12,6 +12,60 @@ public class BodyData
 	     //cosmetic data - managed independently from genetics
 	     public CosmeticFeatures cosmeticFeatures;
 
+	     int numTraits = 23; // Total number of traits
+
+	     int headShapeVariations = 11;
+	     int heightVariations = 21;
+	     int massGeneticsVariations = 101;
+
+	     int eyeShapeVariations = 12;
+	     int eyeColorVariations = 7;
+	     int eyeDarknessVariations = 4;
+	     int eyeHeightVariations = 4;
+
+	     int noseShapeVariations = 27;
+	     int noseHeightVariations = 4;
+
+	     int topLipShapeVariations = 10;
+	     int bottomLipShapeVariations = 10;
+	     int mouthHeightVariations = 4;
+	     int mouthTeethVariations = 5;
+
+	     int skinDepthVariations = 6;
+	     int skinSaturationVariations = 6;
+	     int skinHueVariations = 6;
+	     int frecklesVariations = 13;
+	     int invertFrecklesVariations = 3;
+	     int expressDoubleFrecklesVariations = 3;
+
+	     int hairRednessVariations = 6;
+	     int hairDarknessVariations = 9;
+	     int hairTextureVariations = 5;
+	     int browsVariations = 18;
+	     int browHeightVariations = 4;
+
+	     int moustacheVariations = 18; // 0: none, 1-14: different styles
+
+	     int straightHairUpVariations = 9; // 0: none, 1-4: different styles
+	     int straightHairBackVariations = 6; // 0: none, 1-4: different styles
+	     int straightHairTendrilsVariations = 7; // 0: none, 1-4: different styles
+	     int straightHairFringeVariations = 5; // 0: none, 1-4: different styles
+
+	     int wavyHairUpVariations = 7; // 0: none, 1-4: different styles
+	     int wavyHairBackVariations = 10; // 0: none, 1-4: different styles
+	     int wavyHairTendrilsVariations = 12; // 0: none, 1-4: different styles
+	     int wavyHairFringeVariations = 15; // 0: none, 1-4: different styles
+
+	     int curlyHairUpVariations = 6; // 0: none, 1-4: different styles
+	     int curlyHairBackVariations = 10; // 0: none, 1-4: different styles
+	     int curlyHairTendrilsVariations = 10; // 0: none, 1-4: different styles
+	     int curlyHairFringeVariations = 11; // 0: none, 1-4: different styles
+
+	     int coilyHairUpVariations = 7; // 0: none, 1-4: different styles
+	     int coilyHairBackVariations = 14; // 0: none, 1-4: different styles
+	     int coilyHairTendrilsVariations = 9; // 0: none, 1-4: different styles
+	     int coilyHairFringeVariations = 12; // 0: none, 1-4: different styles
+
 	     public BodyData()
 	     {
 		          // Create maternal chromosome (always XX for mother)
@@ -34,7 +88,9 @@ public class BodyData
 	     }
 
 	     public void ExpressChromosomes(List<NumericalAspect> XpressedChromosomes = null)
-	     {
+	     {//this hardcodes too much. we need to get the number of variations for each trait from the spritesheet or a config file.
+
+
 		          if (XpressedChromosomes == null)
 		          {
 				expressedChromosomes = new List<NumericalAspect>();
@@ -43,7 +99,7 @@ public class BodyData
 				expressedChromosomes.Add(CreateNumericalAspect(
 				    "Head Shape",
 				    Random.value > 0.5f ? maternalChromosome.GetTraitByIndex(0) : paternalChromosome.GetTraitByIndex(0),
-				    1, 9, false, 0, 0));
+				    1, headShapeVariations, false, 0, 0));
 
 				// Hair redness - choose between parents, preferring darker if different
 				float hairRedness;
@@ -53,19 +109,19 @@ public class BodyData
 					     hairRedness = Random.value > 0.5f ? matHairRed : patHairRed;
 				else
 					     hairRedness = matHairRed > patHairRed ? matHairRed : patHairRed;
-				expressedChromosomes.Add(CreateNumericalAspect("Hair Redness", hairRedness, 1, 6, false, 0, 1));
+				expressedChromosomes.Add(CreateNumericalAspect("Hair Redness", hairRedness, 1, hairRednessVariations, false, 0, 1));
 
 				// Hair darkness - average between parents
 				float hairDarkness = Random.Range(
 				    Mathf.Min(maternalChromosome.GetTraitByIndex(2), paternalChromosome.GetTraitByIndex(2)),
 				    Mathf.Max(maternalChromosome.GetTraitByIndex(2), paternalChromosome.GetTraitByIndex(2)));
-				expressedChromosomes.Add(CreateNumericalAspect("Hair Darkness", hairDarkness, 1, 9, false, 0, 2));
+				expressedChromosomes.Add(CreateNumericalAspect("Hair Darkness", hairDarkness, 1, hairDarknessVariations, false, 0, 2));
 
 				// Eye shape - either or
 				expressedChromosomes.Add(CreateNumericalAspect(
 				    "Eye Shape",
 				    Random.value > 0.5f ? maternalChromosome.GetTraitByIndex(3) : paternalChromosome.GetTraitByIndex(3),
-				    1, 11, false, 0, 3));
+				    1, eyeShapeVariations, false, 0, 3));
 
 				// Eye color - complex inheritance
 				int matEye = maternalChromosome.GetTraitByIndex(4);
@@ -81,85 +137,85 @@ public class BodyData
 					     eyeColor = 6; // Hazel dominant
 				else
 					     eyeColor = Mathf.Max(matEye, patEye); // Mixed case - choose darker
-				expressedChromosomes.Add(CreateNumericalAspect("Eye Color", eyeColor, 1, 7, false, 0, 4));
+				expressedChromosomes.Add(CreateNumericalAspect("Eye Color", eyeColor, 1, eyeColorVariations, false, 0, 4));
 
 				// Eye darkness - average between parents
 				float eyeDarkness = Random.Range(
 				    Mathf.Min(maternalChromosome.GetTraitByIndex(5), paternalChromosome.GetTraitByIndex(5)),
 				    Mathf.Max(maternalChromosome.GetTraitByIndex(5), paternalChromosome.GetTraitByIndex(5)));
-				expressedChromosomes.Add(CreateNumericalAspect("Eye Darkness", eyeDarkness, 1, 4, false, 0, 5));
+				expressedChromosomes.Add(CreateNumericalAspect("Eye Darkness", eyeDarkness, 1, eyeDarknessVariations, false, 0, 5));
 
 				// Eye height - either or
 				expressedChromosomes.Add(CreateNumericalAspect(
 				    "Eye Height",
 				    Random.value > 0.5f ? maternalChromosome.GetTraitByIndex(6) : paternalChromosome.GetTraitByIndex(6),
-				    1, 4, false, 0, 6));
+				    1, eyeHeightVariations, false, 0, 6));
 
 				// Nose shape - either or
 				expressedChromosomes.Add(CreateNumericalAspect(
 				    "Nose Shape",
 				    Random.value > 0.5f ? maternalChromosome.GetTraitByIndex(7) : paternalChromosome.GetTraitByIndex(7),
-				    1, 26, false, 0, 7));
+				    1, noseShapeVariations, false, 0, 7));
 
 				// Nose height - either or
 				expressedChromosomes.Add(CreateNumericalAspect(
 				    "Nose Height",
 				    Random.value > 0.5f ? maternalChromosome.GetTraitByIndex(8) : paternalChromosome.GetTraitByIndex(8),
-				    1, 4, false, 0, 8));
+				    1, noseHeightVariations, false, 0, 8));
 
 				// Top lip shape - either or
 				expressedChromosomes.Add(CreateNumericalAspect(
 				    "Top Lip Shape",
 				    Random.value > 0.5f ? maternalChromosome.GetTraitByIndex(9) : paternalChromosome.GetTraitByIndex(9),
-				    1, 9, false, 0, 9));
+				    1, topLipShapeVariations, false, 0, 9));
 
 				// Bottom lip shape - either or
 				expressedChromosomes.Add(CreateNumericalAspect(
 				    "Bottom Lip Shape",
 				    Random.value > 0.5f ? maternalChromosome.GetTraitByIndex(10) : paternalChromosome.GetTraitByIndex(10),
-				    1, 9, false, 0, 10));
+				    1, bottomLipShapeVariations, false, 0, 10));
 
 				// Mouth height - either or
 				expressedChromosomes.Add(CreateNumericalAspect(
 				    "Mouth Height",
 				    Random.value > 0.5f ? maternalChromosome.GetTraitByIndex(11) : paternalChromosome.GetTraitByIndex(11),
-				    1, 4, false, 0, 11));
+				    1, mouthHeightVariations, false, 0, 11));
 
 				// Skin depth - average between parents
 				float skinDepth = Random.Range(
 				    Mathf.Min(maternalChromosome.GetTraitByIndex(12), paternalChromosome.GetTraitByIndex(12)),
 				    Mathf.Max(maternalChromosome.GetTraitByIndex(12), paternalChromosome.GetTraitByIndex(12)));
-				expressedChromosomes.Add(CreateNumericalAspect("Skin Depth", skinDepth, 1, 6, false, 0, 12));
+				expressedChromosomes.Add(CreateNumericalAspect("Skin Depth", skinDepth, 1, skinDepthVariations, false, 0, 12));
 
 				// Skin saturation - either or
 				expressedChromosomes.Add(CreateNumericalAspect(
 				    "Skin Saturation",
 				    Random.value > 0.5f ? maternalChromosome.GetTraitByIndex(13) : paternalChromosome.GetTraitByIndex(13),
-				    1, 6, false, 0, 13));
+				    1, skinSaturationVariations, false, 0, 13));
 
 				// Skin hue - either or
 				expressedChromosomes.Add(CreateNumericalAspect(
 				    "Skin Hue",
 				    Random.value > 0.5f ? maternalChromosome.GetTraitByIndex(14) : paternalChromosome.GetTraitByIndex(14),
-				    1, 6, false, 0, 14));
+				    1, skinHueVariations, false, 0, 14));
 
 				// Freckles - either or
 				expressedChromosomes.Add(CreateNumericalAspect(
 				    "Freckles",
 				    Random.value > 0.5f ? maternalChromosome.GetTraitByIndex(15) : paternalChromosome.GetTraitByIndex(15),
-				    1, 9, false, 0, 15));
+				    1, frecklesVariations, false, 0, 15));
 
 				// Invert freckles - either or
 				expressedChromosomes.Add(CreateNumericalAspect(
 				    "Invert Freckles",
 				    Random.value > 0.5f ? maternalChromosome.GetTraitByIndex(16) : paternalChromosome.GetTraitByIndex(16),
-				    1, 3, false, 0, 16));
+				    1, invertFrecklesVariations, false, 0, 16));
 
 				// Express double freckles - either or
 				expressedChromosomes.Add(CreateNumericalAspect(
 				    "Express Double Freckles",
 				    Random.value > 0.5f ? maternalChromosome.GetTraitByIndex(17) : paternalChromosome.GetTraitByIndex(17),
-				    1, 3, false, 0, 17));
+				    1, expressDoubleFrecklesVariations, false, 0, 17));
 
 				// Hair texture - 50% chance of higher value, else random between
 				int matHairTexture = maternalChromosome.GetTraitByIndex(18);
@@ -167,31 +223,31 @@ public class BodyData
 				float hairTexture = Random.value > 0.5f ?
 				    Mathf.Max(matHairTexture, patHairTexture) :
 				    Random.Range(Mathf.Min(matHairTexture, patHairTexture), Mathf.Max(matHairTexture, patHairTexture) + 1);
-				expressedChromosomes.Add(CreateNumericalAspect("Hair Texture", hairTexture, 1, 5, false, 0, 18));
+				expressedChromosomes.Add(CreateNumericalAspect("Hair Texture", hairTexture, 1, hairTextureVariations, false, 0, 18));
 
 				// Height - average between parents
 				float height = Random.Range(
 				    Mathf.Min(maternalChromosome.GetTraitByIndex(19), paternalChromosome.GetTraitByIndex(19)),
 				    Mathf.Max(maternalChromosome.GetTraitByIndex(19), paternalChromosome.GetTraitByIndex(19)));
-				expressedChromosomes.Add(CreateNumericalAspect("Height", height, 1, 21, false, 0, 19));
+				expressedChromosomes.Add(CreateNumericalAspect("Height", height, 1, heightVariations, false, 0, 19));
 
 				// Mass genetics - average between parents
 				float massGenetics = Random.Range(
 				    Mathf.Min(maternalChromosome.GetTraitByIndex(20), paternalChromosome.GetTraitByIndex(20)),
 				    Mathf.Max(maternalChromosome.GetTraitByIndex(20), paternalChromosome.GetTraitByIndex(20)));
-				expressedChromosomes.Add(CreateNumericalAspect("Mass Genetics", massGenetics, 50, 101, false, 0, 20));
+				expressedChromosomes.Add(CreateNumericalAspect("Mass Genetics", massGenetics, 50, massGeneticsVariations, false, 0, 20));
 
 				// Brows - either or
 				expressedChromosomes.Add(CreateNumericalAspect(
 				    "Brows",
 				    Random.value > 0.5f ? maternalChromosome.GetTraitByIndex(21) : paternalChromosome.GetTraitByIndex(21),
-				    1, 7, false, 0, 21));
+				    1, browsVariations, false, 0, 21));
 
 				// Brow height - either or
 				expressedChromosomes.Add(CreateNumericalAspect(
 				    "Brow Height",
 				    Random.value > 0.5f ? maternalChromosome.GetTraitByIndex(22) : paternalChromosome.GetTraitByIndex(22),
-				    1, 4, false, 0, 22));
+				    1, browHeightVariations, false, 0, 22));
 		          }
 		          else
 		          {
@@ -417,8 +473,8 @@ public class CosmeticFeatures
 
 	     // Other cosmetics
 	     //  public bool wearsMakeup = false;
-
-	     //hair
+	     public int moustacheVariations = 18; // 0: none, 1-14: different styles
+			            //hair
 
 	     // Constructor - initializes with genetic defaults
 	     public CosmeticFeatures()
@@ -470,7 +526,7 @@ public class CosmeticFeatures
 					     // 60% chance of having a moustache if they have stubble
 					     if (pepo.body.cosmeticFeatures.pepoGrooming["Stubble"] >= 2 && Random.value < 0.6f)
 					     {
-						          pepo.body.cosmeticFeatures.pepoGrooming["Moustache"] = Random.Range(1, 16); // 1-15 moustache styles
+						          pepo.body.cosmeticFeatures.pepoGrooming["Moustache"] = Random.Range(1, moustacheVariations); // 1-15 moustache styles
 					     }
 				}
 				else

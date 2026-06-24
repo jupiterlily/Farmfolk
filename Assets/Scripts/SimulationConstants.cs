@@ -9,8 +9,11 @@ public static class SimulationConstants
 	     public const float AxialTilt = 23.5f; // Earth's axial tilt in degrees (constant, modifiable by user)
 	     public const float OrbitalEccentricity = 0.0167f; // Earth's orbital eccentricity (constant, default for Earth)
 
+	     public const float Kelvin = 272.15f;
+
 	     public static int DayOfYear = 0;
 	     public static float TimeOfDay = 0.0f;
+	     public static int YearsPassed = 0;
 
 	     public static float SimulationSpeed = 1f; // Speed of the simulation
 
@@ -32,6 +35,11 @@ public static class SimulationConstants
 	     public static void UpdateDay(int currentDay)
 	     {
 		          DayOfYear = currentDay;
+	     }
+
+	     public static void UpdateYear()
+	     {
+		          YearsPassed++;
 	     }
 
 	     public static Dictionary<string, float> meridians = new Dictionary<string, float>

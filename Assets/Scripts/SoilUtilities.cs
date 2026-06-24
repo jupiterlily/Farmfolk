@@ -291,16 +291,17 @@ public static class SoilUtilities
 	     public static void UpdateSoilTemperature(TileData data, float hours)
 	     {
 		          ThermalEnergy[] energyData = data.composition.energy;
-		          energyData.OrderByDescending(v => v.Mass);
+		          var sorted = energyData.OrderByDescending(v => v.Mass).ToArray();
+		          ThermalEnergy largestComponent = sorted[0];
 		          if (data.surfaceWater.Mass > 1f)
 		          {
 				//transfer the heat between the soil and the surface
-				ThermalEnergyUtilities.ConductHeat(data.surfaceWater, energyData[0], data.tileWidth * data.tileWidth, 1, hours);
+				ThermalEnergyUtilities.ConductHeat(data.surfaceWater, largestComponent, data.tileWidth * data.tileWidth, 1, hours);
 		          }
 		          else
 		          {
-				//radiate heat to the atmosphere.
-				ThermalEnergyUtilities.ConductHeat(data.atmosphereTile.above.above.nitrogen, energyData[0], data.tileWidth * data.tileWidth, 1, hours);
+				//radiate heat to the atmosphere from the largest thermal mass in the soil.
+				ThermalEnergyUtilities.ConductHeat(data.atmosphereTile.above.above.nitrogen, largestComponent, data.tileWidth * data.tileWidth, 1, hours);
 		          }
 		          //distribute heat between all the components within the soil.
 		          ThermalEnergyUtilities.MixTemperaturesByPhase(data.composition.energy);

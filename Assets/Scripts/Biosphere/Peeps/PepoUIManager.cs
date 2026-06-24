@@ -7,40 +7,60 @@ using UnityEngine.UI;
 public class PepoUIManager : MonoBehaviour
 {
 	     // Add sprite references for portrait generation
-	     public List<Sprite> mascEyes;
-	     public List<Sprite> femmeEyes;
-	     public List<Sprite> headShape;
-	     public List<Sprite> freckles;
-	     public List<Sprite> bottomLips;
-	     public List<Sprite> topLips;
-	     public List<Sprite> noseShape;
-	     public List<Sprite> eyecolor;
+	     public Sprite[] mascEyes;
+	     public Sprite[] femmeEyes;
+	     public Sprite[] headShape;
+	     public Sprite[] freckles;
+	     public Sprite[] bottomLips;
+	     public Sprite[] topLips;
+	     public Sprite[] noseShape;
+	     public Sprite[] eyecolor;
 
-	     public List<Sprite> HairUp_1;
-	     public List<Sprite> HairBack_1;
-	     public List<Sprite> HairTendrils_1;
-	     public List<Sprite> HairFringe_1;
+	     public Sprite[] HairUp_1;
+	     public Sprite[] HairBack_1;
+	     public Sprite[] HairTendrils_1;
+	     public Sprite[] HairFringe_1;
 	     //wavy hair
-	     public List<Sprite> HairUp_2;
-	     public List<Sprite> HairBack_2;
-	     public List<Sprite> HairTendrils_2;
-	     public List<Sprite> HairFringe_2;
+	     public Sprite[] HairUp_2;
+	     public Sprite[] HairBack_2;
+	     public Sprite[] HairTendrils_2;
+	     public Sprite[] HairFringe_2;
 	     //curly hair
-	     public List<Sprite> HairUp_3;
-	     public List<Sprite> HairBack_3;
-	     public List<Sprite> HairTendrils_3;
-	     public List<Sprite> HairFringe_3;
+	     public Sprite[] HairUp_3;
+	     public Sprite[] HairBack_3;
+	     public Sprite[] HairTendrils_3;
+	     public Sprite[] HairFringe_3;
 	     //coily hair
-	     public List<Sprite> HairUp_4;
-	     public List<Sprite> HairBack_4;
-	     public List<Sprite> HairTendrils_4;
-	     public List<Sprite> HairFringe_4;
+	     public Sprite[] HairUp_4;
+	     public Sprite[] HairBack_4;
+	     public Sprite[] HairTendrils_4;
+	     public Sprite[] HairFringe_4;
 
-	     public List<Sprite> brows;
-	     public List<Sprite> stubble;
-	     public List<Sprite> moustaches;
+	     public Sprite[] brows;
+	     public Sprite[] stubble;
+	     public Sprite[] teeth;
+	     public Sprite[] moustaches;
+
+	     //take a 2d texture and slice it into a 2d array of sprites. this is for the pepo appearance sprites, which are used to generate the pepo portraits. 
+	     //public Texture2D mascEyesTexture;
+	     //public Texture2D femmeEyesTexture;
+	     // public Sprite[] teefies;
+	     public Sprite[][] pepoAppearanceSprites;
 
 	     Dictionary<string, List<Sprite>> portraitLibrary;
+
+	     private void Awake()
+	     {
+		          //put all the lists in an array so that appearace data can get its values from here and bodydata can read from here instead of having to set hard values. adding more sprites just means adding them to the array and not having to change any code in bodydata or pepodata. this is a more modular approach.
+		          pepoAppearanceSprites = new Sprite[][] { mascEyes, femmeEyes, headShape, freckles, bottomLips, topLips, noseShape, eyecolor, HairUp_1, HairBack_1, HairTendrils_1, HairFringe_1, HairUp_2, HairBack_2, HairTendrils_2, HairFringe_2, HairUp_3, HairBack_3, HairTendrils_3, HairFringe_3, HairUp_4, HairBack_4, HairTendrils_4, HairFringe_4, brows, stubble, teeth, moustaches };
+		          if (portraitLibrary == null)
+		          {
+				portraitLibrary = new Dictionary<string, List<Sprite>>();
+		          }
+
+
+
+	     }
 	     public GameObject CreateStatusPanel(PepoData pepo, Transform parent = null, Vector2 panelSize = default)
 	     {
 		          if (pepo == null)

@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 // This class is the core of our simulation, managing the passage of time and calculating relevant environmental data.
@@ -11,7 +10,7 @@ public class SimulationMaster : MonoBehaviour
 	     //public event EventHandler DayPassed;
 	     //public event EventHandler YearPassed;
 
-	     public TextMeshProUGUI readout; // Text element to display simulation information.
+	     // public TextMeshProUGUI readout; // Text element to display simulation information.
 
 	     public float dayOfYear = 0f; // Current day within the year.
 	     public float year = 0f; // Current year in the simulation.
@@ -27,7 +26,7 @@ public class SimulationMaster : MonoBehaviour
 
 	     // Conversion constants based on simulation time parameters.
 	     public float SecondsPerYear => SimulationConstants.YearLength * SecondsPerDay;
-	     public float SecondsPerDay => SimulationConstants.DayLength * 3600f; // Converting day length in hours to seconds.
+	     public float SecondsPerDay => SimulationConstants.DayLength * 3600f; // Converting day length in h to seconds.
 	     public float SecondsPerHour => SecondsPerDay / SimulationConstants.DayLength; // Seconds per hour.
 	     public float SecondsPerMinute => SecondsPerHour / 60; // Seconds per minute.
 
@@ -90,7 +89,7 @@ public class SimulationMaster : MonoBehaviour
 
 	     }
 
-	     // Manage the passage of time in the simulation, incrementing seconds, minutes, hours, days, and years as needed.
+	     // Manage the passage of time in the simulation, incrementing seconds, minutes, h, days, and years as needed.
 	     private void PassSeconds(int secondsToPass)
 	     {
 		          while (secondsToPass > 0)
@@ -109,9 +108,9 @@ public class SimulationMaster : MonoBehaviour
 				}
 				else if (secondsToPass >= SecondsPerHour)
 				{
-					     int hoursToPass = Mathf.FloorToInt(secondsToPass / SecondsPerHour);
-					     HourPasses(hoursToPass);
-					     secondsToPass -= hoursToPass * Mathf.FloorToInt(SecondsPerHour);
+					     int hToPass = Mathf.FloorToInt(secondsToPass / SecondsPerHour);
+					     HourPasses(hToPass);
+					     secondsToPass -= hToPass * Mathf.FloorToInt(SecondsPerHour);
 				}
 				else if (secondsToPass >= SecondsPerMinute)
 				{
@@ -127,15 +126,7 @@ public class SimulationMaster : MonoBehaviour
 		          }
 	     }
 
-	     // Update the on-screen readout with the current state of the simulation.
-	     private void UpdateReadout()
-	     {
-		          readout.text = $"Year: {year}\n";
-		          readout.text += $"Day of Year: {SimulationConstants.DayOfYear + 1}\n";
-		          readout.text += $"Game time: {currentHourOfDay:00}:{currentMinuteOfHour:00}\n";
-		          //readout.text += $"Elapsed time: {SimulationConstants.TimeConstants[5]:000}:{SimulationConstants.TimeConstants[4]:000}:{SimulationConstants.TimeConstants[3]:000}:{SimulationConstants.TimeConstants[2]:000}:{SimulationConstants.TimeConstants[1]:000}:{SimulationConstants.TimeConstants[0]:000}\n";
-		          //readout.text += $"Energy @ Latitude: {intervalsEnergy}";
-	     }
+
 
 	     // Handle the passage of seconds within the simulation.
 	     void SecondPasses(int seconds)
@@ -151,7 +142,7 @@ public class SimulationMaster : MonoBehaviour
 		          }
 		          SimulationConstants.UpdateTimeConstants(seconds, 0, 0, 0, 0);
 		          currentTimeOfDay = (currentHourOfDay * SecondsPerHour + currentMinuteOfHour * SecondsPerMinute + currentSecondOfMinute) / SecondsPerDay;
-		          UpdateReadout();
+		          //UpdateReadout();
 	     }
 
 	     // Handle the passage of minutes within the simulation.
@@ -186,12 +177,12 @@ public class SimulationMaster : MonoBehaviour
 		          tileManager.AtmosphereStep(minutes / 60f);
 	     }
 
-	     // Handle the passage of hours within the simulation.
-	     void HourPasses(int hours)
+	     // Handle the passage of h within the simulation.
+	     void HourPasses(int h)
 	     {
 
-		          gameObject.GetComponent<PepoPopManager>().SimulateNeeds(hours);
-		          for (int i = 0; i < hours; i++)
+		          gameObject.GetComponent<PepoPopManager>().SimulateNeeds(h);
+		          for (int i = 0; i < h; i++)
 		          {
 				currentHourOfDay++;
 				if (currentHourOfDay >= 24)
@@ -206,17 +197,17 @@ public class SimulationMaster : MonoBehaviour
 
 				tileManager.demeter.gardener.UpdatePlantAges(tileManager.demeter);
 		          }
-		          tileManager.TileUpdate(hours);
+		          tileManager.TileUpdate(h);
 		          //Debug.Log("tiles updated");
-		          // Log solar energy every 3 hours.
+		          // Log solar energy every 3 h.
 		          if (currentHourOfDay % 3 == 0 && Mathf.FloorToInt(previousTimeOfDay * 24f) % 3 != currentHourOfDay % 3)
 		          {
 				float currentEnergy = SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(currentLatitude, dayOfYear, currentTimeOfDay);
 				Debug.Log($"<color=#f9c74f>Current Solar Energy {SolarEnergyCalculator.GetLatitudeDescription(currentLatitude)} at {currentHourOfDay:00}:00: {Mathf.FloorToInt(currentEnergy)} W/m2</color>");
 		          }
-		          SimulationConstants.UpdateTimeConstants(0, 0, hours, 0, 0);
+		          SimulationConstants.UpdateTimeConstants(0, 0, h, 0, 0);
 		          intervalsEnergy = Mathf.FloorToInt(SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(currentLatitude, dayOfYear, currentTimeOfDay));
-		          UpdateReadout();
+		          // UpdateReadout();
 	     }
 
 	     // Handle the passage of days within the simulation.
@@ -237,7 +228,7 @@ public class SimulationMaster : MonoBehaviour
 
 		          SimulationConstants.UpdateTimeConstants(0, 0, 0, days, 0);
 		          SimulationConstants.UpdateDay(Mathf.FloorToInt(dayOfYear));
-		          UpdateReadout();
+		          //    UpdateReadout();
 	     }
 
 	     // Handle the passage of years within the simulation.
@@ -251,7 +242,7 @@ public class SimulationMaster : MonoBehaviour
 		          ProgressPepoPopulation(years);
 		          // Update the time constants to reflect the passage of years in seconds.
 		          SimulationConstants.UpdateTimeConstants(0, 0, 0, 0, years);
-		          UpdateReadout();
+		          //    UpdateReadout();
 	     }
 
 	     void ProgressPepoPopulation(float years = 0)
@@ -260,3 +251,11 @@ public class SimulationMaster : MonoBehaviour
 		          gameObject.GetComponent<PepoPopManager>().SimulateGenerations();
 	     }
 }
+
+//delegates for time events. at each minute, 
+//1 min, 6 min, 10 min, 12 min, 15 min, 20 min, 30 min, 
+//1 h, 3 h, 4 h, 6 h, 8h, 12 h, 
+//1 day, 2 days, 3 days, 4 days, 5 days, 7 days, 13 days, 14 days, 26 days, 28 days, 52 days, 73 days, 91 days, 182 days, 364 days, 365 days, 366 days,
+//1 week, 2 weeks, 4 weeks, 13 weeks, 26 weeks, 52 weeks
+//1 month, 2 months, 3 months, 4 months, 6 months, 12 months
+//1 year, 2 years, 5 years, 10 years, 20 years, 50 years, 100 years

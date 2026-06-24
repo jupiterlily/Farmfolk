@@ -70,6 +70,8 @@ public class Liquid : Layer //will be used by rendering and physics systems.
 	     public List<Matter> dissolvedGases; // gases dissolved in the liquid
 			           //disolved solids
 	     public List<Matter> dissolvedSolids; // solids dissolved in the liquid
+
+	     public List<Matter> suspendedSolids;
 }
 
 public class Solid : Layer //can be both liquid and gas will be used by rendering and physics systems. 
@@ -100,13 +102,12 @@ public class Gas : Layer //can be both liquid and gas will be used by rendering 
 public abstract class Matter
 {
 	     //matter and energy composition of the block
-	     public List<EnergyData> energyComposition; // energy stored in the matter, mass and temperature can be derived from this
+	     //public List<EnergyData> energyComposition; // energy stored in the matter, mass and temperature can be derived from this
 	     public List<Compound> composition; // the composition of the matter in the block used to handle mixtures
 	     public float mass => thermalEnergy.Mass;
 	     public float density; // in kg/m3
 
 	     public ChemicalEnergy chemicalEnergy;
-	     public LatentEnergy latentEnergy;
 	     public MechanicalEnergy mechanicalEnergy;
 	     public ThermalEnergy thermalEnergy;
 }
@@ -116,15 +117,27 @@ public class Compound : Matter
 	     public string name;
 	     public Dictionary<Element, int> elements; // list of elements in the compound
 
-	     public float meltingPoint; // in Celsius
-	     public float boilingPoint; // in Celsius
+	     public float meltingPoint; // in Kelvin
+	     public float boilingPoint; // in Kelvin
 
-	     public float specificHeatCapacity; // in J/(kg*K) amount of energy required to raise 1 kg of the compound by 1 Kelvin
+
+	     public Dictionary<float, float> specificHeatCapacity; //  key = temperature Kelvin, value = specific heat J/(kg*K) amount of energy required to raise 1 kg of the compound by 1 Kelvin
 	     public float thermalConductivity; // in W/(m*K) ability to conduct heat
 	     public float electricalConductivity; // in S/m ability to conduct electricity
 
-	     public ChemicalEnergy energy;
-
+	     //public ChemicalEnergy energy;
+	     public float[,] specificHeatTable = new float[,] // Example table: { { Temperature (K), Specific Heat (J/kg·K) } }
+{
+		          { 273f, 0.5f }, // Solid
+		          { 298f, 4.18f }, // Liquid
+		          { 373f, 2.0f } // Gas
+};
+	     public float[,] densityTable = new float[,] // Example table: { { Temperature (K), Density (kg/m³) } }
+	     {
+		          { 273f, 917f }, // Solid
+		          { 298f, 1000f }, // Liquid
+		          { 373f, 0.6f } // Gas
+	     };
 	     public Dictionary<Element, int> ParseMoleculeString(string molecule)
 	     {
 		          //parse molecular string into elements dictionary
@@ -154,18 +167,18 @@ public class Compound : Matter
 					     count = int.Parse(countStr);
 				}
 				//find element by symbol
-				Element element = MatterLibrary.elements.Find(e => e.symbol == symbol);
-				if (element != null)
-				{
-					     if (elementDict.ContainsKey(element))
-					     {
-						          elementDict[element] += count;
-					     }
-					     else
-					     {
-						          elementDict.Add(element, count);
-					     }
-				}
+				////Element element = MatterLibrary.elements.Find(e => e.symbol == symbol);
+				//if (element != null)
+				//{
+				//	     if (elementDict.ContainsKey(element))
+				//	     {
+				//		          elementDict[element] += count;
+				//	     }
+				//	     else
+				//	     {
+				//		          elementDict.Add(element, count);
+				//	     }
+				//}
 
 		          }
 		          return elementDict;
@@ -175,7 +188,7 @@ public class Compound : Matter
 	     {
 		          name = Name;
 
-		          specificHeatCapacity = SHC;
+		          //specificHeatCapacity = SHC;
 		          thermalConductivity = TC;
 		          electricalConductivity = EC;
 
@@ -183,12 +196,6 @@ public class Compound : Matter
 
 		          meltingPoint = meltPoint;
 		          boilingPoint = boilPoint;
-
-		          energyComposition = new List<EnergyData>();
-		          energyComposition.Add(new LatentEnergy(latentFusion, latentVaporisation));
-		          //initialise chemical energy calculating it from atomic mass for total moles
-		          float chemicalEnergyJoules = bondEnergyKj * 1000; // placeholder calculation
-		          energyComposition.Add(new ChemicalEnergy(chemicalEnergyJoules));
 	     }
 }
 public class Element

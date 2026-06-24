@@ -11,9 +11,9 @@ public class TileManager : MonoBehaviour
 	     public TileGrid grid;
 	     public GameObject tilePrefab;
 	     public WorldTile[,] tiles;
-	     int atmTileSise => (int)grid.tileWidth * 3;
+	     int atmTileSise => (int)grid.tileWidth * 5;
 	     public float atmosphericMoisture; //in liters
-	     public float airTemp;
+	     public float airTemp; //in celcius so add 272.15
 	     public float totalWater; //all the water in the system, in liters
 	     public float totalSoil; //used to track the total soil composition across the world
 	     public float totalSand; //total sand in the world
@@ -53,13 +53,20 @@ public class TileManager : MonoBehaviour
 						          atmTile.tileWidth = atmTileSise;
 						          atmTile.layerHeight = layorFactor;
 						          float atmoFactor = (atmTileSise * layorFactor);
-
+						          float targetTempK = airTemp + SimulationConstants.Kelvin;
 						          //mTile.waterVapor.AddEnergy((airTemp + 273.15f)); //add the air temp iin kelvin and covert to kilojouls. idont fucking know. it's just initialisation.
-						          atmTile.waterVapor.ChangeMass(atmosphericMoisture / (atmGridX * atmGridY * atmLayers));
+						          atmTile.waterVapor.AddMass(atmosphericMoisture / (atmGridX * atmGridY * atmLayers), targetTempK);
+						          atmTile.waterVapor.AddHeat(atmTile.waterVapor.SpecificHeat * atmTile.waterVapor.Mass * targetTempK);
 						          //tmTile.waterVapor.ExtractEnergy(50000f);
-						          atmTile.carbonDioxide.ChangeMass(0.481f * atmoFactor);
-						          atmTile.nitrogen.ChangeMass(1014 * atmoFactor);
-						          atmTile.oxygen.ChangeMass(273 * atmoFactor);
+						          atmTile.carbonDioxide.AddMass(0.481f * atmoFactor, targetTempK);
+						          atmTile.carbonDioxide.AddHeat(atmTile.carbonDioxide.SpecificHeat * atmTile.carbonDioxide.Mass * targetTempK);
+
+						          atmTile.nitrogen.AddMass(1014 * atmoFactor, targetTempK);
+						          atmTile.nitrogen.AddHeat(atmTile.nitrogen.SpecificHeat * atmTile.nitrogen.Mass * targetTempK);
+
+						          atmTile.oxygen.AddMass(273 * atmoFactor, targetTempK);
+						          atmTile.oxygen.AddHeat(atmTile.oxygen.SpecificHeat * atmTile.oxygen.Mass * targetTempK);
+
 						          atmTile.pressure = 101325f - (layer * 12000f); // Example pressure drop per km	
 						          atmTile.windVelocity = (Vector3.right + UnityEngine.Random.insideUnitSphere) * UnityEngine.Random.Range(0.95f, 1.05f);
 						          atmTile.windSpeed = atmTile.windVelocity.magnitude;
@@ -67,7 +74,7 @@ public class TileManager : MonoBehaviour
 					     }
 
 				}
-				layorFactor *= 3; // Increase layer height by factor of 10 for each layer, later 1 is 10m, layer 2 is 100m, layer 3 is 1km 
+				layorFactor *= 5; // Increase layer height by factor of 10 for each layer, later 1 is 10m, layer 2 is 100m, layer 3 is 1km 
 					   // Increase layer height by factor of 3 for each layer, later 1 is 3m, 2 is 9m, 3 is 27m, 4 is 81m, 5 is 243m, 6 is 729m, 7 is 2187m (2.187km) 
 		          }
 
@@ -92,7 +99,7 @@ public class TileManager : MonoBehaviour
 					     grid.Map.SetValue(data, i, j);
 					     tiles.SetValue(tile.GetComponent<WorldTile>(), i, j);
 					     tile.transform.position = new Vector3(i, 1 / 2, j);
-					     tile.GetComponent<WorldTile>().tileData.Initialise(TileUtilities.GetValidNeighbour(data, grid));
+					     tile.GetComponent<WorldTile>().tileData.Initialise(TileUtilities.GetValidNeighbour(data, grid), airTemp);
 					     tile.GetComponent<Renderer>().material.color = TileUtilities.GetSoilColor(tile.GetComponent<WorldTile>().tileData.composition);
 					     //set the name of the tile based on its grid position
 					     tile.name = "Tile " + rowLabel + (j + 1).ToString();
@@ -130,9 +137,13 @@ public class TileManager : MonoBehaviour
 		          AllocateNeighbors();
 		          AtmosphereUtilities.InitializeHadleyCellWinds(atmosphereTiles, this);
 		          AtmosphereUtilities.FinalizePressurePatterns(atmosphereTiles);
-		          //  AtmosphereStep(10f); // Initial atmosphere update
+		          AtmosphereStep(10f); // Initial atmosphere update
 		          TileUpdate(0.5f); // Initial update
-		          WakeDemeter();
+		          TileUpdate(0.5f); // Initial update
+		          TileUpdate(0.5f); // Initial update
+		          TileUpdate(0.5f); // Initial update
+		          TileUpdate(0.5f); // Initial update
+			             // WakeDemeter();
 
 	     }
 	     void WakeDemeter()
@@ -182,6 +193,14 @@ public class TileManager : MonoBehaviour
 	     }
 	     public void AtmosphereStep(float hours)
 	     {
+		          //heat packet comes in, gets absorbed and reflected by the gases in the atmosphere, then is absorbed and reflected by liquids in the atmosphere, then is abosrbed and reflected by solids in the air, then we proceed to the next layer down until we have the enrgy being passed to the tileData.incomingSolarEnergy to be reflected and absorbed.
+
+		          //then  we pick up the outgoing surface radiation and have it be absorbed and transferred to an upper layer or refelcted back down to a lower layer or the surface.
+
+		          //when absorption and reflection happens we should also handle condensation and evaporation and the associated latent heat changes.
+
+		          //after these temperature changes occur we should have different pressures etc.  that tell us how to move matter laterally (and vertically)
+
 		          // First: Update atmospheric wind dynamics
 		          AtmosphereUtilities.UpdateAtmosphericWind(atmosphereTiles, hours);
 
@@ -207,7 +226,7 @@ public class TileManager : MonoBehaviour
 					     {
 						          if (radiativeLoss <= 0)
 								break;
-						          radiativeLoss -= material.ExtractEnergy(radiativeLoss);
+						          radiativeLoss -= material.RemoveEnergy(radiativeLoss);
 					     }
 				}
 
@@ -220,7 +239,7 @@ public class TileManager : MonoBehaviour
 						          ThermalEnergyUtilities.MixTemperaturesByConduction(toMix, hours, atmTileSise, distance);
 					     }
 				}
-				//ThermalEnergyUtilities.MixTemperaturesByConduction(toMix, hours, atmTileSise, distance);
+				ThermalEnergyUtilities.MixTemperaturesByConduction(toMix, hours, atmTileSise, distance);
 		          }
 	     }
 	     /// <summary>
@@ -375,7 +394,7 @@ public class TileManager : MonoBehaviour
 					     );
 
 					     // Update hydrosphere for this tile
-					     UpdateTileHydrosphere(data, solarRadiation, hours);
+					     //  UpdateTileHydrosphere(data, solarRadiation, hours);
 
 					     // Update soil processes
 					     UpdateTileSoil(data, hours, data.latitude, solarRadiation);
@@ -454,7 +473,7 @@ public class TileManager : MonoBehaviour
 
 
 		          }
-		          // Apply soil processes
+		          // Apply soil processes add this back in next
 		          ApplySoilProcesses(data, hours);
 	     }
 
@@ -477,7 +496,7 @@ public class TileManager : MonoBehaviour
 		          SoilUtilities.UpdateDecompaction(data.composition, hours);
 		          SoilUtilities.CalculateDerivedProperties(data.composition);
 
-		          // Redistribute water (surface and lateral)
+		          // Redistribute water (surface and lateral)  
 		          HydrosphereUtilities.RedistributeSurfaceWater(tile, hours);
 		          SoilUtilities.RedistributeWaterLateral(tile, hours);
 		          SoilUtilities.UpdateSoilTemperature(data, hours);
@@ -706,63 +725,67 @@ public class TileManager : MonoBehaviour
 					     }
 				}
 		          }
-
+		          foreach (var plant in demeter.ActivePlants.Keys)
+		          {
+				waterSum += plant.storedWater.Mass;
+		          }
 		          totalWater = waterSum;
 	     }
-	     public void SimulateAtmosphereStep(float hours)
-	     {
-		          int atmLayers = atmosphereTiles.GetLength(0);
-		          int atmGridX = atmosphereTiles.GetLength(1);
-		          int atmGridY = atmosphereTiles.GetLength(2);
+	     //  }
+	     //  public void SimulateAtmosphereStep(float hours)
+	     //  {
+	     //        int atmLayers = atmosphereTiles.GetLength(0);
+	     //        int atmGridX = atmosphereTiles.GetLength(1);
+	     //        int atmGridY = atmosphereTiles.GetLength(2);
 
-		          // 1. Calculate solar radiation absorption
-		          float latitude = GetComponent<SimulationMaster>().currentLatitude;
-		          float solarEnergy = SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(
-		              latitude, SimulationConstants.DayOfYear, SimulationConstants.TimeOfDay);
+	     //        // 1. Calculate solar radiation absorption
+	     //        float latitude = GetComponent<SimulationMaster>().currentLatitude;
+	     //        float solarEnergy = SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(
+	     //            latitude, SimulationConstants.DayOfYear, SimulationConstants.TimeOfDay);
 
-		          // Distribute solar energy to top layer
-		          for (int x = 0; x < atmGridX; x++)
-		          {
-				for (int y = 0; y < atmGridY; y++)
-				{
+	     //        // Distribute solar energy to atmosphere and surface. shortwave radiation is absorbed by the surface and longwave radiation is absorbed by the atmosphere.
+	     //        for (int x = 0; x < atmGridX; x++)
+	     //        {
+	     //for (int y = 0; y < atmGridY; y++)
+	     //{
 
-				}
-		          }
+	     //}
+	     //        }
 
-		          // 2. Run atmospheric physics simulation
-		          // AtmosphereUtilities.SimulateAtmosphere(atmosphereTiles, hours);
+	     //        // 2. Run atmospheric physics simulation
+	     //        // AtmosphereUtilities.SimulateAtmosphere(atmosphereTiles, hours);
 
-		          // 4. Handle cloud formation and precipitation
-
-
-		          // 3. Handle surface-atmosphere interactions
-		          for (int x = 0; x < atmGridX; x++)
-		          {
-				for (int y = 0; y < atmGridY; y++)
-				{
-					     AtmosphereTile surfaceLayer = atmosphereTiles[0, x, y];
-
-					     // Calculate evaporation from surface tiles
-					     int startX = x * 10; // Assuming 10:1 ratio
-					     int startY = y * 10;
-					     int endX = Mathf.Min(startX + 10, worldsise.x);
-					     int endY = Mathf.Min(startY + 10, worldsise.y);
-
-					     float totalEvaporation = 0f;
-					     for (int i = startX; i < endX; i++)
-						          for (int j = startY; j < endY; j++)
-						          {
-
-						          }
-					     //here we need to update the surface layer moisture and temperature and ensure that we 					     
-
-				}
-		          }
+	     //        // 4. Handle cloud formation and precipitation
 
 
-		          // 5. Update global atmospheric properties
-		          UpdateGlobalAtmosphere();
-	     }
+	     //        // 3. Handle surface-atmosphere interactions.
+	     //        for (int x = 0; x < atmGridX; x++)
+	     //        {
+	     //for (int y = 0; y < atmGridY; y++)
+	     //{
+	     //	     AtmosphereTile surfaceLayer = atmosphereTiles[0, x, y];
+
+	     //	     // Calculate evaporation from surface tiles
+	     //	     int startX = x * 10; // Assuming 10:1 ratio
+	     //	     int startY = y * 10;
+	     //	     int endX = Mathf.Min(startX + 10, worldsise.x);
+	     //	     int endY = Mathf.Min(startY + 10, worldsise.y);
+
+	     //	     float totalEvaporation = 0f;
+	     //	     for (int i = startX; i < endX; i++)
+	     //		          for (int j = startY; j < endY; j++)
+	     //		          {
+
+	     //		          }
+	     //	     //here we need to update the surface layer moisture and temperature and ensure that we 					     
+
+	     //}
+	     //        }
+
+
+	     //        // 5. Update global atmospheric properties
+	     //        UpdateGlobalAtmosphere();
+	     //  }
 
 
 	     //  /// <summary>
@@ -900,7 +923,7 @@ public class TileManager : MonoBehaviour
 
 						          // ===== TEMPERATURE CUBE =====
 						          // Fixed: Handle both Celsius conversion and out-of-bounds temperatures
-						          float tempC = atmo.temperature - 273.15f;
+						          float tempC = atmo.temperature - SimulationConstants.Kelvin;
 						          Gizmos.color = GetTemperatureColor(tempC);
 						          float tempSise = 0.2f + Mathf.Clamp01(Mathf.InverseLerp(-20f, 40f, tempC)) * 0.5f;
 						          Gizmos.DrawWireCube(pos + Vector3.up * 0.1f, Vector3.one * tempSise);

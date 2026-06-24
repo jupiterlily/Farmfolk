@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -6,6 +6,333 @@ using UnityEngine.UI;
 
 public static class UIUtilities
 {
+	     public static Vector2 GetVector2FromString(string text)
+	     {
+		          if (string.IsNullOrWhiteSpace(text))
+				return Vector2.zero;
+
+		          // Remove parentheses and spaces, then split by comma
+		          string cleaned = text.Trim('(', ')', ' ');
+		          string[] parts = cleaned.Split(',');
+
+		          if (parts.Length != 2)
+		          {
+				// Optionally throw or return default; here we return (0,0) for malformed input
+				return Vector2.zero;
+		          }
+
+		          // Parse with invariant culture to handle '.' as decimal separator
+		          if (float.TryParse(parts[0].Trim(), System.Globalization.NumberStyles.Float,
+			              System.Globalization.CultureInfo.InvariantCulture, out float x) &&
+		              float.TryParse(parts[1].Trim(), System.Globalization.NumberStyles.Float,
+			              System.Globalization.CultureInfo.InvariantCulture, out float y))
+		          {
+				return new Vector2(x, y);
+		          }
+
+		          return Vector2.zero; // fallback for parsing failure
+	     }
+	     // Approximate width of a text label
+	     public static Vector2 GetLabelSize(string text, int fontSize)
+	     {
+		          float width = text.Length * fontSize * 0.6f + 8; // 0.6 = average char width factor
+		          float height = fontSize + 8;
+		          return new Vector2(width, height);
+	     }
+
+	     // Compute minimum size for any field (label + control)
+	     public static Vector2 GetFieldMinimumSize(UIField field, int defaultTextLength = 6)
+	     {
+		          Vector2 labelSize = GetLabelSize(field.LabelText, field.FontSize);
+		          float controlWidth = 0;
+		          float controlHeight = field.FontSize + 4;
+
+		          switch (field)
+		          {
+		          case TextInputField _:
+		          case ReadOnlyField _:
+		          controlWidth = field.FontSize * defaultTextLength; // ~6 chars
+		          break;
+		          case RangeField _:
+		          controlWidth = 80; // slider + value label
+		          break;
+		          case ToggleField _:
+		          controlWidth = 30;
+		          break;
+		          case DropdownField _:
+		          controlWidth = 100;
+		          break;
+		          case ButtonField btn:
+		          // Use its own button text width
+		          controlWidth = GetLabelSize(btn.LabelText, btn.FontSize).x + 20;
+		          controlHeight = GetLabelSize(btn.LabelText, btn.FontSize).y + 8;
+		          break;
+		          case SpriteField sf:
+		          if (sf.Image != null)
+				return new Vector2(sf.Image.rect.width, sf.Image.rect.height);
+		          controlWidth = 80;
+		          controlHeight = 80;
+		          break;
+		          case GraphField gf:
+		          return new Vector2(gf.Size, gf.Size);
+		          default:
+		          controlWidth = 60;
+		          break;
+		          }
+
+		          float totalWidth = labelSize.x + controlWidth + 10; // spacing
+		          float height = Mathf.Max(labelSize.y, controlHeight);
+		          return new Vector2(totalWidth, height);
+	     }
+
+	     // ─── Hierarchical Sizing ───────────────────────────────────────────
+
+	     /// <summary>
+	     /// Calculate minimum size for a section based on its contained components.
+	     /// For vertical layouts: accumulate heights, use widest child.
+	     /// For horizontal layouts: accumulate widths, use tallest child.
+	     /// </summary>
+	     public static Vector2 GetSectionMinimumSize(UISection section)
+	     {
+		          if (section.Components == null || section.Components.Count == 0)
+				return new Vector2(20, 20);
+
+		          float totalWidth = 0;
+		          float totalHeight = 0;
+		          float maxWidth = 0;
+		          float maxHeight = 0;
+
+		          foreach (var comp in section.Components)
+		          {
+				Vector2 compSize;
+
+				// Get size based on component type
+				if (comp is UIField field)
+				{
+					     compSize = field.MinimumSize;
+				}
+				else if (comp is UISection subSection)
+				{
+					     compSize = GetSectionMinimumSize(subSection);
+				}
+				else
+				{
+					     compSize = comp.MinimumSize;
+				}
+
+				maxWidth = Mathf.Max(maxWidth, compSize.x);
+				maxHeight = Mathf.Max(maxHeight, compSize.y);
+
+				if (section.VerticalLayout)
+				{
+					     totalHeight += compSize.y;
+					     totalWidth = maxWidth;
+				}
+				else
+				{
+					     totalWidth += compSize.x;
+					     totalHeight = maxHeight;
+				}
+		          }
+
+		          // Account for spacing between components
+		          int spacingCount = Mathf.Max(0, section.Components.Count - 1);
+		          if (section.VerticalLayout)
+				totalHeight += spacingCount * section.Spacing;
+		          else
+				totalWidth += spacingCount * section.Spacing;
+
+		          // Account for padding
+		          totalWidth += section.Padding.left + section.Padding.right;
+		          totalHeight += section.Padding.top + section.Padding.bottom;
+
+		          return new Vector2(totalWidth, totalHeight);
+	     }
+
+	     /// <summary>
+	     /// Calculate minimum size for a tab based on all its sections.
+	     /// Tabs are typically vertical, so accumulate heights and use widest section.
+	     /// </summary>
+	     public static Vector2 GetTabMinimumSize(UITab tab)
+	     {
+		          if (tab.Sections == null || tab.Sections.Count == 0)
+				return new Vector2(20, 20);
+
+		          float totalWidth = 0;
+		          float totalHeight = 0;
+		          float maxWidth = 0;
+		          float maxHeight = 0;
+
+		          foreach (var section in tab.Sections)
+		          {
+				Vector2 sectionSize = GetSectionMinimumSize(section);
+				maxWidth = Mathf.Max(maxWidth, sectionSize.x);
+				maxHeight = Mathf.Max(maxHeight, sectionSize.y);
+
+				if (tab.VerticalLayout)
+				{
+					     totalHeight += sectionSize.y;
+					     totalWidth = maxWidth;
+				}
+				else
+				{
+					     totalWidth += sectionSize.x;
+					     totalHeight = maxHeight;
+				}
+		          }
+
+		          // Account for spacing between sections
+		          int spacingCount = Mathf.Max(0, tab.Sections.Count - 1);
+		          if (tab.VerticalLayout)
+				totalHeight += spacingCount * tab.Spacing;
+		          else
+				totalWidth += spacingCount * tab.Spacing;
+
+		          // Account for padding
+		          totalWidth += tab.Padding.left + tab.Padding.right;
+		          totalHeight += tab.Padding.top + tab.Padding.bottom;
+
+		          return new Vector2(totalWidth, totalHeight);
+	     }
+
+	     /// <summary>
+	     /// Calculate minimum size for a window based on all its tabs.
+	     /// Window takes the size of the largest tab plus space for tab buttons.
+	     /// </summary>
+	     public static Vector2 GetWindowMinimumSize(UIWindow window, int buttonStripHeight = 25)
+	     {
+		          if (window.Tabs == null || window.Tabs.Count == 0)
+				return new Vector2(100, 100);
+
+		          float maxTabWidth = 0;
+		          float maxTabHeight = 0;
+
+		          foreach (var tab in window.Tabs)
+		          {
+				Vector2 tabSize = GetTabMinimumSize(tab);
+				maxTabWidth = Mathf.Max(maxTabWidth, tabSize.x);
+				maxTabHeight = Mathf.Max(maxTabHeight, tabSize.y);
+		          }
+
+		          // Add space for tab buttons if more than one tab
+		          float totalWidth = maxTabWidth;
+		          float totalHeight = maxTabHeight;
+
+		          if (window.Tabs.Count > 1)
+		          {
+				// Button strip adds to width or height depending on window layout
+				if (window.VerticalLayout)
+				{
+					     // Horizontal button strip above tabs
+					     totalHeight += buttonStripHeight + window.Spacing;
+				}
+				else
+				{
+					     // Vertical button strip to the side
+					     totalWidth += buttonStripHeight + window.Spacing;
+				}
+		          }
+
+		          // Account for window padding
+		          totalWidth += window.Padding.left + window.Padding.right;
+		          totalHeight += window.Padding.top + window.Padding.bottom;
+
+		          return new Vector2(totalWidth, totalHeight);
+	     }
+	     public static void RefreshAllFields(UIComponentData root)
+	     {
+		          if (root == null)
+				return;
+
+		          // If it's a field, refresh it
+		          if (root is UIField field)
+		          {
+				field.Refresh();
+				return;
+		          }
+
+		          // Otherwise, traverse children
+		          switch (root)
+		          {
+		          case UIWindow window:
+		          foreach (var tab in window.Tabs)
+				RefreshAllFields(tab);
+		          break;
+
+		          case UITab tab:
+		          foreach (var section in tab.Sections)
+				RefreshAllFields(section);
+		          break;
+
+		          case UISection section:
+		          foreach (var comp in section.Components)
+				RefreshAllFields(comp);
+		          break;
+
+		          }
+	     }
+
+	     public static void ApplyLayoutGroupData(GameObject go, UIComponentData sc)
+	     {
+
+		          //if sc says it's a vertical apply ddata, else add a horizontal and apply the data.
+		          if (sc.VerticalLayout)
+		          {
+
+				// Add a vertical layout group to stack tabs
+				VerticalLayoutGroup layout = go.AddComponent<VerticalLayoutGroup>();
+
+				layout.padding = sc.Padding;
+				layout.spacing = sc.Spacing;
+
+				layout.childAlignment = sc.ChildAlignment;
+				layout.reverseArrangement = sc.ReverseArrangement;
+
+				layout.childControlWidth = sc.ControlChildWidth;
+				layout.childControlHeight = sc.ControlChildHeight;
+				layout.childScaleWidth = sc.UseChildScaleWidth;
+				layout.childScaleHeight = sc.UseChildScaleHeight;
+				layout.childForceExpandWidth = sc.ChildForceExpandWidth;
+				layout.childForceExpandHeight = sc.ChildForceExpandHeight;
+
+				LayoutElement le = go.AddComponent<LayoutElement>();
+				le.minWidth = sc.MinimumSize.x;
+				le.minHeight = sc.MinimumSize.y;
+				le.preferredWidth = sc.PreferredSize.x;
+				le.preferredHeight = sc.PreferredSize.y;
+		          }
+		          else
+		          {
+				HorizontalLayoutGroup layout = go.AddComponent<HorizontalLayoutGroup>();
+
+				layout.padding = sc.Padding;
+				layout.spacing = sc.Spacing;
+
+				layout.childAlignment = sc.ChildAlignment;
+				layout.reverseArrangement = sc.ReverseArrangement;
+
+				layout.childControlWidth = sc.ControlChildWidth;
+				layout.childControlHeight = sc.ControlChildHeight;
+				layout.childScaleWidth = sc.UseChildScaleWidth;
+				layout.childScaleHeight = sc.UseChildScaleHeight;
+				layout.childForceExpandWidth = sc.ChildForceExpandWidth;
+				layout.childForceExpandHeight = sc.ChildForceExpandHeight;
+
+
+		          }
+
+		          ApplyLayoutElementData(go, sc);
+	     }
+
+	     public static void ApplyLayoutElementData(GameObject go, UIComponentData cd)
+	     {
+		          LayoutElement le = go.AddComponent<LayoutElement>();
+		          le.minWidth = cd.MinimumSize.x;
+		          le.minHeight = cd.MinimumSize.y;
+		          le.preferredWidth = cd.PreferredSize.x;
+		          le.preferredHeight = cd.PreferredSize.y;
+	     }
+
 
 	     public static Graph GraphFloats(List<float> values, float max, GraphType type = GraphType.radar, float radius = 1f)
 	     {
@@ -243,7 +570,6 @@ public static class UIUtilities
 		          return graph;
 	     }
 
-	     // Helper method to create Values radar graph
 	     // Helper method to create Values radar graph
 	     public static Graph CreateValuesGraph(List<Value> valuesList, GraphType type = GraphType.radar)
 	     {
@@ -576,7 +902,7 @@ public enum GraphType
 {
 	     radar, bar, pie, line
 }
-public static class RadarGraphFactory
+public static class GraphFactory
 {
 	     public static GameObject CreateRadarGraph(Graph graph, Transform parent = null, float size = 80f, string name = "RadarGraph")
 	     {
@@ -595,7 +921,66 @@ public static class RadarGraphFactory
 
 		          return graphGO;
 	     }
+	     public static GameObject CreateBarGraph(Graph graph, Transform parent, float size, string name)
+	     {
+		          GameObject graphGO = new GameObject(name);
+		          RectTransform rt = graphGO.AddComponent<RectTransform>();
+		          rt.sizeDelta = new Vector2(size, size);
+		          rt.anchorMin = new Vector2(0.5f, 0.5f);
+		          rt.anchorMax = new Vector2(0.5f, 0.5f);
+		          rt.pivot = new Vector2(0.5f, 0.5f);
 
+		          int barCount = graph.points.Length / 4;
+		          if (barCount == 0)
+				return graphGO;
+
+		          // Find max height for scaling
+		          float maxHeight = 0;
+		          for (int i = 0; i < graph.points.Length; i++)
+				if (graph.points[i].y > maxHeight)
+					     maxHeight = graph.points[i].y;
+		          if (maxHeight == 0)
+				maxHeight = 1;
+
+		          // Draw each bar as an Image
+		          for (int i = 0; i < barCount; i++)
+		          {
+				Vector3 bl = graph.points[i * 4];
+				Vector3 br = graph.points[i * 4 + 1];
+				Vector3 tr = graph.points[i * 4 + 2];
+				// Calculate width and height in normalized space
+				float width = Mathf.Abs(br.x - bl.x);
+				float height = Mathf.Abs(tr.y - br.y);
+				float centerX = (bl.x + br.x) / 2f;
+				float centerY = (bl.y + tr.y) / 2f;
+
+				// Map to pixel coordinates (assume graph center is (0,0), range -0.5..0.5)
+				float xPos = (centerX - 0.5f) * size;
+				float yPos = (centerY - 0.5f) * size;
+				float barWidth = width * size;
+				float barHeight = height * size;
+
+				GameObject barGO = new GameObject($"Bar_{i}");
+				barGO.transform.SetParent(graphGO.transform, false);
+				RectTransform barRT = barGO.AddComponent<RectTransform>();
+				barRT.anchorMin = new Vector2(0.5f, 0.5f);
+				barRT.anchorMax = new Vector2(0.5f, 0.5f);
+				barRT.pivot = new Vector2(0.5f, 0.5f);
+				barRT.sizeDelta = new Vector2(barWidth, barHeight);
+				barRT.anchoredPosition = new Vector2(xPos, yPos);
+
+				Image barImage = barGO.AddComponent<Image>();
+				Color barColor = (graph.pointColors != null && i < graph.pointColors.Length)
+				    ? graph.pointColors[i * 4]
+				    : Color.white;
+				barImage.color = barColor;
+		          }
+
+		          if (parent != null)
+				graphGO.transform.SetParent(parent, false);
+
+		          return graphGO;
+	     }
 	     private static void DrawRadarGraph(GameObject parent, Graph graph, float scale)
 	     {
 		          // Create background
@@ -775,5 +1160,7 @@ public static class RadarGraphFactory
 		          //        }
 		          labelText.alignment = TextAlignmentOptions.Center;
 	     }
+
+
 
 }

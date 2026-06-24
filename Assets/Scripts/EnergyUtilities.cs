@@ -13,7 +13,7 @@ public static class EnergyTransferUtilities
 				return 0;
 
 		          float available = Mathf.Min(joules, source.StoredEnergy);
-		          float extracted = source.ExtractEnergy(available);
+		          float extracted = source.RemoveEnergy(available);
 		          sink.AddEnergy(extracted);
 
 		          return extracted;
@@ -26,7 +26,7 @@ public static class EnergyTransferUtilities
 		          if (efficiency <= 0)
 				return 0;
 
-		          float extracted = source.ExtractEnergy(joules);
+		          float extracted = source.RemoveEnergy(joules);
 		          float delivered = extracted * Mathf.Clamp01(efficiency);
 		          sink.AddEnergy(delivered);
 
@@ -107,49 +107,56 @@ public static class ThermalEnergyUtilities
 	     /// Mixes temperatures of all ThermalEnergy objects in the same phase within a list
 	     /// This conserves total energy while equalizing temperatures within each phase group
 	     /// </summary>
-	     /// <param name="thermalEnergies">List of ThermalEnergy objects to mix</param>
 	     public static void MixTemperaturesByPhase(ThermalEnergy[] thermalEnergies)
 	     {
 		          if (thermalEnergies == null || thermalEnergies.Length <= 1)
 				return;
 
-		          // Group by phase
-		          var phaseGroups = thermalEnergies.GroupBy(te => te.CurrentPhase)
-		              .Where(g => g.Count() > 1); // Only mix if there are multiple items in phase
+		          // Group by phase (gas, liquid, solid)
+		          var phaseGroups = thermalEnergies
+		              .GroupBy(te => te.CurrentPhase)
+		              .Where(g => g.Count() > 1); // Only mix if there are multiple items
 
 		          foreach (var group in phaseGroups)
 		          {
-				MixTemperaturesForPhaseGroup(group.ToList());
+				var groupList = group.ToList();
+				MixTemperaturesForPhaseGroupDirect(groupList);
 		          }
 	     }
 
-	     /// <summary>
-	     /// Mixes temperatures for a specific phase group
-	     /// </summary>
-	     private static void MixTemperaturesForPhaseGroup(List<ThermalEnergy> phaseGroup)
+	     private static void MixTemperaturesForPhaseGroupDirect(List<ThermalEnergy> phaseGroup)
 	     {
 		          if (phaseGroup.Count <= 1)
 				return;
 
-		          if (phaseGroup.Count <= 1)
-				return;
-
-		          // Calculate total energy and equilibrium temperature
-		          float totalSensibleEnergy = CalculateTotalSensibleEnergy(phaseGroup);
-		          float totalHeatCapacity = CalculateTotalHeatCapacity(phaseGroup);
-
-		          if (totalHeatCapacity <= 0f)
+		          // Calculate total sensible energy and total heat capacity
+		          float totalEnergy = 0f;
+		          float totalHeatCapacity = 0f;
+		          foreach (var te in phaseGroup)
 		          {
-				Debug.LogWarning("Total heat capacity is zero or negative, cannot mix temperatures.");
-				return;
+				totalEnergy += te.Mass * te.SpecificHeat * te.Temperature;
+				totalHeatCapacity += te.Mass * te.SpecificHeat;
 		          }
 
-		          float equilibriumTemperature = totalSensibleEnergy / totalHeatCapacity;
+		          if (totalHeatCapacity <= 0f)
+				return;
 
-		          // Use energy transfer to reach equilibrium
-		          TransferEnergyToReachEquilibrium(phaseGroup, equilibriumTemperature);
+		          float equilibriumTemp = totalEnergy / totalHeatCapacity;
+
+		          // Apply equilibrium temperature to each component, conserving total energy
+		          foreach (var te in phaseGroup)
+		          {
+				float currentEnergy = te.StoredEnergy;
+				float targetEnergy = te.Mass * te.SpecificHeat * equilibriumTemp;
+				float diff = targetEnergy - currentEnergy;
+
+				if (diff > 0.0001f)
+					     te.AddEnergy(diff);
+				else if (diff < -0.0001f)
+					     te.RemoveEnergy(-diff);
+				// If diff is tiny, ignore to avoid floating-point noise
+		          }
 	     }
-
 	     /// <summary>
 	     /// Calculates total sensible energy for a group of ThermalEnergy objects
 	     /// </summary>
@@ -504,6 +511,114 @@ public static class ThermalEnergyUtilities
 		          // For simplicity, use the mixing method which already handles energy transfer
 		          MixTemperaturesByPhase(energies);
 	     }
+
+	     //  public static void ProcessPhaseChanges(ThermalEnergy nrg)
+	     //  {
+	     //        bool changed;
+	     //        do
+	     //        {
+	     //changed = false;
+
+	     //// --- HEATING (Melting / Vaporization) ---
+	     //// These take energy FROM sensible (cooling the mass) to break bonds.
+	     //if (nrg.CurrentPhase == Phase.Solid && nrg.Temperature >= nrg.MeltingPoint)
+	     //{
+	     //	     float needed = nrg.Mass * nrg.LatentHeatFusion;
+	     //	     if (nrg.sensibleEnergy >= needed)
+	     //	     {
+	     //		          // In evaporation/melting, heat comes FROM the object itself OR the environment.
+	     //		          // If we have enough sensible, we just convert it internally.
+	     //		          nrg.sensibleEnergy -= needed;
+	     //		          nrg.latentEnergy += needed;
+	     //		          nrg.CurrentPhase = Phase.Liquid;
+	     //		          changed = true;
+	     //		          if (nrg.materialName == "ice")
+	     //		          {
+	     //				nrg.materialName = "liquid water";
+	     //		          }
+	     //		          MatterLibrary.GetSpecificHeat(nrg.materialName, nrg.Temperature);
+	     //	     }
+	     //	     else
+	     //	     {
+	     //		          nrg.Temperature = nrg.MeltingPoint;
+	     //	     }
+	     //}
+	     //else if (CurrentPhase == Phase.Liquid && Temperature >= BoilingPoint)
+	     //{
+	     //	     float needed = Mass * LatentHeatVaporization;
+	     //	     if (sensibleEnergy >= needed)
+	     //	     {
+	     //		          sensibleEnergy -= needed;
+	     //		          latentEnergy += needed;
+	     //		          CurrentPhase = Phase.Gas;
+	     //		          changed = true;
+	     //		          if (materialName == "liquid water")
+	     //		          {
+	     //				materialName = "water vapour";
+	     //		          }
+	     //		          MatterLibrary.GetSpecificHeat(materialName, temperature);
+	     //	     }
+	     //	     else
+	     //	     {
+	     //		          Temperature = BoilingPoint;
+	     //	     }
+	     //}
+
+	     //// Cooling (freezing, condensation)
+	     //if (CurrentPhase == Phase.Liquid && Temperature < MeltingPoint)
+	     //{
+	     //	     float released = Mass * LatentHeatFusion;
+	     //	     if (latentEnergy >= released)
+	     //	     {
+	     //		          latentEnergy -= released;
+	     //		          sensibleEnergy += released;
+	     //		          CurrentPhase = Phase.Solid;
+	     //		          changed = true;
+	     //		          if (materialName == "liquid water")
+	     //		          {
+	     //				materialName = "ice";
+	     //		          }
+	     //		          MatterLibrary.GetSpecificHeat(materialName, temperature);
+	     //	     }
+	     //	     else
+	     //	     {
+	     //		          Temperature = MeltingPoint;
+	     //	     }
+	     //}
+	     //else if (CurrentPhase == Phase.Gas && Temperature < BoilingPoint)
+	     //{
+	     //	     float released = Mass * LatentHeatVaporization;
+	     //	     if (latentEnergy >= released)
+	     //	     {
+	     //		          latentEnergy -= released;
+	     //		          sensibleEnergy += released;
+	     //		          CurrentPhase = Phase.Liquid;
+	     //		          changed = true;
+	     //		          if (materialName == "water vapour")
+	     //		          {
+	     //				materialName = "liquid water";
+	     //		          }
+	     //		          MatterLibrary.GetSpecificHeat(materialName, temperature);
+	     //	     }
+	     //	     else
+	     //	     {
+	     //		          Temperature = BoilingPoint;
+	     //	     }
+	     //}
+
+	     //// Recalculate temperature from sensible energy using current cp
+	     //if (Mass > 0f)
+	     //{
+	     //	     float cp = SpecificHeat;
+	     //	     Temperature = sensibleEnergy / (Mass * cp);
+	     //}
+	     //else
+	     //	     Temperature = 0f;
+
+	     //ClampTemperatureToPhase();
+
+	     //        } while (changed);
+	     //  }
 }
 
 
@@ -543,7 +658,7 @@ public static class RadiativeEnergyUtilities
 		          float availableEnergy = radiative.StoredEnergy * area * timeStep;
 		          float absorbed = availableEnergy * Mathf.Clamp01(absorptionEfficiency);
 
-		          radiative.ExtractEnergy(absorbed);
+		          radiative.RemoveEnergy(absorbed);
 		          thermal.AddEnergy(absorbed);
 
 		          return absorbed;
@@ -563,7 +678,7 @@ public static class ChemicalEnergyUtilities
 
 		          if (energyChange < 0) // Exothermic - release energy
 		          {
-				chemicals.ExtractEnergy(-energyChange);
+				chemicals.RemoveEnergy(-energyChange);
 				if (sink != null)
 					     sink.AddEnergy(-energyChange);
 				return -energyChange;
@@ -572,7 +687,7 @@ public static class ChemicalEnergyUtilities
 		          {
 				if (sink != null && sink.CanTransferEnergy(energyChange))
 				{
-					     sink.ExtractEnergy(energyChange);
+					     sink.RemoveEnergy(energyChange);
 					     chemicals.AddEnergy(energyChange);
 					     return energyChange;
 				}
@@ -588,68 +703,14 @@ public static class ChemicalEnergyUtilities
 		          float available = chemical.StoredEnergy;
 		          float converted = available * Mathf.Clamp01(efficiency);
 
-		          chemical.ExtractEnergy(converted);
+		          chemical.RemoveEnergy(converted);
 		          thermal.AddEnergy(converted);
 
 		          return converted;
 	     }
 }
 
-public static class LatentEnergyUtilities
-{
-	     // ========== PHASE CHANGE HELPERS ==========
 
-	     /// <summary>Handle phase change with energy balance</summary>
-	     public static bool TryPhaseChangeWithEnergyBalance(LatentEnergy latent,
-				          ThermalEnergy thermal,
-				          Phase newPhase, float mass)
-	     {
-		          float requiredEnergy = latent.GetPhaseChangeEnergy(newPhase, mass);
-		          float availableEnergy = thermal.StoredEnergy;
-
-		          if (Mathf.Abs(requiredEnergy) <= availableEnergy)
-		          {
-				// Phase change occurs - energy is transferred
-				if (requiredEnergy > 0) // Endothermic (needs energy)
-				{
-					     thermal.ExtractEnergy(requiredEnergy);
-					     // Energy is stored in latent form (bonds breaking)
-					     latent.AddEnergy(requiredEnergy);
-				}
-				else // Exothermic (releases energy)
-				{
-					     latent.ExtractEnergy(-requiredEnergy);
-					     thermal.AddEnergy(-requiredEnergy);
-				}
-
-				latent.TryPhaseChange(newPhase, mass, ref requiredEnergy);
-				return true;
-		          }
-		          return false;
-	     }
-
-	     /// <summary>Calculate melting/freezing at boundary</summary>
-	     public static void ProcessPhaseBoundary(LatentEnergy ice, LatentEnergy water,
-			             ThermalEnergy thermal, float interfaceArea,
-			             float timeStep)
-	     {
-		          // Simplified: heat transfer drives phase change
-		          float heatForMelting = 100f * interfaceArea * timeStep; // Simplified rate
-
-		          if (thermal.Temperature > 273.15f) // Above freezing
-		          {
-				// Melting: ice -> water
-				float massThatCanMelt = heatForMelting / ice.LatentHeatFusion;
-				TryPhaseChangeWithEnergyBalance(ice, thermal, Phase.Liquid, massThatCanMelt);
-		          }
-		          else // Below freezing
-		          {
-				// Freezing: water -> ice
-				float massThatCanFreeze = heatForMelting / water.LatentHeatFusion;
-				TryPhaseChangeWithEnergyBalance(water, thermal, Phase.Solid, massThatCanFreeze);
-		          }
-	     }
-}
 
 public static class MechanicalEnergyUtilities
 {
@@ -663,7 +724,7 @@ public static class MechanicalEnergyUtilities
 		          float available = mechanical.StoredEnergy;
 		          float heatGenerated = available * Mathf.Clamp01(efficiency);
 
-		          mechanical.ExtractEnergy(heatGenerated);
+		          mechanical.RemoveEnergy(heatGenerated);
 		          thermal.AddEnergy(heatGenerated);
 
 		          return heatGenerated;

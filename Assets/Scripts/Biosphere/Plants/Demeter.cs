@@ -267,8 +267,8 @@ public class Demeter : MonoBehaviour
 				Destroy(plantObj);
 				//add the plants mass to the soil organic matter of the tile it's on. although I want to spread the organic matter around a random 4 surrounding tiles instead of dumping it all in one tile.
 				float plantMass = Plant_Utilities.CalculateDryMass(plant);
-				plant.OriginTile.composition.organicMaterial.ChangeMass(plant.OriginTile.composition.organicMass + Plant_Utilities.CalculateDryMass(plant));
-				plant.OriginTile.composition.water.ChangeMass(plant.OriginTile.composition.organicMass + Plant_Utilities.CalculateWaterMass(plant));
+				plant.OriginTile.composition.organicMaterial.AddMass(plant.OriginTile.composition.organicMass + Plant_Utilities.CalculateDryMass(plant), plant.storedWater.Temperature);
+				plant.storedWater.TransferMassTo(plant.OriginTile.composition.water, plant.storedWater.Mass);
 				ActivePlants.Remove(plant);
 				PlantCurrentStage.Remove(plant);
 		          }
