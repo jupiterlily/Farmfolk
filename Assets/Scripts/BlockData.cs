@@ -74,7 +74,7 @@ public class Liquid : Layer //will be used by rendering and physics systems.
 	     public List<Matter> suspendedSolids;
 }
 
-public class Solid : Layer //can be both liquid and gas will be used by rendering and physics systems. 
+public class Solid : Layer
 {
 	     public bool surface; // is this a surface layer?
 
@@ -88,7 +88,7 @@ public class Solid : Layer //can be both liquid and gas will be used by renderin
 	     public List<Matter> infiltratedGases; // gases infiltrated in the solid
 }
 
-public class Gas : Layer //can be both liquid and gas will be used by rendering and physics systems. 
+public class Gas : Layer
 {
 	     public bool atmospheric; // is this an atmospheric layer?
 			//composition

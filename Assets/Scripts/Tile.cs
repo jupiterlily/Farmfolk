@@ -44,9 +44,9 @@ public class WorldTile : MonoBehaviour
 		          // Set position so that bottom of tile sits on ground
 		          // Since scale.y is height, center is at height / 2
 		          transform.position = new Vector3(
-		              tileData.tileGridRef.x,
+		              tileData.tileGridRef.x * tileSise,
 		              height / 2f,
-		              tileData.tileGridRef.y
+		              tileData.tileGridRef.y * tileSise
 		          );
 		          Color tileColor = TileUtilities.GetSoilColor(tileData.composition);
 		          //set colour of tile based on composition and moisture

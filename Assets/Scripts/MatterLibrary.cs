@@ -10,7 +10,7 @@ public static class MatterLibrary
         { "sand", 753f },
         { "silt", 745f },
         { "clay", 880f },
-        { "organicmaterial", 837f },
+        { "organic matter", 837f },
         { "oxygen", 918f },
         { "nitrogen", 1040f },
         // add other constant?cp materials here as needed

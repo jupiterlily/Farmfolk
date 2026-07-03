@@ -1,95 +1,579 @@
-﻿using UnityEngine;
+﻿using System;
+using System.Collections.Generic;
+using UnityEngine;
 
 public static class AtmosphereUtilities
 {
-	     // ─── Mass & Energy Conservation ────────────────────────────────
-
-	     /// <summary>
-	     /// Calculate total energy stored in all ThermalEnergy objects in the atmosphere.
-	     /// </summary>
-	     public static float CalculateTotalEnergy(AtmosphereTile[,,] atmosphereTiles)
+	     public static void ProcessDownwelling(AtmosphereTile topTile, TileData[] surfaceTiles, float hours, RadiativeEnergy incomingSolar, float zenithAngle)
 	     {
-		          float totalEnergy = 0f;
-		          for (int layer = 0; layer < atmosphereTiles.GetLength(0); layer++)
+		          RadiativeEnergy incident = new RadiativeEnergy(incomingSolar.Wavelength, incomingSolar.StoredEnergy);
+
+		          AtmosphereTile current = topTile;
+
+
+
+
+		          while (current != null) //while there isn't a tile below us
 		          {
-				for (int x = 0; x < atmosphereTiles.GetLength(1); x++)
+				// Transfer stored downwelling and reflected energy (if any)
+				//Debug.Log($"[Atmosphere Utilities] : {current.downwellingSolar.StoredEnergy} joules in downwelling solar of {current.tileGridRef}.");
+				if (current.downwellingSolar != null && current.downwellingSolar.StoredEnergy > 0f)
+					     EnergyTransferUtilities.TransferEnergy(current.downwellingSolar, incident, current.downwellingSolar.StoredEnergy);
+
+
+				if (current.reflectedSolar != null && current.reflectedSolar.StoredEnergy > 0f)
+					     EnergyTransferUtilities.TransferEnergy(current.reflectedSolar, incident, current.reflectedSolar.StoredEnergy);
+
+				//Debug.Log($"[Atmosphere Utilities] : {incident.StoredEnergy} joules in incident solar of {current.tileGridRef}.");
+				float area = current.tileWidth * current.tileWidth;
+				float layerHeight = current.layerHeight;
+				float cosZenith = Mathf.Cos(zenithAngle * Mathf.Deg2Rad);
+				float pathFactor = 1f / Mathf.Max(cosZenith, 0.001f);
+
+				// ---- Compute optical depth ----
+				float tau = 0f;
+				float weightedOmega = 0f;
+
+				// Inline component additions (no local function overhead)
+				// Water vapour
+				float massPerArea = current.waterVapor.Mass / area;
+				float tau_i = SimulationConstants.EXTINCTION_WATER_VAPOUR * massPerArea * pathFactor;
+				tau += tau_i;
+				weightedOmega += tau_i * SimulationConstants.SSA_WATER_VAPOUR;
+
+				// Cloud water
+				massPerArea = current.cloudWaterContent.Mass / area;
+				tau_i = SimulationConstants.EXTINCTION_CLOUD_WATER * massPerArea * pathFactor;
+				tau += tau_i;
+				weightedOmega += tau_i * SimulationConstants.SSA_CLOUD_WATER;
+
+				// Ice
+				massPerArea = current.iceParticles.Mass / area;
+				tau_i = SimulationConstants.EXTINCTION_ICE * massPerArea * pathFactor;
+				tau += tau_i;
+				weightedOmega += tau_i * SimulationConstants.SSA_ICE;
+
+				// Aerosols (total)
+				float aerosolMass = current.sand.Mass + current.silt.Mass + current.clay.Mass + current.organicMaterial.Mass;
+				massPerArea = aerosolMass / area;
+				tau_i = SimulationConstants.EXTINCTION_AEROSOL * massPerArea * pathFactor;
+				tau += tau_i;
+				weightedOmega += tau_i * SimulationConstants.SSA_AEROSOL;
+
+				float omega = tau > 0f ? weightedOmega / tau : 0f;
+
+				// ---- Two‑stream diffuse ----
+				float k = Mathf.Sqrt(3f * (1f - omega));
+				float exp_kt = Mathf.Exp(k * tau);
+				float exp_neg_kt = 1f / exp_kt;
+				float denom = (1f + k) * (1f + k) * exp_kt - (1f - k) * (1f - k) * exp_neg_kt;
+				float T = 2f * exp_neg_kt / denom;
+				float R = ((1f - k * k) * (exp_kt - exp_neg_kt)) / denom;
+				float A = 1f - T - R;
+				A = Mathf.Clamp(A, 0f, 1f);
+				T = Mathf.Clamp(T, 0f, 1f);
+				R = Mathf.Clamp(R, 0f, 1f);
+
+				float incidentEnergy = incident.StoredEnergy;
+				float absorbed = incidentEnergy * A;
+				float reflected = incidentEnergy * R;
+				float transmitted = incidentEnergy * T;
+
+				// 1. Add absorbed energy to layer's thermal components (distribute by mass)
+				float totalMass = current.Mass;
+				if (totalMass > 0f)
 				{
-					     for (int y = 0; y < atmosphereTiles.GetLength(2); y++)
+					     // Use a temporary pool to avoid multiple TransferEnergy calls? For now, use for loop.
+					     ThermalEnergy[] energies = current.energies;
+					     for (int i = 0; i < energies.Length; i++)
 					     {
-						          AtmosphereTile tile = atmosphereTiles[layer, x, y];
-						          if (tile?.energy == null)
-								continue;
-						          foreach (var energy in tile.energy)
+						          ThermalEnergy nrg = energies[i];
+						          float ratio = nrg.Mass / totalMass;
+						          float energyToAdd = ratio * absorbed;
+						          if (energyToAdd > 0f)
+								EnergyTransferUtilities.TransferEnergy(incident, nrg, energyToAdd);
+					     }
+				}
+
+				// 2. Remove absorbed + reflected from incident (now incident carries transmitted)
+				//incident.RemoveEnergy(absorbed + reflected);  // internal – okay
+				if (current.above != null)
+				{
+
+					     EnergyTransferUtilities.TransferEnergy(incident, current.above.reflectedSolar, reflected);
+				}
+				else
+				{
+					     int len = current.horizontalNeighbors.Length;
+					     EnergyTransferUtilities.TransferEnergy(incident, current.horizontalNeighbors[UnityEngine.Random.Range(0, len)].reflectedSolar, reflected);
+				}
+				//// 3. Store reflected energy in the layer's bucket
+				//if (current.reflectedSolar == null)
+				//	     current.reflectedSolar = new RadiativeEnergy(incident.Wavelength, reflected);
+				//else
+				//	     current.below.reflectedSolar.AddEnergy(reflected);   // internal
+
+				current = current.below;
+		          }
+
+		          // Surface distribution
+		          int tileCount = surfaceTiles.Length;
+		          if (tileCount > 0 && incident.StoredEnergy > 0f)
+		          {
+				float perTile = incident.StoredEnergy / tileCount;
+				for (int i = 0; i < tileCount; i++)
+				{
+					     TileData tile = surfaceTiles[i];
+					     //float removed = incident.RemoveEnergy(perTile); // internal
+					     //tile.incomingSolarEnergy.AddEnergy(removed);   // internal
+
+					     EnergyTransferUtilities.TransferEnergy(incident, tile.incomingSolarEnergy, perTile);
+
+					     //     ProcessSurfaceEnergyBalance(tile, hours);
+				}
+		          }
+		          //        if (current.above != null)
+		          //        {
+
+		          //EnergyTransferUtilities.TransferEnergy(incident, current.above.reflectedSolar, incident.StoredEnergy);
+		          //        }
+	     }
+	     public static void ProcessSurfaceEnergyBalance(TileData tile, float hours)
+	     {
+		          if (tile == null)
+				return;
+
+		          // 1. Surface albedo
+		          float albedo = Mathf.Clamp01(tile.composition.albedo);
+
+		          // 2. Incoming solar energy (Joules)
+		          float incomingEnergy = tile.incomingSolarEnergy.StoredEnergy;
+		          if (incomingEnergy <= 0f)
+				return;
+
+		          // 3. Split into absorbed and reflected
+		          float absorbedEnergy = incomingEnergy * (1f - albedo);
+		          float upwellingReflected = incomingEnergy * albedo;
+
+		          // 4. Convert absorbed solar to thermal energy
+		          float totalMass = tile.surfaceWater.Mass + tile.composition.Mass;
+		          if (totalMass > 0f)
+		          {
+				float waterRatio = tile.surfaceWater.Mass / totalMass;
+				float soilRatio = tile.composition.Mass / totalMass;
+
+				// --- Surface water gets its share ---
+				float waterEnergy = absorbedEnergy * waterRatio;
+				if (waterEnergy > 0f && tile.surfaceWater.Mass > 0f)
+				{
+					     // Transfer from incoming solar to surface water
+					     EnergyTransferUtilities.TransferEnergy(tile.incomingSolarEnergy, tile.surfaceWater, waterEnergy);
+				}
+
+				// --- Soil components get theirs ---
+				float soilEnergy = absorbedEnergy * soilRatio;
+				if (soilEnergy > 0f && tile.composition.Mass > 0f)
+				{
+					     // Distribute among soil components by mass fraction
+					     foreach (var comp in tile.composition.energy)
+					     {
+						          float compRatio = comp.Mass / tile.composition.Mass;
+						          float energyForComp = soilEnergy * compRatio;
+						          if (energyForComp > 0f)
 						          {
-								// Correct: only StoredEnergy, not + SpecificHeat
-								totalEnergy += energy.StoredEnergy;
+								// Transfer from incoming solar directly to each component
+								EnergyTransferUtilities.TransferEnergy(tile.incomingSolarEnergy, comp, energyForComp);
 						          }
 					     }
 				}
 		          }
-		          return totalEnergy;
+		          else
+		          {
+				// Fallback: dump all into surface water
+				EnergyTransferUtilities.TransferEnergy(tile.incomingSolarEnergy, tile.surfaceWater, absorbedEnergy);
+		          }
+
+		          // 5. Move reflected energy to the atmosphere's reflectedSolar bucket
+		          if (upwellingReflected > 0f)
+		          {
+				EnergyTransferUtilities.TransferEnergy(tile.incomingSolarEnergy, tile.atmosphereTile.reflectedSolar, upwellingReflected);
+		          }
+
+		          // 6. Now perform surface processes (infiltration, runoff, etc.)
+		          // ApplySoilProcesses(tile, hours);
 	     }
+	     public static void ProcessUpwelling(AtmosphereTile bottomTile, TileData[] surfaceTiles, float hours, RadiativeEnergy upwellingStream, float zenithAngle, bool isThermal)
+	     {
+		          RadiativeEnergy stream = upwellingStream;
+		          bool flip = true;
+		          AtmosphereTile current = bottomTile;
+		          foreach (var tile in surfaceTiles)
+		          {
+				EnergyTransferUtilities.TransferEnergy(tile.outgoingLongwave, stream, tile.outgoingLongwave.StoredEnergy);
+		          }
+		          while (current != null) //while ther eisnt a tile above us
+		          {
+				// Transfer stored upwelling thermal and reflected solar energy into the stream. although I think we should use thermal energy else where for mass transport.
+				if (current.upwellingThermal != null && current.upwellingThermal.StoredEnergy > 0f)
 
-	     // ─── Semi‑Lagrangian Advection (Conservative Interpolation) ──
+					     // float added = current.upwellingThermal.RemoveEnergy(current.upwellingThermal.StoredEnergy);
+					     // stream.AddEnergy(added);
 
-	     /// <summary>
-	     /// Apply semi‑Lagrangian advection to transport atmospheric properties.
-	     /// This conserves mass and energy by interpolating ThermalEnergy objects.
-	     /// </summary>
+					     EnergyTransferUtilities.TransferEnergy(current.upwellingThermal, stream, current.upwellingThermal.StoredEnergy);
+
+
+
+				if (current.reflectedSolar != null && current.reflectedSolar.StoredEnergy > 0f)
+					     EnergyTransferUtilities.TransferEnergy(current.reflectedSolar, stream, current.reflectedSolar.StoredEnergy);
+
+
+
+
+				float area = current.tileWidth * current.tileWidth;
+				float pathFactor = 1f; // diffuse
+
+				// ---- Compute optical depth ----
+				float tau = 0f;
+				float weightedOmega = 0f;
+
+				// Inline component loop
+				float massPerArea = current.waterVapor.Mass / area;
+				float tau_i = SimulationConstants.EXTINCTION_WATER_VAPOUR * massPerArea * pathFactor;
+				tau += tau_i;
+				weightedOmega += tau_i * SimulationConstants.SSA_WATER_VAPOUR;
+
+				massPerArea = current.cloudWaterContent.Mass / area;
+				tau_i = SimulationConstants.EXTINCTION_CLOUD_WATER * massPerArea * pathFactor;
+				tau += tau_i;
+				weightedOmega += tau_i * SimulationConstants.SSA_CLOUD_WATER;
+
+				massPerArea = current.iceParticles.Mass / area;
+				tau_i = SimulationConstants.EXTINCTION_ICE * massPerArea * pathFactor;
+				tau += tau_i;
+				weightedOmega += tau_i * SimulationConstants.SSA_ICE;
+
+				float aerosolMass = current.sand.Mass + current.silt.Mass + current.clay.Mass + current.organicMaterial.Mass;
+				massPerArea = aerosolMass / area;
+				tau_i = SimulationConstants.EXTINCTION_AEROSOL * massPerArea * pathFactor;
+				tau += tau_i;
+				weightedOmega += tau_i * SimulationConstants.SSA_AEROSOL;
+
+				float omega = tau > 0f ? weightedOmega / tau : 0f;
+
+				// ---- Two‑stream ----
+				float k = Mathf.Sqrt(3f * (1f - omega));
+				float exp_kt = Mathf.Exp(k * tau);
+				float exp_neg_kt = 1f / exp_kt;
+				float denom = (1f + k) * (1f + k) * exp_kt - (1f - k) * (1f - k) * exp_neg_kt;
+				float T = 2f * exp_neg_kt / denom;
+				float R = ((1f - k * k) * (exp_kt - exp_neg_kt)) / denom;
+				float A = 1f - T - R;
+				A = Mathf.Clamp(A, 0f, 1f);
+				T = Mathf.Clamp(T, 0f, 1f);
+				R = Mathf.Clamp(R, 0f, 1f);
+
+				float incidentEnergy = stream.StoredEnergy;
+				float absorbed = incidentEnergy * A;
+				float reflected = incidentEnergy * R;
+				float transmitted = incidentEnergy * T;
+
+				// ---- Thermal emission ----
+				float emitted = 0f;
+				if (isThermal)
+				{
+					     float emissivity = A;
+					     float tempK = current.temperature;
+					     float power = emissivity * Constants.STEFAN_BOLTZMANN * tempK * tempK * tempK * tempK * area;
+					     emitted = power * hours * 3600f;
+				}
+
+				float netThermal = absorbed - emitted;
+				float totalMass = current.Mass;
+				if (totalMass > 0f)
+				{
+					     ThermalEnergy[] energies = current.energies;
+					     for (int i = 0; i < energies.Length; i++)
+					     {
+						          ThermalEnergy nrg = energies[i];
+						          float ratio = nrg.Mass / totalMass;
+						          float energyChange = netThermal * ratio;
+						          if (energyChange > 0f)
+								EnergyTransferUtilities.TransferEnergy(stream, nrg, energyChange);
+						          else if (energyChange < 0f)
+								EnergyTransferUtilities.TransferEnergy(nrg, stream, energyChange * -1);
+					     }
+				}
+
+				// Remove absorbed + reflected from stream (internal)
+				//stream.RemoveEnergy(absorbed + reflected);
+				int len = current.horizontalNeighbors.Length;
+				int l = UnityEngine.Random.Range(0, len);
+				// Store reflected (downward) in current.downwellingSolar
+				if (current.below != null)
+				{
+					     int i = UnityEngine.Random.Range(0, 2);
+
+					     RadiativeEnergy e;
+					     if (i == 0)
+					     {
+						          EnergyTransferUtilities.TransferEnergy(stream, current.below.horizontalNeighbors[UnityEngine.Random.Range(0, len)].reflectedSolar, reflected);
+					     }
+					     else
+						          EnergyTransferUtilities.TransferEnergy(stream, current.below.downwellingSolar, reflected);
+				}
+				else
+				{
+					     EnergyTransferUtilities.TransferEnergy(stream, current.horizontalNeighbors[UnityEngine.Random.Range(0, len)].reflectedSolar, reflected);
+				}
+				//current.downwellingSolar.AddEnergy(reflected);
+
+				// Add emitted radiation to stream (internal)
+				//if (isThermal)
+				//	     stream.AddEnergy(emitted);
+
+				current = current.above;
+		          }
+
+		          // Discard remaining (to space)
+		          stream.RemoveEnergy(stream.StoredEnergy);
+	     }
 	     public static void ApplyAtmosphericAdvection(AtmosphereTile[,,] atmosphereTiles, float hours)
 	     {
 		          int layers = atmosphereTiles.GetLength(0);
 		          int width = atmosphereTiles.GetLength(1);
 		          int height = atmosphereTiles.GetLength(2);
+		          float dt = hours * 3600f;
 
-		          // Create temporary storage for advected properties (we will overwrite the originals)
-		          ThermalEnergy[,,] newVapor = new ThermalEnergy[layers, width, height];
-		          ThermalEnergy[,,] newCloud = new ThermalEnergy[layers, width, height];
-		          ThermalEnergy[,,] newIce = new ThermalEnergy[layers, width, height];
-
-		          float timeStepSeconds = hours * 3600f;
-
-		          for (int layer = 0; layer < layers; layer++)
+		          var components = new (string name, Func<AtmosphereTile, ThermalEnergy> getter)[]
 		          {
-				for (int x = 0; x < width; x++)
+        ("vapor", t => t.waterVapor),
+        ("cloud", t => t.cloudWaterContent),
+        ("ice", t => t.iceParticles),
+        ("nitrogen", t => t.nitrogen),
+        ("oxygen", t => t.oxygen),
+        ("carbon dioxide", t => t.carbonDioxide)
+		          };
+
+		          foreach (var comp in components)
+		          {
+				var fluxList = new List<AdvectionFlux>();
+
+				for (int layer = 0; layer < layers; layer++)
 				{
-					     for (int y = 0; y < height; y++)
+					     for (int x = 0; x < width; x++)
 					     {
-						          AtmosphereTile current = atmosphereTiles[layer, x, y];
-						          if (current == null)
-								continue;
+						          for (int y = 0; y < height; y++)
+						          {
+								AtmosphereTile current = atmosphereTiles[layer, x, y];
+								if (current == null)
+									     continue;
 
-						          // Calculate departure point (where air came from)
-						          Vector2 departure = CalculateDeparturePoint(current, x, y, width, height, timeStepSeconds);
+								ThermalEnergy src = comp.getter(current);
+								if (src.Mass <= 0f)
+									     continue;
 
-						          // Interpolate properties from the four surrounding cells
-						          (ThermalEnergy vapor, ThermalEnergy cloud, ThermalEnergy ice) = InterpolateAtmosphericProperties(
-						              atmosphereTiles, layer, departure, x, y, width, height
-						          );
+								float cellWidth = current.tileWidth;
+								float cellHeight = current.layerHeight;
 
-						          newVapor[layer, x, y] = vapor;
-						          newCloud[layer, x, y] = cloud;
-						          newIce[layer, x, y] = ice;
+								// --- Compute fractions (donor-cell) ---
+								float fx_pos = Mathf.Max(0, current.windVelocity.x) * dt / cellWidth;
+								float fx_neg = Mathf.Max(0, -current.windVelocity.x) * dt / cellWidth;
+								float fy_pos = Mathf.Max(0, current.windVelocity.z) * dt / cellWidth;
+								float fy_neg = Mathf.Max(0, -current.windVelocity.z) * dt / cellWidth;
+								float fz_pos = Mathf.Max(0, current.windVelocity.y) * dt / cellHeight;
+								float fz_neg = Mathf.Max(0, -current.windVelocity.y) * dt / cellHeight;
+
+								// --- Enforce CFL condition ---
+								float totalFraction = fx_pos + fx_neg + fy_pos + fy_neg + fz_pos + fz_neg;
+								if (totalFraction > 1f)
+								{
+									     float scale = 1f / totalFraction;
+									     fx_pos *= scale;
+									     fx_neg *= scale;
+									     fy_pos *= scale;
+									     fy_neg *= scale;
+									     fz_pos *= scale;
+									     fz_neg *= scale;
+								}
+
+								// --- Local helper to add a flux entry (fully expanded) ---
+								void AddFlux(AtmosphereTile dest, float fraction)
+								{
+									     if (dest == null || fraction <= 0f)
+										          return;
+									     float massToMove = src.Mass * fraction;
+									     if (massToMove > 0f)
+									     {
+										          fluxList.Add(new AdvectionFlux
+										          {
+												Source = current,
+												Destination = dest,
+												Component = src,
+												MassToTransfer = massToMove
+										          });
+									     }
+								}
+
+								// --- Add fluxes to all neighbours ---
+								// East (x+1) – wraps around
+								AddFlux(atmosphereTiles[layer, (x + 1) % width, y], fx_pos);
+
+								// West (x-1) – wraps around
+								AddFlux(atmosphereTiles[layer, (x - 1 + width) % width, y], fx_neg);
+
+								// North (y+1) – wraps around
+								AddFlux(atmosphereTiles[layer, x, (y + 1) % height], fy_pos);
+
+								// South (y-1) – wraps around
+								AddFlux(atmosphereTiles[layer, x, (y - 1 + height) % height], fy_neg);
+
+								// Upward (layer+1)
+								if (layer < layers - 1)
+									     AddFlux(atmosphereTiles[layer + 1, x, y], fz_pos);
+								// If layer == top, fz_pos goes to space – we discard it (no neighbour)
+
+								// Downward (layer-1)
+								if (layer > 0)
+									     AddFlux(atmosphereTiles[layer - 1, x, y], fz_neg);
+								// If layer == bottom, fz_neg goes into surface – you may want to handle that separately
+						          }
 					     }
+				}
+
+				// --- Apply all fluxes for this component ---
+				foreach (var flux in fluxList)
+				{
+					     if (flux.MassToTransfer <= 0f)
+						          continue;
+					     ThermalEnergy destComp = comp.getter(flux.Destination);
+					     if (destComp == null)
+						          continue;
+
+					     // Transfer mass AND its associated energy (sensible + latent)
+					     ThermalEnergyUtilities.TransferMassAndEnergy(flux.Component, destComp, flux.MassToTransfer);
 				}
 		          }
 
-		          // Apply advected properties back to tiles
-		          for (int layer = 0; layer < layers; layer++)
+		          // --- Finalise ---
+		          foreach (var tile in atmosphereTiles)
 		          {
-				for (int x = 0; x < width; x++)
-				{
-					     for (int y = 0; y < height; y++)
-					     {
-						          AtmosphereTile tile = atmosphereTiles[layer, x, y];
-						          if (tile == null)
-								continue;
+				tile.MarkMassDirty();
+				tile.MarkTemperatureDirty();
+				tile.CollectGases();
+		          }
+	     }
 
-						          tile.waterVapor = newVapor[layer, x, y];
-						          tile.cloudWaterContent = newCloud[layer, x, y];
-						          tile.iceParticles = newIce[layer, x, y];
-					     }
-				}
+
+	     // Small struct – place this outside the method (e.g., in the same class or a separate file)
+	     struct AdvectionFlux
+	     {
+		          public AtmosphereTile Source;
+		          public AtmosphereTile Destination;
+		          public ThermalEnergy Component;   // the ThermalEnergy object on Source
+		          public float MassToTransfer;
+	     }
+	     // Helper to get the correct ThermalEnergy component by name
+	     //public static void IntraCellConduction(AtmosphereTile tile, float hours)
+	     //{
+	     //      //conduct heat between me and every other nrg that is not me.
+	     //      ThermalEnergyUtilities.MixTemperaturesByConduction(tile.energies.ToList<ThermalEnergy>(), hours, tile.tileWidth * tile.layerHeight, tile.layerHeight);
+	     //}
+	     private static List<ThermalEnergy> tempList = new List<ThermalEnergy>(); // static, reused
+
+	     public static void AtmosphericConduction(AtmosphereTile tile, float hours)
+	     {
+		          float seconds = hours * 3600;
+
+		          tempList.AddRange(tile.energies);
+		          if (tile.below == null)
+		          {
+				tempList.AddRange(tile.above.energies);
+		          }
+		          if (tile.above == null)
+		          {
+				tempList.AddRange(tile.below.energies);
+		          }
+		          //    ThermalEnergyUtilities.MixTemperaturesByConduction(tempList, seconds, tile.tileWidth * tile.tileWidth, tile.layerHeight);
+		          // 1. Within‑tile mixing (all components)
+		          //      tempList.Clear();
+		          tempList.AddRange(tile.energies);
+		          //     ThermalEnergyUtilities.MixTemperaturesByConduction(tempList, seconds, tile.tileWidth * tile.layerHeight, tile.layerHeight);
+
+		          // 2. Horizontal neighbours (N,E,S,W)
+
+		          foreach (var neighbor in tile.horizontalNeighbors)
+				if (neighbor != null)
+					     tempList.AddRange(neighbor.energies);
+		          ThermalEnergyUtilities.MixTemperaturesByConduction(tempList, seconds, tile.tileWidth * tile.layerHeight, tile.tileWidth);
+
+		          // 3. Vertical neighbours (above & below)
+		          tempList.Clear();
+
+	     }
+	     private static ThermalEnergy GetWaterComponent(AtmosphereTile tile, string name)
+	     {
+		          switch (name)
+		          {
+		          case "vapor":
+		          return tile.waterVapor;
+		          case "cloud":
+		          return tile.cloudWaterContent;
+		          case "ice":
+		          return tile.iceParticles;
+		          default:
+		          return null;
+		          }
+	     }
+	     // Helper: interpolate mass and temperature for a given component selector
+	     private static (float mass, float temp) InterpolateMassAndTemp(AtmosphereTile[,,] tiles, int layer, Vector2 departure, int x, int y, int width, int height,
+	         Func<AtmosphereTile, ThermalEnergy> selector)
+	     {
+		          int x0 = Mathf.FloorToInt(departure.x);
+		          int x1 = (x0 + 1) % width;
+		          int y0 = Mathf.FloorToInt(departure.y);
+		          int y1 = (y0 + 1) % height;
+		          float fx = departure.x - x0;
+		          float fy = departure.y - y0;
+
+		          AtmosphereTile t00 = tiles[layer, x0, y0];
+		          AtmosphereTile t10 = tiles[layer, x1, y0];
+		          AtmosphereTile t01 = tiles[layer, x0, y1];
+		          AtmosphereTile t11 = tiles[layer, x1, y1];
+
+		          if (t00 == null || t10 == null || t01 == null || t11 == null)
+		          {
+				// Fallback: keep current tile's values
+				AtmosphereTile current = tiles[layer, x, y];
+				ThermalEnergy e = selector(current);
+				return (e.Mass, e.Temperature);
+		          }
+
+		          ThermalEnergy e00 = selector(t00);
+		          ThermalEnergy e10 = selector(t10);
+		          ThermalEnergy e01 = selector(t01);
+		          ThermalEnergy e11 = selector(t11);
+
+		          // Interpolate mass
+		          float mass00 = e00.Mass, mass10 = e10.Mass, mass01 = e01.Mass, mass11 = e11.Mass;
+		          float mass = BilinearInterpolate(mass00, mass10, mass01, mass11, fx, fy);
+
+		          // Interpolate temperature as mass‑weighted
+		          float totalMass = mass00 + mass10 + mass01 + mass11;
+		          if (totalMass > 1e-6f)
+		          {
+				float weightedTemp00 = e00.Temperature * mass00;
+				float weightedTemp10 = e10.Temperature * mass10;
+				float weightedTemp01 = e01.Temperature * mass01;
+				float weightedTemp11 = e11.Temperature * mass11;
+				float weightedSum = BilinearInterpolate(weightedTemp00, weightedTemp10, weightedTemp01, weightedTemp11, fx, fy);
+				float temp = mass > 0f ? weightedSum / mass : 0f;
+				return (mass, temp);
+		          }
+		          else
+		          {
+				// No mass – interpolate temperature directly
+				float temp = BilinearInterpolate(e00.Temperature, e10.Temperature, e01.Temperature, e11.Temperature, fx, fy);
+				return (mass, temp);
 		          }
 	     }
 
@@ -110,37 +594,6 @@ public static class AtmosphereUtilities
 		          departureY = ((departureY % height) + height) % height;
 
 		          return new Vector2(departureX, departureY);
-	     }
-
-	     private static (ThermalEnergy vapor, ThermalEnergy cloud, ThermalEnergy ice) InterpolateAtmosphericProperties(
-	         AtmosphereTile[,,] tiles, int layer, Vector2 departure, int x, int y, int width, int height)
-	     {
-		          int x0 = Mathf.FloorToInt(departure.x);
-		          int x1 = (x0 + 1) % width;
-		          int y0 = Mathf.FloorToInt(departure.y);
-		          int y1 = (y0 + 1) % height;
-		          float fx = departure.x - x0;
-		          float fy = departure.y - y0;
-
-		          AtmosphereTile t00 = tiles[layer, x0, y0];
-		          AtmosphereTile t10 = tiles[layer, x1, y0];
-		          AtmosphereTile t01 = tiles[layer, x0, y1];
-		          AtmosphereTile t11 = tiles[layer, x1, y1];
-
-		          if (t00 == null || t10 == null || t01 == null || t11 == null)
-		          {
-				// Fallback: return a copy of the current tile's properties (or default)
-				AtmosphereTile current = tiles[layer, x, y];
-				return (CloneThermalEnergy(current.waterVapor),
-				        CloneThermalEnergy(current.cloudWaterContent),
-				        CloneThermalEnergy(current.iceParticles));
-		          }
-
-		          ThermalEnergy vapor = BilinearInterpolateEnergy(t00.waterVapor, t10.waterVapor, t01.waterVapor, t11.waterVapor, fx, fy);
-		          ThermalEnergy cloud = BilinearInterpolateEnergy(t00.cloudWaterContent, t10.cloudWaterContent, t01.cloudWaterContent, t11.cloudWaterContent, fx, fy);
-		          ThermalEnergy ice = BilinearInterpolateEnergy(t00.iceParticles, t10.iceParticles, t01.iceParticles, t11.iceParticles, fx, fy);
-
-		          return (vapor, cloud, ice);
 	     }
 
 	     private static ThermalEnergy BilinearInterpolateEnergy(ThermalEnergy e00, ThermalEnergy e10, ThermalEnergy e01, ThermalEnergy e11, float fx, float fy)
@@ -187,22 +640,6 @@ public static class AtmosphereUtilities
 		          return Mathf.Lerp(x0y, x1y, fy);
 	     }
 
-	     private static ThermalEnergy CloneThermalEnergy(ThermalEnergy source)
-	     {
-		          if (source == null)
-				return null;
-		          return new ThermalEnergy(
-		              source.Mass,
-		              //source.SpecificHeat,
-		              source.materialName,
-		              source.LatentHeatFusion,
-		              source.LatentHeatVaporization,
-		              source.MeltingPoint,
-		              source.BoilingPoint,
-		              source.ThermalConductivity,
-		              source.Temperature
-		          );
-	     }
 
 	     // ─── Initialisation (Hadley Cells) ─────────────────────────────
 
@@ -334,7 +771,34 @@ public static class AtmosphereUtilities
 				}
 		          }
 	     }
+	     public static void UpdateAtmosphericPressure(AtmosphereTile[,,] atmosphereTiles)
+	     {
+		          int layers = atmosphereTiles.GetLength(0);
+		          int width = atmosphereTiles.GetLength(1);
+		          int height = atmosphereTiles.GetLength(2);
+		          float R = 287.05f; // specific gas constant for dry air (J/kg·K)
 
+		          for (int layer = 0; layer < layers; layer++)
+				for (int x = 0; x < width; x++)
+					     for (int y = 0; y < height; y++)
+					     {
+						          AtmosphereTile tile = atmosphereTiles[layer, x, y];
+						          if (tile == null)
+								continue;
+						          float volume = tile.tileWidth * tile.tileWidth * tile.layerHeight;
+						          if (volume <= 0f)
+								continue;
+						          // Use total mass (dry air + water vapour) as an approximation
+						          float totalMass = tile.Mass;
+						          if (totalMass <= 0f)
+						          {
+								tile.pressure = 0f;
+								continue;
+						          }
+						          // Ideal gas law: p = (m * R * T) / V
+						          tile.pressure = (totalMass * R * tile.temperature) / volume;
+					     }
+	     }
 	     private static Vector3 CalculatePressureGradientForce(AtmosphereTile[,,] tiles, int layer, int x, int y, int width, int height)
 	     {
 		          Vector3 force = Vector3.zero;
@@ -364,36 +828,37 @@ public static class AtmosphereUtilities
 	     {
 		          if (tile == null)
 				return 0f;
-		          float temp = tile.temperature;
-		          if (temp < 0.001f)
-				return 0f;
+		          float tempC = tile.temperature - SimulationConstants.Kelvin;
+		          if (tempC < -SimulationConstants.Kelvin)
+				return 0f; // guard
 
-		          float satVaporPressure_Pa = CalculateSaturationVaporPressure(temp);
+		          float satVP = CalculateSaturationVaporPressure(tempC);
 		          float volume = tile.tileWidth * tile.tileWidth * tile.layerHeight;
 		          if (volume <= 0f)
 				volume = 1f;
 
 		          float molesWater = tile.waterVapor.Mass / 0.018f;
-		          float actualVaporPressure = (molesWater * Constants.GAS_CONSTANT * (temp)) / volume;
-		          if (satVaporPressure_Pa < 0.001f)
+		          float actualVP = (molesWater * Constants.GAS_CONSTANT * tile.temperature) / volume;
+		          if (satVP < 0.001f)
 				return 0f;
-		          return Mathf.Clamp01(actualVaporPressure / satVaporPressure_Pa);
+		          return Mathf.Clamp01(actualVP / satVP);
 	     }
 
-	     public static float CalculateSaturationVaporPressure(float temperatureC)
+	     public static float CalculateSaturationVaporPressure(float tempK)
 	     {
-		          float T = temperatureC;
+		          float T = tempK - SimulationConstants.Kelvin;
 		          if (T >= 0)
 				return 611.2f * Mathf.Exp(17.67f * T / (T + 243.5f));
 		          else
 				return 611.2f * Mathf.Exp(22.46f * T / (T + 272.62f));
 	     }
 
-	     public static float CalculateSaturationWaterMass(float temperatureC, float pressurePa, float volumeM3)
+	     public static float CalculateSaturationWaterMass(float tempK, float pressurePa, float volumeM3)
 	     {
+		          float temperatureC = tempK - SimulationConstants.Kelvin;
 		          float satVP = CalculateSaturationVaporPressure(temperatureC);
 		          float mixingRatio = 0.622f * satVP / Mathf.Max(pressurePa - satVP, 1f);
-		          float T = temperatureC + 273.15f;
+		          float T = temperatureC + SimulationConstants.Kelvin;
 		          float dryAirDensity = pressurePa / (Constants.GAS_CONSTANT * T);
 		          float saturationVaporDensity = mixingRatio * dryAirDensity;
 		          return saturationVaporDensity * volumeM3;
@@ -410,7 +875,7 @@ public static class AtmosphereUtilities
 
 	     public static double CalculateAirDensity(float temperature, float pressure)
 	     {
-		          double T = temperature + 273.15;
+		          double T = temperature;
 		          if (T <= 0)
 				return 1.225;
 		          return pressure / (Constants.GAS_CONSTANT * T);
@@ -442,7 +907,7 @@ public static class AtmosphereUtilities
 	     {
 		          if (current == null)
 				return 0f;
-		          float T = current.temperature + 273.15f;
+		          float T = current.temperature;
 		          if (T <= 0f)
 				return 0f;
 		          float p = current.pressure;
@@ -457,12 +922,34 @@ public static class AtmosphereUtilities
 		          return verticalMotion * lapseRate * current.layerHeight;
 	     }
 
+	     public static void ApplyAdiabaticCooling(AtmosphereTile tile, float hours)
+	     {
+		          // Returns energy change (Joules) – positive = warming, negative = cooling
+		          float energyChange = CalculateAdiabaticCooling(tile) * hours * 3600f;
+		          if (Mathf.Abs(energyChange) < 1e-6f)
+				return;
+
+		          float totalMass = tile.Mass;
+		          if (totalMass <= 0f)
+				return;
+
+		          // Distribute energy change evenly across all thermal components (by mass fraction)
+		          foreach (var nrg in tile.energies)
+		          {
+				float fraction = nrg.Mass / totalMass;
+				if (energyChange > 0)
+					     nrg.AddEnergy(energyChange * fraction);
+				else
+					     nrg.RemoveEnergy(-energyChange * fraction);
+		          }
+	     }
+
 	     public static float CalculateRadiativeCooling(AtmosphereTile tile, float hours)
 	     {
 		          if (tile == null)
 				return 0f;
 		          hours *= 3600f;
-		          float tempK = tile.temperature + 273.15f;
+		          float tempK = tile.temperature;
 		          if (tempK <= 0f)
 				return 0f;
 		          float surfaceArea = tile.tileWidth * tile.tileWidth;

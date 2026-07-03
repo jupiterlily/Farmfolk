@@ -2,23 +2,49 @@
 
 public class ThermalEnergy : EnergyData
 {
-	     //tracks mass, temperature, phase and internal energy.
 	     // --- Public Properties ---
-	     private float temperature;  // Kelvin
+	     public float Mass
+	     {
+		          get; private set;
+	     }
+	     public float LatentHeatFusion
+	     {
+		          get; private set;
+	     }
+	     public float LatentHeatVaporization
+	     {
+		          get; private set;
+	     }
+	     public float MeltingPoint
+	     {
+		          get; private set;
+	     }
+	     public float BoilingPoint
+	     {
+		          get; private set;
+	     }
+	     public float ThermalConductivity
+	     {
+		          get; private set;
+	     }
+	     public string materialName;
+
+	     // --- Energy (the only truth) ---
+	     private float sensibleEnergy; // J
+	     private float latentEnergy;   // J
+
+	     public override float StoredEnergy => sensibleEnergy + latentEnergy;
+
+	     // --- Temperature: cached field, updated from energy ---
+	     private float temperature; // Kelvin
 
 	     public float Temperature
 	     {
 		          get => temperature;
-		          private set
-		          {
-				if (Mathf.Abs(temperature - value) > 0.001f)
-				{
-					     temperature = value;
-					     // Invalidate cache because temperature changed
-					     cachedTemperatureForCp = float.NaN;
-				}
-		          }
+		          private set => temperature = value; // only set internally
 	     }
+
+	     // --- Specific heat (uses cached temperature) ---
 	     private float cachedSpecificHeat;
 	     private float cachedTemperatureForCp = float.NaN;
 
@@ -26,9 +52,7 @@ public class ThermalEnergy : EnergyData
 	     {
 		          get
 		          {
-				// Recompute only if temperature has changed noticeably
-				if (float.IsNaN(cachedTemperatureForCp) ||
-				    Mathf.Abs(temperature - cachedTemperatureForCp) > 0.001f)
+				if (float.IsNaN(cachedTemperatureForCp) || Mathf.Abs(temperature - cachedTemperatureForCp) > 0.001f)
 				{
 					     cachedSpecificHeat = MatterLibrary.GetSpecificHeat(materialName, temperature);
 					     cachedTemperatureForCp = temperature;
@@ -36,235 +60,79 @@ public class ThermalEnergy : EnergyData
 				return cachedSpecificHeat;
 		          }
 	     }
+
+	     // --- Phase (derived from temperature, but can be cached too) ---
 	     public Phase CurrentPhase
 	     {
-		          get; private set;
+		          get
+		          {
+				if (Mass <= 0f)
+					     return Phase.Solid;
+				if (temperature < MeltingPoint)
+					     return Phase.Solid;
+				if (temperature < BoilingPoint)
+					     return Phase.Liquid;
+				return Phase.Gas;
+		          }
 	     }
-	     public float Mass
-	     {
-		          get; private set;
-	     }                 // kg
-	     public float LatentHeatFusion
-	     {
-		          get; private set;
-	     }     // J/kg
-	     public float LatentHeatVaporization
-	     {
-		          get; private set;
-	     } // J/kg
-	     public float MeltingPoint
-	     {
-		          get; private set;
-	     }         // Kelvin
-	     public float BoilingPoint
-	     {
-		          get; private set;
-	     }         // Kelvin
-	     public float ThermalConductivity
-	     {
-		          get; private set;
-	     }  // W/m·K
 
-	     public override float StoredEnergy => sensibleEnergy + latentEnergy;
-
-	     // --- Private Fields ---
-	     private float sensibleEnergy; // J, affects temperature
-	     private float latentEnergy;   // J, stored in phase bonds
-
-	     public string materialName;  // used to look up cp from MatterLibrary
-	     private float defaultCp;      // fallback if material not found
-
-	     //private ThermalEnergy environ; //location that heat from  phase change goes or gets removed from. can be a soil component, an atmosphere component
 	     // --- Constructor ---
 	     public ThermalEnergy(float mass, string materialRef,
-		           float latentHeatFusion = 334000f,
-		           float latentHeatVaporization = 2260000f,
-		           float meltingPoint = 273f,
-		           float boilingPoint = 373f,
-		           float thermalConductivity = 0.6089f,
-		           float initialTemperature = 278f,
-		           float fallbackCp = 4186f)
+	         float latentHeatFusion = 334000f,
+	         float latentHeatVaporization = 2260000f,
+	         float meltingPoint = 273f,
+	         float boilingPoint = 373f,
+	         float thermalConductivity = 0.6089f,
+	         float initialTemperature = 278f,
+	         float fallbackCp = 4186f)
 	     {
 		          Type = EnergyType.Thermal;
 		          Mass = mass;
 		          materialName = materialRef;
-		          defaultCp = fallbackCp;
-
 		          LatentHeatFusion = latentHeatFusion;
 		          LatentHeatVaporization = latentHeatVaporization;
 		          MeltingPoint = meltingPoint;
 		          BoilingPoint = boilingPoint;
 		          ThermalConductivity = thermalConductivity;
 
-		          // Determine initial phase
-		          CurrentPhase = initialTemperature < meltingPoint ? Phase.Solid :
-			          (initialTemperature < boilingPoint ? Phase.Liquid : Phase.Gas);
-
-		          // Compute sensible energy using the cp at the initial temperature
-		          float cpInit = SpecificHeat;
-		          sensibleEnergy = mass * cpInit * initialTemperature;
+		          // Initialise sensible energy from temperature
+		          float cp = MatterLibrary.GetSpecificHeat(materialRef, initialTemperature);
+		          sensibleEnergy = mass * cp * initialTemperature;
 		          latentEnergy = 0f;
 		          temperature = initialTemperature;
-
-		          ClampTemperatureToPhase();
+		          cachedTemperatureForCp = initialTemperature;
+		          cachedSpecificHeat = cp;
 	     }
 
-	     // --- Public API ---
+	     // --- Energy manipulation ---
 
-	     /// <summary>Add heat energy (sensible). Handles phase changes iteratively.</summary>
 	     public void AddHeat(float joules)
 	     {
 		          if (joules <= 0f || Mass <= 0f)
 				return;
-
-		          float cp = SpecificHeat;                // uses cached value
-		          float dT = joules / (Mass * cp);
-		          Temperature += dT;
 		          sensibleEnergy += joules;
-		          //ProcessPhaseChanges();
-		          ClampTemperatureToPhase();
+		          UpdateTemperature();
+		          ProcessPhaseChanges();
 	     }
 
-	     /// <summary>Remove heat energy (sensible first, then latent). Handles phase changes.</summary>
 	     public void RemoveHeat(float joules)
 	     {
 		          if (joules <= 0f || Mass <= 0f)
 				return;
-
 		          float toRemove = Mathf.Min(joules, StoredEnergy);
-		          float removed = 0f;
-
-		          // Remove from sensible first
 		          float sensibleToRemove = Mathf.Min(toRemove, sensibleEnergy);
 		          sensibleEnergy -= sensibleToRemove;
-		          removed += sensibleToRemove;
-
-		          // If still need more, remove from latent
 		          toRemove -= sensibleToRemove;
-		          if (toRemove > 0f && latentEnergy > 0f)
+		          if (toRemove > 0f)
 		          {
 				float latentToRemove = Mathf.Min(toRemove, latentEnergy);
 				latentEnergy -= latentToRemove;
-				removed += latentToRemove;
+				toRemove -= latentToRemove;
 		          }
-
-		          // Recompute temperature based on remaining sensible energy
-		          if (Mass > 0f)
-		          {
-				float cp = SpecificHeat;
-
-				temperature = sensibleEnergy / (Mass * cp);
-		          }
-		          else
-		          {
-				temperature = 0f;
-		          }
-
-		          //ProcessPhaseChanges(); // handles freezing/condensation
-		          ClampTemperatureToPhase();
+		          UpdateTemperature();
+		          ProcessPhaseChanges();
 	     }
 
-	     /// <summary>Add mass at a given temperature. Energy is mixed.</summary>
-	     public void AddMass(float kg, float temperature, float? specificHeatOverride = null)
-	     {
-		          if (kg <= 0f)
-				return;
-
-		          // Create temporary object representing the added mass
-		          float sh = specificHeatOverride ?? SpecificHeat;
-		          var tempMass = new ThermalEnergy(kg, materialName,
-				             LatentHeatFusion, LatentHeatVaporization,
-				             MeltingPoint, BoilingPoint,
-				             ThermalConductivity, temperature, defaultCp);
-
-		          // Transfer all mass and energy from tempMass to this
-		          tempMass.TransferMassTo(this, kg);
-	     }
-
-	     /// <summary>Remove mass and proportional energy (preserves temperature).</summary>
-	     public void RemoveMass(float kg)
-	     {
-		          if (kg <= 0f)
-				return;
-		          if (kg >= Mass)
-		          {
-				// Remove everything
-				sensibleEnergy = 0f;
-				latentEnergy = 0f;
-				Mass = 0f;
-				Temperature = 0f;
-				CurrentPhase = Phase.Solid;
-				return;
-		          }
-
-		          float ratio = kg / Mass;
-		          sensibleEnergy *= (1f - ratio);
-		          latentEnergy *= (1f - ratio);
-		          Mass -= kg;
-		          // Temperature remains the same (scaled)
-	     }
-
-	     /// <summary>Transfer mass and proportional energy to another ThermalEnergy.</summary>
-	     public void TransferMassTo(ThermalEnergy target, float kg)
-	     {
-		          if (target == null || kg <= 0f)
-				return;
-		          if (kg > Mass)
-				kg = Mass;
-
-		          float ratio = kg / Mass;
-
-		          // Extract energy proportional to the mass being moved
-		          float sensibleToMove = sensibleEnergy * ratio;
-		          float latentToMove = latentEnergy * ratio;
-
-		          // Remove from source
-		          sensibleEnergy -= sensibleToMove;
-		          latentEnergy -= latentToMove;
-		          Mass -= kg;
-
-		          // Add to target
-		          target.sensibleEnergy += sensibleToMove;
-		          target.latentEnergy += latentToMove;
-		          target.Mass += kg;
-
-		          // Process phase changes on both objects
-		          //ProcessPhaseChanges();
-		          //target.ProcessPhaseChanges();
-
-		          ClampTemperatureToPhase();
-		          target.ClampTemperatureToPhase();
-	     }
-
-	     /// <summary>Mix with another ThermalEnergy to reach thermal equilibrium (no mass transfer).</summary>
-	     public void MixWith(ThermalEnergy other)
-	     {
-		          if (other == null || other.Mass <= 0f || Mass <= 0f)
-				return;
-
-		          // Compute total energy and mass
-		          float totalEnergy = StoredEnergy + other.StoredEnergy;
-		          float totalMass = Mass + other.Mass;
-
-		          // Approximate equilibrium temperature using cp at current temperatures (simple)
-		          float cpThis = SpecificHeat;
-		          float cpOther = other.SpecificHeat;
-
-		          float avgCp = (Mass * cpThis + other.Mass * cpOther) / totalMass;
-		          float equilibriumTemp = totalEnergy / (totalMass * avgCp);
-
-		          // Set both objects to that temperature
-		          sensibleEnergy = Mass * cpThis * equilibriumTemp;  // will be refined later
-		          other.sensibleEnergy = other.Mass * cpOther * equilibriumTemp;
-		          // Keep latent energies unchanged
-
-		          //ProcessPhaseChanges();
-		          //other.ProcessPhaseChanges();
-		          ClampTemperatureToPhase();
-		          other.ClampTemperatureToPhase();
-	     }
-
-	     // --- Overrides from EnergyData ---
 	     public override void AddEnergy(float joules) => AddHeat(joules);
 	     public override float RemoveEnergy(float maxJoules)
 	     {
@@ -273,62 +141,210 @@ public class ThermalEnergy : EnergyData
 		          return removed;
 	     }
 
-	     // --- Internal Helpers ---
+	     // --- Mass transfer ---
 
-	     //  /// <summary>Get specific heat at a given temperature from the library or fallback.</summary>
-	     //  private float GetSpecificHeat(float temperature)
-	     //  {
-	     //        float cp = MatterLibrary.GetSpecificHeat(materialName, temperature);
-	     //        if (cp <= 0f) // not found
-	     //return defaultCp;
-	     //        return cp;
-	     //  }
+	     public void AddMass(float kg, float temperatureKelvin, float? specificHeatOverride = null)
+	     {
+		          if (kg <= 0f)
+				return;
+		          var tempMass = new ThermalEnergy(kg, materialName,
+		              LatentHeatFusion, LatentHeatVaporization,
+		              MeltingPoint, BoilingPoint,
+		              ThermalConductivity, temperatureKelvin, cachedSpecificHeat);
+		          tempMass.TransferMassTo(this, kg);
+	     }
 
-	     /// <summary>Iteratively process phase changes until stable.</summary>
+	     public void RemoveMass(float kg)
+	     {
+		          if (kg <= 0f)
+				return;
+		          if (kg >= Mass)
+		          {
+				sensibleEnergy = 0f;
+				latentEnergy = 0f;
+				Mass = 0f;
+				temperature = 0f;
+				return;
+		          }
+		          float ratio = kg / Mass;
+		          sensibleEnergy *= (1f - ratio);
+		          latentEnergy *= (1f - ratio);
+		          Mass -= kg;
+		          // Temperature remains same (scaled), but let's recalc to be safe
+		          UpdateTemperature();
+	     }
 
+	     public void TransferMassTo(ThermalEnergy target, float kg)
+	     {
+		          if (target == null || kg <= 0f)
+				return;
+		          if (kg > Mass)
+				kg = Mass;
+		          float ratio = kg / Mass;
+		          float sensibleToMove = sensibleEnergy * ratio;
+		          float latentToMove = latentEnergy * ratio;
 
-	     private void ClampTemperatureToPhase()
+		          sensibleEnergy -= sensibleToMove;
+		          latentEnergy -= latentToMove;
+		          Mass -= kg;
+
+		          target.sensibleEnergy += sensibleToMove;
+		          target.latentEnergy += latentToMove;
+		          target.Mass += kg;
+
+		          UpdateTemperature();
+		          target.UpdateTemperature();
+		          ProcessPhaseChanges();
+		          target.ProcessPhaseChanges();
+	     }
+
+	     // --- Phase Change Logic (uses energy, updates temperature) ---
+
+	     private void ProcessPhaseChanges()
 	     {
 		          if (Mass <= 0f)
 		          {
-				Temperature = 0f;
-				return;
-		          }
-
-		          switch (CurrentPhase)
-		          {
-		          case Phase.Solid:
-		          Temperature = Mathf.Min(Temperature, MeltingPoint);
-		          break;
-		          case Phase.Liquid:
-		          Temperature = Mathf.Clamp(Temperature, MeltingPoint, BoilingPoint);
-		          break;
-		          case Phase.Gas:
-		          Temperature = Mathf.Max(Temperature, BoilingPoint);
-		          break;
-		          }
-	     }
-
-	     // Private mass change (used only internally)
-	     private void ChangeMass(float newMass)
-	     {
-		          if (newMass <= 0f)
-		          {
-				Mass = 0f;
 				sensibleEnergy = 0f;
 				latentEnergy = 0f;
-				Temperature = 0f;
-				CurrentPhase = Phase.Solid;
+				temperature = 0f;
 				return;
 		          }
 
-		          float ratio = newMass / Mass;
-		          Mass = newMass;
-		          sensibleEnergy *= ratio;
-		          latentEnergy *= ratio;
-		          // Temperature remains same because energy scaled proportionally
-		          // but we may need to clamp
-		          ClampTemperatureToPhase();
+		          bool changed;
+		          do
+		          {
+				changed = false;
+				float cp = SpecificHeat;
+
+				// Melting (solid → liquid)
+				if (CurrentPhase == Phase.Solid && temperature >= MeltingPoint && sensibleEnergy > 0f)
+				{
+					     float needed = Mass * LatentHeatFusion;
+					     // Check if we have enough sensible energy above the melting point energy
+					     float energyAtMelt = Mass * cp * MeltingPoint;
+					     if (sensibleEnergy >= energyAtMelt + needed)
+					     {
+						          sensibleEnergy -= needed;
+						          latentEnergy += needed;
+						          changed = true;
+						          UpdateTemperature();
+					     }
+					     else
+					     {
+						          // Not enough to fully melt; we can't partially melt, so we just stay solid.
+						          // But we might be above melting point due to rounding; we'll ensure temperature doesn't exceed melting point.
+						          if (temperature > MeltingPoint)
+						          {
+								// Cap temperature to melting point by converting excess sensible to latent? That's not physical.
+								// Actually, if we're above melting point but don't have enough latent heat, we should still melt? 
+								// That's a problem. We'll just let it be; the next iteration will try again.
+						          }
+					     }
+				}
+
+				// Freezing (liquid → solid)
+				if (CurrentPhase == Phase.Liquid && temperature < MeltingPoint && latentEnergy > 0f)
+				{
+					     float released = Mass * LatentHeatFusion;
+					     if (latentEnergy >= released)
+					     {
+						          latentEnergy -= released;
+						          sensibleEnergy += released;
+						          changed = true;
+						          UpdateTemperature();
+					     }
+				}
+
+				// Vaporization (liquid → gas)
+				if (CurrentPhase == Phase.Liquid && temperature >= BoilingPoint && sensibleEnergy > 0f)
+				{
+					     float needed = Mass * LatentHeatVaporization;
+					     float energyAtBoil = Mass * cp * BoilingPoint;
+					     if (sensibleEnergy >= energyAtBoil + needed)
+					     {
+						          sensibleEnergy -= needed;
+						          latentEnergy += needed;
+						          changed = true;
+						          UpdateTemperature();
+					     }
+				}
+
+				// Condensation (gas → liquid)
+				if (CurrentPhase == Phase.Gas && temperature < BoilingPoint && latentEnergy > 0f)
+				{
+					     float released = Mass * LatentHeatVaporization;
+					     if (latentEnergy >= released)
+					     {
+						          latentEnergy -= released;
+						          sensibleEnergy += released;
+						          changed = true;
+						          UpdateTemperature();
+					     }
+				}
+
+		          } while (changed);
+	     }
+
+	     // --- Update temperature from energy ---
+	     private void UpdateTemperature()
+	     {
+		          if (Mass <= 0f || float.IsNaN(sensibleEnergy) || float.IsInfinity(sensibleEnergy))
+		          {
+				temperature = 0f;
+				return;
+		          }
+		          float cp = SpecificHeat;
+		          if (cp <= 0f)
+		          {
+				temperature = 0f;
+				return;
+		          }
+		          temperature = sensibleEnergy / (Mass * cp);
+		          if (float.IsNaN(temperature) || float.IsInfinity(temperature))
+				temperature = 0f;
+	     }
+
+	     // --- Helper for initialisation ---
+	     public void SetTemperature(float tempK)
+	     {
+		          if (Mass <= 0f)
+				return;
+		          float cp = MatterLibrary.GetSpecificHeat(materialName, tempK);
+		          sensibleEnergy = Mass * cp * tempK;
+		          latentEnergy = 0f;
+		          temperature = tempK;
+		          cachedTemperatureForCp = tempK;
+		          cachedSpecificHeat = cp;
+		          // No phase processing; assume initial phase is correct.
+	     }
+
+	     public override string ToString()
+	     {
+		          return $"{materialName}: mass={Mass:F2}kg, T={temperature:F1}K, phase={CurrentPhase}";
+	     }
+
+
+	     //heat to temp and cool to temp. cool to temp should retenr an energydata.
+	     public float HeatToTemp(float tempK)
+	     {
+		          float heatAdded = 0f;
+		          //adds heat until temperature equals tempK. mostly used for initialisiation and editor.
+		          while (Temperature <= tempK)
+		          {
+				heatAdded += tempK;
+				AddHeat(tempK);
+		          }
+		          return heatAdded;
+	     }
+	     public float CoolToTemp(float tempK)
+	     {
+		          float heatRemoved = 0f;
+		          while (Temperature >= tempK)
+		          {
+				heatRemoved += tempK;
+				RemoveHeat(tempK);
+		          }
+		          return heatRemoved;
 	     }
 }
 

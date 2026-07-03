@@ -4,32 +4,31 @@ using UnityEngine;
 
 public static class EnergyTransferUtilities
 {
-	     // ========== CORE ENERGY TRANSFER ==========
-
-	     /// <summary>Transfer energy between any two EnergyData objects</summary>
+	     /// <summary>Transfer energy between any two EnergyData objects. Returns actual transferred.</summary>
 	     public static float TransferEnergy(EnergyData source, EnergyData sink, float joules)
 	     {
-		          if (source == null || sink == null || joules <= 0)
-				return 0;
+		          if (source == null || sink == null || joules <= 0f)
+				return 0f;
 
-		          float available = Mathf.Min(joules, source.StoredEnergy);
-		          float extracted = source.RemoveEnergy(available);
-		          sink.AddEnergy(extracted);
+		          float available = source.StoredEnergy;
+		          float toTransfer = Mathf.Min(joules, available);
+		          if (toTransfer <= 0f)
+				return 0f;
 
-		          return extracted;
+
+		          source.RemoveEnergy(toTransfer);
+		          sink.AddEnergy(toTransfer);
+		          return toTransfer;
 	     }
 
-	     /// <summary>Transfer energy with efficiency factor (0-1)</summary>
-	     public static float TransferEnergyWithLoss(EnergyData source, EnergyData sink,
-				  float joules, float efficiency)
+	     /// <summary>Transfer energy with efficiency (0‑1).</summary>
+	     public static float TransferEnergyWithLoss(EnergyData source, EnergyData sink, float joules, float efficiency)
 	     {
-		          if (efficiency <= 0)
-				return 0;
-
+		          if (efficiency <= 0f)
+				return 0f;
 		          float extracted = source.RemoveEnergy(joules);
 		          float delivered = extracted * Mathf.Clamp01(efficiency);
 		          sink.AddEnergy(delivered);
-
 		          return delivered;
 	     }
 }
@@ -42,6 +41,10 @@ public static class ThermalEnergyUtilities
 	     public static float ConductHeat(ThermalEnergy ThermA, ThermalEnergy ThermB, float area,
 			      float distance, float timeStep)
 	     {
+		          if (distance <= 0)
+		          {
+
+		          }
 
 		          float tempDiff;
 
@@ -64,7 +67,59 @@ public static class ThermalEnergyUtilities
 				return EnergyTransferUtilities.TransferEnergy(ThermB, ThermA, heatFlow);
 		          }
 	     }
+	     //  public static float TryEvaporate(ThermalEnergy sourceLiquid, ThermalEnergy destVapor, float requestedMass)
+	     //  {
+	     //        if (sourceLiquid.Mass <= 0 || requestedMass <= 0)
+	     //return 0;
 
+	     //        // We can only evaporate if we have enough sensible heat to supply the latent heat
+	     //        // without dropping below the freezing point (or a defined minimum temperature).
+	     //        float minAllowedTemp = sourceLiquid.MeltingPoint; // 273.15K for water
+	     //        float currentTemp = sourceLiquid.Temperature;
+
+	     //        // Energy available for evaporation = sensible energy above the melting point
+	     //        float energyAboveMelt = sourceLiquid.Mass * sourceLiquid.SpecificHeat * (currentTemp - minAllowedTemp);
+	     //        float latentRequiredPerKg = sourceLiquid.LatentHeatVaporization;
+
+	     //        // Maximum mass we can evaporate with the available energy
+	     //        float maxEvapMass = energyAboveMelt / latentRequiredPerKg;
+	     //        float actualMass = Mathf.Min(requestedMass, maxEvapMass, sourceLiquid.Mass);
+
+	     //        if (actualMass <= 0)
+	     //return 0;
+
+	     //        //    The vapor receives the mass but *not* the latent heat (that energy is spent).
+	     //        sourceLiquid.TransferMassTo(destVapor, actualMass);
+
+
+	     //        return actualMass;
+	     //  }
+
+
+	     //  public static float TryCondense(ThermalEnergy sourceVapor, ThermalEnergy destLiquid, float requestedMass)
+	     //  {
+	     //        if (sourceVapor.Mass <= 0 || requestedMass <= 0)
+	     //return 0;
+
+	     //        // Vapor must have enough mass and latent heat to condense.
+	     //        // We can condense only if the vapor temperature is below boiling point? 
+	     //        // Actually condensation happens when saturated; we just take the requested mass.
+	     //        float actualMass = Mathf.Min(requestedMass, sourceVapor.Mass);
+
+	     //        // 1. Latent heat released = mass * latent heat of vaporization
+	     //        float latentReleased = actualMass * sourceVapor.LatentHeatVaporization;
+
+	     //        // 2. Remove that latent heat from the vapor (cools it down)
+	     //        sourceVapor.RemoveEnergy(latentReleased);
+
+	     //        // 3. Move mass + remaining sensible energy to liquid
+	     //        sourceVapor.TransferMassTo(destLiquid, actualMass);
+
+	     //        // 4. Add the released latent heat to the liquid (warms it)
+	     //        destLiquid.AddEnergy(latentReleased);
+
+	     //        return actualMass;
+	     //  }
 	     /// <summary>Transfer mass and associated thermal energy</summary>
 	     public static void TransferMassAndEnergy(ThermalEnergy source, ThermalEnergy sink,
 		 float massToTransfer)
@@ -75,18 +130,6 @@ public static class ThermalEnergyUtilities
 		          float actualTransfer = Mathf.Min(massToTransfer, source.Mass);
 		          if (actualTransfer <= 0)
 				return;
-
-		          // Calculate energy proportional to mass being transferred
-		          // float energyPerKg = source.StoredEnergy / source.Mass;
-		          //float energyToTransfer = energyPerKg * actualTransfer;
-
-		          // Transfer energy
-		          //    source.ExtractEnergy(energyToTransfer);
-		          //    sink.AddEnergy(energyToTransfer);
-
-		          // Update masses
-		          //   source.ChangeMass(source.Mass - actualTransfer);
-		          //   sink.ChangeMass(sink.Mass + actualTransfer);
 
 		          source.TransferMassTo(sink, actualTransfer);
 	     }
@@ -275,48 +318,48 @@ public static class ThermalEnergyUtilities
 	     /// More realistic but slower - good for small groups
 	     // </summary>
 	     public static void MixTemperaturesByConduction(List<ThermalEnergy> thermalEnergies,
-	          float timeStep,
-	          float area = 1f, float distance = 1f)
+    float seconds, // <--- MUST BE IN SECONDS
+    float area = 1f, float distance = 1f)
 	     {
 		          if (thermalEnergies == null || thermalEnergies.Count <= 1)
 				return;
 
-		          // Group by phase
-		          var phaseGroups = thermalEnergies
-		              .GroupBy(te => te.CurrentPhase)
-		              .Where(g => g.Count() > 1);
-
-		          foreach (var group in phaseGroups)
+		          // Conduct between every pair in the ENTIRE list (all phases mixed together)
+		          for (int i = 0; i < thermalEnergies.Count; i++)
 		          {
-				var groupList = group.ToList();
-
-				// Perform pairwise conduction between all objects in the group
-				for (int i = 0; i < groupList.Count; i++)
+				for (int j = i + 1; j < thermalEnergies.Count; j++)
 				{
-					     for (int j = i + 1; j < groupList.Count; j++)
+					     ThermalEnergy a = thermalEnergies[i];
+					     ThermalEnergy b = thermalEnergies[j];
+
+					     // Skip if either has zero mass to avoid division issues
+					     if (a.Mass <= 0f || b.Mass <= 0f)
+						          continue;
+
+					     ThermalEnergy hot, cold;
+					     if (a.Temperature >= b.Temperature)
 					     {
-						          ThermalEnergy hot, cold;
-
-						          if (groupList[i].Temperature >= groupList[j].Temperature)
-						          {
-								hot = groupList[i];
-								cold = groupList[j];
-						          }
-						          else
-						          {
-								hot = groupList[j];
-								cold = groupList[i];
-						          }
-
-						          // Use Fourier's law for conduction
-						          float tempDiff = hot.Temperature - cold.Temperature;
-						          if (tempDiff > 0)
-						          {
-								// Simplified: assume unit area and distance with mixing factor
-								float heatFlow = hot.ThermalConductivity * area * (tempDiff / distance) * timeStep;
-								EnergyTransferUtilities.TransferEnergy(hot, cold, heatFlow);
-						          }
+						          hot = a;
+						          cold = b;
 					     }
+					     else
+					     {
+						          hot = b;
+						          cold = a;
+					     }
+
+					     float tempDiff = hot.Temperature - cold.Temperature;
+					     if (tempDiff <= 0f)
+						          continue;
+
+					     // Use the arithmetic mean conductivity for the interface
+					     float effectiveK = (hot.ThermalConductivity + cold.ThermalConductivity) * 0.5f;
+
+					     // Fourier's Law: Q = k * A * (ΔT / d) * Δt
+					     float heatFlow = effectiveK * area * (tempDiff / distance) * seconds;
+
+					     // TransferEnergy safely caps the transfer to what 'hot' actually has
+					     EnergyTransferUtilities.TransferEnergy(hot, cold, heatFlow);
 				}
 		          }
 	     }
@@ -655,11 +698,10 @@ public static class RadiativeEnergyUtilities
 				     float absorptionEfficiency,
 				     float area, float timeStep)
 	     {
-		          float availableEnergy = radiative.StoredEnergy * area * timeStep;
+		          float availableEnergy = radiative.StoredEnergy;
 		          float absorbed = availableEnergy * Mathf.Clamp01(absorptionEfficiency);
 
-		          radiative.RemoveEnergy(absorbed);
-		          thermal.AddEnergy(absorbed);
+		          EnergyTransferUtilities.TransferEnergy(radiative, thermal, absorbed);
 
 		          return absorbed;
 	     }

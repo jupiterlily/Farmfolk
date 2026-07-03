@@ -1198,21 +1198,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce010db710ee9f949b8eeb00988dc2e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  worldsise: {x: 25, y: 65}
+  worldsise: {x: 32, y: 128}
   grid:
     tileWidth: 1
     XGrid: 1
     YGrid: 1
     originPoint: {x: 0, y: 0, z: 0}
+  tilesize: 120
   tilePrefab: {fileID: 32131678100906441, guid: 6e88acb7a37c709409c366a8413542f1, type: 3}
-  atmosphericMoisture: 2000
-  airTemp: 15
+  atmoRatio: 8
+  atmosphericMoisture: 135000
+  airTemp: 5
   totalWater: 0
   totalSoil: 0
   totalSand: 0
   totalSilt: 0
   totalClay: 0
   totalOrganicMaterial: 0
+  totalNRG: 0
   leafSprites:
   - {fileID: -381146040, guid: ab09c0ecc28180b41b5c9f8fd54dc0a7, type: 3}
   - {fileID: 1420910639, guid: ab09c0ecc28180b41b5c9f8fd54dc0a7, type: 3}

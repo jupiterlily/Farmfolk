@@ -81,7 +81,6 @@ public class RadiativeEnergy : EnergyData
 	     {
 		          get; private set;
 	     } // W/m²
-
 	     public RadiativeEnergy(float wavelength, float initialIntensity = 0f)
 	     {
 		          Type = EnergyType.Radiative;

@@ -17,6 +17,7 @@ public static class HydrosphereUtilities
 				//total += atmosphereTile.liquidWater.Mass;
 		          }
 
+
 		          if (surfaceTile != null)
 		          {
 				total += surfaceTile.surfaceWater.Mass;
@@ -140,7 +141,7 @@ public static class HydrosphereUtilities
 	     /// <summary>
 	     /// Main entry point for all hydrosphere updates - coordinates all water phase changes
 	     /// </summary>
-	     public static void UpdateHydrosphere(
+	     public static void UpdateSurfaceHydrosphere(
 	         AtmosphereTile atmosphereTile,
 	         TileData surfaceTile,
 	         float solarRadiation,
@@ -150,24 +151,24 @@ public static class HydrosphereUtilities
 				return;
 
 		          // Store initial water for conservation check
-		          float initialTotalWater = GetTotalWater(atmosphereTile, surfaceTile);
+		          //float initialTotalWater = GetTotalWater(atmosphereTile, surfaceTile);
 
-		          // Calculate air mass once for all thermodynamic calculations
-		          float airVolume = atmosphereTile.tileWidth * atmosphereTile.tileWidth * atmosphereTile.layerHeight;
-		          float airMass = CalculateRealisticAirMass(
-		              atmosphereTile.temperature,
-		              atmosphereTile.pressure,
-		              airVolume
-		          );
+		          //// Calculate air mass once for all thermodynamic calculations
+		          //float airVolume = atmosphereTile.tileWidth * atmosphereTile.tileWidth * atmosphereTile.layerHeight;
+		          //float airMass = CalculateRealisticAirMass(
+		          //    atmosphereTile.temperature,
+		          //    atmosphereTile.pressure,
+		          //    airVolume
+		          //);ti
 
-		          float surfaceArea = surfaceTile.tileWidth * surfaceTile.tileWidth;
-		          float soilMass = SoilUtilities.GetSoilMass(surfaceTile.composition);
+		          //float surfaceArea = surfaceTile.tileWidth * surfaceTile.tileWidth;
+		          //float soilMass = SoilUtilities.GetSoilMass(surfaceTile.composition);
 
 		          // 1. Surface evaporation (driven by solar radiation and atmospheric conditions)
 		          // (commented out in original – can be re‑enabled with updated calls)
 
 		          // 2. Atmospheric phase changes (cloud formation/precipitation)
-		          ApplyAtmosphericPhaseChanges(atmosphereTile, hours);
+		          //ApplyAtmosphericPhaseChanges(atmosphereTile, hours);
 
 		          // 3. Surface condensation (dew/frost formation)
 		          SurfaceCondensation(surfaceTile, hours);
@@ -179,50 +180,166 @@ public static class HydrosphereUtilities
 		          SolarEvaporation(atmosphereTile, surfaceTile, solarRadiation, hours);
 
 		          // 6. Precipitation (commented out in original – can be re‑enabled)
-
+		          SensibleHeatExchange(atmosphereTile, surfaceTile, hours);
 		          // 7. Validate water conservation
 		          //ValidateWaterConservation(...);
 	     }
-
-	     // ---------- Atmospheric Phase Changes (updated) ----------
-	     private static void ApplyAtmosphericPhaseChanges(AtmosphereTile atm, float hours)
+	     public static void SensibleHeatExchange(AtmosphereTile atmo, TileData surface, float hours)
 	     {
-		          if (atm.waterVapor == null || atm.cloudWaterContent == null)
+		          // Temperature difference (Air - Ground)
+		          float tempDiff = atmo.temperature - surface.soilTemperature;
+		          if (Mathf.Abs(tempDiff) < 0.1f)
 				return;
 
-		          float relativeHumidity = CalculateRelativeHumidity(atm);
-		          float timeFactor = Mathf.Min(hours, 1.0f) * 0.1f;
+		          float area = surface.tileWidth * surface.tileWidth;
+		          float timeSeconds = hours * 3600f;
 
-		          if (relativeHumidity > 1.01f && atm.waterVapor.Mass > 0)
+		          // Convective heat transfer coefficient (W/m²·K)
+		          // Depends on wind speed. 5 is calm, 20 is very windy.
+		          float h = 5f + 10f * atmo.windSpeed;
+
+		          // Q = h * A * ΔT * Δt (Joules)
+		          float heatFlow = h * area * tempDiff * timeSeconds;
+
+		          // Limit the flow to prevent absolute equilibrium in 1 frame
+		          float maxTransfer = Mathf.Min(atmo.Mass * 2000f, surface.composition.Mass * 2000f) * 0.1f;
+		          heatFlow = Mathf.Clamp(heatFlow, -maxTransfer, maxTransfer);
+
+		          if (heatFlow > 0) // Air is hotter -> Heat flows INTO the ground
 		          {
-				// Condensation: vapor -> clouds
-				float saturationMass = CalculateSaturationMass(atm);
-				float excessVapor = atm.waterVapor.Mass - saturationMass;
-				float toCondense = Mathf.Min(excessVapor * timeFactor, atm.waterVapor.Mass);
-
-				if (toCondense > 0)
+				// 1. Take heat from the atmosphere proportionally
+				float airMass = atmo.Mass;
+				if (airMass <= 0)
+					     return;
+				foreach (var nrg in atmo.energies)
 				{
-					     // Transfer mass (and all its internal energy) from vapor to cloud water.
-					     // This automatically moves the latent heat of condensation.
-					     ThermalEnergyUtilities.TransferMassAndEnergy(atm.waterVapor, atm.cloudWaterContent, toCondense);
+					     float frac = nrg.Mass / airMass;
+					     nrg.RemoveEnergy(heatFlow * frac);
+				}
+
+				// 2. Give heat to the ground (soil and surface water proportionally)
+				float groundMass = surface.composition.Mass + surface.surfaceWater.Mass;
+				if (groundMass <= 0)
+					     return;
+				float soilFrac = surface.composition.Mass / groundMass;
+				float waterFrac = surface.surfaceWater.Mass / groundMass;
+
+				surface.surfaceWater.AddEnergy(heatFlow * waterFrac);
+				foreach (var comp in surface.composition.energy)
+				{
+					     comp.AddEnergy(heatFlow * soilFrac * (comp.Mass / surface.composition.Mass));
 				}
 		          }
-		          else if (relativeHumidity < 0.98f && atm.cloudWaterContent.Mass > 0)
+		          else // Ground is hotter -> Heat flows INTO the air
 		          {
-				// Evaporation: clouds -> vapor
-				float saturationMass = CalculateSaturationMass(atm);
-				float vaporDeficit = saturationMass - atm.waterVapor.Mass;
-				float toEvaporate = Mathf.Min(vaporDeficit * timeFactor, atm.cloudWaterContent.Mass);
+				// Reverse the logic
+				float groundMass = surface.composition.Mass + surface.surfaceWater.Mass;
+				if (groundMass <= 0)
+					     return;
+				float soilFrac = surface.composition.Mass / groundMass;
+				float waterFrac = surface.surfaceWater.Mass / groundMass;
 
-				if (toEvaporate > 0)
+				surface.surfaceWater.RemoveEnergy(-heatFlow * waterFrac);
+				foreach (var comp in surface.composition.energy)
 				{
-					     // Transfer mass (and its energy) from cloud water to vapor.
-					     // Latent heat of evaporation is automatically taken from the cloud water.
-					     ThermalEnergyUtilities.TransferMassAndEnergy(atm.cloudWaterContent, atm.waterVapor, toEvaporate);
+					     comp.RemoveEnergy(-heatFlow * soilFrac * (comp.Mass / surface.composition.Mass));
+				}
+
+				float airMass = atmo.Mass;
+				if (airMass <= 0)
+					     return;
+				float energyToAdd = -heatFlow; // heatFlow is negative, so this makes it positive
+				foreach (var nrg in atmo.energies)
+				{
+					     float frac = nrg.Mass / airMass;
+					     nrg.AddEnergy(energyToAdd * frac);
 				}
 		          }
 	     }
+	     //  // ---------- Atmospheric Phase Changes (updated) ----------
+	     //  public static void ApplyAtmosphericPhaseChanges(AtmosphereTile atm, float hours)
+	     //  {
 
+	     //        if (atm.waterVapor == null || atm.cloudWaterContent == null)
+	     //return;
+
+	     //        float relativeHumidity = CalculateRelativeHumidity(atm);
+	     //        float timeFactor = Mathf.Min(hours, 1.0f) * 0.1f; // prevents oscillation
+
+	     //        // 1. Condensation (vapor → cloud)
+	     //        if (relativeHumidity > 1.01f && atm.waterVapor.Mass > 0)
+	     //        {
+	     //float saturationMass = CalculateSaturationMass(atm);
+	     //float excessVapor = atm.waterVapor.Mass - saturationMass;
+	     //float massToCondense = Mathf.Min(excessVapor * timeFactor, atm.waterVapor.Mass);
+	     //if (massToCondense > 0)
+	     //	     ApplyCondensation(atm, massToCondense);
+	     //        }
+
+	     //        // 2. Evaporation (cloud → vapor)
+	     //        else if (relativeHumidity < 0.98f && atm.cloudWaterContent.Mass > 0)
+	     //        {
+	     //float saturationMass = CalculateSaturationMass(atm);
+	     //float vaporDeficit = saturationMass - atm.waterVapor.Mass;
+	     //float massToEvaporate = Mathf.Min(vaporDeficit * timeFactor, atm.cloudWaterContent.Mass);
+	     //if (massToEvaporate > 0)
+	     //	     ApplyEvaporation(atm, massToEvaporate);
+	     //        }
+	     //  }
+
+	     //private static void ApplyEvaporation(AtmosphereTile atm, float massToEvaporate)
+	     //{
+	     //      // Only call the utility; it handles all energy moves.
+	     //      ThermalEnergyUtilities.TryEvaporate(atm.cloudWaterContent, atm.waterVapor, massToEvaporate);
+	     //      // No extra steps!
+	     //}
+
+	     //private static void ApplyCondensation(AtmosphereTile atm, float massToCondense)
+	     //{
+	     //      // Use the new TryCondense
+	     //      ThermalEnergyUtilities.TryCondense(atm.waterVapor, atm.cloudWaterContent, massToCondense);
+	     //      // No extra steps!
+	     //}
+	     public static float TryEvaporate(ThermalEnergy sourceLiquid, ThermalEnergy destVapor, float requestedMass)
+	     {
+		          if (sourceLiquid.Mass <= 0 || requestedMass <= 0)
+				return 0;
+
+		          // We can only evaporate if we have enough sensible heat to supply the latent heat
+		          // without dropping below the freezing point (or a defined minimum temperature).
+		          float minAllowedTemp = sourceLiquid.MeltingPoint; // 273.15K for water
+		          float currentTemp = sourceLiquid.Temperature;
+
+		          // Energy available for evaporation = sensible energy above the melting point
+		          float energyAboveMelt = sourceLiquid.Mass * sourceLiquid.SpecificHeat * (currentTemp - minAllowedTemp);
+		          float latentRequiredPerKg = sourceLiquid.LatentHeatVaporization;
+
+		          // Maximum mass we can evaporate with the available energy
+		          float maxEvapMass = energyAboveMelt / latentRequiredPerKg;
+		          float actualMass = Mathf.Min(requestedMass, maxEvapMass, sourceLiquid.Mass);
+
+		          if (actualMass <= 0)
+				return 0;
+
+		          //// 1. Remove latent heat from the liquid's sensible energy (cools it down)
+		          //float latentEnergy = actualMass * latentRequiredPerKg;
+		          //sourceLiquid.RemoveEnergy(latentEnergy); // this cools it exactly to minAllowedTemp
+
+		          // 2. Transfer the mass (and its remaining sensible energy) to the vapor
+		          //    The vapor receives the mass but *not* the latent heat (that energy is spent).
+		          sourceLiquid.TransferMassTo(destVapor, actualMass);
+
+		          //       // 3. Now destVapor (which just got mass at minAllowedTemp) needs the latent heat added.
+		          //       //    But that latent heat came from the liquid's sensible energy (already removed).
+		          //       //    Actually, the vapor must have the latent heat to exist. 
+		          //       //    We removed it from the liquid, we need to add it to the vapor.
+		          //       destVapor.AddEnergy(latentEnergy); // This warms the vapor or adds to its internal latent energy.
+		          //// Note: Your ThermalEnergy.ProcessPhaseChanges() will automatically allocate this to sensible 
+		          //// or latent based on temperature. Since we added mass and energy, if it's above boiling point,
+		          // it stays vapor.
+
+		          return actualMass;
+	     }
 	     // ---------- Surface Condensation (updated) ----------
 	     public static void SurfaceCondensation(TileData hydroTile, float hours)
 	     {
@@ -230,13 +347,38 @@ public static class HydrosphereUtilities
 		          if (atmotile == null || atmotile.waterVapor.Mass < 1 || hydroTile.surfaceTemperature >= atmotile.DewPoint)
 				return;
 
-		          if (hydroTile.surfaceTemperature < atmotile.DewPoint)
-		          {
-				float water = atmotile.waterVapor.Mass / 100; // simplified rate
+		          float tempDiff = atmotile.DewPoint - hydroTile.surfaceTemperature;
+		          if (tempDiff <= 0)
+				return;
 
-				// Transfer mass (with its energy) from vapor to surface water.
-				ThermalEnergyUtilities.TransferMassAndEnergy(atmotile.waterVapor, hydroTile.surfaceWater, water);
-		          }
+		          float condensationRate = Mathf.Clamp01(tempDiff / 10f) * 0.1f * hours;
+		          float maxCondensation = atmotile.waterVapor.Mass * condensationRate;
+		          float water = Mathf.Min(maxCondensation, atmotile.waterVapor.Mass * 0.01f);
+		          if (water <= 0)
+				return;
+
+		          //float latentReleased = water * atmotile.waterVapor.LatentHeatVaporization;
+
+		          //// 1. Cool the vapor
+		          //atmotile.waterVapor.RemoveEnergy(latentReleased);
+
+		          // 2. Move mass to surface
+		          ThermalEnergyUtilities.TransferMassAndEnergy(atmotile.waterVapor, hydroTile.surfaceWater, water);
+
+		          //        // 3. Warm the surface and atmosphere (distribute the released heat)
+		          //        //    You can split between surface and air proportionally
+		          //        float totalMass = hydroTile.surfaceWater.Mass + hydroTile.composition.Mass + atmotile.Mass;
+		          //        if (totalMass > 0f)
+		          //        {
+		          //float perKg = latentReleased / totalMass;
+		          //// Surface gets its share
+		          //hydroTile.surfaceWater.AddEnergy(perKg * hydroTile.surfaceWater.Mass);
+		          //foreach (var comp in hydroTile.composition.energy)
+		          //	     comp.AddEnergy(perKg * comp.Mass);
+		          //// Atmosphere gets its share
+		          //foreach (var nrg in atmotile.energies)
+		          //	     nrg.AddEnergy(perKg * nrg.Mass);
+		          //        }
 	     }
 
 	     // ---------- Surface Evaporation (updated) ----------
@@ -271,10 +413,28 @@ public static class HydrosphereUtilities
 		          float soilEvaporation = Mathf.Min(actualEvaporation - surfaceEvaporation, availableSoilWater);
 
 		          if (surfaceEvaporation > 0)
+		          {
+				float maxEvaporation = vaporPressureDeficit * 0.001f * hours * hydroTile.tileWidth * hydroTile.tileWidth;
+				surfaceEvaporation = Mathf.Min(surfaceEvaporation, maxEvaporation);
+				float latentRequired = surfaceEvaporation * hydroTile.surfaceWater.LatentHeatVaporization;
+
+				// 1. Cool the surface water
+				//hydroTile.surfaceWater.RemoveEnergy(latentRequired);
+
+				// 2. Move mass
 				ThermalEnergyUtilities.TransferMassAndEnergy(hydroTile.surfaceWater, atmotile.waterVapor, surfaceEvaporation);
 
-		          if (soilEvaporation > 0)
-				ThermalEnergyUtilities.TransferMassAndEnergy(hydroTile.composition.water, atmotile.waterVapor, soilEvaporation);
+				//// 3. Warm the atmosphere
+				//float totalAirMass = 0f;
+				//foreach (var nrg in atmotile.energies)
+				//	     totalAirMass += nrg.Mass;
+				//if (totalAirMass > 0f)
+				//{
+				//	     float perKg = latentRequired / totalAirMass;
+				//	     foreach (var nrg in atmotile.energies)
+				//		          nrg.AddEnergy(perKg * nrg.Mass);
+				//}
+		          }
 	     }
 
 	     // ---------- Solar Evaporation (updated) ----------
@@ -303,10 +463,26 @@ public static class HydrosphereUtilities
 		          float soilEvaporation = Mathf.Min(actualEvaporation - surfaceEvaporation, tile.composition.water.Mass * 0.05f);
 
 		          if (surfaceEvaporation > 0)
-				ThermalEnergyUtilities.TransferMassAndEnergy(tile.surfaceWater, tile.atmosphereTile.waterVapor, surfaceEvaporation);
+		          {
+				float latentRequired = surfaceEvaporation * tile.surfaceWater.LatentHeatVaporization;
 
-		          if (soilEvaporation > 0)
-				ThermalEnergyUtilities.TransferMassAndEnergy(tile.composition.water, tile.atmosphereTile.waterVapor, soilEvaporation);
+				// 1. Cool the surface water
+				tile.surfaceWater.RemoveEnergy(latentRequired);
+
+				// 2. Move mass
+				ThermalEnergyUtilities.TransferMassAndEnergy(tile.surfaceWater, atmotile.waterVapor, surfaceEvaporation);
+
+				//// 3. Warm the atmosphere
+				//float totalAirMass = 0f;
+				//foreach (var nrg in atmotile.energies)
+				//	     totalAirMass += nrg.Mass;
+				//if (totalAirMass > 0f)
+				//{
+				//	     float perKg = latentRequired / totalAirMass;
+				//	     foreach (var nrg in atmotile.energies)
+				//		          nrg.AddEnergy(perKg * nrg.Mass);
+				//}
+		          }
 	     }
 
 	     // ---------- Redistribute Surface Water (updated) ----------
@@ -371,642 +547,11 @@ public static class HydrosphereUtilities
 
 	     private static float CalculateSaturationMass(AtmosphereTile atm)
 	     {
+		          float tempK = atm.temperature;
+		          float satVP = AtmosphereUtilities.CalculateSaturationVaporPressure(tempK); // Pa
+		          float R = 461.5f; // specific gas constant for water vapour (J/kg·K)
+		          float density = satVP / (R * atm.temperature); // kg/m³
 		          float volume = atm.tileWidth * atm.tileWidth * atm.layerHeight;
-		          float saturationDensity = 0.02f * Mathf.Exp(0.1f * atm.temperature);
-		          return saturationDensity * volume;
+		          return density * volume;
 	     }
 }
-//public static class HydrosphereUtilities
-//{
-//	     /// <summary>
-//	     /// Main entry point for all hydrosphere updates - coordinates all water phase changes
-//	     /// </summary>
-//	     public static void UpdateHydrosphere(
-//	         AtmosphereTile atmosphereTile,
-//	         TileData surfaceTile,
-//	         float solarRadiation,
-//	         float hours)
-//	     {
-//		          if (atmosphereTile == null || surfaceTile == null)
-//				return;
-
-//		          // Store initial water for conservation check
-//		          float initialTotalWater = GetTotalWater(atmosphereTile, surfaceTile);
-
-//		          // Calculate air mass once for all thermodynamic calculations
-//		          float airVolume = atmosphereTile.tileWidth * atmosphereTile.tileWidth * atmosphereTile.layerHeight;
-//		          float airMass = CalculateRealisticAirMass(
-//		              atmosphereTile.temperature,
-//		              atmosphereTile.pressure,
-//		              airVolume
-//		          );
-
-//		          float surfaceArea = surfaceTile.tileWidth * surfaceTile.tileWidth;
-//		          float soilMass = SoilUtilities.GetSoilMass(surfaceTile.composition);
-
-//		          // 1. Surface evaporation (driven by solar radiation and atmospheric conditions)
-
-//		          // 2. Atmospheric phase changes (cloud formation/precipitation)
-//		          ApplyAtmosphericPhaseChanges(
-//		              atmosphereTile, hours
-//		          );
-
-//		          // 3. Surface condensation (dew/frost formation)
-
-//		          // 4. Calculate and apply precipitation
-//		          //float precipitation = CalculateAndApplyPrecipitation(
-//		          //    atmosphereTile, surfaceTile,
-//		          //    surfaceArea, hours
-//		          //);
-
-//		          // 5. Validate water conservation
-//		          //ValidateWaterConservation(
-//		          //    atmosphereTile, surfaceTile,
-//		          //    initialTotalWater, precipitation
-//		          //);
-//	     }
-
-//	     /// <summary>
-//	     /// Calculates precipitation based on cloud water content and applies it to surface
-//	     /// </summary>
-//	     private static float CalculateAndApplyPrecipitation(
-//	         AtmosphereTile atmosphereTile,
-//	         TileData surfaceTile,
-//	         float surfaceArea,
-//	         float hours)
-//	     {
-//		          if (atmosphereTile == null || atmosphereTile.cloudWaterContent.Mass <= 0)
-//				return 0f;
-
-//		          // Calculate relative humidity
-//		          float relativeHumidity = CalculateRelativeHumidity(
-//		              atmosphereTile.temperature,
-//		              atmosphereTile.waterVapor.Mass,
-//		              atmosphereTile.pressure,
-//		              atmosphereTile.tileWidth * atmosphereTile.tileWidth * atmosphereTile.layerHeight
-//		          );
-
-//		          // Basic precipitation conditions
-//		          if (relativeHumidity < 0.95f)
-//				return 0f;
-
-//		          // Calculate saturation vapor pressure
-//		          float saturationVaporPressure = CalculateSaturationVaporPressure(atmosphereTile.temperature);
-
-//		          // Calculate dew point
-//		          float dewPoint = CalculateDewPoint(atmosphereTile.temperature, relativeHumidity);
-
-//		          // Precipitation intensity depends on how far below dew point temperature is
-//		          float temperatureBelowDewPoint = dewPoint - atmosphereTile.temperature;
-
-//		          if (temperatureBelowDewPoint <= 0)
-//				return 0f;
-
-//		          // Precipitation rate: 0-20 mm/hour based on conditions
-//		          float baseRate = Mathf.Lerp(0f, 20f, Mathf.Clamp01(temperatureBelowDewPoint / 10f));
-
-//		          // Adjust for relative humidity
-//		          float humidityFactor = Mathf.Pow(relativeHumidity, 3f);
-
-//		          // Adjust for cloud water content (more clouds = more precipitation)
-//		          float cloudFactor = Mathf.Clamp01(atmosphereTile.cloudWaterContent.Mass / 1000f);
-
-//		          // Total precipitation rate in mm/hour
-//		          float precipRate = baseRate * humidityFactor * cloudFactor;
-
-//		          // Convert to kg for this timestep (1 mm = 1 kg/m²)
-//		          float precipMass = precipRate * surfaceArea * hours;
-
-//		          // Cannot precipitate more than available cloud water
-//		          precipMass = Mathf.Min(precipMass, atmosphereTile.cloudWaterContent.Mass * 0.8f);
-
-//		          if (precipMass <= 0)
-//				return 0f;
-
-//		          //// Apply precipitation
-//		          //atmosphereTile.cloudWaterContent -= precipMass;
-//		          //surfaceTile.surfaceWater.Mass += precipMass;
-
-//		          ThermalEnergyUtilities.TransferMassAndEnergy(atmosphereTile.cloudWaterContent, surfaceTile.surfaceWater, precipMass);
-
-//		          // If temperature is below freezing, add to snow/ice instead
-//		          if (atmosphereTile.temperature < 0)
-//		          {
-//				// In a more complex system, you'd track snow separately
-//				// For now, just add to surface moisture but note it's frozen
-//				//surfaceTile.surfaceTemperature -= precipMass * 0.01f; // Cooling from snow
-//		          }
-
-//		          return precipMass;
-//	     }
-
-//	     /// <summary>
-//	     /// Applies surface evaporation with proper energy balance
-//	     /// </summary>
-//	     //  private static void ApplySurfaceEvaporation(
-//	     //      AtmosphereTile atmosphereTile,
-//	     //      TileData surfaceTile,
-//	     //      float solarRadiation,
-//	     //      float airMass,
-//	     //      float soilMass,
-//	     //      float surfaceArea,
-//	     //      float hours)
-//	     //  {
-//	     //        // Calculate saturation vapor pressures
-//	     //        float surfaceSaturationVP = CalculateSaturationVaporPressure(surfaceTile.surfaceTemperature);
-//	     //        float airSaturationVP = CalculateSaturationVaporPressure(atmosphereTile.temperature);
-//	     //        float airActualVP = atmosphereTile.RelativeHumidity * airSaturationVP;
-
-//	     //        // Vapor pressure deficit (driving force for evaporation)
-//	     //        float vaporPressureDeficit = surfaceSaturationVP - airActualVP;
-
-//	     //        if (vaporPressureDeficit <= 0 || surfaceTile.surfaceWater.Mass <= 0)
-//	     //return;
-
-//	     //        // Calculate available energy for evaporation
-//	     //        // Solar radiation (converted from W/m² to J/m² for the timestep)
-//	     //        float solarEnergy = solarRadiation * 3600f * hours; // J/m²
-
-//	     //        // Energy available for evaporation (typically 50-70% of net radiation)
-//	     //        float availableEnergy = solarEnergy * 0.6f * surfaceArea; // J
-
-//	     //        // Maximum evaporation from energy constraint
-//	     //        float maxEvaporationFromEnergy = availableEnergy / Constants.LATENT_HEAT_EVAPORATION; // kg
-
-//	     //        // Aerodynamic term (wind-dependent)
-//	     //        float windFactor = 1f + (atmosphereTile.windSpeed * 0.2f);
-//	     //        float aerodynamicEvaporation = vaporPressureDeficit * 0.0026f * windFactor * hours * surfaceArea;
-
-//	     //        // Total potential evaporation
-//	     //        float potentialEvaporation = Mathf.Min(maxEvaporationFromEnergy, aerodynamicEvaporation);
-
-//	     //        // Limit by available surface water
-//	     //        float availableWater = surfaceTile.surfaceWater.Mass +
-//	     //  (surfaceTile.composition.water.Mass * 0.1f); // Top 10cm of soil
-
-//	     //        float actualEvaporation = Mathf.Min(potentialEvaporation, availableWater);
-
-//	     //        if (actualEvaporation <= 0)
-//	     //return;
-
-//	     //        // Evaporate from surface first, then soil
-//	     //        float surfaceEvaporation = Mathf.Min(actualEvaporation, surfaceTile.surfaceWater.Mass);
-//	     //        // surfaceTile.surfaceWater.Mass -= surfaceEvaporation;
-
-//	     //        float soilEvaporation = Mathf.Min(actualEvaporation - surfaceEvaporation,
-//	     //             surfaceTile.composition.water.Mass * 0.1f);
-//	     //        //   surfaceTile.composition.water.Mass-= soilEvaporation;
-
-//	     //        // Add to atmospheric vapor
-//	     //        //  atmosphereTile.waterVapor += actualEvaporation;
-
-//	     //        ThermalEnergyUtilities.TransferMassAndEnergy(surfaceTile.surfaceWater, atmosphereTile.waterVapor, surfaceEvaporation);
-//	     //        ThermalEnergyUtilities.TransferMassAndEnergy(surfaceTile.composition.water, atmosphereTile.waterVapor, soilEvaporation);
-
-//	     //        // Apply latent heat cooling
-//	     //        float energyAbsorbed = actualEvaporation * Constants.LATENT_HEAT_EVAPORATION; // J
-
-//	     //        // Partition cooling between air and surface based on mass
-//	     //        float airHeatCapacity = airMass * ;
-//	     //        float soilHeatCapacity = soilMass * SoilUtilities.GetSoilHeatCapacity(surfaceTile.composition);
-//	     //        float totalHeatCapacity = airHeatCapacity + soilHeatCapacity;
-
-//	     //        if (totalHeatCapacity > 0)
-//	     //        {
-//	     //float airCooling = energyAbsorbed * (airHeatCapacity / totalHeatCapacity);
-//	     //float surfaceCooling = energyAbsorbed * (soilHeatCapacity / totalHeatCapacity);
-
-//	     ////atmosphereTile.temperature -= airCooling / airHeatCapacity;
-//	     ////surfaceTile.surfaceTemperature -= surfaceCooling / soilHeatCapacity;
-//	     //        }
-//	     //  }
-
-//	     /// <summary>
-//	     /// Applies atmospheric phase changes (cloud formation/evaporation)
-//	     /// </summary>
-//	     private static void ApplyAtmosphericPhaseChanges(AtmosphereTile atm, float hours)
-//	     {
-//		          if (atm.waterVapor == null || atm.cloudWaterContent == null)
-//				return;
-
-//		          float relativeHumidity = CalculateRelativeHumidity(atm);
-
-//		          // Time factor to prevent oscillation
-//		          float timeFactor = Mathf.Min(hours, 1.0f) * 0.1f;
-
-//		          if (relativeHumidity > 1.01f && atm.waterVapor.Mass > 0)
-//		          {
-//				// Condensation: vapor -> clouds
-//				float saturationMass = CalculateSaturationMass(atm);
-//				float excessVapor = atm.waterVapor.Mass - saturationMass;
-//				float toCondense = Mathf.Min(excessVapor * timeFactor, atm.waterVapor.Mass);
-
-//				if (toCondense > 0)
-//				{
-//					     // Transfer mass and sensible energy
-//					     ThermalEnergyUtilities.TransferMassAndEnergy(atm.waterVapor, atm.cloudWaterContent, toCondense);
-
-//					     // ADD: Release latent heat of condensation to atmosphere
-//					     float latentHeatReleased = toCondense * atm.waterVapor.LatentHeatVaporization; // J
-
-//					     // Create a thermal mass for the released energy
-//					     // This warms the surrounding air
-//					     if (atm.oxygen != null) // Use a gas component as the heat sink
-//					     {
-//						          atm.nitrogen.AddEnergy(latentHeatReleased);
-//					     }
-//				}
-//		          }
-//		          else if (relativeHumidity < 0.98f && atm.cloudWaterContent.Mass > 0)
-//		          {
-//				// Evaporation: clouds -> vapor
-//				float saturationMass = CalculateSaturationMass(atm);
-//				float vaporDeficit = saturationMass - atm.waterVapor.Mass;
-//				float toEvaporate = Mathf.Min(vaporDeficit * timeFactor, atm.cloudWaterContent.Mass);
-
-//				if (toEvaporate > 0)
-//				{
-//					     // Transfer mass and sensible energy
-//					     ThermalEnergyUtilities.TransferMassAndEnergy(atm.cloudWaterContent, atm.waterVapor, toEvaporate);
-
-//					     // ADD: Absorb latent heat of evaporation from atmosphere
-//					     float latentHeatAbsorbed = toEvaporate * atm.cloudWaterContent.LatentHeatVaporization; // J
-
-//					     // Extract this energy from the air, cooling it
-//					     if (atm.oxygen != null)
-//					     {
-//						          atm.nitrogen.RemoveHeat(latentHeatAbsorbed);
-//					     }
-//				}
-//		          }
-//	     }
-//	     private static float CalculateRelativeHumidity(AtmosphereTile atm)
-//	     {
-//		          if (atm.waterVapor == null || atm.waterVapor.Mass <= 0)
-//				return 0f;
-
-//		          float saturationMass = CalculateSaturationMass(atm);
-//		          if (saturationMass <= 0)
-//				return 0f;
-
-//		          return atm.waterVapor.Mass / saturationMass;
-//	     }
-
-//	     private static float CalculateSaturationMass(AtmosphereTile atm)
-//	     {
-//		          // Calculate saturation water vapor mass based on temperature
-//		          float volume = atm.tileWidth * atm.tileWidth * atm.layerHeight;
-
-//		          // Simplified saturation calculation
-//		          // In reality, this depends on temperature and pressure
-//		          float saturationDensity = 0.02f * Mathf.Exp(0.1f * atm.temperature);
-//		          return saturationDensity * volume;
-//	     }
-//	     //  /// <summary>
-//	     //  /// Applies surface condensation (dew/frost formation)
-//	     //  /// </summary>
-//	     //  private static void ApplySurfaceCondensation(
-//	     //      AtmosphereTile atmosphereTile,
-//	     //      TileData surfaceTile,
-//	     //      float airMass,
-//	     //      float soilMass,
-//	     //      float hours)
-//	     //  {
-//	     //        if (atmosphereTile == null || atmosphereTile.waterVapor.Mass <= 0)
-//	     //return;
-
-//	     //        // Calculate dew point
-//	     //        float relativeHumidity = CalculateRelativeHumidity(
-//	     //            atmosphereTile.temperature,
-//	     //            atmosphereTile.waterVapor.Mass,
-//	     //            atmosphereTile.pressure,
-//	     //            atmosphereTile.tileWidth * atmosphereTile.tileWidth * atmosphereTile.layerHeight
-//	     //        );
-
-//	     //        float dewPoint = CalculateDewPoint(atmosphereTile.temperature, relativeHumidity);
-
-//	     //        // Condensation occurs when surface is below dew point
-//	     //        if (surfaceTile.surfaceTemperature < dewPoint)
-//	     //        {
-//	     //float volume = atmosphereTile.tileWidth * atmosphereTile.tileWidth * atmosphereTile.layerHeight;
-//	     //float saturationMass = CalculateSaturationWaterMass(
-//	     //    atmosphereTile.temperature,
-//	     //    atmosphereTile.pressure,
-//	     //    volume
-//	     //);
-
-//	     //// How much vapor is available to condense
-//	     //float excessVapor = atmosphereTile.waterVapor.Mass - saturationMass;
-
-//	     //if (excessVapor <= 0)
-//	     //	     return;
-
-//	     //// Condensation rate (depends on temperature difference)
-//	     //float tempDifference = dewPoint - surfaceTile.surfaceTemperature;
-//	     //float condensationRate = Mathf.Clamp01(tempDifference / 5f) * 0.1f * hours;
-
-//	     //float vaporToCondense = Mathf.Min(excessVapor * condensationRate, atmosphereTile.waterVapor.Mass);
-
-//	     //if (vaporToCondense <= 0)
-//	     //	     return;
-
-//	     //// Apply condensation
-//	     ////atmosphereTile.waterVapor -= vaporToCondense;
-//	     ////surfaceTile.surfaceWater.Mass += vaporToCondense;
-//	     //ThermalEnergyUtilities.TransferMassAndEnergy(atmosphereTile.waterVapor, surfaceTile.surfaceWater, vaporToCondense);
-
-//	     //// Release latent heat
-//	     //float energyReleased = vaporToCondense * Constants.LATENT_HEAT_CONDENSATION;
-
-//	     //// Partition heat between air and surface
-//	     //float airHeatCapacity = airMass * Constants.AIR_SPECIFIC_HEAT;
-//	     //float soilHeatCapacity = soilMass * SoilUtilities.GetSoilHeatCapacity(surfaceTile.composition);
-//	     //float totalHeatCapacity = airHeatCapacity + soilHeatCapacity;
-
-//	     //if (totalHeatCapacity > 0)
-//	     //{
-//	     //	     float airWarming = energyReleased * (airHeatCapacity / totalHeatCapacity);
-//	     //	     float surfaceWarming = energyReleased * (soilHeatCapacity / totalHeatCapacity);
-
-//	     //	     //atmosphereTile.temperature += airWarming / airHeatCapacity;
-//	     //	     // surfaceTile.surfaceTemperature += surfaceWarming / soilHeatCapacity;
-//	     //}
-//	     //        }
-//	     //  }
-
-//	     /// <summary>
-//	     /// Redistributes surface water between tiles (runoff)
-//	     /// </summary>
-//	     public static void RedistributeSurfaceWater(WorldTile tile, float hours)
-//	     {
-//		          if (tile.tileData.surfaceWater.CurrentPhase == Phase.Solid)
-//		          {
-//				return;
-//		          }
-//		          //  Debug.Log($"[SurfaceWater] Before redistribution: Total water = {GetTotalWater(tile)} kg");
-//		          float flowRate = tile.tileData.surfaceWater.Mass; // m3/hour -> kg/hour
-//		          var neighbors = tile.GetNeighbors();
-//		          var downhillNeighbors = new List<WorldTile>();
-
-//		          //identify the downhill tiles
-//		          foreach (var wT in neighbors)
-//		          {
-//				float heightA = tile.tileData.volume;
-//				float heightB = wT.tileData.volume;
-//				float delta = heightA - heightB;
-
-//				if (delta > 0f)
-//				{
-//					     downhillNeighbors.Add(wT);
-//				}
-//		          }
-//		          downhillNeighbors = downhillNeighbors.OrderByDescending(v => v.tileData.volume).ToList();
-//		          //distribute water to the downhill tiles
-//		          if (downhillNeighbors.Count > 0)
-//		          {
-//				foreach (var neighbor in downhillNeighbors)
-//				{
-//					     if (neighbor == null)
-//						          continue;
-//					     float heightA = tile.tileData.volume;
-//					     float heightB = neighbor.tileData.volume;
-//					     float delta = heightA - heightB;
-
-//					     float gradient = Mathf.Clamp01(delta);
-//					     float flow = flowRate * gradient * hours;
-//					     float availableWater = tile.tileData.surfaceWater.Mass;
-//					     float toTransfer = Mathf.Min(flow, availableWater / downhillNeighbors.Count);
-//					     if (toTransfer <= 0f)
-//						          continue;
-//					     //tile.tileData.surfaceWater.Mass -= toTransfer;
-//					     //neighbor.tileData.surfaceWater.Mass += toTransfer;
-
-//					     ThermalEnergyUtilities.TransferMassAndEnergy(tile.tileData.surfaceWater, neighbor.tileData.surfaceWater, toTransfer);
-
-//					     SoilUtilities.ApplySurfaceErosion(tile.tileData, neighbor.tileData, gradient, toTransfer);
-
-//				}
-//		          }
-//		          // Debug.Log($"[SurfaceWater] After redistribution: Total water = {GetTotalWater(tile)} kg");
-//	     }
-
-
-
-//	     /// <summary>
-//	     /// Validates water conservation after all updates
-//	     /// </summary>
-//	     private static void ValidateWaterConservation(
-//	         AtmosphereTile atmosphereTile,
-//	         TileData surfaceTile,
-//	         float initialTotalWater,
-//	         float precipitationMass)
-//	     {
-//		          float finalTotalWater = GetTotalWater(atmosphereTile, surfaceTile);
-//		          float waterError = Mathf.Abs(finalTotalWater - initialTotalWater);
-
-//		          // Precipitation is added from atmosphere to surface, so it's not an error
-//		          // We should account for this in our check
-//		          float expectedChange = precipitationMass; // Positive: water moved from air to surface
-//		          float actualChange = finalTotalWater - initialTotalWater;
-
-//		          // Allow small floating-point errors
-//		          if (Mathf.Abs(actualChange - expectedChange) > 0.001f)
-//		          {
-//				Debug.LogWarning($"Water conservation error: Expected change {expectedChange}, got {actualChange}");
-
-//				// Fix small errors by redistributing proportionally
-//				float correction = initialTotalWater + expectedChange - finalTotalWater;
-//				if (Mathf.Abs(correction) > 0.001f)
-//				{
-//					     // Add correction back to atmosphere (where most water is)
-//					     //atmosphereTile.waterVapor += correction;
-//				}
-//		          }
-//	     }
-
-
-//	     public static void SurfaceCondensation(TileData hydroTile, float hours)
-//	     {
-//		          AtmosphereTile atmotile = hydroTile.atmosphereTile;
-//		          //condense water vapour into surface liquid water based on temperature and humidity
-//		          if (atmotile == null || atmotile.waterVapor.Mass < 1 || hydroTile.surfaceTemperature >= atmotile.DewPoint)
-//		          {
-//				return;
-//		          }
-//		          if (hydroTile.surfaceTemperature < atmotile.DewPoint)
-//		          {
-//				float water = atmotile.waterVapor.Mass / 100;
-
-//				//hydroTile.surfaceWater.Mass += water;
-//				float Jreleased = water * (hydroTile.surfaceWater.LatentHeatFusion);
-//				float absorbedBySoil = Jreleased / (SoilUtilities.GetSoilHeatCapacity(hydroTile.composition) * SoilUtilities.GetSoilMass(hydroTile.composition));
-//				//hydroTile.surfaceTemperature += absorbedBySoil / 100000;
-//				//atmotile.temperature += (kjreleased - absorbedBySoil) / 100000;
-//				//atmotile.waterVapor -= water;
-
-//				ThermalEnergyUtilities.TransferMassAndEnergy(atmotile.waterVapor, hydroTile.surfaceWater, water);
-
-//		          }
-//	     }
-//	     //  public static void AtmosphericEvaporation(AtmosphereTile atmotile)
-//	     //  {
-//	     //        // Complete this method:
-//	     //        if (atmotile == null || (atmotile.cloudWaterContent.Mass < 1 && atmotile.liquidWater.Mass < 1))
-//	     //return;
-
-//	     //        // Calculate saturation vapor pressure
-//	     //        float saturationVaporPressure = AtmosphereUtilities.CalculateSaturationVaporPressure(atmotile.temperature);
-//	     //        float actualVaporPressure = atmotile.RelativeHumidity * saturationVaporPressure;
-
-//	     //        // Evaporation occurs when air is unsaturated and there's liquid water available
-//	     //        if (atmotile.RelativeHumidity < 0.95f && atmotile.temperature > atmotile.DewPoint)
-//	     //        {
-//	     //float evaporationRate = 0.01f; // Base rate in kg/hour
-
-//	     //// Adjust rate based on humidity deficit
-//	     //float humidityDeficit = 1f - atmotile.RelativeHumidity;
-//	     //evaporationRate *= humidityDeficit;
-
-//	     //// Adjust for temperature (more evaporation when warmer)
-//	     //float tempFactor = Mathf.Clamp01((atmotile.temperature - 273f) / 30f);
-//	     //evaporationRate *= (1f + tempFactor);
-
-//	     //// Wind enhances evaporation
-//	     //float windFactor = 1f + (atmotile.windSpeed * 0.1f);
-//	     //evaporationRate *= windFactor;
-
-//	     //// Determine what to evaporate (prioritize cloud water)
-//	     //float totalEvaporatable = atmotile.cloudWaterContent.Mass + atmotile.liquidWater.Mass;
-//	     //float evaporation = Mathf.Min(evaporationRate, totalEvaporatable);
-
-//	     //// Evaporate from clouds first, then suspended liquid
-//	     //float cloudEvaporation = Mathf.Min(evaporation, atmotile.cloudWaterContent.Mass);
-
-//	     //atmotile.cloudWaterContent -= cloudEvaporation;
-
-//	     //float liquidEvaporation = Mathf.Min(evaporation - cloudEvaporation, atmotile.liquidWater);
-//	     //atmotile.liquidWater -= liquidEvaporation;
-
-//	     //// Add to water vapor
-//	     //atmotile.waterVapor += (cloudEvaporation + liquidEvaporation);
-
-//	     //// Apply latent heat cooling
-//	     //float kjAbsorbed = (cloudEvaporation + liquidEvaporation) * Constants.LATENT_HEAT_EVAPORATION;
-//	     //atmotile.temperature -= kjAbsorbed / 10000f;
-//	     //        }
-//	     //  }
-
-//	     public static void SurfaceEvaporation(AtmosphereTile atmotile, TileData hydroTile, float hours)
-//	     {
-//		          // Complete this method:
-//		          if (atmotile == null || hydroTile == null)
-//				return;
-
-//		          // Calculate potential evaporation using Penman-Monteith simplified equation
-//		          float saturationVaporPressure = AtmosphereUtilities.CalculateSaturationVaporPressure(hydroTile.surfaceTemperature);
-//		          float actualVaporPressure = atmotile.RelativeHumidity *
-//		              AtmosphereUtilities.CalculateSaturationVaporPressure(atmotile.temperature);
-
-//		          float vaporPressureDeficit = saturationVaporPressure - actualVaporPressure;
-
-//		          if (vaporPressureDeficit <= 0)
-//				return;
-
-//		          // Calculate aerodynamic term (wind dependent)
-//		          float aerodynamicTerm = 0.0026f * (1f + 0.54f * atmotile.windSpeed);
-
-//		          // Calculate radiation term (simplified - you could add solar radiation here)
-//		          float radiationTerm = 0.001f; // Base radiation term
-
-//		          // Calculate potential evaporation (mm/hour)
-//		          float potentialEvaporation = (aerodynamicTerm * vaporPressureDeficit + radiationTerm) * hours;
-
-//		          // Convert to kg (1mm water = 1kg/m² for your tile area)
-//		          float potentialEvaporationKg = potentialEvaporation * hydroTile.tileWidth * hydroTile.tileWidth;
-
-//		          // Cap evaporation by available water
-//		          float availableSurfaceWater = hydroTile.surfaceWater.Mass;
-//		          float availableSoilWater = hydroTile.composition.water.Mass * 0.1f; // Only top layer evaporates
-
-//		          float totalAvailable = availableSurfaceWater + availableSoilWater;
-//		          float actualEvaporation = Mathf.Min(potentialEvaporationKg, totalAvailable);
-
-//		          if (actualEvaporation <= 0)
-//				return;
-
-//		          // Evaporate from surface first, then soil
-//		          float surfaceEvaporation = Mathf.Min(actualEvaporation, availableSurfaceWater);
-//		          //   hydroTile.surfaceWater.Mass -= surfaceEvaporation;
-
-//		          float soilEvaporation = Mathf.Min(actualEvaporation - surfaceEvaporation, availableSoilWater);
-//		          // hydroTile.composition.water.Mass-= soilEvaporation;
-
-//		          // Add to atmospheric water vapor
-//		          //atmotile.waterVapor += actualEvaporation;
-
-//		          ThermalEnergyUtilities.TransferMassAndEnergy(hydroTile.surfaceWater, atmotile.waterVapor, surfaceEvaporation);
-//		          ThermalEnergyUtilities.TransferMassAndEnergy(hydroTile.composition.water, atmotile.waterVapor, soilEvaporation);
-
-//		          //// Apply latent heat cooling to surface
-//		          //float kjAbsorbed = actualEvaporation * Constants.LATENT_HEAT_EVAPORATION;
-//		          //float absorbedBySoil = kjAbsorbed * (soilEvaporation / actualEvaporation);
-//		          //float absorbedBySurface = kjAbsorbed * (surfaceEvaporation / actualEvaporation);
-
-//		          //// Cool the soil and surface
-//		          //float soilHeatCapacity = SoilUtilities.GetSoilHeatCapacity(hydroTile.composition);
-//		          //float soilMass = SoilUtilities.GetSoilMass(hydroTile.composition);
-//		          //hydroTile.soilTemperature -= absorbedBySoil / (soilHeatCapacity * soilMass * 1000f);
-//		          //  hydroTile.surfaceTemperature -= absorbedBySurface / 100000f;
-//	     }
-
-//	     public static void SolarEvaporation(AtmosphereTile atmotile, TileData tile, float solarRadiation, float hours)
-//	     {
-//		          // Complete this method - focused on direct solar-driven evaporation
-//		          if (atmotile == null || tile == null || solarRadiation <= 0)
-//				return;
-
-//		          // Convert solar radiation from W/m² to energy (Joules)
-//		          float solarEnergy = solarRadiation * 3600f * hours; // Convert to Joules/hour
-
-//		          // Calculate energy available for evaporation (typically 50-70% of net radiation)
-//		          float availableEnergy = solarEnergy * 0.6f; // 60% efficiency
-
-//		          // Calculate maximum possible evaporation (latent heat of vaporization ~2.45 MJ/kg)
-//		          float maxEvaporation = availableEnergy / (tile.surfaceWater.LatentHeatVaporization * 1000f);
-
-//		          // Adjust for surface conditions
-//		          //float albedo = SoilUtilities.GetAlbedo(tile.composition);
-//		          //maxEvaporation *= (1f - albedo); // Reflective surfaces evaporate less
-
-//		          // Adjust for soil moisture availability
-//		          float soilMoistureFactor = Mathf.Clamp01(tile.composition.saturation);
-//		          maxEvaporation *= soilMoistureFactor;
-
-//		          // Adjust for atmospheric demand
-//		          float atmosphericDemand = 1f - atmotile.RelativeHumidity;
-//		          maxEvaporation *= atmosphericDemand;
-
-//		          // Cap by available water
-//		          float availableWater = tile.surfaceWater.Mass + (tile.composition.water.Mass * 0.05f);
-//		          float actualEvaporation = Mathf.Min(maxEvaporation, availableWater);
-
-//		          if (actualEvaporation <= 0)
-//				return;
-
-//		          // Evaporate water
-//		          float surfaceEvaporation = Mathf.Min(actualEvaporation, tile.surfaceWater.Mass);
-//		          //tile.surfaceWater.Mass -= surfaceEvaporation;
-
-//		          float soilEvaporation = Mathf.Min(actualEvaporation - surfaceEvaporation, tile.composition.water.Mass * 0.05f);
-//		          //tile.composition.water.Mass-= soilEvaporation;
-
-//		          ThermalEnergyUtilities.TransferMassAndEnergy(tile.surfaceWater, tile.atmosphereTile.waterVapor, surfaceEvaporation);
-//		          ThermalEnergyUtilities.TransferMassAndEnergy(tile.composition.water, tile.atmosphereTile.waterVapor, soilEvaporation);
-
-//		          // Add to atmospheric moisture
-//		          // atmotile.waterVapor += actualEvaporation;
-
-//		          // Note: Temperature effects are already accounted for in SurfaceEvaporation
-//		          // This method focuses on the solar radiation component
-//	     }
-//}

@@ -10,6 +10,17 @@ public static class SimulationConstants
 	     public const float OrbitalEccentricity = 0.0167f; // Earth's orbital eccentricity (constant, default for Earth)
 
 	     public const float Kelvin = 272.15f;
+	     public const float SunlightWavelength = 635;
+
+	     public const float EXTINCTION_WATER_VAPOUR = 0.02f;
+	     public const float EXTINCTION_CLOUD_WATER = 0.1f;
+	     public const float EXTINCTION_ICE = 0.05f;
+	     public const float EXTINCTION_AEROSOL = 0.5f;
+	     public const float SSA_WATER_VAPOUR = 0.0f;
+	     public const float SSA_CLOUD_WATER = 0.8f;
+	     public const float SSA_ICE = 0.7f;
+	     public const float SSA_AEROSOL = 0.6f;
+
 
 	     public static int DayOfYear = 0;
 	     public static float TimeOfDay = 0.0f;
