@@ -102,6 +102,35 @@ public class UISection : UIStructuralComponent
 		          }
 	     }
 }
+//sections for pepos, tileData , PopulationData, etc. can be derived from this base class to add specific data binding and functionality.
+public class UISection_Pepo : UISection
+{
+	     public PepoData pepo;
+	     public UISection_Pepo(string name, PepoData pepo, bool Vertical, List<UIComponentData> components = null) : base(name, Vertical, components)
+	     {
+		          this.pepo = pepo;
+	     }
+}
+
+public class UISection_Tile : UISection
+{
+	     public TileData tileData;
+	     public UISection_Tile(string name, TileData tileData, bool Vertical, List<UIComponentData> components = null) : base(name, Vertical, components)
+	     {
+		          this.tileData = tileData;
+	     }
+}
+
+public class UISection_Population : UISection
+{
+	     public PepoPopulation population;
+	     public UISection_Population(string name, PepoPopulation populationData, bool Vertical, List<UIComponentData> components = null) : base(name, Vertical, components)
+	     {
+		          this.population = populationData;
+	     }
+}
+
+
 
 // ─── Fields ────────────────────────────────────────────────────────
 public abstract class UIField : UIComponentData

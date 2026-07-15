@@ -28,7 +28,7 @@ public abstract class ResourceData
 	     public string Name;
 	     public string Description;
 	     public ResourceDomain Domain;
-	     public List<string> Categories = new(); // "Food", "Tool", "Weapon", "Artifact"
+	     public List<string> Categories = new(); // food, tool, sacred, skill, 
 
 	     // Production
 	     public bool IsProductive = false;

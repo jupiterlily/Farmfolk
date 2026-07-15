@@ -16,7 +16,7 @@ public class WorldTile : MonoBehaviour
 	     public WorldTile SWTile;
 	     public WorldTile STile;
 	     public WorldTile SETile;
-
+	     public TectonicPlate Plate;
 	     public void Setup(TileData td)
 	     {
 		          tileData = td;
@@ -37,7 +37,8 @@ public class WorldTile : MonoBehaviour
 	     public void TileVisualUpdate()
 	     {
 		          SoilUtilities.CalculateDerivedProperties(tileData.composition);
-		          float height = SoilUtilities.CalculateEffectiveVolume(tileData.composition) + (tileData.surfaceWater.Mass / 1000);
+		          float height = TileUtilities.CalculateSoilVolume(tileData.composition) + TileUtilities.CalculateSurfaceWaterVolume(tileData);
+
 		          //latitude += tileData.tileGridRef.y / 3; // Adjust latitude based on tile position for variety
 		          transform.localScale = new Vector3(tileSise, height, tileSise);
 
@@ -50,21 +51,24 @@ public class WorldTile : MonoBehaviour
 		          );
 		          Color tileColor = TileUtilities.GetSoilColor(tileData.composition);
 		          //set colour of tile based on composition and moisture
-		          if (tileData.surfaceWater.Mass > 300)
+		          if (tileData.surfaceLiquid.Mass > 5)
 		          {
-				tileColor = Color.Lerp(tileColor, Constants.DEEP_WATER_COLOR, tileData.surfaceWater.Mass / 100f);
+				if (tileData.surfaceLiquid.CurrentPhase == Phase.Liquid)
+				{
+					     tileColor = Color.Lerp(tileColor, Constants.SHALLOW_WATER_COLOR, tileData.surfaceLiquid.Mass / Constants.WATER_DENSITY);
+				}
 		          }
-		          if (tileData.surfaceWater.Mass > 15)
+		          if (tileData.surfaceLiquid.Mass >= 300 && tileData.surfaceLiquid.CurrentPhase == Phase.Liquid)
 		          {
-				if (tileData.surfaceWater.CurrentPhase == Phase.Liquid)
-				{
-					     tileColor = Color.Lerp(tileColor, Constants.SHALLOW_WATER_COLOR, tileData.surfaceWater.Mass / 100f);
-				}
-				else if (tileData.surfaceWater.CurrentPhase == Phase.Solid)
-				{
-					     tileColor = Color.Lerp(tileColor, Constants.ICE_COLOR, tileData.surfaceWater.Mass / 100f);
-				}
-
+				tileColor = Color.Lerp(tileColor, Constants.DEEP_WATER_COLOR, tileData.surfaceLiquid.Mass / Constants.WATER_DENSITY);
+		          }
+		          if (tileData.surfaceIce.Mass > 5 || tileData.surfaceLiquid.CurrentPhase == Phase.Solid)
+		          {
+				tileColor = Color.Lerp(tileColor, Constants.ICE_COLOR, tileData.surfaceIce.Mass / Constants.ICE_DENSITY);
+		          }
+		          if (tileData.composition.ice.Mass > 5 && tileData.composition.ice.CurrentPhase == Phase.Solid)
+		          {
+				tileColor = Color.Lerp(tileColor, Constants.ICE_COLOR, tileData.composition.ice.Mass / Constants.ICE_DENSITY);
 		          }
 		          //convert longitude to a time of day (0-1) from -180 to 180 degrees
 		          float longitude = tileData.longitude; // -180 to 180
@@ -89,4 +93,12 @@ public class WorldTile : MonoBehaviour
 	     }
 
 
+}
+
+public class TectonicPlate
+{
+	     public Vector3 rotationVector;
+	     public Vector2 pivotTile;
+	     public string Name;
+	     public List<TileData> tiles = new List<TileData>();
 }

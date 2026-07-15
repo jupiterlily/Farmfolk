@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public static class AtmosphereUtilities
@@ -143,64 +144,85 @@ public static class AtmosphereUtilities
 		          if (tile == null)
 				return;
 
-		          // 1. Surface albedo
-		          float albedo = Mathf.Clamp01(tile.composition.albedo);
-
-		          // 2. Incoming solar energy (Joules)
+		          // 2. Incoming solar energy
 		          float incomingEnergy = tile.incomingSolarEnergy.StoredEnergy;
 		          if (incomingEnergy <= 0f)
 				return;
 
 		          // 3. Split into absorbed and reflected
+		          float albedo = tile.albedo;
 		          float absorbedEnergy = incomingEnergy * (1f - albedo);
 		          float upwellingReflected = incomingEnergy * albedo;
 
-		          // 4. Convert absorbed solar to thermal energy
-		          float totalMass = tile.surfaceWater.Mass + tile.composition.Mass;
+		          // 4. Distribute absorbed energy to components (by mass fraction)
+		          float totalMass = tile.surfaceLiquid.Mass + tile.surfaceIce.Mass + tile.composition.Mass;
 		          if (totalMass > 0f)
 		          {
-				float waterRatio = tile.surfaceWater.Mass / totalMass;
+				float waterRatio = tile.surfaceLiquid.Mass / totalMass;
+				float iceRatio = tile.surfaceIce.Mass / totalMass;
 				float soilRatio = tile.composition.Mass / totalMass;
 
-				// --- Surface water gets its share ---
+				// Liquid gets its share
 				float waterEnergy = absorbedEnergy * waterRatio;
-				if (waterEnergy > 0f && tile.surfaceWater.Mass > 0f)
+				if (waterEnergy > 0f && tile.surfaceLiquid.Mass > 0f)
 				{
-					     // Transfer from incoming solar to surface water
-					     EnergyTransferUtilities.TransferEnergy(tile.incomingSolarEnergy, tile.surfaceWater, waterEnergy);
+					     EnergyTransferUtilities.TransferEnergy(tile.incomingSolarEnergy, tile.surfaceLiquid, waterEnergy);
+					     ThermalEnergyUtilities.ConductHeat(tile.atmosphereTile.nitrogen, tile.surfaceLiquid, tile.tileWidth * tile.tileWidth, tile.atmosphereTile.layerHeight, hours * 3600);
 				}
 
-				// --- Soil components get theirs ---
+				// Ice gets its share
+				float iceEnergy = absorbedEnergy * iceRatio;
+				if (iceEnergy > 0f && tile.surfaceIce.Mass > 0f)
+				{
+					     EnergyTransferUtilities.TransferEnergy(tile.incomingSolarEnergy, tile.surfaceIce, iceEnergy);
+					     ThermalEnergyUtilities.ConductHeat(tile.atmosphereTile.nitrogen, tile.surfaceIce, tile.tileWidth * tile.tileWidth, tile.atmosphereTile.layerHeight, hours * 3600);
+				}
+
+				// Soil gets its share
 				float soilEnergy = absorbedEnergy * soilRatio;
 				if (soilEnergy > 0f && tile.composition.Mass > 0f)
 				{
-					     // Distribute among soil components by mass fraction
+					     ThermalEnergy[] energyData = tile.composition.energy;
+					     var sorted = energyData.OrderByDescending(v => v.Mass).ToArray();
+					     int i = 0;
 					     foreach (var comp in tile.composition.energy)
 					     {
 						          float compRatio = comp.Mass / tile.composition.Mass;
 						          float energyForComp = soilEnergy * compRatio;
 						          if (energyForComp > 0f)
 						          {
-								// Transfer from incoming solar directly to each component
 								EnergyTransferUtilities.TransferEnergy(tile.incomingSolarEnergy, comp, energyForComp);
+								ThermalEnergyUtilities.ConductHeat(tile.atmosphereTile.nitrogen, sorted[i], tile.tileWidth * tile.tileWidth, tile.atmosphereTile.layerHeight, hours * 3600);
 						          }
+						          i++;
 					     }
+					     //   ThermalEnergyUtilities.ConductHeat(tile.atmosphereTile.nitrogen, sorted[0], tile.tileWidth * tile.tileWidth, tile.atmosphereTile.layerHeight, hours);
 				}
 		          }
 		          else
 		          {
-				// Fallback: dump all into surface water
-				EnergyTransferUtilities.TransferEnergy(tile.incomingSolarEnergy, tile.surfaceWater, absorbedEnergy);
+				if (tile.surfaceIce.Mass > 1f)
+				{
+					     EnergyTransferUtilities.TransferEnergy(tile.incomingSolarEnergy, tile.surfaceIce, absorbedEnergy);
+					     ThermalEnergyUtilities.ConductHeat(tile.atmosphereTile.nitrogen, tile.surfaceIce, tile.tileWidth * tile.tileWidth, tile.atmosphereTile.layerHeight, hours * 3600);
+				}
+				else
+				{
+
+					     // Fallback: all energy to liquid
+					     EnergyTransferUtilities.TransferEnergy(tile.incomingSolarEnergy, tile.surfaceLiquid, absorbedEnergy);
+					     ThermalEnergyUtilities.ConductHeat(tile.atmosphereTile.nitrogen, tile.surfaceLiquid, tile.tileWidth * tile.tileWidth, tile.atmosphereTile.layerHeight, hours * 3600);
+				}
 		          }
 
-		          // 5. Move reflected energy to the atmosphere's reflectedSolar bucket
+		          // 5. Move reflected energy to atmosphere
 		          if (upwellingReflected > 0f)
 		          {
 				EnergyTransferUtilities.TransferEnergy(tile.incomingSolarEnergy, tile.atmosphereTile.reflectedSolar, upwellingReflected);
 		          }
 
-		          // 6. Now perform surface processes (infiltration, runoff, etc.)
-		          // ApplySoilProcesses(tile, hours);
+		          // 6. Process phase changes (melting, evaporation, sublimation, freezing)
+		          HydrosphereUtilities.ProcessSurfacePhaseChanges(tile);
 	     }
 	     public static void ProcessUpwelling(AtmosphereTile bottomTile, TileData[] surfaceTiles, float hours, RadiativeEnergy upwellingStream, float zenithAngle, bool isThermal)
 	     {
@@ -344,20 +366,18 @@ public static class AtmosphereUtilities
 		          int height = atmosphereTiles.GetLength(2);
 		          float dt = hours * 3600f;
 
+		          // Components to advect – we only need water (vapor, cloud, ice) for gameplay.
+		          // If you want to advect gases too, add them here.
 		          var components = new (string name, Func<AtmosphereTile, ThermalEnergy> getter)[]
 		          {
         ("vapor", t => t.waterVapor),
         ("cloud", t => t.cloudWaterContent),
-        ("ice", t => t.iceParticles),
-        ("nitrogen", t => t.nitrogen),
-        ("oxygen", t => t.oxygen),
-        ("carbon dioxide", t => t.carbonDioxide)
+        ("ice", t => t.iceParticles)
 		          };
 
 		          foreach (var comp in components)
 		          {
-				var fluxList = new List<AdvectionFlux>();
-
+				// Loop over all cells in all layers
 				for (int layer = 0; layer < layers; layer++)
 				{
 					     for (int x = 0; x < width; x++)
@@ -375,7 +395,7 @@ public static class AtmosphereUtilities
 								float cellWidth = current.tileWidth;
 								float cellHeight = current.layerHeight;
 
-								// --- Compute fractions (donor-cell) ---
+								// --- Compute donor‑cell fractions (Courant numbers) ---
 								float fx_pos = Mathf.Max(0, current.windVelocity.x) * dt / cellWidth;
 								float fx_neg = Mathf.Max(0, -current.windVelocity.x) * dt / cellWidth;
 								float fy_pos = Mathf.Max(0, current.windVelocity.z) * dt / cellWidth;
@@ -383,11 +403,11 @@ public static class AtmosphereUtilities
 								float fz_pos = Mathf.Max(0, current.windVelocity.y) * dt / cellHeight;
 								float fz_neg = Mathf.Max(0, -current.windVelocity.y) * dt / cellHeight;
 
-								// --- Enforce CFL condition ---
-								float totalFraction = fx_pos + fx_neg + fy_pos + fy_neg + fz_pos + fz_neg;
-								if (totalFraction > 1f)
+								// --- Enforce CFL: total fraction cannot exceed 1 ---
+								float total = fx_pos + fx_neg + fy_pos + fy_neg + fz_pos + fz_neg;
+								if (total > 1f)
 								{
-									     float scale = 1f / totalFraction;
+									     float scale = 1f / total;
 									     fx_pos *= scale;
 									     fx_neg *= scale;
 									     fy_pos *= scale;
@@ -395,82 +415,72 @@ public static class AtmosphereUtilities
 									     fz_pos *= scale;
 									     fz_neg *= scale;
 								}
+								// Upward (layer+1) – no wrap; if at top, mass escapes to space (we discard)
 
-								// --- Local helper to add a flux entry (fully expanded) ---
-								void AddFlux(AtmosphereTile dest, float fraction)
+								if (fz_pos > 0f && layer < layers - 1 && current.above != null)
 								{
-									     if (dest == null || fraction <= 0f)
-										          return;
-									     float massToMove = src.Mass * fraction;
-									     if (massToMove > 0f)
-									     {
-										          fluxList.Add(new AdvectionFlux
-										          {
-												Source = current,
-												Destination = dest,
-												Component = src,
-												MassToTransfer = massToMove
-										          });
-									     }
+
+									     float massToMove = src.Mass * fz_pos;
+									     ThermalEnergyUtilities.TransferMassAndEnergy(src, current.above.waterVapor, massToMove);
+								}
+								// If layer == layers-1 (top), upward flux is lost to space – we do nothing.
+
+								// Downward (layer-1) – no wrap; if at bottom, mass goes to surface (handled elsewhere)
+								if (fz_neg > 0f && layer > 0 && current.below != null)
+								{
+
+									     float massToMove = src.Mass * fz_neg;
+									     ThermalEnergyUtilities.TransferMassAndEnergy(src, current.below.waterVapor, massToMove);
+								}
+								// --- Now transfer mass immediately to neighbours ---
+								// East (x+1) – wraps around
+								if (fx_pos > 0f)
+								{
+
+									     float massToMove = src.Mass * fx_pos;
+									     ThermalEnergyUtilities.TransferMassAndEnergy(src, current.horizontalNeighbors[1].waterVapor, massToMove);
+
 								}
 
-								// --- Add fluxes to all neighbours ---
-								// East (x+1) – wraps around
-								AddFlux(atmosphereTiles[layer, (x + 1) % width, y], fx_pos);
-
 								// West (x-1) – wraps around
-								AddFlux(atmosphereTiles[layer, (x - 1 + width) % width, y], fx_neg);
+								if (fx_neg > 0f)
+								{
+
+									     float massToMove = src.Mass * fx_neg;
+									     ThermalEnergyUtilities.TransferMassAndEnergy(src, current.horizontalNeighbors[3].waterVapor, massToMove);
+
+								}
 
 								// North (y+1) – wraps around
-								AddFlux(atmosphereTiles[layer, x, (y + 1) % height], fy_pos);
+								if (fy_pos > 0f)
+								{
+
+									     float massToMove = src.Mass * fy_pos;
+									     ThermalEnergyUtilities.TransferMassAndEnergy(src, current.horizontalNeighbors[0].waterVapor, massToMove);
+								}
 
 								// South (y-1) – wraps around
-								AddFlux(atmosphereTiles[layer, x, (y - 1 + height) % height], fy_neg);
+								if (fy_neg > 0f)
+								{
 
-								// Upward (layer+1)
-								if (layer < layers - 1)
-									     AddFlux(atmosphereTiles[layer + 1, x, y], fz_pos);
-								// If layer == top, fz_pos goes to space – we discard it (no neighbour)
+									     float massToMove = src.Mass * fy_neg;
+									     ThermalEnergyUtilities.TransferMassAndEnergy(src, current.horizontalNeighbors[2].waterVapor, massToMove);
+								}
 
-								// Downward (layer-1)
-								if (layer > 0)
-									     AddFlux(atmosphereTiles[layer - 1, x, y], fz_neg);
-								// If layer == bottom, fz_neg goes into surface – you may want to handle that separately
+
+
 						          }
 					     }
 				}
-
-				// --- Apply all fluxes for this component ---
-				foreach (var flux in fluxList)
-				{
-					     if (flux.MassToTransfer <= 0f)
-						          continue;
-					     ThermalEnergy destComp = comp.getter(flux.Destination);
-					     if (destComp == null)
-						          continue;
-
-					     // Transfer mass AND its associated energy (sensible + latent)
-					     ThermalEnergyUtilities.TransferMassAndEnergy(flux.Component, destComp, flux.MassToTransfer);
-				}
 		          }
 
-		          // --- Finalise ---
+		          // --- Finalise: mark all tiles dirty and collect gases ---
 		          foreach (var tile in atmosphereTiles)
 		          {
 				tile.MarkMassDirty();
 				tile.MarkTemperatureDirty();
 				tile.CollectGases();
 		          }
-	     }
-
-
-	     // Small struct – place this outside the method (e.g., in the same class or a separate file)
-	     struct AdvectionFlux
-	     {
-		          public AtmosphereTile Source;
-		          public AtmosphereTile Destination;
-		          public ThermalEnergy Component;   // the ThermalEnergy object on Source
-		          public float MassToTransfer;
 	     }
 	     // Helper to get the correct ThermalEnergy component by name
 	     //public static void IntraCellConduction(AtmosphereTile tile, float hours)
@@ -504,6 +514,14 @@ public static class AtmosphereUtilities
 		          foreach (var neighbor in tile.horizontalNeighbors)
 				if (neighbor != null)
 					     tempList.AddRange(neighbor.energies);
+		          if (tile.below != null)
+		          {
+				tempList.AddRange(tile.below.energies);
+		          }
+		          if (tile.above != null)
+		          {
+				tempList.AddRange(tile.above.energies);
+		          }
 		          ThermalEnergyUtilities.MixTemperaturesByConduction(tempList, seconds, tile.tileWidth * tile.layerHeight, tile.tileWidth);
 
 		          // 3. Vertical neighbours (above & below)
@@ -664,19 +682,19 @@ public static class AtmosphereUtilities
 						          tile.windVelocity = wind;
 						          tile.windSpeed = wind.magnitude;
 
-						          float temperature = CalculateHadleyCellTemperature(latitude, layer, layers);
+						          //   float temperature = CalculateHadleyCellTemperature(latitude, layer, layers);
 						          // Instead of calling ChangeMass, we use AddMass (or set via constructor)
 						          // But we already have ThermalEnergy objects with some default mass.
 						          // To set temperature, we adjust the sensible energy directly.
 						          // Using the new API: we can use AddHeat to raise temperature to desired value.
-						          float currentTemp = tile.nitrogen.Temperature;
-						          float deltaTemp = temperature - currentTemp;
-						          float energyToAdd = deltaTemp * tile.nitrogen.Mass * tile.nitrogen.SpecificHeat;
-						          tile.nitrogen.AddHeat(energyToAdd);
+						          // float currentTemp = tile.nitrogen.Temperature;
+						          //   float deltaTemp = temperature - currentTemp;
+						          //   float energyToAdd = deltaTemp * tile.nitrogen.Mass * tile.nitrogen.SpecificHeat;
+						          // tile.nitrogen.AddHeat(energyToAdd);
 
 						          // Similarly, set water vapor mass and cloud mass using AddMass
 						          InitializeHadleyCellHumidity(tile, latitude, layer);
-						          InitializeHadleyCellPressure(tile, latitude, layer, layers);
+						          //   InitializeHadleyCellPressure(tile, latitude, layer, layers);
 					     }
 				}
 		          }
@@ -1072,17 +1090,6 @@ public static class AtmosphereUtilities
 	     }
 
 
-	     private static float CalculateHadleyCellTemperature(float latitude, int layer, int maxLayers)
-	     {
-		          // ... (same as before) ...
-		          return 280f; // placeholder
-	     }
-
-	     private static void InitializeHadleyCellPressure(AtmosphereTile tile, float latitude, int layer, int maxLayers)
-	     {
-		          // ... (same as before, only sets tile.pressure) ...
-		          tile.pressure = 101325f; // placeholder
-	     }
 
 	     /// <summary>
 	     /// Calculates vertical velocity (updrafts/downdrafts) based on circulation cell
@@ -1154,12 +1161,21 @@ public static class AtmosphereUtilities
 										          neighborCount++;
 									     }
 								}
-
+								if (tile.above != null)
+								{
+									     neighborPressureSum += tile.above.pressure;
+									     neighborCount++;
+								}
+								if (tile.below != null)
+								{
+									     neighborPressureSum += tile.below.pressure;
+									     neighborCount++;
+								}
 								if (neighborCount > 0)
 								{
 									     // Gentle smoothing (10% adjustment per iteration)
 									     float avgNeighborPressure = neighborPressureSum / neighborCount;
-									     tile.pressure = Mathf.Lerp(tile.pressure, avgNeighborPressure, 0.1f);
+									     tile.pressure = Mathf.Lerp(tile.pressure, avgNeighborPressure, .8f);
 								}
 						          }
 					     }

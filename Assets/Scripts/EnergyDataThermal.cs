@@ -30,8 +30,8 @@ public class ThermalEnergy : EnergyData
 	     public string materialName;
 
 	     // --- Energy (the only truth) ---
-	     private float sensibleEnergy; // J
-	     private float latentEnergy;   // J
+	     public float sensibleEnergy; // J
+	     public float latentEnergy;   // J
 
 	     public override float StoredEnergy => sensibleEnergy + latentEnergy;
 
@@ -82,7 +82,7 @@ public class ThermalEnergy : EnergyData
 	         float latentHeatVaporization = 2260000f,
 	         float meltingPoint = 273f,
 	         float boilingPoint = 373f,
-	         float thermalConductivity = 0.6089f,
+	         float thermalConductivity = 608.9f,
 	         float initialTemperature = 278f,
 	         float fallbackCp = 4186f)
 	     {

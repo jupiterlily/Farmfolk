@@ -4,7 +4,7 @@ using UnityEngine;
 public static class UILibrary
 {
 	     public static UISection BuildSectionDataIndexTabs(UIManager uim, List<UITab> tabs, UIStructuralComponent sc)
-	     {
+	     { //This is the tab bar that switches between pages of a window
 		          List<UIComponentData> buttons = new List<UIComponentData>();
 
 		          {
@@ -29,7 +29,7 @@ public static class UILibrary
 		          return section;
 	     }
 	     public static UISection BuildSectionDataTime(SimulationMaster sm, UIManager manager)
-	     {
+	     {//this is the clock readout
 		          var yearField = new ReadOnlyField("Year", "", manager.BodyFontSize)
 		          {
 				Getter = () => (sm.year + 1).ToString(),
@@ -307,46 +307,17 @@ public static class UILibrary
 		          {
 				Getter = () =>
 				{
-					     List<float> soilValues = new List<float>
-					     {
-						          tile.composition.sand.Mass,
-						          tile.composition.silt.Mass,
-						          tile.composition.clay.Mass,
-						          tile.composition.organicMaterial.Mass
-					     };
-
-					     float maxSoilValue = 0;
-					     foreach (var value in soilValues)
-					     {
-						          if (value > maxSoilValue)
-						          {
-								maxSoilValue = value;
-						          }
-					     }
-					     Graph graph = UIUtilities.GraphFloats(soilValues, Mathf.Max(maxSoilValue, 1f), GraphType.bar);
-					     graph.axisLabels = new string[] { "Sand", "Silt", "Clay", "Organic" };
-					     graph.axisColors = new Color[]
-					     {
-						          new Color(1f, 0.9f, 0.7f),      // Sand - tan
-						          new Color(0.8f, 0.7f, 0.5f),    // Silt - brown
-						          new Color(0.6f, 0.5f, 0.3f),    // Clay - dark brown
-						          new Color(0.3f, 0.2f, 0.1f)     // Organic - very dark
-					     };
-					     return graph;
+					     return UIUtilities.CreateSoilGraph(tile.composition);
 				},
 				VerticalLayout = false
 		          };
 
 		          // ─── Surface Water Graph ───
-		          var surfaceWaterField = new GraphField("Surface Water", GraphType.bar, 1f, 120f)
+		          var surfaceLiquidField = new GraphField("Water", GraphType.bar, 1f, 120f)
 		          {
 				Getter = () =>
 				{
-					     List<float> waterValues = new List<float> { tile.surfaceWater.Mass };
-					     Graph graph = UIUtilities.GraphFloats(waterValues, Mathf.Max(tile.surfaceWater.Mass * 1.2f, 100f), GraphType.bar);
-					     graph.axisLabels = new string[] { "Water" };
-					     graph.axisColors = new Color[] { new Color(0.3f, 0.6f, 1f) }; // Water blue
-					     return graph;
+					     return UIUtilities.CreateWaterGraph(tile);
 				},
 				VerticalLayout = false
 		          };
@@ -356,42 +327,13 @@ public static class UILibrary
 		          {
 				Getter = () =>
 				{
-					     if (tile.atmosphereTile == null)
-						          return new Graph { points = new Vector3[0], pointColors = new Color[0], axisLabels = new string[0], axisColors = new Color[0] };
-
-					     List<float> atmValues = new List<float>
-					     {
-						          tile.atmosphereTile.nitrogen.Mass,
-						          tile.atmosphereTile.oxygen.Mass,
-						          tile.atmosphereTile.carbonDioxide.Mass,
-						          tile.atmosphereTile.waterVapor.Mass,
-						          tile.atmosphereTile.cloudWaterContent.Mass
-					     };
-					     float maxAtmValue = 0;
-					     foreach (var value in atmValues)
-					     {
-						          if (value > maxAtmValue)
-						          {
-								maxAtmValue = value;
-						          }
-					     }
-					     Graph graph = UIUtilities.GraphFloats(atmValues, Mathf.Max(maxAtmValue, 1f), GraphType.bar);
-					     graph.axisLabels = new string[] { "N2", "O2", "CO2", "H2O", "Cloud" };
-					     graph.axisColors = new Color[]
-					     {
-						          new Color(0.7f, 0.8f, 0.9f),    // Nitrogen - light blue
-						          new Color(0.5f, 0.7f, 1f),      // Oxygen - sky blue
-						          new Color(0.4f, 0.4f, 0.4f),    // CO2 - gray
-						          new Color(0.8f, 0.9f, 1f),      // Water vapor - pale blue
-						          new Color(1f, 1f, 1f)           // Cloud - white
-					     };
-					     return graph;
+					     return UIUtilities.CreateAtmosphereGraph(tile.atmosphereTile);
 				},
 				VerticalLayout = false
 		          };
 
 		          components.Add(soilCompositionField);
-		          components.Add(surfaceWaterField);
+		          components.Add(surfaceLiquidField);
 		          components.Add(atmosphereCompositionField);
 
 		          var section = new UISection("Matter Composition", true, components)
@@ -410,40 +352,76 @@ public static class UILibrary
 	     /// <summary>
 	     /// Builds the "Modify Instance" section for altering tile composition.
 	     /// </summary>
-	     public static UISection BuildSectionTileModifyInstance(TileData tile, TileManager tileManager, UIManager uim)
+	     public static UISection_Tile BuildSectionTileModifyInstance(TileData initialTile, TileManager tileManager, UIManager uim)
 	     {
-		          if (tile == null)
-				return new UISection("Modify Instance", true, new List<UIComponentData>());
-
+		          // 1. Create the components list (empty for now)
 		          List<UIComponentData> components = new List<UIComponentData>();
-		          // Variables for binding
-		          int selectedTileIndex = 0;
-		          int selectedMatterType = 0;
-		          float kgAmount = 0f;
 
-		          // Build tile reference dropdown from all tiles
+		          // 2. CREATE THE SECTION FIRST. 
+		          // We pass 'initialTile' into it so its `tileData` field starts correctly.
+		          var section = new UISection_Tile("Modify Instance", initialTile, true, components)
+		          {
+				Padding = new RectOffset(5, 5, 5, 5),
+				Spacing = 5,
+				VerticalLayout = true,
+				DisplayLabel = true
+		          };
+
+		          // 3. Build the tile options list
 		          List<string> tileOptions = new List<string>();
 		          for (int x = 0; x < tileManager.worldsise.x; x++)
 				for (int y = 0; y < tileManager.worldsise.y; y++)
-					     tileOptions.Add($"{x}, {y}");
+					     tileOptions.Add($"({x},{y})");
 
-		          var tileRefField = new DropdownField("Block Reference (X,Y)", tileOptions, 0, uim.BodyFontSize)
+		          // 4. DROPDOWN - It updates `section.tileData`!
+		          var tileRefField = new DropdownField("Tile Reference (X,Y)", tileOptions, 0, uim.BodyFontSize)
 		          {
-				OptionsGetter = () =>
+				Getter = () =>
 				{
-					     List<string> options = new List<string>();
-					     for (int x = 0; x < tileManager.worldsise.x; x++)
-						          for (int y = 0; y < tileManager.worldsise.y; y++)
-								options.Add($"({x},{y})");
-					     return options;
+					     // Read from the SECTION's current tile
+					     string coord = $"({section.tileData.tileGridRef.x},{section.tileData.tileGridRef.y})";
+					     return tileOptions.IndexOf(coord);
 				},
-				Getter = () => selectedTileIndex, // an int variable
-				Setter = (val) => selectedTileIndex = (int)val,
+				Setter = (val) =>
+				{
+					     // WRITE to the SECTION's tileData
+					     int idx = (int)val;
+					     Vector2 pos = UIUtilities.GetVector2FromString(tileOptions[idx]);
+					     section.tileData = tileManager.GetTileData(pos); // UPDATING THE SECTION!
+				},
 				VerticalLayout = false
 		          };
 
+		          // 5. SOIL GRAPH - It reads from `section.tileData` dynamically!
+		          var dynamicSoilGraph = new GraphField("Soil Composition", GraphType.bar, 1f, 120f)
+		          {
+				Getter = () =>
+				{
+					     if (section.tileData == null)
+						          return new Graph();
+					     return UIUtilities.CreateSoilGraph(section.tileData.composition);
+				},
+				VerticalLayout = false
+		          };
+
+		          // 6. WATER GRAPH (also reads from `section.tileData`)
+		          var dynamicWaterGraph = new GraphField("Water", GraphType.bar, 1f, 120f)
+		          {
+				Getter = () =>
+				{
+					     if (section.tileData == null)
+						          return new Graph();
+					     return UIUtilities.CreateWaterGraph(section.tileData);
+				},
+				VerticalLayout = false
+		          };
+
+		          // 7. MODIFICATION CONTROLS
+		          int selectedMatterType = 0;
+		          float kgAmount = 0f;
+
 		          var matterTypeField = new DropdownField("Matter Type",
-		              new List<string> { "Sand", "Silt", "Clay", "Organic", "Water (Soil)", "Water (Surface)" },
+		              new List<string> { "Sand", "Silt", "Clay", "Organic", "Water (Soil)", "Ice (Soil)" },
 		              0, uim.BodyFontSize)
 		          {
 				Getter = () => selectedMatterType,
@@ -460,9 +438,41 @@ public static class UILibrary
 
 		          var applyButton = new ButtonField("", "Apply Changes", () =>
 		          {
-				Debug.Log($"Applying {kgAmount} kg of matter type {selectedMatterType} to tile ({tile.tileGridRef.x}, {tile.tileGridRef.y})");
-				// Implement actual modification logic here 
-				//we should call a function on the tile? on the matterObject? 
+				// THIS uses the SECTION's current tile!
+				if (section.tileData == null)
+					     return;
+
+				ThermalEnergy target = null;
+				switch (selectedMatterType)
+				{
+				case 0:
+				target = section.tileData.composition.sand;
+				break;
+				case 1:
+				target = section.tileData.composition.silt;
+				break;
+				case 2:
+				target = section.tileData.composition.clay;
+				break;
+				case 3:
+				target = section.tileData.composition.organicMaterial;
+				break;
+				case 4:
+				target = section.tileData.composition.water;
+				break;
+				case 5:
+				target = section.tileData.composition.ice;
+				break;
+				}
+
+				if (target != null)
+				{
+					     target.AddMass(kgAmount, target.Temperature);
+					     Debug.Log($"Added {kgAmount}kg to {section.tileData.tileGridRef}");
+
+					     // CRITICAL: Tell the UI to re-run the Getters so the graphs update!
+					     UIUtilities.RefreshAllFields(section);
+				}
 
 		          }, uim.HeadingFontSize)
 		          {
@@ -470,24 +480,17 @@ public static class UILibrary
 				VerticalLayout = false
 		          };
 
+		          // 8. Add all components to the section's list
 		          components.Add(tileRefField);
+		          components.Add(dynamicSoilGraph);
+		          components.Add(dynamicWaterGraph);
 		          components.Add(matterTypeField);
 		          components.Add(amountField);
 		          components.Add(applyButton);
 
-		          var section = new UISection("Modify Instance", true, components)
-		          {
-				Padding = new RectOffset(5, 5, 5, 5),
-				Spacing = 5,
-				VerticalLayout = true,
-				ChildForceExpandWidth = true,
-				ChildForceExpandHeight = false,
-				DisplayLabel = true
-		          };
-
+		          // Return the section. The `components` list is already inside it.
 		          return section;
 	     }
-
 	     /// <summary>
 	     /// Builds the complete Tile Composition window with both display and modification sections.
 	     /// </summary>

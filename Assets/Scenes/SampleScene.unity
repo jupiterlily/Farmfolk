@@ -1198,16 +1198,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce010db710ee9f949b8eeb00988dc2e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  worldsise: {x: 32, y: 128}
+  worldsise: {x: 48, y: 192}
   grid:
     tileWidth: 1
     XGrid: 1
     YGrid: 1
     originPoint: {x: 0, y: 0, z: 0}
-  tilesize: 120
+  tilesize: 1
   tilePrefab: {fileID: 32131678100906441, guid: 6e88acb7a37c709409c366a8413542f1, type: 3}
   atmoRatio: 8
-  atmosphericMoisture: 135000
+  atmosphericMoisture: 25000
   airTemp: 5
   totalWater: 0
   totalSoil: 0
@@ -1216,6 +1216,7 @@ MonoBehaviour:
   totalClay: 0
   totalOrganicMaterial: 0
   totalNRG: 0
+  plates: 25
   leafSprites:
   - {fileID: -381146040, guid: ab09c0ecc28180b41b5c9f8fd54dc0a7, type: 3}
   - {fileID: 1420910639, guid: ab09c0ecc28180b41b5c9f8fd54dc0a7, type: 3}
@@ -1238,6 +1239,12 @@ MonoBehaviour:
   - {fileID: -1368309579, guid: ab09c0ecc28180b41b5c9f8fd54dc0a7, type: 3}
   - {fileID: 1571434920, guid: ab09c0ecc28180b41b5c9f8fd54dc0a7, type: 3}
   demeter: {fileID: 1956233986128766911, guid: bc8a76db48a4b1a4ab671cc8f9e3423a, type: 3}
+  drawSurfaceGizmos: 1
+  drawAtmosphereGizmos: 1
+  drawClouds: 1
+  drawWind: 1
+  drawPressure: 1
+  displayedAtmoLayer: 0
 --- !u!4 &1440900998
 Transform:
   m_ObjectHideFlags: 0
@@ -1295,8 +1302,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fa2202a81ca9dc4eb5b2fc7d684a014, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialPepos: 50
-  generationSteps: 15
+  initialPepos: 15
+  generationSteps: 5
   maxPepos: 400
   minPopulationThreshold: 15
   immigrantCount: 3

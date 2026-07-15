@@ -137,12 +137,13 @@ public class SimulationMaster : MonoBehaviour
 				if (currentSecondOfMinute >= 60)
 				{
 					     currentSecondOfMinute = 0;
+
 					     MinutePasses(1);
 				}
 		          }
 		          if (currentSecondOfMinute == 30 || currentSecondOfMinute == 0)
 		          {
-				tileManager.AtmosphereStep(30 / (60 * 60));
+
 		          }
 		          SimulationConstants.UpdateTimeConstants(seconds, 0, 0, 0, 0);
 		          currentTimeOfDay = (currentHourOfDay * SecondsPerHour + currentMinuteOfHour * SecondsPerMinute + currentSecondOfMinute) / SecondsPerDay;
@@ -152,6 +153,7 @@ public class SimulationMaster : MonoBehaviour
 	     // Handle the passage of minutes within the simulation.
 	     void MinutePasses(int minutes)
 	     {
+
 		          for (int i = 0; i < minutes; i++)
 		          {
 				currentMinuteOfHour++;
@@ -166,14 +168,16 @@ public class SimulationMaster : MonoBehaviour
 		          {
 				foreach (var tile in tileManager.tiles)
 				{
-					     tile.TileVisualUpdate();
+					     //   tileManager.AtmosphereStep((1f / 60) * 10);
+					     // tileManager.HydrosphereStep((1f / 60) * 10);
+					     //   tile.TileVisualUpdate();
 				}
 		          }
 		          if (currentMinuteOfHour == 9 || currentMinuteOfHour == 29 || currentMinuteOfHour == 49)
 		          {
 
 				tileManager.TileUpdate(1 / 3);
-				//tileManager.demeter.lightManager.CheckPlantLightLevel(tileManager.demeter);
+				tileManager.demeter.lightManager.CheckPlantLightLevel(tileManager.demeter);
 				//tileManager.demeter.gardener.GrowPlants(tileManager.demeter, Mathf.FloorToInt(20 * 60));
 		          }
 		          SimulationConstants.UpdateTimeConstants(0, minutes, 0, 0, 0);
@@ -198,10 +202,11 @@ public class SimulationMaster : MonoBehaviour
 		          }
 		          if (currentHourOfDay == 0 || currentHourOfDay == 4 || currentHourOfDay == 8 || currentHourOfDay == 12 || currentHourOfDay == 16 || currentHourOfDay == 20)
 		          {
+				tileManager.demeter.gardener.GrowPlants(tileManager.demeter, Mathf.FloorToInt(4 * 60 * 60));
 
-				//tileManager.demeter.gardener.UpdatePlantAges(tileManager.demeter);
+				tileManager.demeter.gardener.UpdatePlantAges(tileManager.demeter);
 		          }
-		          tileManager.TileUpdate(h);
+		          //tileManager.TileUpdate(h);
 		          //Debug.Log("tiles updated");
 		          // Log solar energy every 3 h.
 		          if (currentHourOfDay % 3 == 0 && Mathf.FloorToInt(previousTimeOfDay * 24f) % 3 != currentHourOfDay % 3)

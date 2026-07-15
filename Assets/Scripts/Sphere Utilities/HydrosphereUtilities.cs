@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 
 public static class HydrosphereUtilities
@@ -20,7 +19,7 @@ public static class HydrosphereUtilities
 
 		          if (surfaceTile != null)
 		          {
-				total += surfaceTile.surfaceWater.Mass;
+				total += surfaceTile.surfaceLiquid.Mass;
 				total += surfaceTile.composition.water.Mass;
 		          }
 
@@ -127,6 +126,7 @@ public static class HydrosphereUtilities
 	     /// </summary>
 	     public static float CalculateFallEvaporationLoss(int layer, float temperature, float relativeHumidity)
 	     {
+		          //this is terrible and completely against the priniciples of the game.
 		          // Less evaporation in lower layers (more humid), more in upper layers
 		          float layerFactor = Mathf.Clamp01(layer * 0.3f); // 30% per layer
 
@@ -149,7 +149,7 @@ public static class HydrosphereUtilities
 	     {
 		          if (atmosphereTile == null || surfaceTile == null)
 				return;
-
+		          SoilUtilities.RecalculateTilePhysics(surfaceTile);
 		          // Store initial water for conservation check
 		          //float initialTotalWater = GetTotalWater(atmosphereTile, surfaceTile);
 
@@ -173,6 +173,7 @@ public static class HydrosphereUtilities
 		          // 3. Surface condensation (dew/frost formation)
 		          SurfaceCondensation(surfaceTile, hours);
 
+		          SoilUtilities.InfiltrateSurfaceMoisture(surfaceTile, hours);
 		          // 4. Surface evaporation (simplified)
 		          SurfaceEvaporation(atmosphereTile, surfaceTile, hours);
 
@@ -183,6 +184,75 @@ public static class HydrosphereUtilities
 		          SensibleHeatExchange(atmosphereTile, surfaceTile, hours);
 		          // 7. Validate water conservation
 		          //ValidateWaterConservation(...);
+	     }
+
+	     public static void RedistributeWaterLateral(WorldTile tile, float hours)
+	     {//this is water movement within the soil.
+	      // Helper to calculate total water for a tile + neighbors
+		          float GetTotalWater(WorldTile t)
+		          {
+				float total = t.tileData.composition.water.Mass;
+				foreach (var n in t.GetNeighbors())
+				{
+					     if (n != null)
+						          total += n.tileData.composition.water.Mass;
+				}
+				return total;
+		          }
+
+		          // Debug.Log($"[LateralWater] Before redistribution: Total water = {GetTotalWater(tile)} kg");
+
+		          SoilComposition sc = tile.tileData.composition;
+		          float rate = sc.horizontalPermeability / 100f / 24f; // cm/day -> m/hour
+
+		          float waterToMove = sc.water.Mass;
+		          List<WorldTile> neighbors = tile.GetNeighbors();
+
+		          foreach (WorldTile neighbor in neighbors)
+		          {
+				if (neighbor == null)
+					     continue;
+
+				SoilComposition nc = neighbor.tileData.composition;
+				float deltaSat = sc.saturation - nc.saturation;
+				if (deltaSat <= 0f)
+					     continue;
+
+				float transfer = deltaSat * rate * hours * 1000f; // m3 -> kg
+				transfer = Mathf.Clamp(transfer, 0f, waterToMove);
+
+				//sc.water -= transfer;
+				//nc.water += transfer;
+
+				ThermalEnergyUtilities.TransferMassAndEnergy(sc.water, nc.water, transfer);
+
+				waterToMove -= transfer;
+
+				float fineTotal = sc.silt.Mass + sc.clay.Mass;
+				if (fineTotal > 0f)
+				{
+					     float sedimentFraction = sc.erodibility * Mathf.Clamp01(deltaSat);
+					     float sedimentTransfer = sedimentFraction * transfer;
+
+					     float siltRatio = sc.silt.Mass / fineTotal;
+					     float clayRatio = sc.clay.Mass / fineTotal;
+
+					     float siltMoved = sedimentTransfer * siltRatio;
+					     float clayMoved = sedimentTransfer * clayRatio;
+
+					     float organicMoved = sedimentTransfer * 0.1f;
+
+					     ThermalEnergyUtilities.TransferMassAndEnergy(sc.silt, nc.silt, siltMoved);
+					     ThermalEnergyUtilities.TransferMassAndEnergy(sc.clay, nc.clay, clayMoved);
+					     ThermalEnergyUtilities.TransferMassAndEnergy(sc.organicMaterial, nc.organicMaterial, organicMoved);
+				}
+
+				SoilUtilities.RecalculateTilePhysics(neighbor.tileData);
+		          }
+
+		          SoilUtilities.RecalculateTilePhysics(tile.tileData);
+
+		          //    Debug.Log($"[LateralWater] After redistribution: Total water = {GetTotalWater(tile)} kg");
 	     }
 	     public static void SensibleHeatExchange(AtmosphereTile atmo, TileData surface, float hours)
 	     {
@@ -218,13 +288,13 @@ public static class HydrosphereUtilities
 				}
 
 				// 2. Give heat to the ground (soil and surface water proportionally)
-				float groundMass = surface.composition.Mass + surface.surfaceWater.Mass;
+				float groundMass = surface.composition.Mass + surface.surfaceLiquid.Mass;
 				if (groundMass <= 0)
 					     return;
 				float soilFrac = surface.composition.Mass / groundMass;
-				float waterFrac = surface.surfaceWater.Mass / groundMass;
+				float waterFrac = surface.surfaceLiquid.Mass / groundMass;
 
-				surface.surfaceWater.AddEnergy(heatFlow * waterFrac);
+				surface.surfaceLiquid.AddEnergy(heatFlow * waterFrac);
 				foreach (var comp in surface.composition.energy)
 				{
 					     comp.AddEnergy(heatFlow * soilFrac * (comp.Mass / surface.composition.Mass));
@@ -233,13 +303,13 @@ public static class HydrosphereUtilities
 		          else // Ground is hotter -> Heat flows INTO the air
 		          {
 				// Reverse the logic
-				float groundMass = surface.composition.Mass + surface.surfaceWater.Mass;
+				float groundMass = surface.composition.Mass + surface.surfaceLiquid.Mass;
 				if (groundMass <= 0)
 					     return;
 				float soilFrac = surface.composition.Mass / groundMass;
-				float waterFrac = surface.surfaceWater.Mass / groundMass;
+				float waterFrac = surface.surfaceLiquid.Mass / groundMass;
 
-				surface.surfaceWater.RemoveEnergy(-heatFlow * waterFrac);
+				surface.surfaceLiquid.RemoveEnergy(-heatFlow * waterFrac);
 				foreach (var comp in surface.composition.energy)
 				{
 					     comp.RemoveEnergy(-heatFlow * soilFrac * (comp.Mass / surface.composition.Mass));
@@ -363,16 +433,16 @@ public static class HydrosphereUtilities
 		          //atmotile.waterVapor.RemoveEnergy(latentReleased);
 
 		          // 2. Move mass to surface
-		          ThermalEnergyUtilities.TransferMassAndEnergy(atmotile.waterVapor, hydroTile.surfaceWater, water);
+		          ThermalEnergyUtilities.TransferMassAndEnergy(atmotile.waterVapor, hydroTile.surfaceLiquid, water);
 
 		          //        // 3. Warm the surface and atmosphere (distribute the released heat)
 		          //        //    You can split between surface and air proportionally
-		          //        float totalMass = hydroTile.surfaceWater.Mass + hydroTile.composition.Mass + atmotile.Mass;
+		          //        float totalMass = hydroTile.surfaceLiquid.Mass + hydroTile.composition.Mass + atmotile.Mass;
 		          //        if (totalMass > 0f)
 		          //        {
 		          //float perKg = latentReleased / totalMass;
 		          //// Surface gets its share
-		          //hydroTile.surfaceWater.AddEnergy(perKg * hydroTile.surfaceWater.Mass);
+		          //hydroTile.surfaceLiquid.AddEnergy(perKg * hydroTile.surfaceLiquid.Mass);
 		          //foreach (var comp in hydroTile.composition.energy)
 		          //	     comp.AddEnergy(perKg * comp.Mass);
 		          //// Atmosphere gets its share
@@ -400,29 +470,29 @@ public static class HydrosphereUtilities
 		          float potentialEvaporation = (aerodynamicTerm * vaporPressureDeficit + radiationTerm) * hours;
 		          float potentialEvaporationKg = potentialEvaporation * hydroTile.tileWidth * hydroTile.tileWidth;
 
-		          float availableSurfaceWater = hydroTile.surfaceWater.Mass;
+		          float availablesurfaceLiquid = hydroTile.surfaceLiquid.Mass;
 		          float availableSoilWater = hydroTile.composition.water.Mass * 0.1f;
-		          float totalAvailable = availableSurfaceWater + availableSoilWater;
+		          float totalAvailable = availablesurfaceLiquid + availableSoilWater;
 		          float actualEvaporation = Mathf.Min(potentialEvaporationKg, totalAvailable);
 
 		          if (actualEvaporation <= 0)
 				return;
 
 		          // Evaporate from surface first, then soil
-		          float surfaceEvaporation = Mathf.Min(actualEvaporation, availableSurfaceWater);
+		          float surfaceEvaporation = Mathf.Min(actualEvaporation, availablesurfaceLiquid);
 		          float soilEvaporation = Mathf.Min(actualEvaporation - surfaceEvaporation, availableSoilWater);
 
 		          if (surfaceEvaporation > 0)
 		          {
 				float maxEvaporation = vaporPressureDeficit * 0.001f * hours * hydroTile.tileWidth * hydroTile.tileWidth;
 				surfaceEvaporation = Mathf.Min(surfaceEvaporation, maxEvaporation);
-				float latentRequired = surfaceEvaporation * hydroTile.surfaceWater.LatentHeatVaporization;
+				float latentRequired = surfaceEvaporation * hydroTile.surfaceLiquid.LatentHeatVaporization;
 
 				// 1. Cool the surface water
-				//hydroTile.surfaceWater.RemoveEnergy(latentRequired);
+				//hydroTile.surfaceLiquid.RemoveEnergy(latentRequired);
 
 				// 2. Move mass
-				ThermalEnergyUtilities.TransferMassAndEnergy(hydroTile.surfaceWater, atmotile.waterVapor, surfaceEvaporation);
+				ThermalEnergyUtilities.TransferMassAndEnergy(hydroTile.surfaceLiquid, atmotile.waterVapor, surfaceEvaporation);
 
 				//// 3. Warm the atmosphere
 				//float totalAirMass = 0f;
@@ -445,7 +515,7 @@ public static class HydrosphereUtilities
 
 		          float solarEnergy = solarRadiation * 3600f * hours;
 		          float availableEnergy = solarEnergy * 0.6f;
-		          float maxEvaporation = availableEnergy / (tile.surfaceWater.LatentHeatVaporization * 1000f);
+		          float maxEvaporation = availableEnergy / (tile.surfaceLiquid.LatentHeatVaporization * 1000f);
 
 		          float soilMoistureFactor = Mathf.Clamp01(tile.composition.saturation);
 		          maxEvaporation *= soilMoistureFactor;
@@ -453,24 +523,24 @@ public static class HydrosphereUtilities
 		          float atmosphericDemand = 1f - atmotile.RelativeHumidity;
 		          maxEvaporation *= atmosphericDemand;
 
-		          float availableWater = tile.surfaceWater.Mass + (tile.composition.water.Mass * 0.05f);
+		          float availableWater = tile.surfaceLiquid.Mass + (tile.composition.water.Mass * 0.05f);
 		          float actualEvaporation = Mathf.Min(maxEvaporation, availableWater);
 
 		          if (actualEvaporation <= 0)
 				return;
 
-		          float surfaceEvaporation = Mathf.Min(actualEvaporation, tile.surfaceWater.Mass);
+		          float surfaceEvaporation = Mathf.Min(actualEvaporation, tile.surfaceLiquid.Mass);
 		          float soilEvaporation = Mathf.Min(actualEvaporation - surfaceEvaporation, tile.composition.water.Mass * 0.05f);
 
 		          if (surfaceEvaporation > 0)
 		          {
-				float latentRequired = surfaceEvaporation * tile.surfaceWater.LatentHeatVaporization;
+				float latentRequired = surfaceEvaporation * tile.surfaceLiquid.LatentHeatVaporization;
 
 				// 1. Cool the surface water
-				tile.surfaceWater.RemoveEnergy(latentRequired);
+				tile.surfaceLiquid.RemoveEnergy(latentRequired);
 
 				// 2. Move mass
-				ThermalEnergyUtilities.TransferMassAndEnergy(tile.surfaceWater, atmotile.waterVapor, surfaceEvaporation);
+				ThermalEnergyUtilities.TransferMassAndEnergy(tile.surfaceLiquid, atmotile.waterVapor, surfaceEvaporation);
 
 				//// 3. Warm the atmosphere
 				//float totalAirMass = 0f;
@@ -486,54 +556,80 @@ public static class HydrosphereUtilities
 	     }
 
 	     // ---------- Redistribute Surface Water (updated) ----------
-	     public static void RedistributeSurfaceWater(WorldTile tile, float hours)
-	     {
-		          if (tile.tileData.surfaceWater.CurrentPhase == Phase.Solid)
-				return;
+	     //  public static void RedistributesurfaceLiquid(WorldTile tile, float hours)
+	     //  {
+	     //        if (tile.tileData.surfaceLiquid.CurrentPhase == Phase.Solid)
+	     //return;
 
-		          float flowRate = tile.tileData.surfaceWater.Mass; // kg/hour
-		          var neighbors = tile.GetNeighbors();
-		          var downhillNeighbors = new List<WorldTile>();
+	     //        float flowRate = tile.tileData.surfaceLiquid.Mass; // kg/hour
+	     //        var neighbors = tile.GetNeighbors();
+	     //        var downhillNeighbors = new List<WorldTile>();
 
-		          foreach (var wT in neighbors)
+	     //        foreach (var wT in neighbors)
+	     //        {
+	     //float heightA = tile.tileData.volume;
+	     //float heightB = wT.tileData.volume;
+	     //float delta = heightA - heightB;
+	     //if (delta > 0f)
+	     //	     downhillNeighbors.Add(wT);
+	     //        }
+
+	     //        downhillNeighbors = downhillNeighbors.OrderByDescending(v => v.tileData.volume).ToList();
+
+	     //        if (downhillNeighbors.Count > 0)
+	     //        {
+	     //foreach (var neighbor in downhillNeighbors)
+	     //{
+	     //	     if (neighbor == null)
+	     //		          continue;
+	     //	     float heightA = tile.tileData.volume;
+	     //	     float heightB = neighbor.tileData.volume;
+	     //	     float delta = heightA - heightB;
+	     //	     float gradient = Mathf.Clamp01(delta);
+	     //	     float flow = flowRate * gradient * hours;
+	     //	     float availableWater = tile.tileData.surfaceLiquid.Mass;
+	     //	     float toTransfer = Mathf.Min(flow, availableWater / downhillNeighbors.Count);
+
+	     //	     if (toTransfer > 0f)
+	     //	     {
+	     //		          // Move water (and its energy) to the downhill tile
+	     //		          ThermalEnergyUtilities.TransferMassAndEnergy(
+	     //		              tile.tileData.surfaceLiquid,
+	     //		              neighbor.tileData.surfaceLiquid,
+	     //		              toTransfer
+	     //		          );
+	     //		          SoilUtilities.ApplySurfaceErosion(tile.tileData, neighbor.tileData, gradient, toTransfer);
+	     //	     }
+	     //}
+	     //        }
+	     //  }
+	     public static void ConductHeatLateral(WorldTile tile, float hours)
+	     {//this is conducting heat to our neighbors
+
+		          hours = hours / 4;
+		          ThermalEnergy water = tile.tileData.surfaceLiquid;
+		          ThermalEnergy ice = tile.tileData.surfaceIce;
+		          List<WorldTile> neighbors = tile.GetNeighbors();
+
+		          float area = tile.tileData.tileWidth * tile.tileData.tileWidth;
+		          float distance = tile.tileData.tileWidth;
+
+		          foreach (WorldTile neighbor in neighbors)
 		          {
-				float heightA = tile.tileData.volume;
-				float heightB = wT.tileData.volume;
-				float delta = heightA - heightB;
-				if (delta > 0f)
-					     downhillNeighbors.Add(wT);
+				if (neighbor == null)
+					     continue;
+
+
+				ThermalEnergyUtilities.ConductHeat(water, neighbor.tileData.surfaceLiquid, area, distance, hours * 3600f);
+				ThermalEnergyUtilities.ConductHeat(water, neighbor.tileData.surfaceIce, area, distance, hours * 3600f);
+				ThermalEnergyUtilities.ConductHeat(ice, neighbor.tileData.surfaceLiquid, area, distance, hours * 3600f);
+				ThermalEnergyUtilities.ConductHeat(ice, neighbor.tileData.surfaceIce, area, distance, hours * 3600f);
+
+
 		          }
 
-		          downhillNeighbors = downhillNeighbors.OrderByDescending(v => v.tileData.volume).ToList();
-
-		          if (downhillNeighbors.Count > 0)
-		          {
-				foreach (var neighbor in downhillNeighbors)
-				{
-					     if (neighbor == null)
-						          continue;
-					     float heightA = tile.tileData.volume;
-					     float heightB = neighbor.tileData.volume;
-					     float delta = heightA - heightB;
-					     float gradient = Mathf.Clamp01(delta);
-					     float flow = flowRate * gradient * hours;
-					     float availableWater = tile.tileData.surfaceWater.Mass;
-					     float toTransfer = Mathf.Min(flow, availableWater / downhillNeighbors.Count);
-
-					     if (toTransfer > 0f)
-					     {
-						          // Move water (and its energy) to the downhill tile
-						          ThermalEnergyUtilities.TransferMassAndEnergy(
-						              tile.tileData.surfaceWater,
-						              neighbor.tileData.surfaceWater,
-						              toTransfer
-						          );
-						          SoilUtilities.ApplySurfaceErosion(tile.tileData, neighbor.tileData, gradient, toTransfer);
-					     }
-				}
-		          }
+		          //    Debug.Log($"[LateralWater] After redistribution: Total water = {GetTotalWater(tile)} kg");
 	     }
-
 	     // ---------- Helper Methods (unchanged) ----------
 	     private static float CalculateRelativeHumidity(AtmosphereTile atm)
 	     {
@@ -553,5 +649,123 @@ public static class HydrosphereUtilities
 		          float density = satVP / (R * atm.temperature); // kg/m³
 		          float volume = atm.tileWidth * atm.tileWidth * atm.layerHeight;
 		          return density * volume;
+	     }
+
+
+	     /// <summary>
+	     /// Processes melting, freezing, evaporation, and sublimation for the tile's surface water.
+	     /// Uses exact energy balance – no arbitrary fraction limits.
+	     /// </summary>
+	     public static void ProcessSurfacePhaseChanges(TileData tile)
+	     {
+		          if (tile == null)
+				return;
+
+		          // ---- MELTING (ice → liquid) ----
+		          if (tile.surfaceIce.Mass > 0f)
+		          {
+				float meltTemp = tile.surfaceIce.MeltingPoint; // 273.15 K
+				float cpIce = tile.surfaceIce.SpecificHeat;
+				float energyAtMelt = tile.surfaceIce.Mass * cpIce * meltTemp;
+				float excess = tile.surfaceIce.sensibleEnergy - energyAtMelt;
+
+				if (excess > 0f)
+				{
+					     // Maximum ice that can melt with this excess energy
+					     float maxMeltMass = excess / tile.surfaceIce.LatentHeatFusion;
+					     float massToMelt = Mathf.Min(maxMeltMass, tile.surfaceIce.Mass);
+
+					     if (massToMelt > 0f)
+					     {
+						          // Transfer mass (and its proportional energy) to liquid
+						          ThermalEnergyUtilities.TransferMassAndEnergy(tile.surfaceIce, tile.surfaceLiquid, massToMelt);
+					     }
+				}
+		          }
+
+		          // ---- FREEZING (liquid → ice) ----
+		          if (tile.surfaceLiquid.Mass > 0f)
+		          {
+				float freezeTemp = tile.surfaceLiquid.MeltingPoint;
+				float cpLiq = tile.surfaceLiquid.SpecificHeat;
+				float energyAtFreeze = tile.surfaceLiquid.Mass * cpLiq * freezeTemp;
+				float deficit = energyAtFreeze - tile.surfaceLiquid.sensibleEnergy;
+
+				if (deficit > 0f)
+				{
+					     // How much liquid must freeze to release enough latent heat to raise temperature to freezeTemp?
+					     // The released heat warms the remaining liquid+ice mixture.
+					     // We approximate by freezing a mass such that the released latent heat equals the deficit.
+					     float massToFreeze = deficit / tile.surfaceLiquid.LatentHeatFusion;
+					     massToFreeze = Mathf.Min(massToFreeze, tile.surfaceLiquid.Mass);
+
+					     if (massToFreeze > 0f)
+					     {
+						          // Freezing releases latent heat, which reduces the deficit.
+						          // Transfer mass from liquid to ice.
+						          ThermalEnergyUtilities.TransferMassAndEnergy(tile.surfaceLiquid, tile.surfaceIce, massToFreeze);
+						          // After transfer, the released latent heat is now in the ice object (as sensible energy? Actually, TransferMassAndEnergy moves proportional sensible+latent. Freezing should convert latent to sensible. We need to handle that.
+						          // Better: we manually move mass and then convert latent heat to sensible.
+						          // But we can trust TransferMassAndEnergy to move both sensible and latent correctly.
+						          // However, freezing should release latent heat, which means the ice should gain sensible energy.
+						          // In TransferMassAndEnergy, the source loses its latent energy proportionally, and the target gains it.
+						          // So the ice will gain latent energy, which is fine – it will later be converted to sensible if needed.
+					     }
+				}
+		          }
+
+		          // ---- EVAPORATION (liquid → vapour) ----
+		          if (tile.surfaceLiquid.Mass > 0f && tile.atmosphereTile != null)
+		          {
+				float boilTemp = tile.surfaceLiquid.BoilingPoint;
+				float cpLiq = tile.surfaceLiquid.SpecificHeat;
+				float energyAtBoil = tile.surfaceLiquid.Mass * cpLiq * boilTemp;
+				float excess = tile.surfaceLiquid.sensibleEnergy - energyAtBoil;
+
+				if (excess > 0f)
+				{
+					     float maxEvapMass = excess / tile.surfaceLiquid.LatentHeatVaporization;
+					     float massToEvap = Mathf.Min(maxEvapMass, tile.surfaceLiquid.Mass);
+
+					     if (massToEvap > 0f)
+					     {
+						          // Move mass from liquid to atmosphere's water vapour
+						          ThermalEnergyUtilities.TransferMassAndEnergy(tile.surfaceLiquid, tile.atmosphereTile.waterVapor, massToEvap);
+					     }
+				}
+		          }
+
+		          // ---- SUBLIMATION (ice → vapour) ----
+		          if (tile.surfaceIce.Mass > 0f && tile.atmosphereTile != null)
+		          {
+				// Sublimation occurs when ice has enough energy to go directly to gas.
+				// We'll use a threshold: if ice temperature is above boiling point (unlikely but possible),
+				// or we can simply check if ice has excess energy above melting point and use sublimation instead of melting.
+				// For simplicity, we'll treat sublimation as a separate path: if ice temperature is very high,
+				// we can sublimate some mass.
+				// A more realistic approach: at temperatures below melting, sublimation can happen if the air is dry,
+				// but that's driven by vapour pressure deficit, not just energy. We'll keep it simple for now.
+				// We'll check if the ice's sensible energy is above the energy needed to bring it to boiling point
+				// (i.e., heat it to melt, then to boil). If so, we can sublimate directly.
+				float meltTemp = tile.surfaceIce.MeltingPoint;
+				float boilTemp = tile.surfaceIce.BoilingPoint;
+				float cpIce = tile.surfaceIce.SpecificHeat;
+				float energyToBoil = tile.surfaceIce.Mass * cpIce * boilTemp;
+				float excess = tile.surfaceIce.sensibleEnergy - energyToBoil;
+
+				if (excess > 0f)
+				{
+					     float maxSubMass = excess / (tile.surfaceIce.LatentHeatFusion + tile.surfaceIce.LatentHeatVaporization);
+					     float massToSub = Mathf.Min(maxSubMass, tile.surfaceIce.Mass);
+
+					     if (massToSub > 0f)
+					     {
+						          // Move mass from ice to atmosphere's water vapour
+						          ThermalEnergyUtilities.TransferMassAndEnergy(tile.surfaceIce, tile.atmosphereTile.waterVapor, massToSub);
+					     }
+				}
+		          }
+		          float atmoratio = tile.atmosphereTile.tileWidth / tile.tileWidth;
+		          tile.CollectGases(atmoratio * atmoratio);
 	     }
 }

@@ -408,7 +408,7 @@ public static class UIUtilities
 				graph.points[i * 4 + 3] = new Vector3(xPos, normalisedValue, 0); // top-left
 
 				// Set colors for this bar
-				Color barColor = Color.HSVToRGB(i / (float)barCount, 0.8f, 0.8f);
+				Color barColor = graph.axisColors[i];
 				for (int j = 0; j < 4; j++)
 				{
 					     graph.pointColors[i * 4 + j] = barColor;
@@ -486,7 +486,87 @@ public static class UIUtilities
 		          graph.type = GraphType.pie;
 		          return graph;
 	     }
+	     public static Graph CreateSoilGraph(SoilComposition soil, GraphType type = GraphType.bar)
+	     {
+		          List<float> soilValues = new List<float>
+					     {
+						          soil.sand.Mass,
+						         soil.Mass,
+						          soil.clay.Mass,
+						          soil.organicMaterial.Mass
+					     };
 
+		          float maxSoilValue = 0;
+		          foreach (var value in soilValues)
+		          {
+				if (value > maxSoilValue)
+				{
+					     maxSoilValue = value;
+				}
+		          }
+		          Graph graph = UIUtilities.GraphFloats(soilValues, Mathf.Max(maxSoilValue, 1f), GraphType.bar);
+		          graph.axisLabels = new string[] { "Sand", "Silt", "Clay", "Organic" };
+		          graph.axisColors = new Color[]
+		          {
+						          Constants.SAND_COLOR, Constants.SILT_COLOR, Constants.CLAY_COLOR, Constants.ORGANIC_COLOR
+		          };
+		          for (int i = 0; i < graph.axisLabels.Length; i++)
+		          {
+				graph.pointColors[i] = graph.axisColors[i];
+		          }
+		          return graph;
+	     }
+	     public static Graph CreateWaterGraph(TileData tile, GraphType type = GraphType.bar)
+	     {
+		          List<float> waterValues = new List<float> { tile.surfaceLiquid.Mass, tile.surfaceIce.Mass };
+		          Graph graph = UIUtilities.GraphFloats(waterValues, Mathf.Max(tile.surfaceLiquid.Mass * 1.2f, 100f), GraphType.bar);
+		          graph.axisLabels = new string[] { "Surface Water", "Surface Ice", "Soil Water", "Soil Ice" };
+		          graph.axisColors = new Color[] {
+						          Constants.SHALLOW_WATER_COLOR, Constants.ICE_COLOR, Constants.DEEP_WATER_COLOR, Constants.ICE_COLOR,
+					     };
+		          for (int i = 0; i < graph.axisLabels.Length; i++)
+		          {
+				graph.pointColors[i] = graph.axisColors[i];
+		          }
+		          return graph;
+	     }
+	     public static Graph CreateAtmosphereGraph(AtmosphereTile tile, GraphType type = GraphType.bar)
+	     {
+		          if (tile == null)
+				return new Graph { points = new Vector3[0], pointColors = new Color[0], axisLabels = new string[0], axisColors = new Color[0] };
+
+		          List<float> atmValues = new List<float>
+					     {
+						          tile.nitrogen.Mass,
+						          tile.oxygen.Mass,
+						          tile.carbonDioxide.Mass,
+						          tile.waterVapor.Mass,
+						          tile.cloudWaterContent.Mass
+					     };
+		          float maxAtmValue = 0;
+		          foreach (var value in atmValues)
+		          {
+				if (value > maxAtmValue)
+				{
+					     maxAtmValue = value;
+				}
+		          }
+		          Graph graph = UIUtilities.GraphFloats(atmValues, Mathf.Max(maxAtmValue, 1f), GraphType.pie);
+		          graph.axisLabels = new string[] { "N2", "O2", "CO2", "H2O", "Cloud" };
+		          graph.axisColors = new Color[]
+		          {
+						          new Color(0.7f, 0.8f, 0.9f),    // Nitrogen - light blue
+						          new Color(0.5f, 0.7f, 1f),      // Oxygen - sky blue
+						          new Color(0.4f, 0.4f, 0.4f),    // CO2 - gray
+						          new Color(0.8f, 0.9f, 1f),      // Water vapor - pale blue
+						          new Color(1f, 1f, 1f)           // Cloud - white
+		          };
+		          for (int i = 0; i < graph.axisLabels.Length; i++)
+		          {
+				graph.pointColors[i] = graph.axisColors[i];
+		          }
+		          return graph;
+	     }
 	     // Helper method to create HEXACO radar graph
 	     public static Graph CreateHexacoGraph(HEXACO hexaco, GraphType type = GraphType.radar)
 	     {

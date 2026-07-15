@@ -8,14 +8,23 @@ public static class Constants
 	     public const float CLAY_DENSITY = 2650f;
 	     public const float ORGANIC_DENSITY = 250f;
 	     public const float WATER_DENSITY = 1000f;
+	     public const float ICE_DENSITY = 916.2F;
+	     public const float GRANITE_DENSITY = 2600f;
 	     public const float GRAVITY_ACCELERATION = 9.81f;
 
+	     // --- Constants (no magic numbers) ---
+	     public const float GLENN_FLOW_LAW_EXPONENT = 3f; // n in Glen's flow law
+	     public const float MIN_ICE_THICKNESS_FOR_FLOW = 0.5f; // meters
+	     public const float WATER_FLOW_RESISTANCE = 5f;   // m/s per unit slope
+	     public const float ICE_FLOW_RESISTANCE = 0.005f;   // m/s per unit slope (slower)
+	     public const float WIND_DRAG_COEFFICIENT = 0.03f;       // wind-to-current conversion	         
 
-	     // Energy (Joules per kg)
-	     //public const float LATENT_HEAT_EVAPORATION = 2260f; // kJ/kg (approximate)
-	     // public const float LATENT_HEAT_VAPORIZATION = 2_260_000f; // J/kg
-	     //public const float LATENT_HEAT_CONDENSATION = 2.5e6f; // J/kg
-	     //public const float AIR_SPECIFIC_HEAT = 1005f; // J/kg·K
+	     public const float SEDIMENT_ENTRAINMENT_COEFFICIENT = 0.001f;  // fraction of sediment eroded per unit flow
+	     public const float SEDIMENT_DEPOSITION_COEFFICIENT = 0.05f; // fraction of sediment deposited per unit flow
+	     public const float ICE_FLOATING_THRESHOLD = 0.9f; // ice floats if water depth > ice thickness * (ice_density/water_density) * threshold// Energy (Joules per kg)
+	     public const float GLACIAL_EROSION_COEFFICIENT = 0.001f;
+
+
 	     public const float AIR_DENSITY = 1.225f; // kg/m³
 				 // Air heat capacity (used if transferring heat to atmosphere)
 

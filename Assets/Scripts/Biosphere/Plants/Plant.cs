@@ -43,7 +43,7 @@ public class Plant
 	     public TileData OriginTile; //gets assigned when the plant is placed
 			   //dictionary of tiles that the plant is in, with the tile as the key and the amount of roots in that tile as the value
 	     public Dictionary<TileData, float> RootTiles = new Dictionary<TileData, float>();
-	     public ThermalEnergy storedWater = new ThermalEnergy(100, "liquid water", 334000, 2260000, 273, 373, 0.6089f, 20f); //water in the plant in liters
+	     public ThermalEnergy storedWater = new ThermalEnergy(100, "liquid water"); //water in the plant in liters
 	     public GameObject PlantObject; //gets added and instantiated with the plant
 	     public Plant()
 	     {

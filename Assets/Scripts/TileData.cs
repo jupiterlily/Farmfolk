@@ -1,4 +1,4 @@
-using UnityEngine;
+ï»¿using UnityEngine;
 
 [System.Serializable]
 public class TileData
@@ -9,15 +9,21 @@ public class TileData
 	     public float longitude; // Longitude in degrees
 	     public float elevation; // Elevation in meters
 
-
+	     public float albedo;
 	     public Vector3[] tileCorners = new Vector3[8]; //tile corners for rendering and  physics
 
 	     [Header("Dynamic States")]
 	     //public float surfaceMoisture;
-	     public ThermalEnergy surfaceWater;
-	     public float surfaceTemperature => surfaceWater.Temperature;
-	     public float volume;
-	     public float soilTemperature => composition.water.Temperature; //should be derived from energy stored in soil composition
+	     public ThermalEnergy surfaceIce;
+	     public ThermalEnergy surfaceLiquid;
+
+	     //bedrock
+	     public ThermalEnergy bedrock = new ThermalEnergy(10, "silicon dioxide", 1790000, 128000000, 1986, 3220, 1.48f);
+	     // public ThermalEnergy surfaceVapor;
+	     public float surfaceTemperature => (surfaceLiquid.Temperature + surfaceIce.Temperature) / 2;
+	     public float volume = 1; //m3
+	     public float groundElevation; // meters
+	     public float soilTemperature => composition.temperature; //should be derived from energy stored in soil composition
 
 	     public AtmosphereTile atmosphereTile;
 	     public SoilComposition composition;
@@ -27,43 +33,64 @@ public class TileData
 								   //public MechanicalEnergy
 	     public void Initialise(TileData neighbor = null, float temp = 10f)
 	     {
-		          float volume = tileWidth * tileWidth * tileWidth; // 1,000,000 m³
+		          float vol = tileWidth * tileWidth; // 1,000,000 mÂ³
 		          composition = new SoilComposition();
-		          temp += SimulationConstants.Kelvin;
-		          surfaceWater = new ThermalEnergy(15 * tileWidth, "liquid water");
-		          surfaceWater.HeatToTemp(temp);
+		          temp = TileUtilities.GetTemperatureFromLatitude(latitude, 0);
+		          surfaceLiquid = new ThermalEnergy(0.5f, "liquid water");
+		          surfaceIce = new ThermalEnergy(.5f, "ice", 334000f, 2260000f, 273f, 373f, 2.5f);
+
+		          //   surfaceVapor = new ThermalEnergy(0.5f, "water vapour");
+		          surfaceLiquid.HeatToTemp(temp);
 
 		          if (neighbor == null)
 		          {
-				// World-edge tile: use a random density (kg/m³) multiplied by volume.
-				float sandDensity = Random.Range(15.5f, 390f);      // kg/m³
+				// World-edge tile: use a random density (kg/mÂ³) multiplied by vol.
+				float sandDensity = Random.Range(15.5f, 390f);      // kg/mÂ³
 				float siltDensity = Random.Range(21f, 525f);
 				float clayDensity = Random.Range(26.5f, 662f);
 				float organicDensity = Random.Range(2.5f, 12.5f);
-
-				composition.sand.AddMass(sandDensity * volume, temp);
-				composition.silt.AddMass(siltDensity * volume, temp);
-				composition.clay.AddMass(clayDensity * volume, temp);
-				composition.organicMaterial.AddMass(organicDensity * volume, temp);
+				float waterDensity = Random.Range(100, 1500);
+				bedrock.AddMass(Random.Range(0, Constants.GRANITE_DENSITY * 4), temp);
+				if (temp > SimulationConstants.Kelvin)
+				{
+					     surfaceLiquid.AddMass(waterDensity * vol, temp + 30);
+				}
+				if (temp < SimulationConstants.Kelvin)
+				{
+					     surfaceIce.AddMass(waterDensity * vol, temp - 5);
+				}
+				composition.sand.AddMass(sandDensity * vol, temp);
+				composition.silt.AddMass(siltDensity * vol, temp);
+				composition.clay.AddMass(clayDensity * vol, temp);
+				composition.organicMaterial.AddMass(organicDensity * vol, temp);
 				composition.compaction = Random.Range(0.2f, 0.7f);
+
 		          }
 		          else
 		          {
-				// Inherit neighbor's mass, but apply a percentage variation (±15%)
+				// Inherit neighbor's mass, but apply a percentage variation (Â±15%)
 				float variation = Random.Range(0.85f, 1.15f);
 
 				float sandMass = neighbor.composition.sand.Mass * variation;
 				float siltMass = neighbor.composition.silt.Mass * variation;
 				float clayMass = neighbor.composition.clay.Mass * variation;
 				float organicMass = neighbor.composition.organicMaterial.Mass * variation;
-
+				float surfaceLiquidMass = neighbor.surfaceLiquid.Mass + neighbor.surfaceIce.Mass * variation;
 				// Optional: clamp to physically plausible density ranges 
-				// (e.g., 1 to 800 kg/m³) to prevent runaway extremes.
-				float minSand = 1f * volume;   // 1e6 kg
-				float maxSand = 800f * volume; // 8e8 kg
+				// (e.g., 1 to 800 kg/mÂ³) to prevent runaway extremes.
+				float minSand = 1f * vol;   // 1e6 kg
+				float maxSand = 800f * vol; // 8e8 kg
 				sandMass = Mathf.Clamp(sandMass, minSand, maxSand);
 				// Similarly for silt, clay, organic...
-
+				if (temp > SimulationConstants.Kelvin)
+				{
+					     surfaceLiquid.AddMass(surfaceLiquidMass * vol, temp + 30);
+				}
+				if (temp < SimulationConstants.Kelvin)
+				{
+					     surfaceIce.AddMass(surfaceLiquidMass * vol, temp);
+				}
+				bedrock.AddMass(neighbor.bedrock.Mass, temp);
 				composition.sand.AddMass(sandMass, temp);
 				composition.silt.AddMass(siltMass, temp);
 				composition.clay.AddMass(clayMass, temp);
@@ -80,35 +107,135 @@ public class TileData
 		          float wc = composition.waterCapacity;
 		          if (neighbor == null)
 		          {
-				float waterMass = Random.Range(0f, wc) * 0.5f;
-				composition.water.AddMass(waterMass, temp);
+				float waterMass = Random.Range(0f, wc);
+				if (temp > SimulationConstants.Kelvin)
+				{
+					     composition.water.AddMass(waterMass * vol, temp + 30);
+				}
+				if (temp < SimulationConstants.Kelvin)
+				{
+					     composition.ice.AddMass(waterMass * vol, temp);
+				}
 		          }
 		          else
 		          {
 				// Start with 70-100% of neighbor's water, but cap at current capacity.
-				float waterMass = neighbor.composition.water.Mass * Random.Range(0.7f, 1.0f);
-				waterMass = Mathf.Clamp(waterMass, 0f, wc);
-				composition.water.AddMass(waterMass, temp);
+				float waterMass = neighbor.composition.water.Mass * Random.Range(0.8f, 1.2f);
+				if (temp > SimulationConstants.Kelvin)
+				{
+					     composition.water.AddMass(waterMass * vol, temp + 30);
+				}
+				if (temp < SimulationConstants.Kelvin)
+				{
+					     composition.ice.AddMass(waterMass * vol, temp);
+				}
 		          }
 	     }
-	     public void CollectGases()
+	     public void CollectGases(float tilesPerAtmoTile)
 	     {
-		          //transfer surfacewater mass to atmosphere if its phase is gas. 
+		          //when collecting gases from the atmosphere, we should only collect our portion though. atmosphere tiles cover multiple surface tiles.
 
-		          //transfer gaseous soil water to atmosphere.
+		          //transfer gaseous soil and surface water to atmosphere.
 
-		          if (surfaceWater.CurrentPhase == Phase.Gas)
+		          if (surfaceLiquid.CurrentPhase == Phase.Gas)
 		          {
-				surfaceWater.TransferMassTo(atmosphereTile.waterVapor, surfaceWater.Mass);
+				surfaceLiquid.TransferMassTo(atmosphereTile.waterVapor, surfaceLiquid.Mass);
 		          }
 		          if (composition.water.CurrentPhase == Phase.Gas)
 		          {
 				composition.water.TransferMassTo(atmosphereTile.waterVapor, composition.water.Mass);
 		          }
+		          if (surfaceIce.CurrentPhase == Phase.Gas)
+		          {
+				composition.water.TransferMassTo(atmosphereTile.waterVapor, composition.water.Mass);
+		          }
+
+		          //transfer solid water from atmosphere and suface and to surface ice
+		          if (surfaceLiquid.CurrentPhase == Phase.Solid)
+		          {
+				surfaceLiquid.TransferMassTo(surfaceIce, surfaceLiquid.Mass);
+		          }
+		          if (atmosphereTile.waterVapor.CurrentPhase == Phase.Solid)
+		          {
+				atmosphereTile.waterVapor.TransferMassTo(surfaceIce, atmosphereTile.waterVapor.Mass / tilesPerAtmoTile);
+		          }
+		          if (atmosphereTile.cloudWaterContent.CurrentPhase == Phase.Solid)
+		          {
+				atmosphereTile.cloudWaterContent.TransferMassTo(surfaceIce, atmosphereTile.cloudWaterContent.Mass / tilesPerAtmoTile);
+		          }
+		          //transfer solid water from soil liquid to soil ice
+		          if (composition.water.CurrentPhase == Phase.Solid)
+		          {
+				composition.water.TransferMassTo(composition.ice, composition.water.Mass);
+		          }
+		          //transger liquid water from soil ice to soil water
+		          if (composition.ice.CurrentPhase == Phase.Liquid)
+		          {
+				composition.ice.TransferMassTo(composition.water, composition.ice.Mass);
+		          }
+		          //transfer liquids in surface ice and atmopheric ice and vapour to surface water.
+		          if (surfaceIce.CurrentPhase == Phase.Liquid)
+		          {
+				surfaceIce.TransferMassTo(surfaceLiquid, surfaceIce.Mass);
+		          }
+		          if (atmosphereTile.waterVapor.CurrentPhase == Phase.Liquid)
+		          {
+				atmosphereTile.waterVapor.TransferMassTo(surfaceLiquid, atmosphereTile.waterVapor.Mass / tilesPerAtmoTile);
+		          }
+		          if (atmosphereTile.iceParticles.CurrentPhase == Phase.Liquid)
+		          {
+				atmosphereTile.iceParticles.TransferMassTo(surfaceLiquid, atmosphereTile.iceParticles.Mass / tilesPerAtmoTile);
+		          }
+
+		          //if we have no surface water we should also move all the surface ice to the soil ice.
+		          if (surfaceLiquid.Mass < 5f && surfaceIce.Mass < 10)
+		          {
+				surfaceIce.TransferMassTo(composition.ice, surfaceIce.Mass);
+		          }
+	     }
+
+	     public void DetermineAlbedo()
+	     {
+		          float total = surfaceIce.Mass + surfaceLiquid.Mass + composition.Mass;
+		          if (total <= 0f)
+		          {
+				albedo = SurfaceAlbedo.Soil;
+				return;
+		          }
+
+		          float iceFrac = surfaceIce.Mass / total;
+		          float waterFrac = surfaceLiquid.Mass / total;
+		          float soilFrac = composition.Mass / total;
+
+		          // Base albedo from fractions
+		          float ab = iceFrac * SurfaceAlbedo.Ice +
+			      waterFrac * SurfaceAlbedo.LiquidWater +
+			      soilFrac * SurfaceAlbedo.Soil;
+
+		          // Refine soil part based on its colour (if there's soil)
+		          if (soilFrac > 0.01f && composition.Mass > 0f)
+		          {
+				Color soilColor = TileUtilities.GetSoilColor(composition);
+				float luminance = soilColor.grayscale; // 0..1
+						         // Map luminance to albedo range, e.g., dark soil ~0.1, light soil ~0.35
+				float soilAlbedo = Mathf.Lerp(0.1f, 0.35f, luminance);
+				// Replace the generic soil contribution with colourâ€‘based one
+				ab = iceFrac * SurfaceAlbedo.Ice +
+				     waterFrac * SurfaceAlbedo.LiquidWater +
+				     soilFrac * soilAlbedo;
+		          }
+
+		          albedo = Mathf.Clamp01(ab);
 	     }
 
 }
-
+public static class SurfaceAlbedo
+{
+	     public const float Ice = 0.6f;        // snow/ice
+	     public const float LiquidWater = 0.07f;
+	     public const float Soil = 0.2f;       // bare soil (can be refined by colour)
+	     public const float Vegetation = 0.18f; // if you add vegetation later
+}
 
 //nutrient capacity,  water  erosion  succeptibility, wind erosion succeptibility,  compactability,  water capacity, aeration
 
@@ -119,14 +246,15 @@ public class TileData
 public class SoilComposition
 {
 	     // Component masses (kg/m3)
-	     public ThermalEnergy sand = new ThermalEnergy(.257f, "sand", 1800000, 12500000, 1500f, 2330, 1.1f);  //kg
-	     public ThermalEnergy silt = new ThermalEnergy(.257f, "silt", 1700000, 11000000, 1550f, 2650f, 2f);  //kg
-	     public ThermalEnergy clay = new ThermalEnergy(.257f, "clay", 500000, 1300000, 1600f, 2980f, 2.5f);  //kg
+	     public ThermalEnergy sand = new ThermalEnergy(.257f, "sand", 1800000, 12500000, 1500f, 2330, 0.3347f);  //kg
+	     public ThermalEnergy silt = new ThermalEnergy(.257f, "silt", 1700000, 11000000, 1550f, 2650f, 0.0004f);  //kg
+	     public ThermalEnergy clay = new ThermalEnergy(.257f, "clay", 500000, 1300000, 1600f, 2980f, 0.676f);  //kg
 	     public ThermalEnergy organicMaterial = new ThermalEnergy(.257f, "organic matter", 237500, 2250000); //kg     
-	     public ThermalEnergy water = new ThermalEnergy(1, "liquid water", 334000, 2260000, 20);
+	     public ThermalEnergy water = new ThermalEnergy(1, "liquid water");
+	     public ThermalEnergy ice = new ThermalEnergy(1, "ice", 334000f, 2260000f, 273f, 373f, 2.5f);
 
 	     //public List<ThermalEnergy> energy => new List<ThermalEnergy>() { sand, silt, clay, organicMaterial, water };
-	     public ThermalEnergy[] energy = new ThermalEnergy[5];
+	     public ThermalEnergy[] energy = new ThermalEnergy[6];
 
 	     // Derived properties
 	     public float porosity;  //
@@ -141,7 +269,7 @@ public class SoilComposition
 	     public float horizontalPermeability;  //(cm/day)
 	     public float verticalPermeability; //(cm/day)
 	     public float compaction; //compaction percentage
-	     public float albedo;
+			//    public float albedo;
 
 	     public float sandMass => sand.Mass;
 	     public float siltMass => silt.Mass;
@@ -195,6 +323,7 @@ public class SoilComposition
 		          energy[2] = clay;
 		          energy[3] = organicMaterial;
 		          energy[4] = water;
+		          energy[5] = ice;
 	     }
 }
 [System.Serializable]
@@ -227,17 +356,17 @@ public class AtmosphereTile
 
 	     private void RecalculateTemperature()
 	     {
-		          float totalMass = nitrogen.Mass + oxygen.Mass + carbonDioxide.Mass + waterVapor.Mass;
+		          float totalMass = nitrogen.Mass + oxygen.Mass + carbonDioxide.Mass + waterVapor.Mass + cloudWaterContent.Mass + iceParticles.Mass;
 		          if (totalMass <= 0f)
 		          {
-				cachedTemperature = 273.15f;
+				cachedTemperature = SimulationConstants.Kelvin;
 		          }
 		          else
 		          {
 				cachedTemperature = ((nitrogen.Temperature * nitrogen.Mass) +
 					      (oxygen.Temperature * oxygen.Mass) +
 					      (carbonDioxide.Temperature * carbonDioxide.Mass) +
-					      (waterVapor.Temperature * waterVapor.Mass))
+					      (waterVapor.Temperature * waterVapor.Mass) + (cloudWaterContent.Temperature * cloudWaterContent.Mass) + (iceParticles.Temperature * iceParticles.Mass))
 					      / totalMass;
 		          }
 		          temperatureDirty = false;
@@ -284,6 +413,7 @@ public class AtmosphereTile
 	     }
 	     public float windSpeed;
 
+
 	     public AtmosphereTile above;
 	     public AtmosphereTile below;
 	     public AtmosphereTile[] horizontalNeighbors = new AtmosphereTile[4]; //N, E, S, W
@@ -291,9 +421,9 @@ public class AtmosphereTile
 	     public ThermalEnergy[] energies;
 	     //public float waterVapor;        // kg
 	     public ThermalEnergy[] WaterEnergy;
-	     public ThermalEnergy waterVapor = new ThermalEnergy(0.00001f, "water vapour", 334000, 2260000, 273, 373, 0.018f, 375);
+	     public ThermalEnergy waterVapor = new ThermalEnergy(0.00001f, "water vapour", 334000, 2260000, 273, 373, 0.018f, 24.57f);
 	     //public float liquidWater;       // kg
-	     public ThermalEnergy iceParticles = new ThermalEnergy(0.00001f, "ice");
+	     public ThermalEnergy iceParticles = new ThermalEnergy(0.00001f, "ice", 334000f, 2260000f, 273f, 373f, 2.5f);
 	     //clouds
 	     public ThermalEnergy cloudWaterContent = new ThermalEnergy(0.00001f, "liquid water"); // kg
 
@@ -321,7 +451,7 @@ public class AtmosphereTile
 	     }
 	     public void CollectGases()
 	     {
-		          //transfer surfacewater mass to atmosphere if its phase is gas. 
+		          //transfer surfaceLiquid mass to atmosphere if its phase is gas. 
 
 		          //transfer gaseous soil water to atmosphere.
 
@@ -353,6 +483,7 @@ public class AtmosphereTile
 
 
 	     }
+
 	     //here we need a script that calls an atmosphere utility that validates that phases are all in the right place
 
 }

@@ -22,12 +22,23 @@ public class TileManager : MonoBehaviour
 	     public float totalClay; //total clay in the world
 	     public float totalOrganicMaterial; //total organic matter in the world
 	     public float totalNRG;
+	     public int plates;
 	     public List<Sprite> leafSprites;
 	     // 3 layers, each with reduced resolution (10x tile sise)
 	     public AtmosphereTile[,,] atmosphereTiles;
-
+	     public TectonicPlate[] tectonicPlates;
 	     public Demeter demeter;
-	     // Start is called before the first frame update
+
+
+
+	     //gizmotool bools
+	     public bool drawSurfaceGizmos = true;
+	     public bool drawAtmosphereGizmos = true;
+	     public bool drawClouds = true;
+	     public bool drawWind = true;
+	     public bool drawPressure = true;
+	     public int displayedAtmoLayer = 0; // 0 = surface layer
+			          // Start is called before the first frame update
 	     void Start()
 	     {
 		          grid = new TileGrid(worldsise.x, worldsise.y, tilesize);
@@ -35,11 +46,12 @@ public class TileManager : MonoBehaviour
 		          grid.YGrid = worldsise.y;
 		          tiles = new WorldTile[worldsise.x, worldsise.y];
 
+		          tectonicPlates = new TectonicPlate[plates];
 		          // Atmosphere tile setup
 
 		          int atmGridX = Mathf.CeilToInt((float)worldsise.x / atmoRatio);
 		          int atmGridY = Mathf.CeilToInt((float)worldsise.y / atmoRatio);
-		          int atmLayers = 8;
+		          int atmLayers = 5;
 		          atmosphereTiles = new AtmosphereTile[atmLayers, atmGridX, atmGridY];
 		          int layorFactor = 2;
 		          //  atmosphericMoisture *= atmoRatio * (atmGridX * atmGridY * atmLayers);
@@ -62,6 +74,7 @@ public class TileManager : MonoBehaviour
 						          float targetRH = 0.75f; // 75% humidity to start
 						          float satMass = AtmosphereUtilities.CalculateSaturationWaterMass(targetTempK, atmTile.pressure, volume);
 						          float vaporMass = satMass * targetRH * UnityEngine.Random.Range(0.9f, 1.1f);
+						          vaporMass *= atmoFactor;
 						          atmTile.waterVapor.AddMass(vaporMass, targetTempK);
 						          // Do NOT initialize cloud water with the same mass; make it very small.
 						          atmTile.cloudWaterContent.AddMass(atmosphericMoisture, targetTempK);
@@ -98,6 +111,8 @@ public class TileManager : MonoBehaviour
 					   // Increase layer height by factor of 3 for each layer, later 1 is 3m, 2 is 9m, 3 is 27m, 4 is 81m, 5 is 243m, 6 is 729m, 7 is 2187m (2.187km) 
 		          }
 
+		          //generate plates. take the number of plates we are supposed to generate. choose that many unique coordinates from the tile grid, assign to a plate, then go through each tile and add one of its neighbors to its plate. if the tile already has aplate, ignore it and move to the next one.
+
 		          for (int i = 0; i < grid.XGrid; i++)
 		          {
 				//row numbering
@@ -119,8 +134,8 @@ public class TileManager : MonoBehaviour
 					     grid.Map.SetValue(data, i, j);
 					     tiles.SetValue(tile.GetComponent<WorldTile>(), i, j);
 					     tile.transform.position = new Vector3(i, 0.5f, j);
-					     tile.GetComponent<WorldTile>().tileData.Initialise(TileUtilities.GetValidNeighbour(data, grid), airTemp);
-					     tile.GetComponent<Renderer>().material.color = TileUtilities.GetSoilColor(tile.GetComponent<WorldTile>().tileData.composition);
+					     // tile.GetComponent<WorldTile>().tileData.Initialise(TileUtilities.GetValidNeighbour(data, grid), airTemp);
+					     //   tile.GetComponent<Renderer>().material.color = TileUtilities.GetSoilColor(tile.GetComponent<WorldTile>().tileData.composition);
 					     //set the name of the tile based on its grid position
 					     tile.name = "Tile " + rowLabel + (j + 1).ToString();
 
@@ -155,22 +170,25 @@ public class TileManager : MonoBehaviour
 				}
 		          }
 		          AllocateNeighbors();
+		          AssignPlates();
 		          AssignAtmosphereHorizontalNeighbors();
 		          AtmosphereUtilities.InitializeHadleyCellWinds(atmosphereTiles, this);
 		          AtmosphereUtilities.FinalizePressurePatterns(atmosphereTiles);
-		          //  AtmosphereStep(10f); // Initial atmosphere update
-		          int k = atmLayers * 2;
-		          for (int i = 0; i < k; i++)
-		          {
-				AtmosphereStep(0.5f); // Initial atmosphere update
-		          }
-
+		          HydrosphereStep(0.2f);
+		          AtmosphereStep(0.6f); // Initial atmosphere update
+				  // int k = atmLayers * 2;
+				  //        for (int i = 0; i < k; i++)
+				  //        {
+				  //AtmosphereStep(0.5f); // Initial atmosphere update
+				  //        }
+		          HydrosphereStep(0.2f);
+		          HydrosphereStep(0.2f);
 		          TileUpdate(0.5f); // Initial update
-		          TileUpdate(0.5f); // Initial update
-		          TileUpdate(0.5f); // Initial update
-		          TileUpdate(0.5f); // Initial update
-		          TileUpdate(0.5f); // Initial update
-			             // WakeDemeter();
+			             //         TileUpdate(0.5f); // Initial update
+			             //         TileUpdate(0.5f); // Initial update
+			             //        TileUpdate(0.5f); // Initial update
+			             //          TileUpdate(0.5f); // Initial update
+		          WakeDemeter();
 
 	     }
 	     void WakeDemeter()
@@ -196,7 +214,7 @@ public class TileManager : MonoBehaviour
 		          foreach (var tile in tiles)
 		          {
 				TileData data = tile.tileData;
-				if (data.composition.water.Mass > 5f && data.surfaceWater.Mass < 10f && (data.composition.organicMaterial.Mass > 1f || data.composition.clay.Mass > 1f || data.composition.silt.Mass > 1f || data.composition.sand.Mass > 1f))
+				if (data.composition.water.Mass > 5f && data.surfaceLiquid.Mass < 10f && (data.composition.organicMaterial.Mass > 1f || data.composition.clay.Mass > 1f || data.composition.silt.Mass > 1f || data.composition.sand.Mass > 1f))
 				{
 					     plantPositions.Add(data);
 				}
@@ -265,7 +283,10 @@ public class TileManager : MonoBehaviour
 		          }
 		          foreach (var tile in grid.Map)
 		          {
-				// Process the surface energy balance and get the reflected solar
+
+				//calculate albedo
+				tile.DetermineAlbedo();
+				// Process the surface energy balance and get the reflected solar. 
 				AtmosphereUtilities.ProcessSurfaceEnergyBalance(tile, hours);
 
 		          }
@@ -273,7 +294,7 @@ public class TileManager : MonoBehaviour
 
 		          foreach (var tile in atmosphereTiles)
 		          {
-				AtmosphereUtilities.AtmosphericConduction(tile, hours);
+				//AtmosphereUtilities.AtmosphericConduction(tile, hours);
 				AtmosphereUtilities.ApplyAdiabaticCooling(tile, hours);
 				//HydrosphereUtilities.ApplyAtmosphericPhaseChanges(tile, hours);
 				//TileData[] under = GetSurfaceTilesUnderAtmo(tile.tileGridRef.x, tile.tileGridRef.y);
@@ -281,31 +302,150 @@ public class TileManager : MonoBehaviour
 
 		          }
 		          // --- Phase 2: Global atmospheric dynamics (ONCE per timestep) ---
-		          // Advection (moves air, vapor, clouds)
-		          AtmosphereUtilities.ApplyAtmosphericAdvection(atmosphereTiles, hours);
+		          // Advection (moves air, vapor, clouds) vertical advection should be more simple.
+
 
 		          AtmosphereUtilities.UpdateAtmosphericPressure(atmosphereTiles);
 		          AtmosphereUtilities.UpdateAtmosphericWind(atmosphereTiles, hours);
 
+		          // AtmosphereUtilities.ApplyAtmosphericAdvection(atmosphereTiles, hours);
 		          // Latent heat release (condensation) – you need to implement this
 		          //ProcessLatentHeat(atmosphereTiles, hours);
 		          AtmosphereUtilities.FinalizePressurePatterns(atmosphereTiles);
 		          // Precipitation (from clouds to surface)
-		          ApplyPrecipitationToSurface(hours);
-		          foreach (var tile in grid.Map)
-		          {
-				//  surface.CollectGases();
-				HydrosphereUtilities.UpdateSurfaceHydrosphere(tile.atmosphereTile, tile, tile.incomingSolarEnergy.RemoveEnergy(tile.incomingSolarEnergy.StoredEnergy), hours);
-				tile.CollectGases();
-		          }
+
 		          // --- Phase 3: Surface processes (ONCE per timestep) ---
-		          //    TileUpdate(hours);
+		          //TileUpdate(hours);
 
 		          // --- Phase 4: Diagnostics (ONCE per timestep) ---
 		          //UpdateTotals();
 	     }
+	     public void HydrosphereStep(float hours)
+	     {
 
+		          ApplyPrecipitationToSurface(hours);
+		          foreach (var tile in grid.Map)
+		          {
 
+				//  surface.CollectGases();
+				HydrosphereUtilities.UpdateSurfaceHydrosphere(tile.atmosphereTile, tile, tile.incomingSolarEnergy.RemoveEnergy(tile.incomingSolarEnergy.StoredEnergy), hours);
+
+				CryosphereUtilities.RedistributeSurfaceWaterAndIce(tiles[tile.tileGridRef.x, tile.tileGridRef.y], hours);
+				//HydrosphereUtilities.RedistributeWaterLateral(tiles[tile.tileGridRef.x, tile.tileGridRef.y], hours);
+				tile.CollectGases(atmoRatio * atmoRatio);
+		          }
+	     }
+	     public void AssignPlates()
+	     {
+		          if (plates <= 0)
+				return;
+
+		          // ---- 1. Generate unique seed points (same as your working method) ----
+		          List<Vector2Int> seeds = new List<Vector2Int>();
+		          int maxAttempts = 1000;
+		          int attempts = 0;
+		          while (seeds.Count < plates && attempts < maxAttempts)
+		          {
+				int x = UnityEngine.Random.Range(0, worldsise.x);
+				int y = UnityEngine.Random.Range(0, worldsise.y);
+				Vector2Int candidate = new Vector2Int(x, y);
+				if (!seeds.Contains(candidate))
+					     seeds.Add(candidate);
+				attempts++;
+		          }
+		          while (seeds.Count < plates) // fallback
+				seeds.Add(new Vector2Int(
+				    UnityEngine.Random.Range(0, worldsise.x),
+				    UnityEngine.Random.Range(0, worldsise.y)
+				));
+
+		          // ---- 2. Initialise plates and ownership ----
+		          tectonicPlates = new TectonicPlate[plates];
+		          int[,] owner = new int[worldsise.x, worldsise.y];
+		          for (int x = 0; x < worldsise.x; x++)
+				for (int y = 0; y < worldsise.y; y++)
+					     owner[x, y] = -1;
+
+		          Queue<Vector2Int> queue = new Queue<Vector2Int>();
+
+		          for (int i = 0; i < plates; i++)
+		          {
+				TectonicPlate plate = new TectonicPlate();
+				plate.Name = "Plate " + (i + 1);
+				plate.pivotTile = seeds[i];
+				tectonicPlates[i] = plate;
+
+				Vector2Int seed = seeds[i];
+				owner[seed.x, seed.y] = i;
+				queue.Enqueue(seed);
+		          }
+
+		          // ---- 3. Pre‑compute all 8 neighbour offsets (including diagonals) ----
+		          Vector2Int[] offsets = new Vector2Int[]
+		          {
+        new Vector2Int( 1,  0), // North
+        new Vector2Int( 1,  1), // North-East
+        new Vector2Int( 0,  1), // East
+        new Vector2Int(-1,  1), // South-East
+        new Vector2Int(-1,  0), // South
+        new Vector2Int(-1, -1), // South-West
+        new Vector2Int( 0, -1), // West
+        new Vector2Int( 1, -1)  // North-West
+		          };
+
+		          // ---- 4. BFS growth with random neighbour order ----
+		          while (queue.Count > 0)
+		          {
+				Vector2Int current = queue.Dequeue();
+				int plateIdx = owner[current.x, current.y];
+
+				// Get up to 8 valid neighbours (with pole and wrap handling)
+				Vector2Int[] neighbours = GetNeighbours8(current.x, current.y);
+
+				// Shuffle the neighbour list for organic growth
+				for (int i = neighbours.Length - 1; i > 0; i--)
+				{
+					     int j = UnityEngine.Random.Range(0, i + 1);
+					     Vector2Int temp = neighbours[i];
+					     neighbours[i] = neighbours[j];
+					     neighbours[j] = temp;
+				}
+
+				foreach (Vector2Int n in neighbours)
+				{
+					     // Skip invalid (out of bounds) – GetNeighbours8 already returns valid ones,
+					     // but we keep the check for safety.
+					     if (n.x < 0 || n.x >= worldsise.x || n.y < 0 || n.y >= worldsise.y)
+						          continue;
+
+					     if (owner[n.x, n.y] == -1)
+					     {
+						          owner[n.x, n.y] = plateIdx;
+						          WorldTile tile = tiles[n.x, n.y];
+						          tile.Plate = tectonicPlates[plateIdx];
+						          tectonicPlates[plateIdx].tiles.Add(tile.tileData);
+						          queue.Enqueue(n);
+					     }
+				}
+		          }
+
+		          // ---- 5. Verify all tiles are assigned (should never happen) ----
+		          for (int x = 0; x < worldsise.x; x++)
+				for (int y = 0; y < worldsise.y; y++)
+					     if (owner[x, y] == -1)
+						          Debug.LogWarning($"Tile ({x},{y}) not assigned to any plate – filling with plate 0");
+
+		          // ---- 6. Initialise each plate using its seed tile ----
+		          foreach (var plate in tectonicPlates)
+		          {
+				TileData seedTile = GetTileData(plate.pivotTile);
+				seedTile.Initialise();                          // seed gets a fresh random composition
+				foreach (TileData data in plate.tiles)
+				{
+					     data.Initialise(seedTile);                  // other tiles copy the seed (with ±15% variation)
+				}
+		          }
+	     }
 	     private TileData[] GetSurfaceTilesUnderAtmo(int atmX, int atmY)
 	     {
 		          int startX = atmX * atmoRatio;
@@ -341,7 +481,54 @@ public class TileManager : MonoBehaviour
 				}
 		          }
 	     }
+	     private Vector2Int[] GetNeighbours8(int x, int y)
+	     {
+		          Vector2Int[] neighbours = new Vector2Int[8];
+		          int count = 0;
 
+		          int yEast = (y + 1) % worldsise.y;
+		          int yWest = (y - 1 + worldsise.y) % worldsise.y;
+
+		          // ---- North (latitude +1) ----
+		          if (x < worldsise.x - 1)
+		          {
+				neighbours[count++] = new Vector2Int(x + 1, y);
+				neighbours[count++] = new Vector2Int(x + 1, yEast);
+				neighbours[count++] = new Vector2Int(x + 1, yWest);
+		          }
+		          else // North Pole
+		          {
+				int oppositeY = (y + worldsise.y / 2) % worldsise.y;
+				neighbours[count++] = new Vector2Int(x, oppositeY);
+				neighbours[count++] = new Vector2Int(x, (oppositeY + 1) % worldsise.y);
+				neighbours[count++] = new Vector2Int(x, (oppositeY - 1 + worldsise.y) % worldsise.y);
+		          }
+
+		          // ---- South (latitude -1) ----
+		          if (x > 0)
+		          {
+				neighbours[count++] = new Vector2Int(x - 1, y);
+				neighbours[count++] = new Vector2Int(x - 1, yEast);
+				neighbours[count++] = new Vector2Int(x - 1, yWest);
+		          }
+		          else // South Pole
+		          {
+				int oppositeY = (y + worldsise.y / 2) % worldsise.y;
+				neighbours[count++] = new Vector2Int(x, oppositeY);
+				neighbours[count++] = new Vector2Int(x, (oppositeY + 1) % worldsise.y);
+				neighbours[count++] = new Vector2Int(x, (oppositeY - 1 + worldsise.y) % worldsise.y);
+		          }
+
+		          // ---- East / West (same latitude) ----
+		          neighbours[count++] = new Vector2Int(x, yEast);
+		          neighbours[count++] = new Vector2Int(x, yWest);
+
+		          // Fill remaining slots with invalid coordinates (they'll be skipped)
+		          while (count < 8)
+				neighbours[count++] = new Vector2Int(-1, -1);
+
+		          return neighbours;
+	     }
 	     /// <summary>
 	     /// Calculates precipitation for an atmosphere tile
 	     /// </summary>
@@ -420,7 +607,7 @@ public class TileManager : MonoBehaviour
 					     TileData data = tile.tileData;
 
 					     // Transfer directly from cloud to surface – no temporary object
-					     ThermalEnergyUtilities.TransferMassAndEnergy(cloudWater, data.surfaceWater, perTile);
+					     ThermalEnergyUtilities.TransferMassAndEnergy(cloudWater, data.surfaceLiquid, perTile * UnityEngine.Random.Range(0.9f, 1.1f));
 				}
 		          }
 
@@ -461,51 +648,23 @@ public class TileManager : MonoBehaviour
 		          WorldTile tile = tiles[data.tileGridRef.x, data.tileGridRef.y];
 		          if (tile == null)
 				return;
-
+		          //temperature redisttribution
+		          SoilUtilities.UpdateSoilTemperature(data, hours);
+		          SoilUtilities.ConductHeatLateral(tile, hours);
+		          HydrosphereUtilities.ConductHeatLateral(tile, hours);
 		          // Soil physical processes
-		          SoilUtilities.InfiltrateSurfaceMoisture(data, hours);
+		          //SoilUtilities.InfiltrateSurfaceMoisture(data, hours);
 		          SoilUtilities.ApplySelfCompaction(data, hours);
 		          SoilUtilities.UpdateDecompaction(data.composition, hours);
 		          SoilUtilities.CalculateDerivedProperties(data.composition);
 
 		          // Water redistribution
-		          HydrosphereUtilities.RedistributeSurfaceWater(tile, hours);
-		          SoilUtilities.RedistributeWaterLateral(tile, hours);
+		          //CryosphereUtilities.RedistributeSurfaceWaterAndIce(tile, hours);
 
 		          // 3. Surface‑atmosphere conduction (already in UpdateSoilTemperature, but we can keep it)
 		          //    We'll keep the call to SoilUtilities.UpdateSoilTemperature which handles surface‑air conduction.
-		          SoilUtilities.UpdateSoilTemperature(data, hours);
+
 	     }
-
-	     /// <summary>
-	     /// Computes a bulk thermal conductivity for the soil (excluding air).
-	     /// Uses a weighted harmonic mean (series model) for layered materials, or a geometric mean.
-	     /// For simplicity, we use a weighted arithmetic mean based on volume fractions.
-	     /// </summary>
-	     private float ComputeBulkThermalConductivity(SoilComposition sc)
-	     {
-		          // Thermal conductivities (W/m·K) - approximate values
-		          float kSand = 1.1f;
-		          float kSilt = 2.0f;
-		          float kClay = 2.5f;
-		          float kOrganic = 0.2f;
-		          float kWater = 0.6f;
-
-		          // Volume fractions (m³) – using mass / density
-		          float volSand = sc.sand.Mass / Constants.SAND_DENSITY;
-		          float volSilt = sc.silt.Mass / Constants.SILT_DENSITY;
-		          float volClay = sc.clay.Mass / Constants.CLAY_DENSITY;
-		          float volOrganic = sc.organicMaterial.Mass / Constants.ORGANIC_DENSITY;
-		          float volWater = sc.water.Mass / 1000f; // water density ~1000 kg/m³
-		          float totalVol = volSand + volSilt + volClay + volOrganic + volWater;
-		          if (totalVol <= 0f)
-				return 0.5f; // fallback
-
-		          // Weighted arithmetic mean (isotropic approximation)
-		          float k = (volSand * kSand + volSilt * kSilt + volClay * kClay + volOrganic * kOrganic + volWater * kWater) / totalVol;
-		          return Mathf.Clamp(k, 0.1f, 5f);
-	     }
-
 
 	     public void AllocateNeighbors()
 	     {
@@ -661,6 +820,33 @@ public class TileManager : MonoBehaviour
 				}
 		          }
 	     }
+
+	     /// <summary>
+	     /// Returns the TileData at the specified grid position.
+	     /// </summary>
+	     /// <param name="gridPos">Grid coordinates (x, y) in tile indices.</param>
+	     /// <returns>TileData if position is valid; otherwise null.</returns>
+	     public TileData GetTileData(Vector2Int gridPos)
+	     {
+		          if (gridPos.x < 0 || gridPos.x >= worldsise.x ||
+		              gridPos.y < 0 || gridPos.y >= worldsise.y)
+				return null;
+
+		          WorldTile tile = tiles[gridPos.x, gridPos.y];
+		          return tile != null ? tile.tileData : null;
+	     }
+
+	     /// <summary>
+	     /// Overload that accepts a Vector2 (floats) and rounds to the nearest integer grid position.
+	     /// </summary>
+	     public TileData GetTileData(Vector2 gridPos)
+	     {
+		          Vector2Int intPos = new Vector2Int(
+		              Mathf.RoundToInt(gridPos.x),
+		              Mathf.RoundToInt(gridPos.y)
+		          );
+		          return GetTileData(intPos);
+	     }
 	     // Call this before and after simulation steps to check for conservation
 	     public void UpdateTotals()
 	     {
@@ -676,7 +862,7 @@ public class TileManager : MonoBehaviour
 				for (int j = 0; j < worldsise.y; j++)
 				{
 					     var comp = tiles[i, j].tileData.composition;
-					     waterSum += comp.water.Mass + tiles[i, j].tileData.surfaceWater.Mass;
+					     waterSum += comp.water.Mass + tiles[i, j].tileData.surfaceLiquid.Mass + tiles[i, j].tileData.surfaceIce.Mass + comp.ice.Mass;
 
 					     totalSand += comp.sand.Mass;
 					     totalSilt += comp.silt.Mass;
@@ -752,76 +938,84 @@ public class TileManager : MonoBehaviour
 		          int atmGridX = atmosphereTiles.GetLength(1);
 		          int atmGridY = atmosphereTiles.GetLength(2);
 
-		          // ----- 1. Draw surface tiles (moisture & temperature) -----
-		          DrawSurfaceTilesGizmos();
+		          // ---- 1. Surface tiles (always drawn if enabled) ----
+		          if (drawSurfaceGizmos)
+				DrawSurfaceTilesGizmos();
 
-		          // ----- 2. Draw atmosphere columns (stacked layers) -----
-		          for (int layer = 0; layer < atmLayers; layer++)
+		          // ---- 2. Atmosphere (only the selected layer) ----
+		          if (!drawAtmosphereGizmos)
+				return;
+
+		          int layer = Mathf.Clamp(displayedAtmoLayer, 0, atmLayers - 1);
+
+		          for (int x = 0; x < atmGridX; x++)
 		          {
-				for (int x = 0; x < atmGridX; x++)
+				for (int y = 0; y < atmGridY; y++)
 				{
-					     for (int y = 0; y < atmGridY; y++)
+					     AtmosphereTile atmo = atmosphereTiles[layer, x, y];
+					     if (atmo == null)
+						          continue;
+
+					     Vector3 pos = GetAtmoTileWorldPos(x, y, layer, atmo);
+
+					     // ---- a) Temperature (colour‑coded cube) ----
+					     float tempC = atmo.temperature - SimulationConstants.Kelvin;
+					     Color tempColor = GetTemperatureColor(tempC);
+					     Gizmos.color = tempColor;
+					     Gizmos.DrawCube(pos, new Vector3(0.3f, 0.3f, 0.3f) * 0.5f);
+
+					     // ---- b) Humidity (small sphere, only if significant) ----
+					     float rh = atmo.RelativeHumidity;
+					     if (rh > 0.1f)
 					     {
-						          AtmosphereTile atmo = atmosphereTiles[layer, x, y];
-						          if (atmo == null)
-								continue;
+						          Gizmos.color = new Color(0.2f, 0.4f, 0.8f, 0.5f);
+						          float humSize = 0.2f + 0.5f * rh;
+						          Gizmos.DrawSphere(pos + Vector3.up * 0.6f, humSize);
+					     }
 
-						          Vector3 pos = GetAtmoTileWorldPos(x, y, layer, atmo);
+					     // ---- c) Clouds (white fluffy, only if enabled and mass > threshold) ----
+					     if (drawClouds && atmo.cloudWaterContent.Mass > 0.1f)
+					     {
+						          float cloudMass = atmo.cloudWaterContent.Mass;
+						          float cloudSize = 0.3f * Mathf.Clamp01(cloudMass / 10f);
+						          Gizmos.color = new Color(1f, 1f, 1f, 0.4f);
+						          Gizmos.DrawSphere(pos + new Vector3(0, 0.8f, 0), cloudSize + 0.2f);
+						          Gizmos.DrawSphere(pos + new Vector3(0.3f, 0.9f, 0.2f), cloudSize);
+						          Gizmos.DrawSphere(pos + new Vector3(-0.2f, 0.7f, -0.3f), cloudSize * 0.8f);
+					     }
 
-						          // ---- a) Humidity sphere (blue gradient) ----
-						          float rh = atmo.RelativeHumidity;
-						          Gizmos.color = new Color(0.2f, 0.2f, 0.8f + 0.2f * rh, 0.6f);
-						          float humSize = 0.3f + 0.7f * rh;
-						          Gizmos.DrawSphere(pos, humSize);
+					     // ---- d) Wind (arrow, only if enabled and speed > threshold) ----
+					     if (drawWind && atmo.windSpeed > 0.5f)
+					     {
+						          float speedNorm = Mathf.Clamp01(atmo.windSpeed / 20f);
+						          Color windColor = Color.Lerp(Color.green, Color.red, speedNorm);
+						          Gizmos.color = windColor;
+						          Vector3 windDir = atmo.windVelocity.normalized;
+						          float arrowLength = 0.5f + speedNorm * 1.5f;
+						          Vector3 end = pos + windDir * arrowLength;
+						          Gizmos.DrawLine(pos, end);
+						          DrawArrowHead(pos, end, 0.2f);
+					     }
 
-						          // ---- b) Cloud water (white fluffy cloud) ----
-						          if (atmo.cloudWaterContent.Mass > 0.01f)
-						          {
-								float cloudMass = atmo.cloudWaterContent.Mass;
-								float cloudSize = 0.2f + 0.8f * Mathf.Clamp01(cloudMass / 10f);
-								// Draw several overlapping spheres for fluffiness
-								Gizmos.color = new Color(1f, 1f, 1f, 0.4f);
-								Gizmos.DrawSphere(pos + new Vector3(0, 0.5f, 0), cloudSize);
-								Gizmos.DrawSphere(pos + new Vector3(0.3f, 0.6f, 0.2f), cloudSize * 0.7f);
-								Gizmos.DrawSphere(pos + new Vector3(-0.2f, 0.4f, -0.3f), cloudSize * 0.6f);
-								Gizmos.DrawSphere(pos + new Vector3(0.1f, 0.8f, -0.1f), cloudSize * 0.5f);
-						          }
-
-						          // ---- c) Temperature cube (colour‑coded) ----
-						          float tempC = atmo.temperature - SimulationConstants.Kelvin;
-						          Color tempColor = GetTemperatureColor(tempC);
-						          Gizmos.color = tempColor;
-						          float tempSize = 0.3f + Mathf.Clamp01(Mathf.Abs(tempC) / 60f) * 0.5f;
-						          Gizmos.DrawWireCube(pos + Vector3.up * 0.1f, Vector3.one * tempSize);
-
-						          // ---- d) Wind arrow (dynamic) ----
-						          if (atmo.windSpeed > 0.01f)
-						          {
-								float maxWind = 30f; // for normalisation
-								float speedNorm = Mathf.Clamp01(atmo.windSpeed / maxWind);
-								Color windColor = Color.Lerp(Color.green, Color.red, speedNorm);
-								Gizmos.color = windColor;
-								Vector3 windDir = atmo.windVelocity.normalized;
-								float arrowLength = 0.5f + speedNorm * 2f;
-								Vector3 end = pos + windDir * arrowLength;
-								Gizmos.DrawLine(pos, end);
-								DrawArrowHead(pos, end, 0.3f);
-						          }
-
-						          // ---- e) Pressure as a vertical bar ----
+					     // ---- e) Pressure (small vertical bar, only if enabled) ----
+					     if (drawPressure && atmo.pressure > 0)
+					     {
 						          float pressureNorm = Mathf.Clamp01(atmo.pressure / 110000f);
 						          Gizmos.color = new Color(0.8f, 0.8f, 0.2f, 0.5f);
-						          Vector3 barBase = pos + new Vector3(0.8f, -0.3f, 0);
-						          Vector3 barTop = barBase + Vector3.up * pressureNorm * 0.8f;
+						          Vector3 barBase = pos + new Vector3(0.6f, -0.3f, 0);
+						          Vector3 barTop = barBase + Vector3.up * pressureNorm * 0.5f;
 						          Gizmos.DrawLine(barBase, barTop);
-						          Gizmos.DrawWireCube((barBase + barTop) / 2, new Vector3(0.1f, 0.8f * pressureNorm, 0.1f));
-
-						          // ---- f) Debug label (optional) ----
-#if UNITY_EDITOR
-						          string label = $"L{layer}\n{tempC:F0}°C\n{rh:P0}";
-						          UnityEditor.Handles.Label(pos + Vector3.up * 1.2f, label);
-#endif
+						          Gizmos.DrawWireCube((barBase + barTop) / 2, new Vector3(0.08f, pressureNorm * 0.5f, 0.08f));
 					     }
+
+#if UNITY_EDITOR
+					     // ---- f) Debug label (optional, only if hovering) ----
+					     if (UnityEditor.Selection.activeGameObject == gameObject)
+					     {
+						          UnityEditor.Handles.Label(pos + Vector3.up * 3f,
+						              $"T:{tempC:F0}°C\nRH:{rh:P0}\nP:{atmo.pressure / 1000f:F1}kPa");
+					     }
+#endif
 				}
 		          }
 	     }
@@ -829,7 +1023,7 @@ public class TileManager : MonoBehaviour
 	     private Vector3 GetAtmoTileWorldPos(int x, int y, int layer, AtmosphereTile atmo)
 	     {
 		          // X and Z: visual grid. Each atm tile covers 'atmoRatio' surface tiles (spacing 1).
-		          float visualSpacing = atmoRatio; // == atmTileSise / tilesize
+		          float visualSpacing = atmoRatio + layer; // == atmTileSise / tilesize
 		          float worldX = (x + 0.5f) * visualSpacing;
 		          float worldZ = (y + 0.5f) * visualSpacing;
 
@@ -893,7 +1087,7 @@ public class TileManager : MonoBehaviour
 					     Gizmos.DrawCube(pos, new Vector3(0.8f, 0.05f, 0.8f));
 
 					     // ---- b) Surface water depth (translucent disc) ----
-					     float waterDepth = data.surfaceWater.Mass / 1000f; // m (assuming 1m² area)
+					     float waterDepth = data.surfaceLiquid.Mass / 1000f; // m (assuming 1m² area)
 					     if (waterDepth > 0.001f)
 					     {
 						          float maxDepth = 0.5f; // visual max
