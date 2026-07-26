@@ -90,7 +90,7 @@ public static class UILibrary
 				("GameSpeed", new List<UISection>
 				{ BuildSectionDataGameSpeed(simMaster, manager) }) })
 		          {
-				PreferredSize = new Vector2(300, 150),
+				PreferredSize = new Vector2(150, 150),
 				CanResize = false,
 				CanClose = false,
 				CanMinimize = false
@@ -295,10 +295,8 @@ public static class UILibrary
 	     /// 2. Surface water content
 	     /// 3. Atmosphere tile composition
 	     /// </summary>
-	     public static UISection BuildSectionTileCompositionDisplay(TileData tile, UIManager uim)
+	     public static UISection BuildSectionTileCompositionDisplay(UISection_Tile rootSection)
 	     {
-		          if (tile == null)
-				return new UISection("Matter Composition", true, new List<UIComponentData>());
 
 		          List<UIComponentData> components = new List<UIComponentData>();
 
@@ -307,7 +305,7 @@ public static class UILibrary
 		          {
 				Getter = () =>
 				{
-					     return UIUtilities.CreateSoilGraph(tile.composition);
+					     return UIUtilities.CreateSoilGraph(rootSection.tileData.composition);
 				},
 				VerticalLayout = false
 		          };
@@ -317,7 +315,7 @@ public static class UILibrary
 		          {
 				Getter = () =>
 				{
-					     return UIUtilities.CreateWaterGraph(tile);
+					     return UIUtilities.CreateWaterGraph(rootSection.tileData);
 				},
 				VerticalLayout = false
 		          };
@@ -327,7 +325,7 @@ public static class UILibrary
 		          {
 				Getter = () =>
 				{
-					     return UIUtilities.CreateAtmosphereGraph(tile.atmosphereTile);
+					     return UIUtilities.CreateAtmosphereGraph(rootSection.tileData.atmosphereTile);
 				},
 				VerticalLayout = false
 		          };
@@ -335,31 +333,29 @@ public static class UILibrary
 		          components.Add(soilCompositionField);
 		          components.Add(surfaceLiquidField);
 		          components.Add(atmosphereCompositionField);
-
 		          var section = new UISection("Matter Composition", true, components)
 		          {
 				Padding = new RectOffset(5, 5, 5, 5),
-				Spacing = 10,
+				Spacing = 5,
 				VerticalLayout = true,
 				ChildForceExpandWidth = true,
 				ChildForceExpandHeight = false,
 				DisplayLabel = true
 		          };
-
 		          return section;
 	     }
 
 	     /// <summary>
 	     /// Builds the "Modify Instance" section for altering tile composition.
 	     /// </summary>
-	     public static UISection_Tile BuildSectionTileModifyInstance(TileData initialTile, TileManager tileManager, UIManager uim)
+	     public static UISection BuildSectionTileModifyInstance(UISection_Tile root, TileManager manager, UIManager uim)
 	     {
 		          // 1. Create the components list (empty for now)
 		          List<UIComponentData> components = new List<UIComponentData>();
 
 		          // 2. CREATE THE SECTION FIRST. 
 		          // We pass 'initialTile' into it so its `tileData` field starts correctly.
-		          var section = new UISection_Tile("Modify Instance", initialTile, true, components)
+		          var section = new UISection("Modify Tile", true, components)
 		          {
 				Padding = new RectOffset(5, 5, 5, 5),
 				Spacing = 5,
@@ -367,58 +363,65 @@ public static class UILibrary
 				DisplayLabel = true
 		          };
 
-		          // 3. Build the tile options list
-		          List<string> tileOptions = new List<string>();
-		          for (int x = 0; x < tileManager.worldsise.x; x++)
-				for (int y = 0; y < tileManager.worldsise.y; y++)
-					     tileOptions.Add($"({x},{y})");
+		          // ─── Build X and Y options separately ───
+		          List<string> xOptions = new List<string>();
+		          List<string> yOptions = new List<string>();
+		          for (int x = 0; x < manager.worldsise.x; x++)
+				xOptions.Add(x.ToString());
+		          for (int y = 0; y < manager.worldsise.y; y++)
+				yOptions.Add(y.ToString());
 
-		          // 4. DROPDOWN - It updates `section.tileData`!
-		          var tileRefField = new DropdownField("Tile Reference (X,Y)", tileOptions, 0, uim.BodyFontSize)
+		          // ─── Horizontal layout to put X and Y side by side ───
+		          var coordSection = new UISection("Tile Coordinates", false, new List<UIComponentData>())
 		          {
-				Getter = () =>
-				{
-					     // Read from the SECTION's current tile
-					     string coord = $"({section.tileData.tileGridRef.x},{section.tileData.tileGridRef.y})";
-					     return tileOptions.IndexOf(coord);
-				},
+				DisplayLabel = false,
+				Spacing = 5,
+				Padding = new RectOffset(0, 0, 0, 0),
+				VerticalLayout = false,
+				ChildForceExpandWidth = true
+		          };
+
+		          // ─── X Dropdown ───
+		          var tileRefFieldX = new DropdownField("X", xOptions, root.tileData.tileGridRef.x, uim.BodyFontSize)
+		          {
+				Getter = () => root.tileData.tileGridRef.x,
 				Setter = (val) =>
 				{
-					     // WRITE to the SECTION's tileData
-					     int idx = (int)val;
-					     Vector2 pos = UIUtilities.GetVector2FromString(tileOptions[idx]);
-					     section.tileData = tileManager.GetTileData(pos); // UPDATING THE SECTION!
+					     int newX = (int)val;
+					     Vector2 pos = new Vector2(newX, root.tileData.tileGridRef.y);
+					     TileData newTile = manager.GetTileData(pos);
+					     if (newTile != null)
+					     {
+						          root.tileData = newTile;
+						          UIUtilities.RefreshAllFields(coordSection);
+					     }
 				},
 				VerticalLayout = false
 		          };
+		          coordSection.Components.Add(tileRefFieldX);
 
-		          // 5. SOIL GRAPH - It reads from `section.tileData` dynamically!
-		          var dynamicSoilGraph = new GraphField("Soil Composition", GraphType.bar, 1f, 120f)
+		          // ─── Y Dropdown ───
+		          var tileRefFieldY = new DropdownField("Y", yOptions, root.tileData.tileGridRef.y, uim.BodyFontSize)
 		          {
-				Getter = () =>
+				Getter = () => root.tileData.tileGridRef.y,
+				Setter = (val) =>
 				{
-					     if (section.tileData == null)
-						          return new Graph();
-					     return UIUtilities.CreateSoilGraph(section.tileData.composition);
+					     int newY = (int)val;
+					     Vector2 pos = new Vector2(root.tileData.tileGridRef.x, newY);
+					     TileData newTile = manager.GetTileData(pos);
+					     if (newTile != null)
+					     {
+						          root.tileData = newTile;
+						          UIUtilities.RefreshAllFields(coordSection);
+					     }
 				},
 				VerticalLayout = false
 		          };
-
-		          // 6. WATER GRAPH (also reads from `section.tileData`)
-		          var dynamicWaterGraph = new GraphField("Water", GraphType.bar, 1f, 120f)
-		          {
-				Getter = () =>
-				{
-					     if (section.tileData == null)
-						          return new Graph();
-					     return UIUtilities.CreateWaterGraph(section.tileData);
-				},
-				VerticalLayout = false
-		          };
+		          coordSection.Components.Add(tileRefFieldY);
 
 		          // 7. MODIFICATION CONTROLS
 		          int selectedMatterType = 0;
-		          float kgAmount = 0f;
+		          float kgAmount = 1000f;
 
 		          var matterTypeField = new DropdownField("Matter Type",
 		              new List<string> { "Sand", "Silt", "Clay", "Organic", "Water (Soil)", "Ice (Soil)" },
@@ -439,36 +442,36 @@ public static class UILibrary
 		          var applyButton = new ButtonField("", "Apply Changes", () =>
 		          {
 				// THIS uses the SECTION's current tile!
-				if (section.tileData == null)
+				if (root.tileData == null)
 					     return;
 
 				ThermalEnergy target = null;
 				switch (selectedMatterType)
 				{
 				case 0:
-				target = section.tileData.composition.sand;
+				target = root.tileData.composition.sand;
 				break;
 				case 1:
-				target = section.tileData.composition.silt;
+				target = root.tileData.composition.silt;
 				break;
 				case 2:
-				target = section.tileData.composition.clay;
+				target = root.tileData.composition.clay;
 				break;
 				case 3:
-				target = section.tileData.composition.organicMaterial;
+				target = root.tileData.composition.organicMaterial;
 				break;
 				case 4:
-				target = section.tileData.composition.water;
+				target = root.tileData.composition.water;
 				break;
 				case 5:
-				target = section.tileData.composition.ice;
+				target = root.tileData.composition.ice;
 				break;
 				}
 
 				if (target != null)
 				{
 					     target.AddMass(kgAmount, target.Temperature);
-					     Debug.Log($"Added {kgAmount}kg to {section.tileData.tileGridRef}");
+					     Debug.Log($"Added {kgAmount}kg of {target.materialName} to {root.tileData.tileGridRef}");
 
 					     // CRITICAL: Tell the UI to re-run the Getters so the graphs update!
 					     UIUtilities.RefreshAllFields(section);
@@ -481,12 +484,10 @@ public static class UILibrary
 		          };
 
 		          // 8. Add all components to the section's list
-		          components.Add(tileRefField);
-		          components.Add(dynamicSoilGraph);
-		          components.Add(dynamicWaterGraph);
-		          components.Add(matterTypeField);
-		          components.Add(amountField);
-		          components.Add(applyButton);
+		          section.Components.Add(coordSection);
+		          section.Components.Add(matterTypeField);
+		          section.Components.Add(amountField);
+		          section.Components.Add(applyButton);
 
 		          // Return the section. The `components` list is already inside it.
 		          return section;
@@ -496,20 +497,29 @@ public static class UILibrary
 	     /// </summary>
 	     public static UIWindow BuildWindowTileComposition(Vector2 tileRef, TileManager tileManager, UIManager uim)
 	     {
-		          var compositionTab = new UITab("Composition", new List<UISection>
+		          UISection_Tile rootTile = new UISection_Tile("Tile ref", tileManager.tiles[(int)tileRef.x - 1, (int)tileRef.y - 1].tileData, true);
+		          var compositionTab = new UITab("Tile Information", new List<UISection>
 		          {
-				BuildSectionTileCompositionDisplay(tileManager.tiles[(int)tileRef.x-1,(int)tileRef.y-1].tileData, uim),
-				BuildSectionTileModifyInstance(tileManager.tiles[(int)tileRef.x-1,(int) tileRef.y - 1].tileData, tileManager, uim)
+				//rootTile,
+				BuildSectionTileCompositionDisplay(rootTile)
 		          });
 
-		          var window = new UIWindow("Tile Composition", new List<UITab> { compositionTab })
+		          var modifyTab = new UITab("Modify Tile", new List<UISection>
 		          {
-				PreferredSize = new Vector2(450, 550),
+				BuildSectionTileModifyInstance(rootTile, tileManager, uim)
+		          });
+
+		          var window = new UIWindow("Tile Composition", new List<UITab> { modifyTab, compositionTab, })
+		          {
+				PreferredSize = new Vector2(250, 550),
 				CanResize = true,
 				CanClose = true,
-				CanMinimize = false
+				CanMinimize = false,
+				VerticalLayout = true
+
 		          };
 
 		          return window;
 	     }
+
 }

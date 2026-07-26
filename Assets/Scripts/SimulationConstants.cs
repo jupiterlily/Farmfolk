@@ -8,6 +8,8 @@ public static class SimulationConstants
 	     public const float YearLength = 365f; // Length of a year in days (constant)
 	     public const float AxialTilt = 23.5f; // Earth's axial tilt in degrees (constant, modifiable by user)
 	     public const float OrbitalEccentricity = 0.0167f; // Earth's orbital eccentricity (constant, default for Earth)
+	     public const float Gravity = 9.81f; //m/s^2
+	     public const float PlanetRadius = 6378137;
 
 	     public const float Kelvin = 272.15f;
 	     public const float SunlightWavelength = 635;

@@ -1,0 +1,72 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6746cb7d034fd6a4885be1f46b27a127, type: 3}
+  m_Name: BasicTheme
+  m_EditorClassIdentifier: 
+  BaseUnit: 8
+  ControlHeight: 28
+  LabelWidth: 80
+  FontSize: 12
+  WindowBackground: {fileID: 0}
+  SectionBackground: {fileID: 0}
+  FieldBackground: {fileID: 0}
+  ButtonBackground: {fileID: 0}
+  SliderHandle: {fileID: 0}
+  SliderBackground: {fileID: 0}
+  ToggleOn: {fileID: 0}
+  ToggleOff: {fileID: 0}
+  DropdownBackground: {fileID: 0}
+  IconClose: {fileID: 0}
+  IconMinimise: {fileID: 0}
+  IconMaximise: {fileID: 0}
+  IconPin: {fileID: 0}
+  IconEyedropper: {fileID: 0}
+  IconDropdownArrow: {fileID: 0}
+  WindowBG: {r: 0.15, g: 0.15, b: 0.2, a: 0.95}
+  SectionBG: {r: 0.2, g: 0.2, b: 0.3, a: 0.5}
+  TabBG: {r: 0.15, g: 0.15, b: 0.2, a: 0.9}
+  TabButtonNormal: {r: 0.25, g: 0.25, b: 0.35, a: 1}
+  TabButtonSelected: {r: 0.3, g: 0.5, b: 0.7, a: 1}
+  TabButtonHover: {r: 0.3, g: 0.4, b: 0.5, a: 1}
+  InputBackground: {r: 0.1, g: 0.1, b: 0.1, a: 0.5}
+  InputTextColor: {r: 1, g: 1, b: 1, a: 1}
+  InputPlaceholderColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  InputFocusedColor: {r: 0.2, g: 0.4, b: 0.6, a: 0.3}
+  SliderTrackColor: {r: 0.15, g: 0.15, b: 0.15, a: 0.8}
+  SliderFillColor: {r: 0.2, g: 0.5, b: 0.8, a: 1}
+  SliderHandleColor: {r: 1, g: 1, b: 1, a: 1}
+  ButtonNormalColor: {r: 0.2, g: 0.4, b: 0.6, a: 1}
+  ButtonHighlightedColor: {r: 0.3, g: 0.5, b: 0.7, a: 1}
+  ButtonPressedColor: {r: 0.1, g: 0.2, b: 0.3, a: 1}
+  ButtonTextColor: {r: 1, g: 1, b: 1, a: 1}
+  DropdownBackgroundColor: {r: 0.15, g: 0.15, b: 0.2, a: 0.95}
+  DropdownItemNormal: {r: 0.2, g: 0.2, b: 0.2, a: 1}
+  DropdownItemHighlighted: {r: 0.3, g: 0.3, b: 0.4, a: 1}
+  DropdownItemSelected: {r: 0.2, g: 0.4, b: 0.6, a: 1}
+  TextColor: {r: 1, g: 1, b: 1, a: 1}
+  TextSecondary: {r: 0.7, g: 0.7, b: 0.7, a: 1}
+  PlaceholderColor: {r: 0.5, g: 0.5, b: 0.5, a: 1}
+  SeparatorColor: {r: 0.3, g: 0.3, b: 0.4, a: 0.5}
+  TitleFontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  HeadingFontAsset: {fileID: 0}
+  SubheadingFontAsset: {fileID: 0}
+  BodyFontAsset: {fileID: 0}
+  SmallFontAsset: {fileID: 0}
+  ButtonPrefab: {fileID: 0}
+  InputFieldPrefab: {fileID: 0}
+  DropdownPrefab: {fileID: 0}
+  SliderPrefab: {fileID: 0}
+  TogglePrefab: {fileID: 0}
+  DefaultAlignment: 3
+  CenterAlignment: 4
+  LabelAlignment: 3
+  ValueAlignment: 5

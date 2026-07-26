@@ -149,7 +149,7 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_0
+      name: Hair_Tendrils_0
       rect:
         serializedVersion: 2
         x: 0
@@ -163,14 +163,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4330100e53101fb4ca7865192ef9a3ae
-      internalID: 1216588767
+      spriteID: f034e7f478597d044aafeb729f9a81d7
+      internalID: 1902492137
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_1
+      name: Hair_Tendrils_1
       rect:
         serializedVersion: 2
         x: 128
@@ -184,14 +184,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e21d1ba02ab110a48bf3c4655c7a6c5a
-      internalID: -855320343
+      spriteID: abb4a76a6450fbd479c9ae715606c974
+      internalID: -1885747854
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_2
+      name: Hair_Tendrils_2
       rect:
         serializedVersion: 2
         x: 256
@@ -205,14 +205,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 32613523709911e43bbd1be33828e728
-      internalID: -584572588
+      spriteID: 707819d4a12d0104b839dd8c3508e4f4
+      internalID: -755084195
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_3
+      name: Hair_Tendrils_3
       rect:
         serializedVersion: 2
         x: 384
@@ -226,14 +226,161 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 235948df75203dd42bae1de337cae963
-      internalID: -517835396
+      spriteID: 413289d3ccafd7e4ca413109ee184475
+      internalID: -1757607078
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_4
+      name: Hair_Tendrils_4
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 8a627769e81ecd3418159eeba02a1f5c
+      internalID: 1776483337
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_5
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e71d3bd8a5e216d4c9a9eefa9d8a864a
+      internalID: 598588553
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_6
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ba7cd2df14b613d4db81887ea7904eb1
+      internalID: 1469119189
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_7
+      rect:
+        serializedVersion: 2
+        x: 896
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ac4626d9864e6704089af57428a086e6
+      internalID: -1852218184
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_8
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ad143563e76760e4e8abda7e08526c88
+      internalID: 1121034442
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_9
+      rect:
+        serializedVersion: 2
+        x: 1152
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ff3d4e805dd134140863080495adf0bb
+      internalID: 57094479
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_10
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 70c4306cb30a64848a3154a1bd9258d4
+      internalID: 1551090163
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_11
       rect:
         serializedVersion: 2
         x: 128
@@ -247,14 +394,35 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 520d0246f1c3b254c9e9116be081e436
-      internalID: -324223556
+      spriteID: 4bd9056d07db6854ebefb0a491b411bd
+      internalID: -174555221
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_5
+      name: Hair_Tendrils_12
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d3402928d2cd14b4a9fca12a92241061
+      internalID: -852082033
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_13
       rect:
         serializedVersion: 2
         x: 384
@@ -268,14 +436,77 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: b06212e724cc5e54b8f046dbf24f6ad7
-      internalID: -19620011
+      spriteID: 6a7b3d73dc4ab3144af51a4b8a498648
+      internalID: 1662118959
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_6
+      name: Hair_Tendrils_14
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 680d63415e51fa94d9c9c26c6938779b
+      internalID: 1828357660
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_15
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3831c94084f2418408bece8933be9c50
+      internalID: 1647323636
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_16
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3be6077da807f164abb62dd93639ee87
+      internalID: -1184426876
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_17
       rect:
         serializedVersion: 2
         x: 896
@@ -289,14 +520,77 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 14251c28747b33d4294c121fda71ce2e
-      internalID: -369539587
+      spriteID: d9e3f88cd43ff8045a1d4d7eb5369ad2
+      internalID: 1090481110
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_7
+      name: Hair_Tendrils_18
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: fd278cef260917843851c8033a6ff7da
+      internalID: 866509637
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_19
+      rect:
+        serializedVersion: 2
+        x: 1152
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 6f87c1ce23d20f84b922faa036bb644c
+      internalID: -710366600
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_20
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 128
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3d8a36b03d2643a44bc7b7b359446f47
+      internalID: -1054586059
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_21
       rect:
         serializedVersion: 2
         x: 128
@@ -310,14 +604,35 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3f2daa7ce751fba4ea3bbb24db8e3b65
-      internalID: -2045676734
+      spriteID: 3d7cd3b25c6ab9b4abaab2fcfe8ed87a
+      internalID: 2092673503
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_8
+      name: Hair_Tendrils_22
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 128
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 49d2a0c8d0e0a48408867b1deb68195f
+      internalID: 1338368335
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_23
       rect:
         serializedVersion: 2
         x: 384
@@ -331,14 +646,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 55a4483c7498af240a2641d5e53e3a18
-      internalID: 1192668536
+      spriteID: c3b59cd7eac585840965823c2da60feb
+      internalID: -1626695056
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_9
+      name: Hair_Tendrils_24
       rect:
         serializedVersion: 2
         x: 512
@@ -352,14 +667,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4faf7d17e72cd5a48acc9b54d9f0f6d1
-      internalID: 74498607
+      spriteID: 07bf163784ed9c14482999cd613b63d0
+      internalID: -1931456390
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_10
+      name: Hair_Tendrils_25
       rect:
         serializedVersion: 2
         x: 640
@@ -373,14 +688,35 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 3e575654b6aaf4c449e1759a458abb4c
-      internalID: -496969828
+      spriteID: 1551ee18d29b075459bb45f4a2ad0120
+      internalID: 1158456971
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_11
+      name: Hair_Tendrils_26
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 128
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 32c1e3bdfc9372a4e999f992f3e0ca9c
+      internalID: -1306971967
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_27
       rect:
         serializedVersion: 2
         x: 896
@@ -394,14 +730,35 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8851fc0850534844bb2702e8c02bc9a5
-      internalID: -1050004858
+      spriteID: dab0436b6b9ac2d47860646649931274
+      internalID: 766724336
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_12
+      name: Hair_Tendrils_28
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 128
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a04ce1ab837d41f45a32b6135d68143a
+      internalID: 213675710
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_29
       rect:
         serializedVersion: 2
         x: 1152
@@ -415,14 +772,35 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 8fe7f737aea03ce45841a05b30891dbf
-      internalID: 272910976
+      spriteID: 85a9e20516590164ea71e3ae134fb355
+      internalID: 1688682462
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_13
+      name: Hair_Tendrils_30
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bdabbaba2630d2b46afa8b795c0a36a6
+      internalID: 23679158
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_31
       rect:
         serializedVersion: 2
         x: 128
@@ -436,14 +814,35 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: fd9cf6e650a21df4ebc25231ab4df553
-      internalID: -524976294
+      spriteID: e0c3e0ea75f5f8d428cd887815a9fdc9
+      internalID: 332966002
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_14
+      name: Hair_Tendrils_32
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b162ea6d50b6d9843be417bb8abf59a6
+      internalID: -1016434171
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_33
       rect:
         serializedVersion: 2
         x: 384
@@ -457,14 +856,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 951b9d309df703441be5bcafa6ad7bd8
-      internalID: 1334824979
+      spriteID: 9f98a0b6bcd32a5448c14cc2311f9660
+      internalID: -589646727
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_15
+      name: Hair_Tendrils_34
       rect:
         serializedVersion: 2
         x: 512
@@ -478,14 +877,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7b11c4f234928e94db4d46af353ecc1c
-      internalID: -908107390
+      spriteID: 600264e09162c67428561927e9bcd33d
+      internalID: -121301685
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_16
+      name: Hair_Tendrils_35
       rect:
         serializedVersion: 2
         x: 640
@@ -499,14 +898,35 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 21d78b540ea66c84f967a6694a2dd7c0
-      internalID: 1051615581
+      spriteID: c43f5fa2e3d81234c8d6778364ab10a1
+      internalID: 1121005880
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_17
+      name: Hair_Tendrils_36
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 52f9cbe35d65a0e4fb93b3d66427eef7
+      internalID: -1361972711
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Tendrils_37
       rect:
         serializedVersion: 2
         x: 896
@@ -520,14 +940,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: cd01264ac2382464ba9b986e44733341
-      internalID: -685816981
+      spriteID: 0fd8950f938619742b3c2f54f2097392
+      internalID: 1818695476
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_18
+      name: Hair_Tendrils_38
       rect:
         serializedVersion: 2
         x: 1024
@@ -541,14 +961,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: db238170cee59004f886ec44bce9c1eb
-      internalID: 670846381
+      spriteID: 3e47e2d4d9d1ed340bec390e071c5001
+      internalID: 1141043594
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Tendrils_19
+      name: Hair_Tendrils_39
       rect:
         serializedVersion: 2
         x: 1152
@@ -562,8 +982,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5f8ba43e27a969c4aa8fd6e7d8fb7f4a
-      internalID: -1718760156
+      spriteID: e435b8d7c385e254fb9d7f0b2c39e602
+      internalID: 39326363
       vertices: []
       indices: 
       edges: []
@@ -579,26 +999,46 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Pepo_Hair_Tendrils_0: 1216588767
-      Pepo_Hair_Tendrils_1: -855320343
-      Pepo_Hair_Tendrils_10: -496969828
-      Pepo_Hair_Tendrils_11: -1050004858
-      Pepo_Hair_Tendrils_12: 272910976
-      Pepo_Hair_Tendrils_13: -524976294
-      Pepo_Hair_Tendrils_14: 1334824979
-      Pepo_Hair_Tendrils_15: -908107390
-      Pepo_Hair_Tendrils_16: 1051615581
-      Pepo_Hair_Tendrils_17: -685816981
-      Pepo_Hair_Tendrils_18: 670846381
-      Pepo_Hair_Tendrils_19: -1718760156
-      Pepo_Hair_Tendrils_2: -584572588
-      Pepo_Hair_Tendrils_3: -517835396
-      Pepo_Hair_Tendrils_4: -324223556
-      Pepo_Hair_Tendrils_5: -19620011
-      Pepo_Hair_Tendrils_6: -369539587
-      Pepo_Hair_Tendrils_7: -2045676734
-      Pepo_Hair_Tendrils_8: 1192668536
-      Pepo_Hair_Tendrils_9: 74498607
+      Hair_Tendrils_0: 1902492137
+      Hair_Tendrils_1: -1885747854
+      Hair_Tendrils_10: 1551090163
+      Hair_Tendrils_11: -174555221
+      Hair_Tendrils_12: -852082033
+      Hair_Tendrils_13: 1662118959
+      Hair_Tendrils_14: 1828357660
+      Hair_Tendrils_15: 1647323636
+      Hair_Tendrils_16: -1184426876
+      Hair_Tendrils_17: 1090481110
+      Hair_Tendrils_18: 866509637
+      Hair_Tendrils_19: -710366600
+      Hair_Tendrils_2: -755084195
+      Hair_Tendrils_20: -1054586059
+      Hair_Tendrils_21: 2092673503
+      Hair_Tendrils_22: 1338368335
+      Hair_Tendrils_23: -1626695056
+      Hair_Tendrils_24: -1931456390
+      Hair_Tendrils_25: 1158456971
+      Hair_Tendrils_26: -1306971967
+      Hair_Tendrils_27: 766724336
+      Hair_Tendrils_28: 213675710
+      Hair_Tendrils_29: 1688682462
+      Hair_Tendrils_3: -1757607078
+      Hair_Tendrils_30: 23679158
+      Hair_Tendrils_31: 332966002
+      Hair_Tendrils_32: -1016434171
+      Hair_Tendrils_33: -589646727
+      Hair_Tendrils_34: -121301685
+      Hair_Tendrils_35: 1121005880
+      Hair_Tendrils_36: -1361972711
+      Hair_Tendrils_37: 1818695476
+      Hair_Tendrils_38: 1141043594
+      Hair_Tendrils_39: 39326363
+      Hair_Tendrils_4: 1776483337
+      Hair_Tendrils_5: 598588553
+      Hair_Tendrils_6: 1469119189
+      Hair_Tendrils_7: -1852218184
+      Hair_Tendrils_8: 1121034442
+      Hair_Tendrils_9: 57094479
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

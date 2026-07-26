@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
+//we then need to create aclass that's a pepo category which a struct that functions as a filter for the pepo data. this will be used to determine what pepos are in what categories. 
 public class PepoData
 {
 	     public QualitativeAspect[] pepoName = new QualitativeAspect[2] { new QualitativeAspect("forename", "John"), new QualitativeAspect("surname", "Doe") };

@@ -62,7 +62,7 @@ public abstract class Layer : BlockData
 	     public float density; //density in kg/m3
 }
 
-public class Liquid : Layer //will be used by rendering and physics systems. 
+public class LiquidLayer : Layer //will be used by rendering and physics systems. 
 {
 	     //composition
 	     public List<ThermalEnergy> liquidComposition; // list of matter in the liquid.
@@ -74,7 +74,7 @@ public class Liquid : Layer //will be used by rendering and physics systems.
 	     public List<ThermalEnergy> suspendedSolids;
 }
 
-public class Solid : Layer
+public class SolidLayer : Layer
 {
 	     public bool surface; // is this a surface layer?
 
@@ -88,7 +88,7 @@ public class Solid : Layer
 	     public List<ThermalEnergy> infiltratedGases; // gases infiltrated in the solid
 }
 
-public class Gas : Layer
+public class GasLayer : Layer
 {
 	     public bool atmospheric; // is this an atmospheric layer?
 			//composition
@@ -99,123 +99,6 @@ public class Gas : Layer
 	     public List<ThermalEnergy> liquidDroplets; // liquid droplets in the gas
 }
 
-public abstract class Matter
-{
-	     //matter and energy composition of the block
-	     //public List<EnergyData> energyComposition; // energy stored in the matter, mass and temperature can be derived from this
-	     public List<Compound> composition; // the composition of the matter in the block used to handle mixtures
-	     public float mass => thermalEnergy.Mass;
-	     public float density; // in kg/m3
 
-	     public ChemicalEnergy chemicalEnergy;
-	     public MechanicalEnergy mechanicalEnergy;
-	     public ThermalEnergy thermalEnergy;
-}
-
-public class Compound : Matter
-{
-	     public string name;
-	     public Dictionary<Element, int> elements; // list of elements in the compound
-
-	     public float meltingPoint; // in Kelvin
-	     public float boilingPoint; // in Kelvin
-
-
-	     public Dictionary<float, float> specificHeatCapacity; //  key = temperature Kelvin, value = specific heat J/(kg*K) amount of energy required to raise 1 kg of the compound by 1 Kelvin
-	     public float thermalConductivity; // in W/(m*K) ability to conduct heat
-	     public float electricalConductivity; // in S/m ability to conduct electricity
-
-	     //public ChemicalEnergy energy;
-	     public float[,] specificHeatTable = new float[,] // Example table: { { Temperature (K), Specific Heat (J/kg·K) } }
-{
-		          { 273f, 0.5f }, // Solid
-		          { 298f, 4.18f }, // Liquid
-		          { 373f, 2.0f } // Gas
-};
-	     public float[,] densityTable = new float[,] // Example table: { { Temperature (K), Density (kg/m³) } }
-	     {
-		          { 273f, 917f }, // Solid
-		          { 298f, 1000f }, // Liquid
-		          { 373f, 0.6f } // Gas
-	     };
-	     public Dictionary<Element, int> ParseMoleculeString(string molecule)
-	     {
-		          //parse molecular string into elements dictionary
-		          Dictionary<Element, int> elementDict = new Dictionary<Element, int>();
-		          //simple parser for molecular strings like H2O, CO2, C6H12O6
-		          int i = 0;
-		          while (i < molecule.Length)
-		          {
-				//get element symbol
-				string symbol = molecule[i].ToString();
-				i++;
-				if (i < molecule.Length && char.IsLower(molecule[i]))
-				{
-					     symbol += molecule[i];
-					     i++;
-				}
-				//get element count
-				string countStr = "";
-				while (i < molecule.Length && char.IsDigit(molecule[i]))
-				{
-					     countStr += molecule[i];
-					     i++;
-				}
-				int count = 1;
-				if (countStr != "")
-				{
-					     count = int.Parse(countStr);
-				}
-				//find element by symbol
-				////Element element = MatterLibrary.elements.Find(e => e.symbol == symbol);
-				//if (element != null)
-				//{
-				//	     if (elementDict.ContainsKey(element))
-				//	     {
-				//		          elementDict[element] += count;
-				//	     }
-				//	     else
-				//	     {
-				//		          elementDict.Add(element, count);
-				//	     }
-				//}
-
-		          }
-		          return elementDict;
-	     }
-
-	     public Compound(string Name, string Symbol, float AtNo, float AtMass, float SHC, float TC, float EC, float meltPoint, float boilPoint, string molecule, float latentFusion, float latentVaporisation, float bondEnergyKj)
-	     {
-		          name = Name;
-
-		          //specificHeatCapacity = SHC;
-		          thermalConductivity = TC;
-		          electricalConductivity = EC;
-
-		          elements = ParseMoleculeString(molecule);
-
-		          meltingPoint = meltPoint;
-		          boilingPoint = boilPoint;
-	     }
-}
-public class Element
-{
-	     public string name;
-	     public string symbol;
-	     public float atomicNumber; // number of protons
-	     public float atomicMass; // in amu     
-	     public float atomicRadius; // in pm
-
-	     //constructor for element takes strings and floats name, symbol, atomic number, atomic mass, specific heat capacity, thermal conductivity, electrical conductivity and initialises the element including base class Compound and Matter
-	     public Element(string Name, string Symbol, float AtNo, float AtMass)
-	     {
-		          symbol = Symbol;
-
-		          atomicNumber = AtNo;
-		          atomicMass = AtMass;
-	     }
-
-
-}
 
 

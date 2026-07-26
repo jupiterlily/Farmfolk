@@ -1,0 +1,32 @@
+fileFormatVersion: 2
+guid: 6746cb7d034fd6a4885be1f46b27a127
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - WindowBackground: {instanceID: 0}
+  - SectionBackground: {instanceID: 0}
+  - FieldBackground: {instanceID: 0}
+  - ButtonBackground: {instanceID: 0}
+  - SliderHandle: {instanceID: 0}
+  - SliderBackground: {instanceID: 0}
+  - ToggleOn: {instanceID: 0}
+  - ToggleOff: {instanceID: 0}
+  - DropdownBackground: {instanceID: 0}
+  - IconClose: {instanceID: 0}
+  - IconMinimise: {instanceID: 0}
+  - IconMaximise: {instanceID: 0}
+  - IconPin: {instanceID: 0}
+  - IconEyedropper: {instanceID: 0}
+  - IconDropdownArrow: {instanceID: 0}
+  - FontAsset: {fileID: 11400000, guid: 8f586378b4e144a9851e7b34d9b748ee, type: 2}
+  - ButtonPrefab: {instanceID: 0}
+  - InputFieldPrefab: {instanceID: 0}
+  - DropdownPrefab: {instanceID: 0}
+  - SliderPrefab: {instanceID: 0}
+  - TogglePrefab: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

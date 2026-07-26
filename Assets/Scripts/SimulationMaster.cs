@@ -166,12 +166,16 @@ public class SimulationMaster : MonoBehaviour
 		          //every  10 minutes
 		          if (currentMinuteOfHour == 0 || currentMinuteOfHour == 10 || currentMinuteOfHour == 20 || currentMinuteOfHour == 30 || currentMinuteOfHour == 40 || currentMinuteOfHour == 50)
 		          {
+
+				tileManager.AtmosphereStep((1f / 60) * 10);
+				tileManager.HydrosphereStep((1f / 60) * 10);
 				foreach (var tile in tileManager.tiles)
 				{
-					     //   tileManager.AtmosphereStep((1f / 60) * 10);
-					     // tileManager.HydrosphereStep((1f / 60) * 10);
-					     //   tile.TileVisualUpdate();
+
+
+					     tile.TileVisualUpdate();
 				}
+
 		          }
 		          if (currentMinuteOfHour == 9 || currentMinuteOfHour == 29 || currentMinuteOfHour == 49)
 		          {
@@ -202,9 +206,9 @@ public class SimulationMaster : MonoBehaviour
 		          }
 		          if (currentHourOfDay == 0 || currentHourOfDay == 4 || currentHourOfDay == 8 || currentHourOfDay == 12 || currentHourOfDay == 16 || currentHourOfDay == 20)
 		          {
-				tileManager.demeter.gardener.GrowPlants(tileManager.demeter, Mathf.FloorToInt(4 * 60 * 60));
+				//tileManager.demeter.gardener.GrowPlants(tileManager.demeter, Mathf.FloorToInt(4 * 60 * 60));
 
-				tileManager.demeter.gardener.UpdatePlantAges(tileManager.demeter);
+				//tileManager.demeter.gardener.UpdatePlantAges(tileManager.demeter);
 		          }
 		          //tileManager.TileUpdate(h);
 		          //Debug.Log("tiles updated");

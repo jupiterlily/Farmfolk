@@ -53,6 +53,7 @@ public class PepoUIManager : MonoBehaviour
 	     {
 		          //put all the lists in an array so that appearace data can get its values from here and bodydata can read from here instead of having to set hard values. adding more sprites just means adding them to the array and not having to change any code in bodydata or pepodata. this is a more modular approach.
 		          pepoAppearanceSprites = new Sprite[][] { mascEyes, femmeEyes, headShape, freckles, bottomLips, topLips, noseShape, eyecolor, HairUp_1, HairBack_1, HairTendrils_1, HairFringe_1, HairUp_2, HairBack_2, HairTendrils_2, HairFringe_2, HairUp_3, HairBack_3, HairTendrils_3, HairFringe_3, HairUp_4, HairBack_4, HairTendrils_4, HairFringe_4, brows, stubble, teeth, moustaches };
+		          PepoUIUtilities.InitialiseSprites(pepoAppearanceSprites);
 		          if (portraitLibrary == null)
 		          {
 				portraitLibrary = new Dictionary<string, List<Sprite>>();
@@ -109,7 +110,7 @@ public class PepoUIManager : MonoBehaviour
 		          PanelLayoutGroup.childForceExpandHeight = false;
 
 		          // Create info container (vertical layout for text and graphs)		          
-		          GameObject portraitContainer = PepoUIUtilities.CreatePortrait(pepo, HairUp_1, HairBack_1, HairTendrils_1, HairFringe_1, HairUp_2, HairBack_2, HairTendrils_2, HairFringe_2, HairUp_3, HairBack_3, HairTendrils_3, HairFringe_3, HairUp_4, HairBack_4, HairTendrils_4, HairFringe_4, headShape, eyecolor, mascEyes, femmeEyes, noseShape, topLips, bottomLips, freckles, brows, stubble, moustaches);
+		          GameObject portraitContainer = PepoUIUtilities.CreatePortrait(pepo);
 		          portraitContainer.transform.SetParent(personalPanel.transform, false);
 
 		          GameObject infoContainer = PepoUIUtilities.CreateInfoContainer(pepo);
@@ -380,7 +381,7 @@ public class PepoUIManager : MonoBehaviour
 		          layoutElement.flexibleWidth = 0f;
 
 		          // Create portrait then make it smaller etc.
-		          GameObject portrait = PepoUIUtilities.CreatePortrait(person, HairUp_1, HairBack_1, HairTendrils_1, HairFringe_1, HairUp_2, HairBack_2, HairTendrils_2, HairFringe_2, HairUp_3, HairBack_3, HairTendrils_3, HairFringe_3, HairUp_4, HairBack_4, HairTendrils_4, HairFringe_4, headShape, eyecolor, mascEyes, femmeEyes, noseShape, topLips, bottomLips, freckles, brows, stubble, moustaches);
+		          GameObject portrait = PepoUIUtilities.CreatePortrait(person);
 		          portrait.transform.SetParent(memberPanel.transform, false);
 		          portrait.transform.localScale = Vector3.one * 0.25f;
 

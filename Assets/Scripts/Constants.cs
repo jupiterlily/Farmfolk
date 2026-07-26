@@ -10,9 +10,9 @@ public static class Constants
 	     public const float WATER_DENSITY = 1000f;
 	     public const float ICE_DENSITY = 916.2F;
 	     public const float GRANITE_DENSITY = 2600f;
-	     public const float GRAVITY_ACCELERATION = 9.81f;
 
-	     // --- Constants (no magic numbers) ---
+
+
 	     public const float GLENN_FLOW_LAW_EXPONENT = 3f; // n in Glen's flow law
 	     public const float MIN_ICE_THICKNESS_FOR_FLOW = 0.5f; // meters
 	     public const float WATER_FLOW_RESISTANCE = 5f;   // m/s per unit slope

@@ -254,7 +254,7 @@ public static class SoilUtilities
 	     public static void ApplySelfCompaction(TileData tileData, float hours)
 	     {
 		          SoilComposition sc = tileData.composition;
-		          float weight = sc.bulkDensity * Constants.GRAVITY_ACCELERATION; // N/m2
+		          float weight = sc.bulkDensity * SimulationConstants.Gravity; // N/m2
 		          float selfPressure_kPa = weight / 1000f; // Convert to kPa
 		          UpdateCompaction(sc, hours, appliedPressure: selfPressure_kPa);
 		          CalculateDerivedProperties(sc);
@@ -270,15 +270,39 @@ public static class SoilUtilities
 
 	     public static void RecalculateTilePhysics(TileData data)
 	     {
-		          //  CalculateDerivedProperties(data.composition);
-		          float solidVolume = (data.composition.sand.Mass / Constants.SAND_DENSITY)
-	   + (data.composition.silt.Mass / Constants.SILT_DENSITY)
-	   + (data.composition.clay.Mass / Constants.CLAY_DENSITY)
-	   + (data.composition.organicMaterial.Mass / Constants.ORGANIC_DENSITY)
-	   + (data.bedrock.Mass / Constants.GRANITE_DENSITY);
-		          //+ (data.composition.water.Mass / Constants.WATER_DENSITY) + (data.composition.ice.Mass / Constants.ICE_DENSITY)
-		          data.groundElevation = solidVolume / (data.tileWidth * data.tileWidth);
-		          data.volume = solidVolume + (data.surfaceLiquid.Mass / Constants.WATER_DENSITY) + (data.surfaceIce.Mass / Constants.ICE_DENSITY);
+		          float tileArea = data.tileWidth * data.tileWidth;
+
+		          // ---- 1. All solid materials (bedrock + soil minerals) ----
+		          float solidVolume =
+		              (data.bedrock.Mass / Constants.GRANITE_DENSITY) +
+		              (data.composition.sand.Mass / Constants.SAND_DENSITY) +
+		              (data.composition.silt.Mass / Constants.SILT_DENSITY) +
+		              (data.composition.clay.Mass / Constants.CLAY_DENSITY) +
+		              (data.composition.organicMaterial.Mass / Constants.ORGANIC_DENSITY);
+
+		          // ---- 2. Soil pore water & ice (inside the soil column) ----
+		          float soilWaterVol = data.composition.water.Mass / Constants.WATER_DENSITY;
+		          float soilIceVol = data.composition.ice.Mass / Constants.ICE_DENSITY;
+
+		          // ---- 3. Aeration (air in pores) ----
+		          // IMPORTANT: In CalculateDerivedProperties you set:
+		          //   sc.aeration = sc.porosity * (1f - sc.saturation);
+		          // This is a fraction (0–1). Since you treat it as an absolute volume in CalculateSoilVolume,
+		          // we do the same here to keep everything consistent.
+		          float aerationVol = data.composition.aeration;
+
+		          // ---- 4. Total soil column volume (everything that makes up the "ground") ----
+		          float soilColumnVolume = solidVolume + soilWaterVol + soilIceVol + aerationVol;
+
+		          // ---- 5. groundElevation = the physical ground surface (includes air & soil water!) ----
+		          data.groundElevation = soilColumnVolume / tileArea;
+
+		          // ---- 6. Surface water & ice (ON TOP of the ground) ----
+		          float surfaceWaterVol = data.surfaceLiquid.Mass / Constants.WATER_DENSITY;
+		          float surfaceIceVol = data.surfaceIce.Mass / Constants.ICE_DENSITY;
+
+		          // ---- 7. Total volume (this is the unified height source for visuals) ----
+		          data.volume = soilColumnVolume + surfaceWaterVol + surfaceIceVol;
 	     }
 
 	     public static void UpdateSoilTemperature(TileData data, float hours)

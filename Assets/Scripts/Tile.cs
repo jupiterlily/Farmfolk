@@ -37,7 +37,7 @@ public class WorldTile : MonoBehaviour
 	     public void TileVisualUpdate()
 	     {
 		          SoilUtilities.CalculateDerivedProperties(tileData.composition);
-		          float height = TileUtilities.CalculateSoilVolume(tileData.composition) + TileUtilities.CalculateSurfaceWaterVolume(tileData);
+		          float height = TileUtilities.CalculateSoilVolume(tileData.composition) + TileUtilities.CalculateSurfaceWaterVolume(tileData) + (tileData.bedrock.Mass / Constants.GRANITE_DENSITY);
 
 		          //latitude += tileData.tileGridRef.y / 3; // Adjust latitude based on tile position for variety
 		          transform.localScale = new Vector3(tileSise, height, tileSise);

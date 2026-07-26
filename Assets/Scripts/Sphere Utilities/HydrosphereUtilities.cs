@@ -738,15 +738,7 @@ public static class HydrosphereUtilities
 		          // ---- SUBLIMATION (ice → vapour) ----
 		          if (tile.surfaceIce.Mass > 0f && tile.atmosphereTile != null)
 		          {
-				// Sublimation occurs when ice has enough energy to go directly to gas.
-				// We'll use a threshold: if ice temperature is above boiling point (unlikely but possible),
-				// or we can simply check if ice has excess energy above melting point and use sublimation instead of melting.
-				// For simplicity, we'll treat sublimation as a separate path: if ice temperature is very high,
-				// we can sublimate some mass.
-				// A more realistic approach: at temperatures below melting, sublimation can happen if the air is dry,
-				// but that's driven by vapour pressure deficit, not just energy. We'll keep it simple for now.
-				// We'll check if the ice's sensible energy is above the energy needed to bring it to boiling point
-				// (i.e., heat it to melt, then to boil). If so, we can sublimate directly.
+
 				float meltTemp = tile.surfaceIce.MeltingPoint;
 				float boilTemp = tile.surfaceIce.BoilingPoint;
 				float cpIce = tile.surfaceIce.SpecificHeat;

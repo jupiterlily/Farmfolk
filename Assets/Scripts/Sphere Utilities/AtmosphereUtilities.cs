@@ -359,129 +359,7 @@ public static class AtmosphereUtilities
 		          // Discard remaining (to space)
 		          stream.RemoveEnergy(stream.StoredEnergy);
 	     }
-	     public static void ApplyAtmosphericAdvection(AtmosphereTile[,,] atmosphereTiles, float hours)
-	     {
-		          int layers = atmosphereTiles.GetLength(0);
-		          int width = atmosphereTiles.GetLength(1);
-		          int height = atmosphereTiles.GetLength(2);
-		          float dt = hours * 3600f;
 
-		          // Components to advect – we only need water (vapor, cloud, ice) for gameplay.
-		          // If you want to advect gases too, add them here.
-		          var components = new (string name, Func<AtmosphereTile, ThermalEnergy> getter)[]
-		          {
-        ("vapor", t => t.waterVapor),
-        ("cloud", t => t.cloudWaterContent),
-        ("ice", t => t.iceParticles)
-		          };
-
-		          foreach (var comp in components)
-		          {
-				// Loop over all cells in all layers
-				for (int layer = 0; layer < layers; layer++)
-				{
-					     for (int x = 0; x < width; x++)
-					     {
-						          for (int y = 0; y < height; y++)
-						          {
-								AtmosphereTile current = atmosphereTiles[layer, x, y];
-								if (current == null)
-									     continue;
-
-								ThermalEnergy src = comp.getter(current);
-								if (src.Mass <= 0f)
-									     continue;
-
-								float cellWidth = current.tileWidth;
-								float cellHeight = current.layerHeight;
-
-								// --- Compute donor‑cell fractions (Courant numbers) ---
-								float fx_pos = Mathf.Max(0, current.windVelocity.x) * dt / cellWidth;
-								float fx_neg = Mathf.Max(0, -current.windVelocity.x) * dt / cellWidth;
-								float fy_pos = Mathf.Max(0, current.windVelocity.z) * dt / cellWidth;
-								float fy_neg = Mathf.Max(0, -current.windVelocity.z) * dt / cellWidth;
-								float fz_pos = Mathf.Max(0, current.windVelocity.y) * dt / cellHeight;
-								float fz_neg = Mathf.Max(0, -current.windVelocity.y) * dt / cellHeight;
-
-								// --- Enforce CFL: total fraction cannot exceed 1 ---
-								float total = fx_pos + fx_neg + fy_pos + fy_neg + fz_pos + fz_neg;
-								if (total > 1f)
-								{
-									     float scale = 1f / total;
-									     fx_pos *= scale;
-									     fx_neg *= scale;
-									     fy_pos *= scale;
-									     fy_neg *= scale;
-									     fz_pos *= scale;
-									     fz_neg *= scale;
-								}
-								// Upward (layer+1) – no wrap; if at top, mass escapes to space (we discard)
-
-								if (fz_pos > 0f && layer < layers - 1 && current.above != null)
-								{
-
-									     float massToMove = src.Mass * fz_pos;
-									     ThermalEnergyUtilities.TransferMassAndEnergy(src, current.above.waterVapor, massToMove);
-								}
-								// If layer == layers-1 (top), upward flux is lost to space – we do nothing.
-
-								// Downward (layer-1) – no wrap; if at bottom, mass goes to surface (handled elsewhere)
-								if (fz_neg > 0f && layer > 0 && current.below != null)
-								{
-
-									     float massToMove = src.Mass * fz_neg;
-									     ThermalEnergyUtilities.TransferMassAndEnergy(src, current.below.waterVapor, massToMove);
-								}
-								// --- Now transfer mass immediately to neighbours ---
-								// East (x+1) – wraps around
-								if (fx_pos > 0f)
-								{
-
-									     float massToMove = src.Mass * fx_pos;
-									     ThermalEnergyUtilities.TransferMassAndEnergy(src, current.horizontalNeighbors[1].waterVapor, massToMove);
-
-								}
-
-								// West (x-1) – wraps around
-								if (fx_neg > 0f)
-								{
-
-									     float massToMove = src.Mass * fx_neg;
-									     ThermalEnergyUtilities.TransferMassAndEnergy(src, current.horizontalNeighbors[3].waterVapor, massToMove);
-
-								}
-
-								// North (y+1) – wraps around
-								if (fy_pos > 0f)
-								{
-
-									     float massToMove = src.Mass * fy_pos;
-									     ThermalEnergyUtilities.TransferMassAndEnergy(src, current.horizontalNeighbors[0].waterVapor, massToMove);
-								}
-
-								// South (y-1) – wraps around
-								if (fy_neg > 0f)
-								{
-
-									     float massToMove = src.Mass * fy_neg;
-									     ThermalEnergyUtilities.TransferMassAndEnergy(src, current.horizontalNeighbors[2].waterVapor, massToMove);
-								}
-
-
-
-						          }
-					     }
-				}
-		          }
-
-		          // --- Finalise: mark all tiles dirty and collect gases ---
-		          foreach (var tile in atmosphereTiles)
-		          {
-				tile.MarkMassDirty();
-				tile.MarkTemperatureDirty();
-				tile.CollectGases();
-		          }
-	     }
 	     // Helper to get the correct ThermalEnergy component by name
 	     //public static void IntraCellConduction(AtmosphereTile tile, float hours)
 	     //{
@@ -681,20 +559,18 @@ public static class AtmosphereUtilities
 						          Vector3 wind = CalculateHadleyCellWind(latitude, layer, layers);
 						          tile.windVelocity = wind;
 						          tile.windSpeed = wind.magnitude;
-
-						          //   float temperature = CalculateHadleyCellTemperature(latitude, layer, layers);
-						          // Instead of calling ChangeMass, we use AddMass (or set via constructor)
-						          // But we already have ThermalEnergy objects with some default mass.
-						          // To set temperature, we adjust the sensible energy directly.
-						          // Using the new API: we can use AddHeat to raise temperature to desired value.
-						          // float currentTemp = tile.nitrogen.Temperature;
-						          //   float deltaTemp = temperature - currentTemp;
-						          //   float energyToAdd = deltaTemp * tile.nitrogen.Mass * tile.nitrogen.SpecificHeat;
-						          // tile.nitrogen.AddHeat(energyToAdd);
-
-						          // Similarly, set water vapor mass and cloud mass using AddMass
 						          InitializeHadleyCellHumidity(tile, latitude, layer);
-						          //   InitializeHadleyCellPressure(tile, latitude, layer, layers);
+						          float temperature = TileUtilities.GetTemperatureFromLatitude(latitude, 0);
+						          float currentTemp = tile.nitrogen.Temperature;
+						          float deltaTemp = temperature - currentTemp;
+						          float energyToAdd = deltaTemp * tile.nitrogen.Mass * tile.nitrogen.SpecificHeat;
+						          tile.nitrogen.AddHeat(energyToAdd);
+						          //        foreach (var gas in tile.AtmosphericEnergy)
+						          //        {
+						          //gas.HeatToTemp(temperature);
+						          //        }
+						          // Similarly, set water vapor mass and cloud mass using AddMass
+
 					     }
 				}
 		          }
@@ -807,7 +683,11 @@ public static class AtmosphereUtilities
 						          if (volume <= 0f)
 								continue;
 						          // Use total mass (dry air + water vapour) as an approximation
-						          float totalMass = tile.Mass;
+						          float totalMass = 0;
+						          foreach (var gas in tile.AerosolisedEnergy)
+						          {
+								totalMass += gas.Mass;
+						          }
 						          if (totalMass <= 0f)
 						          {
 								tile.pressure = 0f;
@@ -1182,4 +1062,459 @@ public static class AtmosphereUtilities
 				}
 		          }
 	     }
+	     private static float[,,] _newMass;
+	     private static float[,,] _newEnergy;
+
+	     public static void EnsureAllocated(int layers, int width, int height)
+	     {
+		          if (_newMass == null || _newMass.GetLength(0) != layers ||
+		              _newMass.GetLength(1) != width || _newMass.GetLength(2) != height)
+		          {
+				_newMass = new float[layers, width, height];
+				_newEnergy = new float[layers, width, height];
+		          }
+	     }
+	     /// <summary>
+	     /// Performs 3D semi-Lagrangian advection on all ThermalEnergy components in the atmosphere grid.
+	     /// Uses trilinear interpolation to compute new mass and energy at each cell, then overwrites.
+	     /// Finally applies a global mass/energy fix to ensure perfect conservation.
+	     /// </summary>
+	     public static void AdvectAtmosphereSemiLagrangian(
+	         AtmosphereTile[,,] atmosphereTiles,
+	         float timeStepSeconds)
+	     {
+		          if (atmosphereTiles == null)
+				return;
+
+		          int layers = atmosphereTiles.GetLength(0);
+		          int width = atmosphereTiles.GetLength(1);
+		          int height = atmosphereTiles.GetLength(2);
+
+		          if (layers == 0 || width == 0 || height == 0)
+				return;
+
+		          // --- Step 1: Compute new mass and energy for every cell ---
+		          // We do this for each ThermalEnergy component separately
+		          // because each has different material properties.
+
+		          // Get all component arrays from the first tile (they're the same for all tiles)
+		          AtmosphereTile firstTile = atmosphereTiles[0, 0, 0];
+		          if (firstTile == null)
+				return;
+		          ThermalEnergy[] allComponents = firstTile.energies;
+
+		          // For each component type (e.g., nitrogen, oxygen, waterVapor, etc.)
+		          for (int compIdx = 0; compIdx < allComponents.Length; compIdx++)
+		          {
+				// Compute departure points and interpolate for every cell
+				for (int layer = 0; layer < layers; layer++)
+				{
+					     for (int x = 0; x < width; x++)
+					     {
+						          for (int y = 0; y < height; y++)
+						          {
+								AtmosphereTile current = atmosphereTiles[layer, x, y];
+								if (current == null)
+									     continue;
+
+								// 1. Compute departure point (backwards trajectory)
+								Vector3 departure = CalculateDeparturePoint3D(
+								    current, x, y, layer, width, height, layers, timeStepSeconds);
+
+								// 2. Interpolate mass and total energy at the departure point
+								(float mass, float energy) = TrilinearInterpolateComponent(
+								    atmosphereTiles,
+								    compIdx,
+								    departure,
+								    layers, width, height);
+
+								_newMass[layer, x, y] = mass;
+								_newEnergy[layer, x, y] = energy;
+						          }
+					     }
+				}
+
+				// --- Step 2: Overwrite all tiles with the interpolated values ---
+				for (int layer = 0; layer < layers; layer++)
+				{
+					     for (int x = 0; x < width; x++)
+					     {
+						          for (int y = 0; y < height; y++)
+						          {
+								AtmosphereTile tile = atmosphereTiles[layer, x, y];
+								if (tile == null)
+									     continue;
+
+								ThermalEnergy component = tile.energies[compIdx];
+								if (component == null)
+									     continue;
+
+								float mass = _newMass[layer, x, y];
+								float energy = _newEnergy[layer, x, y];
+
+								// Set the new mass and total energy directly.
+								// This preserves the component's material identity (materialName).
+								component.SetMassAndEnergy(mass, energy, 0f);
+
+						          }
+					     }
+				}
+		          }
+
+		          // --- Step 3: Global conservation fix ---
+		          // Interpolation has a tiny mass/energy drift. Correct it globally.
+		          FixGlobalConservation(atmosphereTiles);
+	     }
+
+	     private static Vector3 CalculateDeparturePoint3D(
+    AtmosphereTile current,
+    int x, int y, int layer,
+    int width, int height, int layers,
+    float timeStepSeconds)
+	     {
+		          if (current == null)
+				return new Vector3(x, y, layer);
+
+		          float cellWidth = current.tileWidth;
+		          float layerHeight = current.layerHeight;
+
+		          // Wind displacement in grid units
+		          float dx = (current.windVelocity.x * timeStepSeconds) / cellWidth;
+		          float dy = (current.windVelocity.z * timeStepSeconds) / cellWidth;
+		          float dz = (current.windVelocity.y * timeStepSeconds) / layerHeight;
+
+		          // Departure point (backwards in time)
+		          float departureX = x - dx;
+		          float departureY = y - dy;
+		          float departureZ = layer - dz;
+
+		          // Periodic boundary in X (latitude) and Y (longitude)
+		          // For latitude (X), clamp to [0, width-1] to handle poles
+		          departureX = Mathf.Clamp(departureX, 0f, width - 1f);
+		          departureY = ((departureY % height) + height) % height;
+		          departureZ = Mathf.Clamp(departureZ, 0f, layers - 1f);
+
+		          return new Vector3(departureX, departureY, departureZ);
+	     }
+	     private static (float mass, float energy) TricubicInterpolateComponent(
+    AtmosphereTile[,,] tiles,
+    int compIdx,
+    Vector3 departure,
+    int layers, int width, int height)
+	     {
+		          float px = departure.x;
+		          float py = departure.y;
+		          float pz = departure.z;
+
+		          // Get the integer indices of the cell containing the departure point
+		          int x0 = Mathf.FloorToInt(px);
+		          int y0 = Mathf.FloorToInt(py);
+		          int z0 = Mathf.FloorToInt(pz);
+
+		          // Fractional distances (0 to 1)
+		          float fx = px - x0;
+		          float fy = py - y0;
+		          float fz = pz - z0;
+
+		          // Build 4x4x4 neighbourhood
+		          // For cubic interpolation, we need indices: x0-1, x0, x0+1, x0+2
+		          // We'll clamp indices to valid ranges
+		          int[] xIndices = new int[4];
+		          int[] yIndices = new int[4];
+		          int[] zIndices = new int[4];
+
+		          // x indices (latitude) - clamp to [0, width-1]
+		          for (int i = 0; i < 4; i++)
+		          {
+				int idx = x0 - 1 + i;
+				xIndices[i] = Mathf.Clamp(idx, 0, width - 1);
+		          }
+
+		          // y indices (longitude) - wrap around
+		          for (int i = 0; i < 4; i++)
+		          {
+				int idx = y0 - 1 + i;
+				yIndices[i] = ((idx % height) + height) % height;
+		          }
+
+		          // z indices (vertical) - clamp to [0, layers-1]
+		          for (int i = 0; i < 4; i++)
+		          {
+				int idx = z0 - 1 + i;
+				zIndices[i] = Mathf.Clamp(idx, 0, layers - 1);
+		          }
+
+		          // Build 4x4x4 grid of mass values and energy values
+		          float[,,] massGrid = new float[4, 4, 4];
+		          float[,,] energyGrid = new float[4, 4, 4];
+
+		          for (int zi = 0; zi < 4; zi++)
+		          {
+				for (int yi = 0; yi < 4; yi++)
+				{
+					     for (int xi = 0; xi < 4; xi++)
+					     {
+						          int z = zIndices[zi];
+						          int y = yIndices[yi];
+						          int x = xIndices[xi];
+
+						          ThermalEnergy comp = GetComponent(tiles, z, x, y, compIdx);
+						          if (comp != null)
+						          {
+								massGrid[xi, yi, zi] = comp.Mass;
+								energyGrid[xi, yi, zi] = comp.StoredEnergy;
+						          }
+						          else
+						          {
+								massGrid[xi, yi, zi] = 0f;
+								energyGrid[xi, yi, zi] = 0f;
+						          }
+					     }
+				}
+		          }
+
+		          // Perform tricubic interpolation
+		          float mass = TricubicInterpolate(massGrid, fx, fy, fz);
+		          float energy = TricubicInterpolate(energyGrid, fx, fy, fz);
+
+		          return (mass, energy);
+	     }
+
+	     private static float TricubicInterpolate(float[,,] values, float fx, float fy, float fz)
+	     {
+		          // values is a 4x4x4 grid: values[x, y, z]
+		          // fx, fy, fz are fractional positions within the cell [0,1]
+
+		          // Interpolate along X for each (y, z) pair
+		          float[,] xInterp = new float[4, 4];
+		          for (int y = 0; y < 4; y++)
+		          {
+				for (int z = 0; z < 4; z++)
+				{
+					     xInterp[y, z] = CubicInterpolate(
+					         values[0, y, z],
+					         values[1, y, z],
+					         values[2, y, z],
+					         values[3, y, z],
+					         fx
+					     );
+				}
+		          }
+
+		          // Interpolate along Y for each z
+		          float[] zInterp = new float[4];
+		          for (int z = 0; z < 4; z++)
+		          {
+				zInterp[z] = CubicInterpolate(
+				    xInterp[0, z],
+				    xInterp[1, z],
+				    xInterp[2, z],
+				    xInterp[3, z],
+				    fy
+				);
+		          }
+
+		          // Interpolate along Z
+		          return CubicInterpolate(
+		              zInterp[0],
+		              zInterp[1],
+		              zInterp[2],
+		              zInterp[3],
+		              fz
+		          );
+	     }
+	     private static float CubicInterpolate(float p0, float p1, float p2, float p3, float t)
+	     {
+		          // Catmull‑Rom spline: passes through all control points
+		          // p1 and p2 are the points on either side of the interval [0,1]
+		          float a0 = p1;
+		          float a1 = -0.5f * p0 + 0.5f * p2;
+		          float a2 = p0 - 2.5f * p1 + 2f * p2 - 0.5f * p3;
+		          float a3 = -0.5f * p0 + 1.5f * p1 - 1.5f * p2 + 0.5f * p3;
+		          return a0 + a1 * t + a2 * t * t + a3 * t * t * t;
+	     }
+
+	     private static (float mass, float energy) TrilinearInterpolateComponent(
+    AtmosphereTile[,,] tiles,
+    int compIdx,
+    Vector3 departure,
+    int layers, int width, int height)
+	     {
+		          float px = departure.x;
+		          float py = departure.y;
+		          float pz = departure.z;
+
+		          // Get the 8 surrounding cells
+		          int x0 = Mathf.FloorToInt(px);
+		          int x1 = Mathf.Min(x0 + 1, width - 1);
+		          int y0 = Mathf.FloorToInt(py);
+		          int y1 = (y0 + 1) % height;
+		          int z0 = Mathf.FloorToInt(pz);
+		          int z1 = Mathf.Min(z0 + 1, layers - 1);
+
+		          // Fractional distances
+		          float fx = px - x0;
+		          float fy = py - y0;
+		          float fz = pz - z0;
+
+		          // Get the 8 component references
+		          ThermalEnergy c000 = GetComponent(tiles, z0, x0, y0, compIdx);
+		          ThermalEnergy c100 = GetComponent(tiles, z0, x1, y0, compIdx);
+		          ThermalEnergy c010 = GetComponent(tiles, z0, x0, y1, compIdx);
+		          ThermalEnergy c110 = GetComponent(tiles, z0, x1, y1, compIdx);
+		          ThermalEnergy c001 = GetComponent(tiles, z1, x0, y0, compIdx);
+		          ThermalEnergy c101 = GetComponent(tiles, z1, x1, y0, compIdx);
+		          ThermalEnergy c011 = GetComponent(tiles, z1, x0, y1, compIdx);
+		          ThermalEnergy c111 = GetComponent(tiles, z1, x1, y1, compIdx);
+
+		          // If any are null, fallback to the nearest valid cell
+		          if (c000 == null || c100 == null || c010 == null || c110 == null ||
+		              c001 == null || c101 == null || c011 == null || c111 == null)
+		          {
+				// Fallback: use the cell at the departure point (clamped)
+				int zc = Mathf.Clamp(Mathf.RoundToInt(pz), 0, layers - 1);
+				int xc = Mathf.Clamp(Mathf.RoundToInt(px), 0, width - 1);
+				int yc = Mathf.Clamp(Mathf.RoundToInt(py), 0, height - 1);
+				ThermalEnergy fallback = GetComponent(tiles, zc, xc, yc, compIdx);
+				if (fallback != null)
+					     return (fallback.Mass, fallback.StoredEnergy);
+				return (0f, 0f);
+		          }
+
+		          // Interpolate mass
+		          float mass000 = c000.Mass, mass100 = c100.Mass;
+		          float mass010 = c010.Mass, mass110 = c110.Mass;
+		          float mass001 = c001.Mass, mass101 = c101.Mass;
+		          float mass011 = c011.Mass, mass111 = c111.Mass;
+
+		          float mass00 = Mathf.Lerp(mass000, mass100, fx);
+		          float mass10 = Mathf.Lerp(mass010, mass110, fx);
+		          float mass01 = Mathf.Lerp(mass001, mass101, fx);
+		          float mass11 = Mathf.Lerp(mass011, mass111, fx);
+
+		          float mass0 = Mathf.Lerp(mass00, mass10, fy);
+		          float mass1 = Mathf.Lerp(mass01, mass11, fy);
+		          float mass = Mathf.Lerp(mass0, mass1, fz);
+
+		          // Interpolate energy (using total stored energy)
+		          float energy000 = c000.StoredEnergy, energy100 = c100.StoredEnergy;
+		          float energy010 = c010.StoredEnergy, energy110 = c110.StoredEnergy;
+		          float energy001 = c001.StoredEnergy, energy101 = c101.StoredEnergy;
+		          float energy011 = c011.StoredEnergy, energy111 = c111.StoredEnergy;
+
+		          float energy00 = Mathf.Lerp(energy000, energy100, fx);
+		          float energy10 = Mathf.Lerp(energy010, energy110, fx);
+		          float energy01 = Mathf.Lerp(energy001, energy101, fx);
+		          float energy11 = Mathf.Lerp(energy011, energy111, fx);
+
+		          float energy0 = Mathf.Lerp(energy00, energy10, fy);
+		          float energy1 = Mathf.Lerp(energy01, energy11, fy);
+		          float energy = Mathf.Lerp(energy0, energy1, fz);
+
+		          return (mass, energy);
+	     }
+
+	     private static ThermalEnergy GetComponent(
+	         AtmosphereTile[,,] tiles,
+	         int layer, int x, int y,
+	         int compIdx)
+	     {
+		          if (layer < 0 || layer >= tiles.GetLength(0))
+				return null;
+		          if (x < 0 || x >= tiles.GetLength(1))
+				return null;
+		          if (y < 0 || y >= tiles.GetLength(2))
+				return null;
+
+		          AtmosphereTile tile = tiles[layer, x, y];
+		          if (tile == null || tile.energies == null)
+				return null;
+		          if (compIdx < 0 || compIdx >= tile.energies.Length)
+				return null;
+
+		          return tile.energies[compIdx];
+	     }
+
+	     private static float globalInitialMass = -1f;
+	     private static float globalInitialEnergy = -1f;
+
+	     public static void FixGlobalConservation(AtmosphereTile[,,] tiles)
+	     {
+		          int layers = tiles.GetLength(0);
+		          int width = tiles.GetLength(1);
+		          int height = tiles.GetLength(2);
+
+		          // Calculate current totals
+		          float totalMass = 0f;
+		          float totalEnergy = 0f;
+
+		          for (int layer = 0; layer < layers; layer++)
+		          {
+				for (int x = 0; x < width; x++)
+				{
+					     for (int y = 0; y < height; y++)
+					     {
+						          AtmosphereTile tile = tiles[layer, x, y];
+						          if (tile == null)
+								continue;
+
+						          foreach (var comp in tile.energies)
+						          {
+								if (comp == null)
+									     continue;
+								totalMass += comp.Mass;
+								totalEnergy += comp.StoredEnergy;
+						          }
+					     }
+				}
+		          }
+
+		          // Store initial values on first call
+		          if (globalInitialMass < 0f)
+		          {
+				globalInitialMass = totalMass;
+				globalInitialEnergy = totalEnergy;
+				return;
+		          }
+
+		          // Prevent division by zero
+		          if (totalMass <= 0f || totalEnergy <= 0f)
+				return;
+
+		          // Calculate correction factors
+		          float massCorrection = globalInitialMass / totalMass;
+		          float energyCorrection = globalInitialEnergy / totalEnergy;
+
+		          // Only apply if drift is significant (>0.001%)
+		          if (Mathf.Abs(massCorrection - 1f) < 0.00001f &&
+		              Mathf.Abs(energyCorrection - 1f) < 0.00001f)
+				return;
+
+		          // Apply correction to all components
+		          for (int layer = 0; layer < layers; layer++)
+		          {
+				for (int x = 0; x < width; x++)
+				{
+					     for (int y = 0; y < height; y++)
+					     {
+						          AtmosphereTile tile = tiles[layer, x, y];
+						          if (tile == null)
+								continue;
+
+						          foreach (var comp in tile.energies)
+						          {
+								if (comp == null || comp.Mass <= 0f)
+									     continue;
+
+								float newMass = comp.Mass * massCorrection;
+								float newEnergy = comp.StoredEnergy * energyCorrection;
+
+								// Set the corrected values
+								comp.SetMassAndEnergy(newMass, newEnergy, 0f);
+						          }
+					     }
+				}
+		          }
+	     }
 }
+

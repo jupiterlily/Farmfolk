@@ -149,7 +149,217 @@ TextureImporter:
     serializedVersion: 2
     sprites:
     - serializedVersion: 2
-      name: Pepo_Hair_Up_0
+      name: Hair_Up_0
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f71b27ec1d3e13e4c8f979a0c3c44efb
+      internalID: 1957846146
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_1
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 07ea5d24ed43e354887da11afa8f275d
+      internalID: -1753182167
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_2
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ee7eb82294007a149a3ff5d31685bce0
+      internalID: 1727748051
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_3
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 726d7953d14e6a64c90f18f6f6bda10b
+      internalID: 599270245
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_4
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: bfe05a99cd0ae284298cb1e080a5acf9
+      internalID: 1756833817
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_5
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: ec047c816da77a2498ee08cf03419545
+      internalID: -287382235
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_6
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: aee2f577028876d4d983450b0521a2a9
+      internalID: 1117550667
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_7
+      rect:
+        serializedVersion: 2
+        x: 896
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 91bb4abf2ce76ec418140ac1ef4ad2e7
+      internalID: 223836012
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_8
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 260c29cfd32f8a94487af776a9af0678
+      internalID: 666812553
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_9
+      rect:
+        serializedVersion: 2
+        x: 1152
+        y: 384
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 96e41baa8774a9a45ad37c085ccf91a6
+      internalID: -1146807495
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_10
       rect:
         serializedVersion: 2
         x: 0
@@ -163,14 +373,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 97a737e911e77f2409d88d59d57f74eb
-      internalID: 1832372601
+      spriteID: 3d628a4a226db1445bdb6de0154caa35
+      internalID: 1253756293
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Up_1
+      name: Hair_Up_11
       rect:
         serializedVersion: 2
         x: 128
@@ -184,14 +394,182 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6e22aaca6dea1254e9bef2516d5a26dc
-      internalID: 1447573784
+      spriteID: 7c5ac8fd2c92b90469809445240eb9bc
+      internalID: 175376821
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Up_2
+      name: Hair_Up_12
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 583fe9347c069644989204848787f0fe
+      internalID: 1451453283
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_13
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b3a9d80b8746b604aaf31cb85cde3c8c
+      internalID: 867582712
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_14
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7a1ee961e4fa64a428e7ffaa3f623554
+      internalID: 1853758436
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_15
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c5d46ba857dc4374ab575efdf805ba7f
+      internalID: 1163263036
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_16
+      rect:
+        serializedVersion: 2
+        x: 768
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b5e1ab04e2500e447b1f86bd6af6eadb
+      internalID: 1693009252
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_17
+      rect:
+        serializedVersion: 2
+        x: 896
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: d281fa0b4c81fa140a000672e39b51ce
+      internalID: 1102134347
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_18
+      rect:
+        serializedVersion: 2
+        x: 1024
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: c9500cc3f453bc84ea09c7b8116913bd
+      internalID: 46640068
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_19
+      rect:
+        serializedVersion: 2
+        x: 1152
+        y: 256
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9207dac1f378e564686d3343b1d23178
+      internalID: -1113501233
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_20
       rect:
         serializedVersion: 2
         x: 0
@@ -205,14 +583,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 19a1afe07e1661042bb1fef3d1e94056
-      internalID: -1621693347
+      spriteID: 67208860610a77942a07b74bc8d3a74f
+      internalID: 1199203054
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Up_3
+      name: Hair_Up_21
       rect:
         serializedVersion: 2
         x: 128
@@ -226,14 +604,98 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 22f82f76005fd5d4b9c8906132987856
-      internalID: -162976138
+      spriteID: 34569027b988eec4a8b573ccedafc366
+      internalID: -893130544
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Up_4
+      name: Hair_Up_22
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 128
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 642ef1499969bb340ae784198669fb12
+      internalID: -742863769
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_23
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 128
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7fbd8b0c34d2b18458dc029b5f875d74
+      internalID: -563549124
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_24
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 128
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: f591359769181534ba370a1321b2331a
+      internalID: -2056853200
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_25
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 128
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 37a17a7f4c328b24e8eefbef41e2a90d
+      internalID: -1992981071
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_26
       rect:
         serializedVersion: 2
         x: 768
@@ -247,14 +709,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e957ecf1c70abe545bcdd97497bbf5af
-      internalID: 2122630946
+      spriteID: 61a0c0006621a8d4f808a078abf40e73
+      internalID: 1338264977
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Up_5
+      name: Hair_Up_27
       rect:
         serializedVersion: 2
         x: 896
@@ -268,14 +730,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 5dbb73437551cbd4488522faea8a6eb6
-      internalID: -1541117204
+      spriteID: 8910ef174294ac1419847d54a0cb969a
+      internalID: 1064735699
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Up_6
+      name: Hair_Up_28
       rect:
         serializedVersion: 2
         x: 1024
@@ -289,14 +751,35 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 726fa102fdc80e04685227801be00c42
-      internalID: -1926265829
+      spriteID: c7e9a47d0f0cef84492328df113ea22b
+      internalID: -575934679
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Up_7
+      name: Hair_Up_29
+      rect:
+        serializedVersion: 2
+        x: 1152
+        y: 128
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 27a592dda1f96c544b36d22858815599
+      internalID: -11798703
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_30
       rect:
         serializedVersion: 2
         x: 0
@@ -310,14 +793,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 4fc66f39e4d8ae24d8fa6c6cd7235d74
-      internalID: 169623582
+      spriteID: 6b6a853075602584aa43da83c4d2f04c
+      internalID: -861082177
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Up_8
+      name: Hair_Up_31
       rect:
         serializedVersion: 2
         x: 128
@@ -331,14 +814,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 7b99ef0bd5ab67142bf984aeb2f64c4d
-      internalID: -648771049
+      spriteID: 7ede2a2258c806448b34fbd6f4a8747e
+      internalID: 1472188105
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Up_9
+      name: Hair_Up_32
       rect:
         serializedVersion: 2
         x: 256
@@ -352,14 +835,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: f0cd8471077a3204ca7dbb31fe5fe011
-      internalID: 196292624
+      spriteID: afc7f3107bba28049a38c007fdab9c07
+      internalID: -1900747881
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Up_10
+      name: Hair_Up_33
       rect:
         serializedVersion: 2
         x: 384
@@ -373,14 +856,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 722d6f8ede30b904ca9cd8c0022e6b57
-      internalID: 1752297386
+      spriteID: 752ed765de68a234fa4187e735ed549c
+      internalID: -1120330306
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Up_11
+      name: Hair_Up_34
       rect:
         serializedVersion: 2
         x: 512
@@ -394,14 +877,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: c771ba84935a79b499956559118bdf79
-      internalID: 22120921
+      spriteID: 3202ef5bb4c18ee47925ada42280fa30
+      internalID: -2119674067
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Up_12
+      name: Hair_Up_35
       rect:
         serializedVersion: 2
         x: 640
@@ -415,14 +898,35 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: 6005ea2ac523e7c479aa5d881cb02f07
-      internalID: 1228319256
+      spriteID: f3310f9f746a89240ac7f37fc94f1194
+      internalID: 1912926056
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Up_13
+      name: Hair_Up_36
+      rect:
+        serializedVersion: 2
+        x: 896
+        y: 0
+        width: 128
+        height: 128
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 19bde64c51388b640ab3547141f7f7a6
+      internalID: 52119804
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Hair_Up_37
       rect:
         serializedVersion: 2
         x: 1024
@@ -436,14 +940,14 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: cb53af4194df25d4aaad501d9f7ef356
-      internalID: 1640155478
+      spriteID: f85b2ae397776dd4e8fda18e2e833376
+      internalID: -872062930
       vertices: []
       indices: 
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Pepo_Hair_Up_14
+      name: Hair_Up_38
       rect:
         serializedVersion: 2
         x: 1152
@@ -457,8 +961,8 @@ TextureImporter:
       physicsShape: []
       tessellationDetail: 0
       bones: []
-      spriteID: e042ad5269f87e341844b079f240f206
-      internalID: -1171122686
+      spriteID: bc1d61e700abbca42a0253e377799597
+      internalID: 269307098
       vertices: []
       indices: 
       edges: []
@@ -474,21 +978,45 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
-      Pepo_Hair_Up_0: 1832372601
-      Pepo_Hair_Up_1: 1447573784
-      Pepo_Hair_Up_10: 1752297386
-      Pepo_Hair_Up_11: 22120921
-      Pepo_Hair_Up_12: 1228319256
-      Pepo_Hair_Up_13: 1640155478
-      Pepo_Hair_Up_14: -1171122686
-      Pepo_Hair_Up_2: -1621693347
-      Pepo_Hair_Up_3: -162976138
-      Pepo_Hair_Up_4: 2122630946
-      Pepo_Hair_Up_5: -1541117204
-      Pepo_Hair_Up_6: -1926265829
-      Pepo_Hair_Up_7: 169623582
-      Pepo_Hair_Up_8: -648771049
-      Pepo_Hair_Up_9: 196292624
+      Hair_Up_0: 1957846146
+      Hair_Up_1: -1753182167
+      Hair_Up_10: 1253756293
+      Hair_Up_11: 175376821
+      Hair_Up_12: 1451453283
+      Hair_Up_13: 867582712
+      Hair_Up_14: 1853758436
+      Hair_Up_15: 1163263036
+      Hair_Up_16: 1693009252
+      Hair_Up_17: 1102134347
+      Hair_Up_18: 46640068
+      Hair_Up_19: -1113501233
+      Hair_Up_2: 1727748051
+      Hair_Up_20: 1199203054
+      Hair_Up_21: -893130544
+      Hair_Up_22: -742863769
+      Hair_Up_23: -563549124
+      Hair_Up_24: -2056853200
+      Hair_Up_25: -1992981071
+      Hair_Up_26: 1338264977
+      Hair_Up_27: 1064735699
+      Hair_Up_28: -575934679
+      Hair_Up_29: -11798703
+      Hair_Up_3: 599270245
+      Hair_Up_30: -861082177
+      Hair_Up_31: 1472188105
+      Hair_Up_32: -1900747881
+      Hair_Up_33: -1120330306
+      Hair_Up_34: -2119674067
+      Hair_Up_35: 1912926056
+      Hair_Up_36: 52119804
+      Hair_Up_37: -872062930
+      Hair_Up_38: 269307098
+      Hair_Up_4: 1756833817
+      Hair_Up_5: -287382235
+      Hair_Up_6: 1117550667
+      Hair_Up_7: 223836012
+      Hair_Up_8: 666812553
+      Hair_Up_9: -1146807495
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

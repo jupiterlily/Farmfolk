@@ -73,6 +73,7 @@ public class UIFactory
 
 		          Image bg = windowGO.AddComponent<Image>();
 		          bg.color = new Color(0.15f, 0.15f, 0.2f, 0.95f);
+		          bg.raycastTarget = false;
 
 		          UIUtilities.ApplyLayoutGroupData(windowGO, windowDef);
 
@@ -199,7 +200,7 @@ public class UIFactory
 		          // Add a background image (optional)
 		          Image bg = sectionGO.AddComponent<Image>();
 		          bg.color = new Color(0.2f, 0.2f, 0.3f, 0.5f);
-
+		          bg.raycastTarget = false;
 
 		          // Store reference
 		          sectionDef.ComponentObject = sectionGO;
@@ -288,11 +289,15 @@ public class UIFactory
 		          case ButtonField buttonField:
 		          controlGO = CreateButton(buttonField, fieldGO.transform);
 		          break;
+		          case PortraitField portraitField:
+		          controlGO = CreatePortrait(portraitField, fieldGO.transform);
+		          break;
 		          default:
 		          Debug.LogWarning($"Unknown field type: {fieldDef.GetType()}");
 		          controlGO = new GameObject("Unsupported");
 		          controlGO.transform.SetParent(fieldGO.transform, false);
 		          break;
+
 		          }
 
 		          // Make control flexible width
@@ -312,43 +317,63 @@ public class UIFactory
 	     }
 
 	     // --- Individual Control Creators ---------------------------------
+	     private GameObject CreatePortrait(PortraitField def, Transform parent)
+	     {
+		          GameObject go = PepoUIUtilities.CreatePortrait(def.subject);
+		          go.transform.SetParent(parent, false);
 
+		          return go;
+	     }
 	     private GameObject CreateTextInput(TextInputField def, Transform parent)
 	     {
 		          GameObject go = new GameObject("TextInput");
 		          go.transform.SetParent(parent, false);
+
+		          // Background image (so it's visible and clickable)
+		          Image bg = go.AddComponent<Image>();
+		          bg.color = new Color(0.1f, 0.1f, 0.1f, 0.5f);
+		          bg.raycastTarget = true;
+
 		          TMP_InputField input = go.AddComponent<TMP_InputField>();
-		          // Set default text, max length, etc.
 		          input.text = def.DefaultText;
 		          input.characterLimit = def.MaxLength;
-		          // Add placeholder or text component
+
+		          // Text component
 		          GameObject textGO = new GameObject("Text");
 		          textGO.transform.SetParent(go.transform, false);
 		          TextMeshProUGUI tmp = textGO.AddComponent<TextMeshProUGUI>();
 		          tmp.fontSize = def.FontSize;
 		          tmp.color = Color.white;
-		          // Assign to input field
+		          tmp.alignment = TextAlignmentOptions.MidlineLeft;
+		          RectTransform textRT = textGO.GetComponent<RectTransform>();
+		          textRT.anchorMin = Vector2.zero;
+		          textRT.anchorMax = Vector2.one;
+		          textRT.offsetMin = new Vector2(5, 2);
+		          textRT.offsetMax = new Vector2(-5, -2);
 		          input.textComponent = tmp;
-		          // Add placeholder
+
+		          // Placeholder
 		          GameObject placeholderGO = new GameObject("Placeholder");
 		          placeholderGO.transform.SetParent(go.transform, false);
 		          TextMeshProUGUI placeholderTmp = placeholderGO.AddComponent<TextMeshProUGUI>();
 		          placeholderTmp.text = "Enter text...";
 		          placeholderTmp.fontSize = def.FontSize;
 		          placeholderTmp.color = Color.gray;
+		          placeholderTmp.alignment = TextAlignmentOptions.MidlineLeft;
+		          RectTransform placeholderRT = placeholderGO.GetComponent<RectTransform>();
+		          placeholderRT.anchorMin = Vector2.zero;
+		          placeholderRT.anchorMax = Vector2.one;
+		          placeholderRT.offsetMin = new Vector2(5, 2);
+		          placeholderRT.offsetMax = new Vector2(-5, -2);
 		          input.placeholder = placeholderTmp;
 
-		          // Set rect transform to fill parent
-		          RectTransform rt = go.GetComponent<RectTransform>();
-		          rt.anchorMin = Vector2.zero;
-		          rt.anchorMax = Vector2.one;
-		          rt.offsetMin = Vector2.zero;
-		          rt.offsetMax = Vector2.zero;
-
-		          // Data binding: on value changed
+		          // Data binding
 		          if (def.Getter != null)
 				input.text = def.GetValue<string>();
 		          input.onValueChanged.AddListener((val) => def.SetValue(val));
+
+		          // --- CRITICAL: Apply layout properties ---
+		          UIUtilities.ApplyLayoutGroupData(go, def);
 
 		          return go;
 	     }
@@ -387,15 +412,73 @@ public class UIFactory
 	     {
 		          GameObject go = new GameObject("Range");
 		          go.transform.SetParent(parent, false);
+
+		          // --- Layout Element: give the slider a minimum height ---
+		          LayoutElement mainLE = go.AddComponent<LayoutElement>();
+		          mainLE.minHeight = def.FontSize + 12;
+		          mainLE.preferredHeight = def.FontSize + 12;
+		          mainLE.flexibleHeight = 0;
+
+		          // --- Background (the track) ---
+		          Image bg = go.AddComponent<Image>();
+		          bg.color = new Color(0.15f, 0.15f, 0.15f, 0.8f);
+		          bg.raycastTarget = true;
+
 		          Slider slider = go.AddComponent<Slider>();
 		          slider.minValue = def.MinValue;
 		          slider.maxValue = def.MaxValue;
 		          slider.wholeNumbers = def.UseIntStep;
-		          // Add a text display for value
+		          slider.direction = Slider.Direction.LeftToRight;
+
+		          // --- FILL AREA (the progress bar background) ---
+		          GameObject fillArea = new GameObject("Fill Area", typeof(RectTransform));
+		          fillArea.transform.SetParent(go.transform, false);
+		          RectTransform fillAreaRT = fillArea.GetComponent<RectTransform>();
+		          fillAreaRT.anchorMin = new Vector2(0, 0.2f);
+		          fillAreaRT.anchorMax = new Vector2(1, 0.8f);
+		          fillAreaRT.offsetMin = new Vector2(8, 0);
+		          fillAreaRT.offsetMax = new Vector2(-8, 0);
+
+		          // --- FILL (the colored progress) ---
+		          GameObject fill = new GameObject("Fill", typeof(RectTransform));
+		          fill.transform.SetParent(fillArea.transform, false);
+		          RectTransform fillRT = fill.GetComponent<RectTransform>();
+		          fillRT.anchorMin = Vector2.zero;
+		          fillRT.anchorMax = Vector2.zero; // Anchored to left – slider will stretch it
+		          fillRT.pivot = new Vector2(0, 0.5f);
+		          fillRT.sizeDelta = new Vector2(0, 0);
+		          Image fillImage = fill.AddComponent<Image>();
+		          fillImage.color = new Color(0.2f, 0.5f, 0.8f);
+		          slider.fillRect = fillRT;
+
+		          // --- HANDLE SLIDE AREA (the clickable zone) ---
+		          GameObject handleArea = new GameObject("Handle Slide Area", typeof(RectTransform));
+		          handleArea.transform.SetParent(go.transform, false);
+		          RectTransform handleAreaRT = handleArea.GetComponent<RectTransform>();
+		          handleAreaRT.anchorMin = Vector2.zero;
+		          handleAreaRT.anchorMax = Vector2.one;
+		          handleAreaRT.sizeDelta = Vector2.zero;
+		          handleAreaRT.offsetMin = Vector2.zero;
+		          handleAreaRT.offsetMax = Vector2.zero;
+
+		          // --- HANDLE (the draggable circle) ---
+		          GameObject handle = new GameObject("Handle", typeof(RectTransform));
+		          handle.transform.SetParent(handleArea.transform, false);
+		          RectTransform handleRT = handle.GetComponent<RectTransform>();
+		          handleRT.anchorMin = new Vector2(0, 0.5f);
+		          handleRT.anchorMax = new Vector2(0, 0.5f);
+		          handleRT.pivot = new Vector2(0.5f, 0.5f);
+		          handleRT.sizeDelta = new Vector2(18, 18);
+		          handleRT.anchoredPosition = Vector2.zero;
+		          Image handleImage = handle.AddComponent<Image>();
+		          handleImage.color = Color.white;
+		          slider.handleRect = handleRT;
+
+		          // --- VALUE LABEL ---
 		          GameObject valueLabel = new GameObject("Value");
 		          valueLabel.transform.SetParent(go.transform, false);
 		          TextMeshProUGUI tmp = valueLabel.AddComponent<TextMeshProUGUI>();
-		          tmp.fontSize = def.FontSize;
+		          tmp.fontSize = def.FontSize - 2;
 		          tmp.color = Color.white;
 		          tmp.alignment = TextAlignmentOptions.MidlineRight;
 		          RectTransform valueRT = valueLabel.GetComponent<RectTransform>();
@@ -403,29 +486,29 @@ public class UIFactory
 		          valueRT.anchorMax = new Vector2(1, 0.5f);
 		          valueRT.pivot = new Vector2(1, 0.5f);
 		          valueRT.sizeDelta = new Vector2(50, 30);
-		          valueRT.anchoredPosition = new Vector2(-5, 0);
+		          valueRT.anchoredPosition = new Vector2(-8, 0);
 
-		          // Set initial value
+		          // --- Initial value ---
 		          if (def.Getter != null)
 				slider.value = def.GetValue<float>();
-		          // Update value label on change
+
+		          // --- Update label & data on change ---
 		          slider.onValueChanged.AddListener((val) =>
 		          {
 				tmp.text = def.UseIntStep ? ((int)val).ToString() : val.ToString("F1");
 				def.SetValue(val);
 		          });
-		          // Initial label
 		          tmp.text = slider.value.ToString(def.UseIntStep ? "0" : "F1");
 
-		          // Set slider to fill remaining space
-		          LayoutElement le = go.AddComponent<LayoutElement>();
-		          le.flexibleWidth = 1;
+		          // Store reference
+		          def.Slider = slider;
+		          def.Refresh();
 
-		          def.Slider = slider;     // ✅ store reference
-		          def.Refresh();           // ✅ update from getter
+		          // --- Apply layout ---
+		          UIUtilities.ApplyLayoutGroupData(go, def);
+
 		          return go;
 	     }
-
 	     private GameObject CreateToggle(ToggleField def, Transform parent)
 	     {
 		          GameObject go = new GameObject("Toggle");
@@ -455,7 +538,7 @@ public class UIFactory
 	     }
 	     private GameObject CreateDropdown(DropdownField def, Transform parent)
 	     {
-		          // Main GameObject
+		          // 1. Main GameObject
 		          GameObject go = new GameObject("Dropdown", typeof(RectTransform));
 		          go.transform.SetParent(parent, false);
 
@@ -463,12 +546,12 @@ public class UIFactory
 		          mainRT.anchorMin = new Vector2(0, 0.5f);
 		          mainRT.anchorMax = new Vector2(1, 0.5f);
 		          mainRT.pivot = new Vector2(0.5f, 0.5f);
-		          mainRT.sizeDelta = new Vector2(0, def.FontSize + 8);
+		          mainRT.sizeDelta = new Vector2(100, def.FontSize + 8);
 
 		          TMP_Dropdown dropdown = go.AddComponent<TMP_Dropdown>();
 		          def.dropdown = dropdown;
 
-		          // --- Caption (visible selected option) ---
+		          // 2. Caption (visible selected option)
 		          GameObject captionGO = new GameObject("Caption", typeof(RectTransform));
 		          captionGO.transform.SetParent(go.transform, false);
 		          RectTransform captionRT = captionGO.GetComponent<RectTransform>();
@@ -482,21 +565,31 @@ public class UIFactory
 		          captionText.alignment = TextAlignmentOptions.MidlineLeft;
 		          dropdown.captionText = captionText;
 
-		          // --- Template (the dropdown list) ---
+		          // 3. Template (dropdown list) – child of dropdown
 		          GameObject templateGO = new GameObject("Template", typeof(RectTransform));
 		          templateGO.transform.SetParent(go.transform, false);
-		          templateGO.SetActive(false); // hidden initially
+		          templateGO.SetActive(false);
 		          RectTransform templateRT = templateGO.GetComponent<RectTransform>();
 		          templateRT.anchorMin = new Vector2(0, 1);
 		          templateRT.anchorMax = new Vector2(1, 1);
 		          templateRT.pivot = new Vector2(0.5f, 1);
-		          templateRT.sizeDelta = new Vector2(0, 100);
+		          templateRT.sizeDelta = new Vector2(0, 150); // Height will auto-size
 
+		          // Background image for the list
+		          Image templateBg = templateGO.AddComponent<Image>();
+		          templateBg.color = new Color(0.15f, 0.15f, 0.2f, 0.95f);
+		          templateBg.raycastTarget = true; // Block clicks behind list
+
+		          // Prevent parent layout from affecting template
+		          LayoutElement le = templateGO.AddComponent<LayoutElement>();
+		          le.ignoreLayout = true;
+
+		          // 4. ScrollRect
 		          ScrollRect scrollRect = templateGO.AddComponent<ScrollRect>();
 		          scrollRect.horizontal = false;
 		          scrollRect.vertical = true;
 
-		          // Viewport
+		          // 5. Viewport
 		          GameObject viewportGO = new GameObject("Viewport", typeof(RectTransform));
 		          viewportGO.transform.SetParent(templateGO.transform, false);
 		          RectTransform viewportRT = viewportGO.GetComponent<RectTransform>();
@@ -507,9 +600,9 @@ public class UIFactory
 		          viewportRT.offsetMax = Vector2.zero;
 		          viewportGO.AddComponent<Mask>().showMaskGraphic = false;
 		          Image viewportImage = viewportGO.AddComponent<Image>();
-		          viewportImage.color = new Color(0.1f, 0.1f, 0.1f, 0.9f);
+		          viewportImage.color = new Color(0.1f, 0.1f, 0.1f, 0.95f);
 
-		          // Content
+		          // 6. Content
 		          GameObject contentGO = new GameObject("Content", typeof(RectTransform));
 		          contentGO.transform.SetParent(viewportGO.transform, false);
 		          RectTransform contentRT = contentGO.GetComponent<RectTransform>();
@@ -529,14 +622,21 @@ public class UIFactory
 		          ContentSizeFitter csf = contentGO.AddComponent<ContentSizeFitter>();
 		          csf.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
 
-		          // Item (Toggle) – this will be cloned automatically by the dropdown
+		          // 7. Item Template (each option)
 		          GameObject itemGO = new GameObject("Item", typeof(RectTransform));
 		          itemGO.transform.SetParent(contentGO.transform, false);
 		          RectTransform itemRT = itemGO.GetComponent<RectTransform>();
-		          itemRT.anchorMin = new Vector2(0, 0.5f);
-		          itemRT.anchorMax = new Vector2(1, 0.5f);
-		          itemRT.pivot = new Vector2(0.5f, 0.5f);
-		          itemRT.sizeDelta = new Vector2(0, 20);
+		          // Set anchors so the item stretches horizontally and is pinned to top
+		          itemRT.anchorMin = new Vector2(0, 1);
+		          itemRT.anchorMax = new Vector2(1, 1);
+		          itemRT.pivot = new Vector2(0.5f, 1);
+		          itemRT.sizeDelta = new Vector2(0, def.FontSize + 8); // height will be set by layout group
+
+		          LayoutElement itemLE = itemGO.AddComponent<LayoutElement>();
+		          itemLE.minHeight = def.FontSize + 8;
+		          itemLE.preferredHeight = def.FontSize + 8;
+		          itemLE.flexibleHeight = 0;
+		          itemLE.flexibleWidth = 1;
 
 		          Toggle toggle = itemGO.AddComponent<Toggle>();
 		          toggle.isOn = false;
@@ -544,9 +644,10 @@ public class UIFactory
 
 		          Image itemImage = itemGO.AddComponent<Image>();
 		          itemImage.color = new Color(0.2f, 0.2f, 0.2f);
+		          itemImage.raycastTarget = true; // allow clicking
 		          toggle.targetGraphic = itemImage;
 
-		          // Label inside the Toggle
+		          // Label inside Toggle
 		          GameObject itemLabelGO = new GameObject("Label", typeof(RectTransform));
 		          itemLabelGO.transform.SetParent(itemGO.transform, false);
 		          RectTransform itemLabelRT = itemLabelGO.GetComponent<RectTransform>();
@@ -559,14 +660,14 @@ public class UIFactory
 		          itemText.color = Color.white;
 		          itemText.alignment = TextAlignmentOptions.MidlineLeft;
 
-		          // Link ScrollRect to Viewport and Content
+		          // 8. Link everything
 		          scrollRect.viewport = viewportRT;
 		          scrollRect.content = contentRT;
 
-		          // Assign template (the ScrollRect's RectTransform)
-		          dropdown.template = templateRT;   // ✅ RectTransform
-		          dropdown.itemText = itemText;     // ✅ Text component inside the Toggle
+		          dropdown.template = templateRT;
+		          dropdown.itemText = itemText;
 
+		          // 9. Populate options
 		          List<string> optionList = def.OptionsGetter?.Invoke() ?? def.Options;
 		          if (optionList != null)
 		          {
@@ -576,16 +677,18 @@ public class UIFactory
 				dropdown.RefreshShownValue();
 		          }
 
-		          // Bind value
+		          // 10. Bind value
 		          if (def.Getter != null)
 				dropdown.value = (int)def.Getter();
 		          dropdown.onValueChanged.AddListener((val) => def.Setter?.Invoke(val));
 
 		          // Store reference for later refresh
 		          def.dropdown = dropdown;
-		          UIUtilities.ApplyLayoutGroupData(go, def);
-		          return go;
 
+		          // 11. Apply layout to the main dropdown GameObject
+		          UIUtilities.ApplyLayoutGroupData(go, def);
+
+		          return go;
 	     }
 	     private GameObject CreateImageDisplay(SpriteField sprite, Transform parent)
 	     {
@@ -672,7 +775,7 @@ public class UIFactory
 
 		          // Listener will be added later – keep it empty for now
 		          // (We'll add after wiring OnClick)
-
+		          btn.onClick.AddListener(() => def.OnClick?.Invoke());
 		          // Layout
 		          LayoutElement le = go.AddComponent<LayoutElement>();
 		          le.minWidth = def.MinimumSize.x;

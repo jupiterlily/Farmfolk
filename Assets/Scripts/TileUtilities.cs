@@ -83,7 +83,7 @@ public static class TileUtilities
 		          float waterVolume = sc.water.Mass / Constants.WATER_DENSITY; // Convert kg/m2 back to m3/m3 for volume calculation
 		          float iceVolume = sc.ice.Mass / Constants.ICE_DENSITY;
 
-		          float airVolume = sc.aeration; // already calculated from porosity and saturation
+		          float airVolume = sc.aeration; // already calculated from porosity and saturation 
 
 		          float total = solidVolume + waterVolume + iceVolume + airVolume;
 

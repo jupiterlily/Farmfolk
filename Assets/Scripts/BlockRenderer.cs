@@ -2,9 +2,9 @@ using UnityEngine;
 
 public class BlockRenderer : MonoBehaviour
 {
-	     Gas AeolianLayer;
-	     Liquid FluidLayer;
-	     Solid SubstrateLayer;
+	     GasLayer AeolianLayer;
+	     LiquidLayer FluidLayer;
+	     SolidLayer SubstrateLayer;
 
 	     public void Awake()
 	     {

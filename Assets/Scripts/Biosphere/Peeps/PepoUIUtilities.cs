@@ -3,11 +3,51 @@ using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class PepoUIUtilities
-{
 
-	     public static GameObject CreatePortrait(PepoData pepo, Sprite[] sHairUp, Sprite[] sHairBack, Sprite[] sHairTendrils, Sprite[] sHairFront, Sprite[] wHairUp, Sprite[] wHairBack, Sprite[] wHairTendrils, Sprite[] wHairFront, Sprite[] cHairUp, Sprite[] cHairBack, Sprite[] cHairTendrils, Sprite[] cHairFront, Sprite[] kHairUp, Sprite[] kHairBack, Sprite[] kHairTendrils, Sprite[] kHairFront, Sprite[] heads, Sprite[] eyeColours, Sprite[] mascEyes, Sprite[] femmeEyes, Sprite[] noses, Sprite[] topLips, Sprite[] bottomLips, Sprite[] freckles, Sprite[] brows, Sprite[] stubbleSprites, Sprite[] moustaches)
+public static class PepoUIUtilities
+{
+	     //we should store the base sprites for each feature in a dictionary or list, and then use the pepo's cosmetic features to determine which sprite to use for each feature. This way, we can easily add new features or change existing ones without having to modify the code.
+	     public static Sprite[] sHairUp; public static Sprite[] sHairBack; public static Sprite[] sHairTendrils; public static Sprite[] sHairFront; public static Sprite[] wHairUp; public static Sprite[] wHairBack; public static Sprite[] wHairTendrils; public static Sprite[] wHairFront; public static Sprite[] cHairUp; public static Sprite[] cHairBack; public static Sprite[] cHairTendrils; public static Sprite[] cHairFront; public static Sprite[] kHairUp; public static Sprite[] kHairBack; public static Sprite[] kHairTendrils; public static Sprite[] kHairFront; public static Sprite[] heads; public static Sprite[] eyeColours; public static Sprite[] mascEyes; public static Sprite[] femmeEyes; public static Sprite[] noses; public static Sprite[] topLips; public static Sprite[] bottomLips; public static Sprite[] freckles; public static Sprite[] brows; public static Sprite[] stubbleSprites; public static Sprite[] moustaches;
+
+	     public static void InitialiseSprites(Sprite[][] pepoAppearanceSprites)
 	     {
+		          //this is the order they get fed in.
+		          //0 mascEyes, 1 femmeEyes, 2 headShape,3 freckles,4 bottomLips, 5 topLips, 6 noseShape, 7 eyecolor, 8 HairUp_1, 9 HairBack_1, 10 HairTendrils_1, 11 HairFringe_1, 12  HairUp_2, 13 HairBack_2, 14 HairTendrils_2, 15 HairFringe_2, 16 HairUp_3, 17 HairBack_3, 18 HairTendrils_3, 19 HairFringe_3, 20 HairUp_4, 21 HairBack_4, 22 HairTendrils_4, 23 HairFringe_4, 24  brows, 25 stubble, 26 teeth, 27 moustaches }
+		          sHairUp = pepoAppearanceSprites[8];
+		          sHairBack = pepoAppearanceSprites[9];
+		          sHairTendrils = pepoAppearanceSprites[10];
+		          sHairFront = pepoAppearanceSprites[11];
+		          wHairUp = pepoAppearanceSprites[12];
+		          wHairBack = pepoAppearanceSprites[13];
+		          wHairTendrils = pepoAppearanceSprites[14];
+		          wHairFront = pepoAppearanceSprites[15];
+		          cHairUp = pepoAppearanceSprites[16];
+		          cHairBack = pepoAppearanceSprites[17];
+		          cHairTendrils = pepoAppearanceSprites[18];
+		          cHairFront = pepoAppearanceSprites[19];
+		          kHairUp = pepoAppearanceSprites[20];
+		          kHairBack = pepoAppearanceSprites[21];
+		          kHairTendrils = pepoAppearanceSprites[22];
+		          kHairFront = pepoAppearanceSprites[23];
+		          heads = pepoAppearanceSprites[2];
+		          eyeColours = pepoAppearanceSprites[7];
+		          mascEyes = pepoAppearanceSprites[0];
+		          femmeEyes = pepoAppearanceSprites[1];
+		          noses = pepoAppearanceSprites[6];
+		          topLips = pepoAppearanceSprites[5];
+		          bottomLips = pepoAppearanceSprites[4];
+		          freckles = pepoAppearanceSprites[3];
+		          brows = pepoAppearanceSprites[24];
+		          stubbleSprites = pepoAppearanceSprites[25];
+		          moustaches = pepoAppearanceSprites[27];
+	     }
+	     public static GameObject CreatePortrait(PepoData pepo)
+	     {
+		          if (pepo == null)
+		          {
+				Debug.LogWarning("Pepo is null, creating a random pepo for portrait.");
+				pepo = PepoFactory.InitialiseRandom();
+		          }
 		          GameObject portrait = new GameObject("Portrait");
 		          RectTransform rt = portrait.AddComponent<RectTransform>();
 		          rt.sizeDelta = new Vector2(64f, 64f);

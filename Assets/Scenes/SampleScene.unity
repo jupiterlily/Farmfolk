@@ -402,27 +402,35 @@ MonoBehaviour:
   - {fileID: 196292624, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
   - {fileID: 0}
   HairBack_1:
-  - {fileID: -588822615, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 1961909093, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -1937694078, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -825963489, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1859613765, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1260325299, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 941907320, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1933541254, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1404669461, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 1899289427, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 1854432033, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1277698380, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -174396715, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   - {fileID: 0}
   HairTendrils_1:
-  - {fileID: 1216588767, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -855320343, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -324223556, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -2045676734, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -524976294, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1902492137, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1885747854, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1551090163, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -174555221, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1054586059, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 2092673503, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 23679158, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 332966002, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: 0}
   HairFringe_1:
   - {fileID: -429902375, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: -1572616106, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1413900928, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: -770124147, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1460403247, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1413900928, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: 1693558801, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -995059459, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1847313115, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1180897023, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 1885004322, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1823470855, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   HairUp_2:
   - {fileID: 1752297386, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
   - {fileID: 196292624, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
@@ -431,42 +439,49 @@ MonoBehaviour:
   - {fileID: 22120921, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
   - {fileID: 0}
   HairBack_2:
-  - {fileID: -898953414, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -825963489, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 1674807873, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 1432098852, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -988476810, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -1859613765, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 208382617, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 3274882, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   - {fileID: 0}
+  - {fileID: -1859613765, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 1947212241, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 941907320, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1846124770, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -856819415, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1404669461, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 1392598302, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1688553149, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -472164713, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1682469732, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 1509135685, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1096450053, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 815552826, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   HairTendrils_2:
-  - {fileID: -855320343, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -584572588, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -517835396, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -324223556, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -19620011, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -2045676734, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 1192668536, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -524976294, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 1334824979, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -908107390, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -755084195, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1757607078, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1902492137, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -852082033, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1662118959, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 2092673503, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1626695056, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1016434171, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -589646727, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -121301685, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: 0}
   HairFringe_2:
   - {fileID: -20522087, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: 1934551973, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1230508520, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -49929971, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: 359154545, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: 249790017, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1180897023, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: -1349171064, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: 1639802676, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -995059459, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1847313115, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: 1885004322, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: -1823470855, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: -1139511258, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1230508520, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -49929971, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -318063368, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -729504871, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1180897023, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 271526187, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1081517111, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 1693558801, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   HairUp_3:
   - {fileID: 22120921, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
   - {fileID: 1228319256, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
@@ -474,36 +489,44 @@ MonoBehaviour:
   - {fileID: -1541117204, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
   - {fileID: 0}
   HairBack_3:
-  - {fileID: 923430363, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 871507666, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 3274882, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 208382617, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 941907320, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -1822944673, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -1859613765, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -1260325299, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 0}
+  - {fileID: -1447248545, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 1190741220, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 1887230387, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 1217550424, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -421529693, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -472164713, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1682469732, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1096450053, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 1006971955, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 815552826, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   HairTendrils_3:
-  - {fileID: -584572588, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -517835396, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -369539587, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 74498607, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -496969828, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -1050004858, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -908107390, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 1051615581, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1757607078, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1469119189, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1828357660, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1090481110, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1931456390, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1158456971, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -121301685, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1121005880, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1184426876, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 766724336, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1361972711, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1306971967, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: 0}
   HairFringe_3:
-  - {fileID: -13038391, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 178855024, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1081517111, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1509269615, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1586910127, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1922496955, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 867699694, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 359154545, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -318063368, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 249790017, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -729504871, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1582632575, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: -49929971, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: -1230508520, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -318063368, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -729504871, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: 1639802676, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: 867699694, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1922496955, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1586910127, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1139511258, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   HairUp_4:
   - {fileID: -1171122686, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
   - {fileID: 1640155478, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
@@ -512,40 +535,45 @@ MonoBehaviour:
   - {fileID: 2122630946, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
   - {fileID: 0}
   HairBack_4:
-  - {fileID: 2140129682, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -616452297, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -125516672, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -1699364217, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -1648944127, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 1947212241, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -1260325299, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 2046876590, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 923430363, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 1396756617, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 28797262, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 871507666, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1135953965, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -853414241, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 1782381999, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1750985337, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 693304752, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 2078946726, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1682469732, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -1848797287, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 1379248351, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -803982488, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -421529693, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: -518255893, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 1887230387, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 1190741220, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   - {fileID: 0}
   HairTendrils_4:
-  - {fileID: -369539587, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -496969828, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -1050004858, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 272910976, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -685816981, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 670846381, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -1718760156, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 39326363, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1141043594, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1818695476, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1361972711, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1688682462, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 766724336, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1306971967, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1184426876, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1090481110, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1828357660, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1469119189, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: 0}
   HairFringe_4:
-  - {fileID: -13038391, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -964480603, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -729504871, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1582632575, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1922496955, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1586910127, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1509269615, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: 271526187, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1081517111, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: 178855024, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 722374233, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1370266368, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1056785328, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: 1072560327, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1847313115, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -995059459, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1509269615, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1586910127, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1460403247, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1582632575, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   brows:
   - {fileID: -2147003862, guid: 6e9d8d24942b94944b982cea032bf9d4, type: 3}
   - {fileID: -517527976, guid: 6e9d8d24942b94944b982cea032bf9d4, type: 3}
@@ -1302,8 +1330,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fa2202a81ca9dc4eb5b2fc7d684a014, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialPepos: 15
-  generationSteps: 5
+  initialPepos: 45
+  generationSteps: 25
   maxPepos: 400
   minPopulationThreshold: 15
   immigrantCount: 3

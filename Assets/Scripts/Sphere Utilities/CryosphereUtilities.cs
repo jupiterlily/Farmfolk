@@ -42,14 +42,13 @@ public static class CryosphereUtilities
 		          // Inside RedistributeSurfaceWaterAndIce, after getting _downhillWater
 
 		          // Sort by slope descending (steepest first)
-		          _downhillWater.Sort((a, b) => a.slope.CompareTo(b.slope));
+		          _downhillWater.Sort((a, b) => b.slope.CompareTo(a.slope));
 
 		          foreach (var (neighbor, slope) in _downhillWater)
 		          {
-				if (data.surfaceLiquid.Mass <= 0f || data.volume < neighbor.tileData.volume)
+				if (data.surfaceLiquid.Mass <= 0f)
 					     break;
 
-				// Compute current water surfaces (could be cached)
 				float area = data.tileWidth * data.tileWidth;
 				float myDepth = data.surfaceLiquid.Mass / (Constants.WATER_DENSITY * area);
 				float mySurface = data.groundElevation + myDepth;
@@ -58,36 +57,50 @@ public static class CryosphereUtilities
 				float nDepth = nd.surfaceLiquid.Mass / (Constants.WATER_DENSITY * area);
 				float nSurface = nd.groundElevation + nDepth;
 
-				// The amount of water needed to raise neighbor's surface to match mine
-				float heightDiff = mySurface - nSurface; // positive
-				float neededVolume = heightDiff * area;
-				float neededMass = neededVolume * Constants.WATER_DENSITY;
+				float heightDiff = mySurface - nSurface;
+				if (heightDiff <= 0f)
+					     continue;
 
-				// Cap by available water
-				float massToMove = Mathf.Lerp(0, data.surfaceIce.Mass, slope);
+				// Mass needed to equalise surfaces
+				float neededMass = heightDiff * area * Constants.WATER_DENSITY;
+
+				// 1. Compute flow velocity (Manning's equation)
+				// v = (1/n) * R^(2/3) * sqrt(S)
+				// For overland flow, R ≈ depth (shallow water approximation)
+				float roughness = 0.04f;//Constants.MANNING_N; // 0.04 for natural surfaces
+				float velocity = (1f / roughness) * Mathf.Pow(myDepth, 0.666f) * Mathf.Sqrt(slope);
+
+				// 2. Mass flux crossing the tile boundary per second
+				// Q = v * depth * width (m³/s)
+				float volumetricFlux = velocity * myDepth * data.tileWidth;
+				float massFlux = volumetricFlux * Constants.WATER_DENSITY; // kg/s
+
+				// 3. Mass that can move this timestep
+				float maxMassThisStep = massFlux * hours * 3600;
+
+				// 4. CFL stability limit (never move more than 30% of available mass per step)
+				float cflLimit = data.surfaceLiquid.Mass * 0.6f;
+
+				// 5. Actual mass to move
+				float massToMove = Mathf.Min(neededMass * 0.6f, maxMassThisStep, cflLimit);
 
 				if (massToMove > 0f)
 				{
-					     float flowStrength = massToMove * slope; // or use a more physical formula
-								 // Erode from source and deposit to neighbor (similar to your existing MoveSediment)
-					     float entrainment = Constants.SEDIMENT_ENTRAINMENT_COEFFICIENT * flowStrength / data.surfaceLiquid.Mass;
-					     // Move water (and energy)
 					     ThermalEnergyUtilities.TransferMassAndEnergy(
 					         data.surfaceLiquid,
 					         nd.surfaceLiquid,
 					         massToMove
 					     );
 
-					     // Now move sediment based on flow strength (use the slope and mass moved)
-
+					     // Sediment transport...
+					     float flowStrength = massToMove * slope;
+					     float entrainment = Constants.SEDIMENT_ENTRAINMENT_COEFFICIENT * flowStrength / (data.surfaceLiquid.Mass + 0.001f);
 					     MoveSediment(tile, neighbor, entrainment, ref _sedimentToMove);
 
-					     // Recalculate physics on both tiles (or just surfaces)
 					     SoilUtilities.RecalculateTilePhysics(data);
 					     SoilUtilities.RecalculateTilePhysics(nd);
 				}
 		          }
-
 		          // ---- 5. Ice movement (solid) ----
 		          bool isFloating = IsIceFloating(data);
 		          // float maxMoveFraction = isFloating ? 0.2f : 0.01f; // 20% per hour if floating, 1% if grounded
@@ -95,7 +108,7 @@ public static class CryosphereUtilities
 
 		          foreach (var (neighbor, slope) in _downhillIce)
 		          {
-				if (data.surfaceIce.Mass <= 0f)
+				if (data.surfaceIce.Mass <= 5f)
 					     break;
 
 				// Compute speed: gravity + wind (if floating)

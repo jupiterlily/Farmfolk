@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 
@@ -6,41 +7,42 @@ public class PersonalityAspect : NumericalAspect
 {//exists on a scale of 0-10 with 5 being the mid point
 	     public PersonalityAspect(char n, float max, List<string> high, List<string> low, float v = -1, string hardname = null)
 	     {
-		          if (n == 'h' || n == 'H')
-		          {
-				name = "Honesty";
-				value = v;
-		          }
-		          if (n == 'e' || n == 'E')
-		          {
-				name = "Emotionality";
-				value = v;
-		          }
-		          if (n == 'x' || n == 'X')
-		          {
-				name = "Extraversion";
-				value = v;
-		          }
-		          if (n == 'a' || n == 'A')
-		          {
-				name = "Agreeableness";
-				value = v;
-		          }
-		          if (n == 'c' || n == 'C')
-		          {
-				name = "Conscientiousness";
-				value = v;
-		          }
-		          if (n == 'o' || n == 'O')
-		          {
-				name = "Openness";
-				value = v;
-		          }
 		          if (hardname != null)
 		          {
 				name = hardname;
 				value = v;
 		          }
+		          else if (n == 'h' || n == 'H')
+		          {
+				name = "Honesty";
+				value = v;
+		          }
+		          else if (n == 'e' || n == 'E')
+		          {
+				name = "Emotionality";
+				value = v;
+		          }
+		          else if (n == 'x' || n == 'X')
+		          {
+				name = "Extraversion";
+				value = v;
+		          }
+		          else if (n == 'a' || n == 'A')
+		          {
+				name = "Agreeableness";
+				value = v;
+		          }
+		          else if (n == 'c' || n == 'C')
+		          {
+				name = "Conscientiousness";
+				value = v;
+		          }
+		          else if (n == 'o' || n == 'O')
+		          {
+				name = "Openness";
+				value = v;
+		          }
+
 		          if (value > max / 2)
 		          {
 				descriptor = high[UnityEngine.Random.Range(0, high.Count)];
@@ -57,12 +59,19 @@ public class PersonalityAspect : NumericalAspect
 
 public class HEXACO
 {
-	     public PersonalityAspect Honesty = HEXACODimension.H;
-	     public PersonalityAspect Emotionality = HEXACODimension.E;
-	     public PersonalityAspect Extraversion = HEXACODimension.X;
-	     public PersonalityAspect Agreeableness = HEXACODimension.A;
-	     public PersonalityAspect Conscientiousness = HEXACODimension.C;
-	     public PersonalityAspect Openness = HEXACODimension.O;
+	     public PersonalityAspect Honesty = PepoLibraryPersonality.HEXACODimension.H;
+	     public PersonalityAspect Emotionality = PepoLibraryPersonality.HEXACODimension.E;
+	     public PersonalityAspect Extraversion = PepoLibraryPersonality.HEXACODimension.X;
+	     public PersonalityAspect Agreeableness = PepoLibraryPersonality.HEXACODimension.A;
+	     public PersonalityAspect Conscientiousness = PepoLibraryPersonality.HEXACODimension.C;
+	     public PersonalityAspect Openness = PepoLibraryPersonality.HEXACODimension.O;
+
+	     public PersonalityAspect[] HonestyFacets = PepoLibraryPersonality.HFacets.Values.ToArray();
+	     public PersonalityAspect[] EmotionalityFacets = PepoLibraryPersonality.EFacets.Values.ToArray();
+	     public PersonalityAspect[] ExtraversionFacets = PepoLibraryPersonality.XFacets.Values.ToArray();
+	     public PersonalityAspect[] AgreeablenessFacets = PepoLibraryPersonality.AFacets.Values.ToArray();
+	     public PersonalityAspect[] ConscientiousnessFacets = PepoLibraryPersonality.CFacets.Values.ToArray();
+	     public PersonalityAspect[] OpennessFacets = PepoLibraryPersonality.OFacets.Values.ToArray();
 
 	     public float maximumValue = 10f;
 
@@ -113,84 +122,6 @@ public class HEXACO
 	     }
 }
 
-public static class HEXACODimension
-{
-	     public static PersonalityAspect H => new PersonalityAspect('h', 10f, new List<string> { "humble" }, new List<string> { "manipulative" });
-	     public static PersonalityAspect E => new PersonalityAspect('e', 10f, new List<string> { "emotional" }, new List<string> { "detatched" });
-	     public static PersonalityAspect X => new PersonalityAspect('x', 10f, new List<string> { "extraverted" }, new List<string> { "introverted" });
-	     public static PersonalityAspect A => new PersonalityAspect('a', 10f, new List<string> { "forgiving" }, new List<string> { "resentful" });
-	     public static PersonalityAspect C => new PersonalityAspect('c', 10f, new List<string> { "careful" }, new List<string> { "reckless" });
-	     public static PersonalityAspect O => new PersonalityAspect('o', 10f, new List<string> { "open" }, new List<string> { "nonchalant" });
-	     public static List<string> HFacets(bool invert)
-	     {
-		          if (!invert)
-		          {
-				return new List<string> { "sincere", "honest", "faithful", "loyal", "modest", "unassuming", "authentic", "decent", "trustworthy", "honourable", "genuine", "direct" };
-		          }
-		          else
-		          {
-				return new List<string> { "sly", "deceitful", "greedy", "pretentious", "hypocritical", "boastful", "proud", "deceptive", "false", "duplicitous", "underhanded", "misleading", "two faced", "disingenuous" };
-		          }
-	     }
-	     public static List<string> EFacets(bool invert)
-	     {
-		          if (!invert)
-		          {
-				return new List<string> { "emotional", "sensitive", "sentimental", "anxious", "romantic", "idealistic", "hopeful", "passionate" };
-		          }
-		          else
-		          {
-				return new List<string> { "brave", "stoic", "independent", "self-assured", "stable", "serious", "cold", "pragmatic" };
-		          }
-		          ;
-	     }
-	     public static List<string> XFacets(bool invert)
-	     {
-		          if (!invert)
-		          {
-				return new List<string> { "outgoing", "lively", "extraverted", "sociable", "talkative", "bold", "active" };
-		          }
-		          else
-		          {
-				return new List<string> { "shy", "passive", "withdrawn", "introverted", "quiet", "reserved", "unenthusastic" };
-		          }
-	     }
-	     public static List<string> AFacets(bool invert)
-	     {
-		          if (!invert)
-		          {
-				return new List<string> { "patient", "tolerant", "peaceful", "mild", "agreeable", "lenient", "gentle", "accommodating" };
-		          }
-		          else
-		          {
-				return new List<string> { "ill-tempered", "quarrelsome", "stubborn", "choleric", "cynical" };
-		          }
-		          ;
-	     }
-	     public static List<string> CFacets(bool invert)
-	     {
-		          if (!invert)
-		          {
-				return new List<string> { "organised", "disciplined", "diligent", "careful", "thorough", "precise" };
-		          }
-		          else
-		          {
-				return new List<string> { "sloppy", "negligent", "reckless", "irresponsible", "absent-minded" };
-		          }
-	     }
-	     public static List<string> OFacets(bool invert)
-	     {
-		          if (!invert)
-		          {
-				return new List<string> { "intellectual", "creative", "unconventional", "innovative", "curious", "accepting" };
-		          }
-		          else
-		          {
-				return new List<string> { "shallow", "unimaginative", "conventional" };
-		          }
-		          ;
-	     }
-}
 
 public class Mood
 {

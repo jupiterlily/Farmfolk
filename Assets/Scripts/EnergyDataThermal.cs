@@ -326,31 +326,51 @@ public class ThermalEnergy : EnergyData
 
 	     //heat to temp and cool to temp. cool to temp should retenr an energydata.
 	     public float HeatToTemp(float tempK)
-	     {
-		          float heatAdded = 0f;
-		          //adds heat until temperature equals tempK. mostly used for initialisiation and editor.
-		          while (Temperature <= tempK)
+	     {//if the target temperature is lower than the current temperature call cooltotemp instead		          
+		          if (Temperature > tempK)
 		          {
-				heatAdded += tempK;
-				AddHeat(tempK);
+				return CoolToTemp(tempK);
 		          }
-		          return heatAdded;
+		          else
+		          {
+				float heatAdded = 0f;
+
+				//adds heat until temperature equals tempK. mostly used for initialisiation and editor.
+				while (Temperature <= tempK)
+				{
+					     heatAdded += tempK;
+					     AddHeat(tempK * SpecificHeat * Mass);
+				}
+				return heatAdded;
+		          }
 	     }
 	     public float CoolToTemp(float tempK)
 	     {
-		          float heatRemoved = 0f;
-		          while (Temperature >= tempK)
+		          if (Temperature < tempK)
 		          {
-				heatRemoved += tempK;
-				RemoveHeat(tempK);
+				return HeatToTemp(tempK);
 		          }
-		          return heatRemoved;
-	     }
-}
+		          else
+		          {
+				float heatRemoved = 0f;
+				while (Temperature >= tempK)
+				{
+					     heatRemoved += tempK;
+					     RemoveHeat(tempK * SpecificHeat * Mass);
+				}
+				return heatRemoved;
+		          }
 
-public enum Phase
-{
-	     Solid,
-	     Liquid,
-	     Gas
+
+	     }
+
+	     public void SetMassAndEnergy(float newMass, float newTotalEnergy, float newLatent)
+	     {
+		          Mass = newMass;
+		          sensibleEnergy = newTotalEnergy; // We set the total as sensible, then let phase logic redistribute
+		          latentEnergy = newLatent;
+		          UpdateTemperature();
+		          ProcessPhaseChanges();
+	     }
+
 }

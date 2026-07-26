@@ -74,7 +74,7 @@ public class TileManager : MonoBehaviour
 						          float targetRH = 0.75f; // 75% humidity to start
 						          float satMass = AtmosphereUtilities.CalculateSaturationWaterMass(targetTempK, atmTile.pressure, volume);
 						          float vaporMass = satMass * targetRH * UnityEngine.Random.Range(0.9f, 1.1f);
-						          vaporMass *= atmoFactor;
+
 						          atmTile.waterVapor.AddMass(vaporMass, targetTempK);
 						          // Do NOT initialize cloud water with the same mass; make it very small.
 						          atmTile.cloudWaterContent.AddMass(atmosphericMoisture, targetTempK);
@@ -175,6 +175,7 @@ public class TileManager : MonoBehaviour
 		          AtmosphereUtilities.InitializeHadleyCellWinds(atmosphereTiles, this);
 		          AtmosphereUtilities.FinalizePressurePatterns(atmosphereTiles);
 		          HydrosphereStep(0.2f);
+		          AtmosphereUtilities.EnsureAllocated(atmLayers, atmosphereTiles.GetLength(1), atmosphereTiles.GetLength(2));
 		          AtmosphereStep(0.6f); // Initial atmosphere update
 				  // int k = atmLayers * 2;
 				  //        for (int i = 0; i < k; i++)
@@ -182,18 +183,18 @@ public class TileManager : MonoBehaviour
 				  //AtmosphereStep(0.5f); // Initial atmosphere update
 				  //        }
 		          HydrosphereStep(0.2f);
-		          HydrosphereStep(0.2f);
-		          TileUpdate(0.5f); // Initial update
-			             //         TileUpdate(0.5f); // Initial update
-			             //         TileUpdate(0.5f); // Initial update
-			             //        TileUpdate(0.5f); // Initial update
-			             //          TileUpdate(0.5f); // Initial update
+		          //       HydrosphereStep(0.2f);
+		          TileUpdate(12f); // Initial update
+			            //         TileUpdate(0.5f); // Initial update
+			            //         TileUpdate(0.5f); // Initial update
+			            //        TileUpdate(0.5f); // Initial update
+			            //          TileUpdate(0.5f); // Initial update
 		          WakeDemeter();
 
 	     }
 	     void WakeDemeter()
 	     {
-		          demeter = new Demeter();
+		          //  demeter = new Demeter();
 		          // Initialize systems early in the lifecycle
 		          demeter.lightManager = new LightManager(demeter.NightTint);
 		          demeter.gardener = new Gardener();
@@ -226,16 +227,11 @@ public class TileManager : MonoBehaviour
 	     /// </summary>
 	     public void TileUpdate(float hours)
 	     {
-
-
-		          // HydrosphereUtilities.InfiltrateAndFlow();
-
-		          //HydrosphereUtilities.Evaporate();
 		          foreach (var tile in grid.Map)
 		          {
 				ApplySoilProcesses(tile, hours);
 		          }
-		          //SoilUtilities.ProcessWindErosion();
+
 		          // Fifth: Update each tile's soil and hydrosphere
 		          UpdateAllTiles(hours);
 
@@ -248,6 +244,10 @@ public class TileManager : MonoBehaviour
 		          int atmGridX = atmosphereTiles.GetLength(1);
 		          int atmGridY = atmosphereTiles.GetLength(2);
 
+		          AtmosphereUtilities.UpdateAtmosphericPressure(atmosphereTiles);
+		          AtmosphereUtilities.UpdateAtmosphericWind(atmosphereTiles, hours);
+
+		          AtmosphereUtilities.AdvectAtmosphereSemiLagrangian(atmosphereTiles, hours * 3600);
 
 		          // --- Phase 1: Column-local radiative transfer ---
 		          for (int x = 0; x < atmGridX; x++)
@@ -294,7 +294,7 @@ public class TileManager : MonoBehaviour
 
 		          foreach (var tile in atmosphereTiles)
 		          {
-				//AtmosphereUtilities.AtmosphericConduction(tile, hours);
+				AtmosphereUtilities.AtmosphericConduction(tile, hours);
 				AtmosphereUtilities.ApplyAdiabaticCooling(tile, hours);
 				//HydrosphereUtilities.ApplyAtmosphericPhaseChanges(tile, hours);
 				//TileData[] under = GetSurfaceTilesUnderAtmo(tile.tileGridRef.x, tile.tileGridRef.y);
@@ -305,10 +305,7 @@ public class TileManager : MonoBehaviour
 		          // Advection (moves air, vapor, clouds) vertical advection should be more simple.
 
 
-		          AtmosphereUtilities.UpdateAtmosphericPressure(atmosphereTiles);
-		          AtmosphereUtilities.UpdateAtmosphericWind(atmosphereTiles, hours);
 
-		          // AtmosphereUtilities.ApplyAtmosphericAdvection(atmosphereTiles, hours);
 		          // Latent heat release (condensation) – you need to implement this
 		          //ProcessLatentHeat(atmosphereTiles, hours);
 		          AtmosphereUtilities.FinalizePressurePatterns(atmosphereTiles);
@@ -328,9 +325,10 @@ public class TileManager : MonoBehaviour
 		          {
 
 				//  surface.CollectGases();
-				HydrosphereUtilities.UpdateSurfaceHydrosphere(tile.atmosphereTile, tile, tile.incomingSolarEnergy.RemoveEnergy(tile.incomingSolarEnergy.StoredEnergy), hours);
+
 
 				CryosphereUtilities.RedistributeSurfaceWaterAndIce(tiles[tile.tileGridRef.x, tile.tileGridRef.y], hours);
+				HydrosphereUtilities.UpdateSurfaceHydrosphere(tile.atmosphereTile, tile, tile.incomingSolarEnergy.RemoveEnergy(tile.incomingSolarEnergy.StoredEnergy), hours);
 				//HydrosphereUtilities.RedistributeWaterLateral(tiles[tile.tileGridRef.x, tile.tileGridRef.y], hours);
 				tile.CollectGases(atmoRatio * atmoRatio);
 		          }
@@ -653,7 +651,7 @@ public class TileManager : MonoBehaviour
 		          SoilUtilities.ConductHeatLateral(tile, hours);
 		          HydrosphereUtilities.ConductHeatLateral(tile, hours);
 		          // Soil physical processes
-		          //SoilUtilities.InfiltrateSurfaceMoisture(data, hours);
+		          SoilUtilities.InfiltrateSurfaceMoisture(data, hours);
 		          SoilUtilities.ApplySelfCompaction(data, hours);
 		          SoilUtilities.UpdateDecompaction(data.composition, hours);
 		          SoilUtilities.CalculateDerivedProperties(data.composition);

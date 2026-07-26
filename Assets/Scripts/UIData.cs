@@ -97,8 +97,6 @@ public class UISection : UIStructuralComponent
 					     MinimumSize += comp.MinimumSize;
 				}
 				// here a section should size itself according to the components within it.
-
-
 		          }
 	     }
 }
@@ -306,6 +304,16 @@ public class GraphField : UIField
 		          Size = size;
 		          MinimumSize = new Vector2(size, size);
 		          VerticalLayout = false;
+	     }
+}
+public class PortraitField : UIField
+{
+	     //a portrait is afield that displays all of the portrait sprites layered on top of each other to create a composite image of a pepo. it can be used to display a pepo's face, body, or any other composite image.
+	     public PepoData subject;
+	     public PortraitField(string label, int fontSize = 14)
+	         : base("Field_Portrait", label)
+	     {
+
 	     }
 }
 
