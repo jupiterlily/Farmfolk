@@ -15,7 +15,12 @@ MonoBehaviour:
   BaseUnit: 8
   ControlHeight: 28
   LabelWidth: 80
-  FontSize: 12
+  screenWidth: 1920
+  screenHeight: 1200
+  HeaderPercentage: 0.06666667
+  FooterPercentage: 0.125
+  LeftSidebarPercentage: 0.2
+  RightSidebarPercentage: 0.125
   WindowBackground: {fileID: 0}
   SectionBackground: {fileID: 0}
   FieldBackground: {fileID: 0}

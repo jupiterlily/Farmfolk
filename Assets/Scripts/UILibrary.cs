@@ -30,19 +30,19 @@ public static class UILibrary
 	     }
 	     public static UISection BuildSectionDataTime(SimulationMaster sm, UIManager manager)
 	     {//this is the clock readout
-		          var yearField = new ReadOnlyField("Year", "", manager.BodyFontSize)
+		          var yearField = new ReadOnlyField("Year", "", (int)manager.theme.BodyFontSize)
 		          {
 				Getter = () => (sm.year + 1).ToString(),
 				VerticalLayout = false
 		          };
 
-		          var dayField = new ReadOnlyField("Day", "", manager.BodyFontSize)
+		          var dayField = new ReadOnlyField("Day", "", (int)manager.theme.BodyFontSize)
 		          {
 				Getter = () => (sm.dayOfYear + 1).ToString(),
 				VerticalLayout = false
 		          };
 
-		          var timeField = new ReadOnlyField("Time", "", manager.BodyFontSize)
+		          var timeField = new ReadOnlyField("Time", "", (int)manager.theme.BodyFontSize)
 		          {
 				Getter = () =>
 				{
@@ -61,7 +61,7 @@ public static class UILibrary
 	     //next, a section that shows what game speed we are on.
 	     public static UISection BuildSectionDataGameSpeed(SimulationMaster sm, UIManager uim)
 	     {
-		          var gameSpeedField = new ReadOnlyField("Speed", "", uim.BodyFontSize)
+		          var gameSpeedField = new ReadOnlyField("Speed", "",  (int)uim.theme.BodyFontSize)
 		          {
 				Getter = () => (SimulationConstants.SimulationSpeed).ToString(),
 				VerticalLayout = false
@@ -186,7 +186,7 @@ public static class UILibrary
 		          List<UIComponentData> components = new List<UIComponentData>();
 
 		          // Block Reference (X, Y) dropdown
-		          var blockRefField = new DropdownField("Block Reference (X,Y)", new List<string> { "Select block..." }, 0, uim.BodyFontSize)
+		          var blockRefField = new DropdownField("Block Reference (X,Y)", new List<string> { "Select block..." }, 0,  (int)uim.theme.BodyFontSize)
 		          {
 				Getter = () => 0,
 
@@ -194,21 +194,21 @@ public static class UILibrary
 		          };
 
 		          // Block to alter dropdown
-		          var blockToAlterField = new DropdownField("Block to Alter", new List<string> { "Atmosphere", "Soil", "Water" }, 0, uim.BodyFontSize)
+		          var blockToAlterField = new DropdownField("Block to Alter", new List<string> { "Atmosphere", "Soil", "Water" }, 0,  (int)uim.theme.BodyFontSize)
 		          {
 				Getter = () => 0,
 				VerticalLayout = false
 		          };
 
 		          // Matter to alter dropdown (dynamically populated based on selected block)
-		          var matterToAlterField = new DropdownField("Matter to Alter", new List<string> { "Select block first..." }, 0, uim.BodyFontSize)
+		          var matterToAlterField = new DropdownField("Matter to Alter", new List<string> { "Select block first..." }, 0,  (int)uim.theme.BodyFontSize)
 		          {
 				Getter = () => 0,
 				VerticalLayout = false
 		          };
 
 		          // KG change input field
-		          var kgChangeField = new TextInputField("KG Change", "0", uim.BodyFontSize)
+		          var kgChangeField = new TextInputField("KG Change", "0",  (int)uim.theme.BodyFontSize)
 		          {
 				Getter = () => "0",
 				Setter = (val) =>
@@ -223,7 +223,7 @@ public static class UILibrary
 		          };
 
 		          // Amount to add/remove (convenience field)
-		          var amountField = new RangeField("Amount to Add/Remove (kg)", -100f, 100f, true, uim.BodyFontSize)
+		          var amountField = new RangeField("Amount to Add/Remove (kg)", -100f, 100f, true, (int)(int)uim.theme.BodyFontSize)
 		          {
 				Getter = () => 0f,
 				Setter = (val) =>
@@ -239,7 +239,7 @@ public static class UILibrary
 				// Execute the block modification logic here
 
 				Debug.Log("Block composition modified");
-		          }, uim.HeadingFontSize)
+		          }, (int)(int)uim.theme.HeadingFontSize)
 		          {
 				DisplayLabel = false,
 				VerticalLayout = false
@@ -382,7 +382,7 @@ public static class UILibrary
 		          };
 
 		          // ─── X Dropdown ───
-		          var tileRefFieldX = new DropdownField("X", xOptions, root.tileData.tileGridRef.x, uim.BodyFontSize)
+		          var tileRefFieldX = new DropdownField("X", xOptions, root.tileData.tileGridRef.x,  (int)uim.theme.BodyFontSize)
 		          {
 				Getter = () => root.tileData.tileGridRef.x,
 				Setter = (val) =>
@@ -401,7 +401,7 @@ public static class UILibrary
 		          coordSection.Components.Add(tileRefFieldX);
 
 		          // ─── Y Dropdown ───
-		          var tileRefFieldY = new DropdownField("Y", yOptions, root.tileData.tileGridRef.y, uim.BodyFontSize)
+		          var tileRefFieldY = new DropdownField("Y", yOptions, root.tileData.tileGridRef.y,  (int)uim.theme.BodyFontSize)
 		          {
 				Getter = () => root.tileData.tileGridRef.y,
 				Setter = (val) =>
@@ -425,14 +425,14 @@ public static class UILibrary
 
 		          var matterTypeField = new DropdownField("Matter Type",
 		              new List<string> { "Sand", "Silt", "Clay", "Organic", "Water (Soil)", "Ice (Soil)" },
-		              0, uim.BodyFontSize)
+		              0,  (int)uim.theme.BodyFontSize)
 		          {
 				Getter = () => selectedMatterType,
 				Setter = (val) => selectedMatterType = (int)val,
 				VerticalLayout = false
 		          };
 
-		          var amountField = new RangeField("Amount (kg)", -500f, 500f, true, uim.BodyFontSize)
+		          var amountField = new RangeField("Amount (kg)", -500f, 500f, true,  (int)uim.theme.BodyFontSize)
 		          {
 				Getter = () => kgAmount,
 				Setter = (val) => kgAmount = (float)val,
@@ -477,7 +477,7 @@ public static class UILibrary
 					     UIUtilities.RefreshAllFields(section);
 				}
 
-		          }, uim.HeadingFontSize)
+		          }, (int)(int)uim.theme.HeadingFontSize)
 		          {
 				DisplayLabel = false,
 				VerticalLayout = false

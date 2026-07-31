@@ -39,6 +39,7 @@ public class TileManager : MonoBehaviour
 	     public bool drawPressure = true;
 	     public int displayedAtmoLayer = 0; // 0 = surface layer
 			          // Start is called before the first frame update
+					  
 	     void Start()
 	     {
 		          grid = new TileGrid(worldsise.x, worldsise.y, tilesize);
@@ -222,6 +223,7 @@ public class TileManager : MonoBehaviour
 		          }
 		          return plantPositions;
 	     }
+		 
 	     /// <summary>
 	     /// Main update method - called from SimulationMaster
 	     /// </summary>

@@ -38,7 +38,6 @@ RenderSettings:
   m_ReflectionIntensity: 1
   m_CustomReflection: {fileID: 0}
   m_Sun: {fileID: 0}
-  m_IndirectSpecularColor: {r: 0, g: 0, b: 0, a: 1}
   m_UseRadianceAmbientProbe: 0
 --- !u!157 &3
 LightmapSettings:
@@ -245,10 +244,9 @@ MonoBehaviour:
   pepoPanel: {fileID: 0}
   world: {fileID: 1440900996}
   pepoPopManager: {fileID: 1440901001}
-  simulationMaster: {fileID: 0}
+  simulationMaster: {fileID: 1440900999}
   pepoUI: {fileID: 628422717}
-  HeadingFontSize: 10
-  BodyFontSize: 8
+  theme: {fileID: 11400000, guid: 7d5f53f84384c01499653397d695fbab, type: 2}
   Header: {fileID: 1220995179}
   LeftSidebar: {fileID: 713165364}
   Body: {fileID: 1901984180}
@@ -454,34 +452,33 @@ MonoBehaviour:
   - {fileID: -1096450053, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   - {fileID: 815552826, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   HairTendrils_2:
+  - {fileID: 0}
   - {fileID: -755084195, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: -1757607078, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 1902492137, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: -852082033, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: 1662118959, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 2092673503, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1338368335, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: -1626695056, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: -1016434171, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: -589646727, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -121301685, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 0}
   HairFringe_2:
+  - {fileID: -1572616106, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: -20522087, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: 1934551973, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1230508520, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -49929971, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: 359154545, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: 249790017, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -318063368, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -729504871, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 1693558801, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1180897023, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: -1349171064, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: 1639802676, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: -1823470855, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: -1139511258, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1230508520, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -49929971, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -318063368, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -729504871, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1180897023, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: 271526187, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: -1081517111, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: 1693558801, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   HairUp_3:
   - {fileID: 22120921, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
   - {fileID: 1228319256, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
@@ -499,34 +496,35 @@ MonoBehaviour:
   - {fileID: -1096450053, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   - {fileID: 1006971955, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   - {fileID: 815552826, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
+  - {fileID: 0}
   HairTendrils_3:
+  - {fileID: 0}
+  - {fileID: 1776483337, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 598588553, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: -1757607078, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 1469119189, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: 1828357660, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 1090481110, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1647323636, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: -1931456390, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: 1158456971, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: -121301685, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: 1121005880, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -1184426876, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 766724336, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -1361972711, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1469119189, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: -1306971967, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 0}
+  - {fileID: 766724336, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   HairFringe_3:
-  - {fileID: 178855024, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1081517111, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1509269615, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1586910127, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1922496955, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: 867699694, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1230508520, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -49929971, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: 359154545, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -318063368, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: 249790017, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -318063368, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: -729504871, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: -1582632575, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -49929971, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1230508520, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 867699694, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1922496955, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1586910127, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1509269615, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1081517111, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 178855024, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   HairUp_4:
   - {fileID: -1171122686, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
   - {fileID: 1640155478, guid: 31244a415d901914f884d7f82bfe688a, type: 3}
@@ -551,29 +549,37 @@ MonoBehaviour:
   - {fileID: 1190741220, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   - {fileID: 0}
   HairTendrils_4:
-  - {fileID: 39326363, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 1141043594, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 1818695476, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -1361972711, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 1688682462, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 766724336, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: -1306971967, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1469119189, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1852218184, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1121034442, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 57094479, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: -1184426876, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: 1090481110, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 1828357660, guid: b80296da6eba05f4590e34624c58be69, type: 3}
-  - {fileID: 1469119189, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 866509637, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -710366600, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1306971967, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 766724336, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 213675710, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1688682462, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: -1361972711, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1818695476, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 1141043594, guid: b80296da6eba05f4590e34624c58be69, type: 3}
+  - {fileID: 39326363, guid: b80296da6eba05f4590e34624c58be69, type: 3}
   - {fileID: 0}
   HairFringe_4:
-  - {fileID: 722374233, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1370266368, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1056785328, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: 1072560327, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1847313115, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -995059459, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1509269615, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1586910127, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
-  - {fileID: -1460403247, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -49929971, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -13038391, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -964480603, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   - {fileID: -1582632575, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1460403247, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1586910127, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1509269615, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -995059459, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1847313115, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 1072560327, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1056785328, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: -1370266368, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
+  - {fileID: 722374233, guid: 206d9d81bde256342a8f6f66c38b1414, type: 3}
   brows:
   - {fileID: -2147003862, guid: 6e9d8d24942b94944b982cea032bf9d4, type: 3}
   - {fileID: -517527976, guid: 6e9d8d24942b94944b982cea032bf9d4, type: 3}
@@ -1226,7 +1232,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce010db710ee9f949b8eeb00988dc2e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  worldsise: {x: 48, y: 192}
+  worldsise: {x: 96, y: 24}
   grid:
     tileWidth: 1
     XGrid: 1
@@ -1393,6 +1399,7 @@ GameObject:
   - component: {fileID: 1455962979}
   - component: {fileID: 1455962978}
   - component: {fileID: 1455962977}
+  - component: {fileID: 1455962980}
   m_Layer: 5
   m_Name: Footer
   m_TagString: Untagged
@@ -1483,6 +1490,26 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1455962975}
   m_CullTransparentMesh: 1
+--- !u!114 &1455962980
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1455962975}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 306cc8c2b49d7114eaa3623786fc2126, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_IgnoreLayout: 0
+  m_MinWidth: -1
+  m_MinHeight: -1
+  m_PreferredWidth: -1
+  m_PreferredHeight: -1
+  m_FlexibleWidth: -1
+  m_FlexibleHeight: -1
+  m_LayoutPriority: 1
 --- !u!1 &1765547147
 GameObject:
   m_ObjectHideFlags: 0
@@ -1854,12 +1881,12 @@ MonoBehaviour:
   m_RequiresColorTexture: 0
   m_Version: 2
   m_TaaSettings:
-    quality: 3
-    frameInfluence: 0.1
-    jitterScale: 1
-    mipBias: 0
-    varianceClampScale: 0.9
-    contrastAdaptiveSharpening: 0
+    m_Quality: 3
+    m_FrameInfluence: 0.1
+    m_JitterScale: 1
+    m_MipBias: 0
+    m_VarianceClampScale: 0.9
+    m_ContrastAdaptiveSharpening: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0

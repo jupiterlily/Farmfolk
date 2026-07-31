@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public static class UIUtilities
 {
+	
 	     public static Vector2 GetVector2FromString(string text)
 	     {
 		          if (string.IsNullOrWhiteSpace(text))
@@ -40,49 +41,102 @@ public static class UIUtilities
 		          return new Vector2(width, height);
 	     }
 
-	     // Compute minimum size for any field (label + control)
-	     public static Vector2 GetFieldMinimumSize(UIField field, int defaultTextLength = 6)
+	     private static float GetThemeMinValue(UITheme theme, float fallback)
 	     {
-		          Vector2 labelSize = GetLabelSize(field.LabelText, field.FontSize);
-		          float controlWidth = 0;
-		          float controlHeight = field.FontSize + 4;
+	          return theme != null ? Mathf.Max(fallback, theme.ControlHeight * 2f) : fallback;
+	     }
 
-		          switch (field)
-		          {
-		          case TextInputField _:
-		          case ReadOnlyField _:
-		          controlWidth = field.FontSize * defaultTextLength; // ~6 chars
-		          break;
-		          case RangeField _:
-		          controlWidth = 80; // slider + value label
-		          break;
-		          case ToggleField _:
-		          controlWidth = 30;
-		          break;
-		          case DropdownField _:
-		          controlWidth = 100;
-		          break;
-		          case ButtonField btn:
-		          // Use its own button text width
-		          controlWidth = GetLabelSize(btn.LabelText, btn.FontSize).x + 20;
-		          controlHeight = GetLabelSize(btn.LabelText, btn.FontSize).y + 8;
-		          break;
-		          case SpriteField sf:
-		          if (sf.Image != null)
-				return new Vector2(sf.Image.rect.width, sf.Image.rect.height);
-		          controlWidth = 80;
-		          controlHeight = 80;
-		          break;
-		          case GraphField gf:
-		          return new Vector2(gf.Size, gf.Size);
-		          default:
-		          controlWidth = 60;
-		          break;
-		          }
+	     private static Vector2 ApplyParentConstraints(Vector2 size, UIComponentData component, RectTransform parentRect)
+	     {
+	          if (component == null || !component.ConstrainToParent || parentRect == null)
+			return size;
 
-		          float totalWidth = labelSize.x + controlWidth + 10; // spacing
-		          float height = Mathf.Max(labelSize.y, controlHeight);
-		          return new Vector2(totalWidth, height);
+	          Vector2 parentSize = parentRect.rect.size;
+	          if (parentSize.x > 0f)
+			size.x = Mathf.Min(size.x, parentSize.x);
+	          if (parentSize.y > 0f)
+			size.y = Mathf.Min(size.y, parentSize.y);
+
+	          return size;
+	     }
+
+	     public static Vector2 ResolveAndApplySize(UIComponentData component, UITheme theme = null, RectTransform parentRect = null)
+	     {
+	          if (component == null)
+			return Vector2.zero;
+
+	          Vector2 resolvedSize = CalculateMinimumSize(component, theme, parentRect);
+	          component.MinimumSize = resolvedSize;
+	          component.PreferredSize = resolvedSize;
+	          return resolvedSize;
+	     }
+
+	     public static Vector2 CalculateMinimumSize(UIComponentData component, UITheme theme = null, RectTransform parentRect = null)
+	     {
+	          if (component == null)
+			return Vector2.zero;
+
+	          switch (component)
+	          {
+	          case UIField field:
+	          return GetFieldMinimumSize(field, theme, 6, parentRect);
+	          case UISection section:
+	          return GetSectionMinimumSize(section, theme, parentRect);
+	          case UITab tab:
+	          return GetTabMinimumSize(tab, theme, parentRect);
+	          case UIWindow window:
+	          return GetWindowMinimumSize(window, theme, 25, parentRect);
+	          default:
+	          return ApplyParentConstraints(new Vector2(GetThemeMinValue(theme, 20f), GetThemeMinValue(theme, 20f)), component, parentRect);
+	          }
+	     }
+
+	     // Compute minimum size for any field (label + control)
+	     public static Vector2 GetFieldMinimumSize(UIField field, UITheme theme = null, int defaultTextLength = 6, RectTransform parentRect = null)
+	     {
+	          float labelFontSize = theme != null ? Mathf.Max(theme.FontSize, field.FontSize) : field.FontSize;
+	          Vector2 labelSize = GetLabelSize(field.LabelText, Mathf.RoundToInt(labelFontSize));
+	          float controlWidth = 0f;
+	          float controlHeight = Mathf.Max(field.FontSize + 4f, theme != null ? theme.ControlHeight : 24f);
+	          float minControlHeight = theme != null ? Mathf.Max(theme.ControlHeight, theme.FieldHeight) : Mathf.Max(field.FontSize + 4f, 24f);
+	          float gap = theme != null ? theme.SmallSpacing : 10f;
+
+	          switch (field)
+	          {
+	          case TextInputField _:
+	          case ReadOnlyField _:
+	          controlWidth = theme != null ? theme.MinTextFieldWidth : Mathf.Max(field.FontSize * defaultTextLength, 80f);
+	          break;
+	          case RangeField _:
+	          controlWidth = theme != null ? theme.MinRangeWidth : 80f;
+	          break;
+	          case ToggleField _:
+	          controlWidth = theme != null ? theme.MinToggleWidth : 30f;
+	          break;
+	          case DropdownField _:
+	          controlWidth = theme != null ? theme.MinDropdownWidth : 100f;
+	          break;
+	          case ButtonField btn:
+	          controlWidth = Mathf.Max(GetLabelSize(btn.LabelText, btn.FontSize).x + (theme != null ? theme.SmallPadding : 20f), theme != null ? theme.MinButtonWidth : 60f);
+	          controlHeight = Mathf.Max(GetLabelSize(btn.LabelText, btn.FontSize).y + (theme != null ? theme.SmallPadding : 8f), minControlHeight);
+	          break;
+	          case SpriteField sf:
+	          if (sf.Image != null)
+			return ApplyParentConstraints(new Vector2(sf.Image.rect.width, sf.Image.rect.height), field, parentRect);
+	          controlWidth = theme != null ? theme.MinImageSize : 80f;
+	          controlHeight = theme != null ? theme.MinImageSize : 80f;
+	          break;
+	          case GraphField gf:
+	          float graphSize = Mathf.Max(gf.Size, theme != null ? theme.MinGraphSize : 80f);
+	          return ApplyParentConstraints(new Vector2(graphSize, graphSize), field, parentRect);
+	          default:
+	          controlWidth = theme != null ? theme.MinTextFieldWidth : 60f;
+	          break;
+	          }
+
+	          float totalWidth = Mathf.Max(labelSize.x + controlWidth + gap, controlWidth + gap);
+	          float height = Mathf.Max(labelSize.y, controlHeight, minControlHeight);
+	          return ApplyParentConstraints(new Vector2(totalWidth, height), field, parentRect);
 	     }
 
 	     // ─── Hierarchical Sizing ───────────────────────────────────────────
@@ -92,124 +146,128 @@ public static class UIUtilities
 	     /// For vertical layouts: accumulate heights, use widest child.
 	     /// For horizontal layouts: accumulate widths, use tallest child.
 	     /// </summary>
-	     public static Vector2 GetSectionMinimumSize(UISection section)
+	     public static Vector2 GetSectionMinimumSize(UISection section, UITheme theme = null, RectTransform parentRect = null)
 	     {
-		          if (section.Components == null || section.Components.Count == 0)
-				return new Vector2(20, 20);
+	          if (section.Components == null || section.Components.Count == 0)
+			return ApplyParentConstraints(new Vector2(theme != null ? theme.DefaultSectionMinWidth : 20f, theme != null ? theme.DefaultSectionMinHeight : 20f), section, parentRect);
 
-		          float totalWidth = 0;
-		          float totalHeight = 0;
-		          float maxWidth = 0;
-		          float maxHeight = 0;
+	          float totalWidth = 0;
+	          float totalHeight = 0;
+	          float maxWidth = 0;
+	          float maxHeight = 0;
 
-		          foreach (var comp in section.Components)
-		          {
-				Vector2 compSize;
+	          foreach (var comp in section.Components)
+	          {
+			Vector2 compSize;
 
-				// Get size based on component type
-				if (comp is UIField field)
-				{
-					     compSize = field.MinimumSize;
-				}
-				else if (comp is UISection subSection)
-				{
-					     compSize = GetSectionMinimumSize(subSection);
-				}
-				else
-				{
-					     compSize = comp.MinimumSize;
-				}
+			// Get size based on component type
+			if (comp is UIField field)
+			{
+				     compSize = field.MinimumSize.x > 0f || field.MinimumSize.y > 0f ? field.MinimumSize : GetFieldMinimumSize(field, theme, 6, parentRect);
+			}
+			else if (comp is UISection subSection)
+			{
+				     compSize = GetSectionMinimumSize(subSection, theme, parentRect);
+			}
+			else
+			{
+				     compSize = comp.MinimumSize.x > 0f || comp.MinimumSize.y > 0f ? comp.MinimumSize : new Vector2(20f, 20f);
+			}
 
-				maxWidth = Mathf.Max(maxWidth, compSize.x);
-				maxHeight = Mathf.Max(maxHeight, compSize.y);
+			maxWidth = Mathf.Max(maxWidth, compSize.x);
+			maxHeight = Mathf.Max(maxHeight, compSize.y);
 
-				if (section.VerticalLayout)
-				{
-					     totalHeight += compSize.y;
-					     totalWidth = maxWidth;
-				}
-				else
-				{
-					     totalWidth += compSize.x;
-					     totalHeight = maxHeight;
-				}
-		          }
+			if (section.VerticalLayout)
+			{
+				     totalHeight += compSize.y;
+				     totalWidth = Mathf.Max(totalWidth, compSize.x);
+			}
+			else
+			{
+				     totalWidth += compSize.x;
+				     totalHeight = Mathf.Max(totalHeight, compSize.y);
+			}
+	          }
 
-		          // Account for spacing between components
-		          int spacingCount = Mathf.Max(0, section.Components.Count - 1);
-		          if (section.VerticalLayout)
-				totalHeight += spacingCount * section.Spacing;
-		          else
-				totalWidth += spacingCount * section.Spacing;
+	          // Account for spacing between components
+	          int spacingCount = Mathf.Max(0, section.Components.Count - 1);
+	          if (section.VerticalLayout)
+			totalHeight += spacingCount * section.Spacing;
+	          else
+			totalWidth += spacingCount * section.Spacing;
 
-		          // Account for padding
-		          totalWidth += section.Padding.left + section.Padding.right;
-		          totalHeight += section.Padding.top + section.Padding.bottom;
+	          // Account for padding
+	          totalWidth += section.Padding.left + section.Padding.right;
+	          totalHeight += section.Padding.top + section.Padding.bottom;
 
-		          return new Vector2(totalWidth, totalHeight);
+	          float minWidth = Mathf.Max(totalWidth, section.MinimumSize.x > 0f ? section.MinimumSize.x : 0f);
+	          float minHeight = Mathf.Max(totalHeight, section.MinimumSize.y > 0f ? section.MinimumSize.y : 0f);
+	          return ApplyParentConstraints(new Vector2(Mathf.Max(minWidth, theme != null ? theme.DefaultSectionMinWidth : 20f), Mathf.Max(minHeight, theme != null ? theme.DefaultSectionMinHeight : 20f)), section, parentRect);
 	     }
 
 	     /// <summary>
 	     /// Calculate minimum size for a tab based on all its sections.
 	     /// Tabs are typically vertical, so accumulate heights and use widest section.
 	     /// </summary>
-	     public static Vector2 GetTabMinimumSize(UITab tab)
+	     public static Vector2 GetTabMinimumSize(UITab tab, UITheme theme = null, RectTransform parentRect = null)
 	     {
-		          if (tab.Sections == null || tab.Sections.Count == 0)
-				return new Vector2(20, 20);
+	          if (tab.Sections == null || tab.Sections.Count == 0)
+			return ApplyParentConstraints(new Vector2(theme != null ? theme.DefaultTabMinWidth : 20f, theme != null ? theme.DefaultTabMinHeight : 20f), tab, parentRect);
 
-		          float totalWidth = 0;
-		          float totalHeight = 0;
-		          float maxWidth = 0;
-		          float maxHeight = 0;
+	          float totalWidth = 0;
+	          float totalHeight = 0;
+	          float maxWidth = 0;
+	          float maxHeight = 0;
 
-		          foreach (var section in tab.Sections)
-		          {
-				Vector2 sectionSize = GetSectionMinimumSize(section);
-				maxWidth = Mathf.Max(maxWidth, sectionSize.x);
-				maxHeight = Mathf.Max(maxHeight, sectionSize.y);
+	          foreach (var section in tab.Sections)
+	          {
+			Vector2 sectionSize = GetSectionMinimumSize(section, theme, parentRect);
+			maxWidth = Mathf.Max(maxWidth, sectionSize.x);
+			maxHeight = Mathf.Max(maxHeight, sectionSize.y);
 
-				if (tab.VerticalLayout)
-				{
-					     totalHeight += sectionSize.y;
-					     totalWidth = maxWidth;
-				}
-				else
-				{
-					     totalWidth += sectionSize.x;
-					     totalHeight = maxHeight;
-				}
-		          }
+			if (tab.VerticalLayout)
+			{
+				     totalHeight += sectionSize.y;
+				     totalWidth = Mathf.Max(totalWidth, sectionSize.x);
+			}
+			else
+			{
+				     totalWidth += sectionSize.x;
+				     totalHeight = Mathf.Max(totalHeight, sectionSize.y);
+			}
+	          }
 
-		          // Account for spacing between sections
-		          int spacingCount = Mathf.Max(0, tab.Sections.Count - 1);
-		          if (tab.VerticalLayout)
-				totalHeight += spacingCount * tab.Spacing;
-		          else
-				totalWidth += spacingCount * tab.Spacing;
+	          // Account for spacing between sections
+	          int spacingCount = Mathf.Max(0, tab.Sections.Count - 1);
+	          if (tab.VerticalLayout)
+			totalHeight += spacingCount * tab.Spacing;
+	          else
+			totalWidth += spacingCount * tab.Spacing;
 
-		          // Account for padding
-		          totalWidth += tab.Padding.left + tab.Padding.right;
-		          totalHeight += tab.Padding.top + tab.Padding.bottom;
+	          // Account for padding
+	          totalWidth += tab.Padding.left + tab.Padding.right;
+	          totalHeight += tab.Padding.top + tab.Padding.bottom;
 
-		          return new Vector2(totalWidth, totalHeight);
+	          float minWidth = Mathf.Max(totalWidth, tab.MinimumSize.x > 0f ? tab.MinimumSize.x : 0f);
+	          float minHeight = Mathf.Max(totalHeight, tab.MinimumSize.y > 0f ? tab.MinimumSize.y : 0f);
+	          return ApplyParentConstraints(new Vector2(Mathf.Max(minWidth, theme != null ? theme.DefaultTabMinWidth : 20f), Mathf.Max(minHeight, theme != null ? theme.DefaultTabMinHeight : 20f)), tab, parentRect);
 	     }
 
 	     /// <summary>
 	     /// Calculate minimum size for a window based on all its tabs.
 	     /// Window takes the size of the largest tab plus space for tab buttons.
 	     /// </summary>
-	     public static Vector2 GetWindowMinimumSize(UIWindow window, int buttonStripHeight = 25)
+public static Vector2 GetWindowMinimumSize(UIWindow window, UITheme theme = null, int buttonStripHeight = 25, RectTransform parentRect = null)
 	     {
-		          if (window.Tabs == null || window.Tabs.Count == 0)
-				return new Vector2(100, 100);
+	          if (window.Tabs == null || window.Tabs.Count == 0)
+			return ApplyParentConstraints(new Vector2(Mathf.Max(100f, theme != null ? theme.DefaultWindowMinWidth : 100f), Mathf.Max(100f, theme != null ? theme.DefaultWindowMinHeight : 100f)), window, parentRect);
 
 		          float maxTabWidth = 0;
 		          float maxTabHeight = 0;
 
 		          foreach (var tab in window.Tabs)
 		          {
-				Vector2 tabSize = GetTabMinimumSize(tab);
+				Vector2 tabSize = GetTabMinimumSize(tab, theme, parentRect);
 				maxTabWidth = Mathf.Max(maxTabWidth, tabSize.x);
 				maxTabHeight = Mathf.Max(maxTabHeight, tabSize.y);
 		          }
@@ -237,7 +295,9 @@ public static class UIUtilities
 		          totalWidth += window.Padding.left + window.Padding.right;
 		          totalHeight += window.Padding.top + window.Padding.bottom;
 
-		          return new Vector2(totalWidth, totalHeight);
+		          float minWidth = Mathf.Max(totalWidth, window.MinimumSize.x > 0f ? window.MinimumSize.x : 0f);
+		          float minHeight = Mathf.Max(totalHeight, window.MinimumSize.y > 0f ? window.MinimumSize.y : 0f);
+		          return new Vector2(Mathf.Max(minWidth, theme != null ? theme.ControlHeight * 4f : 100f), Mathf.Max(minHeight, theme != null ? theme.ControlHeight * 4f : 100f));
 	     }
 	     public static void RefreshAllFields(UIComponentData root)
 	     {
@@ -271,68 +331,79 @@ public static class UIUtilities
 
 		          }
 	     }
-
+//we need a method that applies the theme to the ui component
+public static void ApplyUITheme(UITheme theme, UIComponentData sc){}
 	     public static void ApplyLayoutGroupData(GameObject go, UIComponentData sc)
 	     {
+	          if (go == null || sc == null)
+			return;
 
-		          //if sc says it's a vertical apply ddata, else add a horizontal and apply the data.
-		          if (sc.VerticalLayout)
-		          {
+	          //if sc says it's a vertical apply ddata, else add a horizontal and apply the data.
+	          if (sc.VerticalLayout)
+	          {
+			// Add a vertical layout group to stack tabs
+			VerticalLayoutGroup layout = go.GetComponent<VerticalLayoutGroup>();
+			if (layout == null)
+				layout = go.AddComponent<VerticalLayoutGroup>();
 
-				// Add a vertical layout group to stack tabs
-				VerticalLayoutGroup layout = go.AddComponent<VerticalLayoutGroup>();
+			layout.padding = sc.Padding;
+			layout.spacing = sc.Spacing;
 
-				layout.padding = sc.Padding;
-				layout.spacing = sc.Spacing;
+			layout.childAlignment = sc.ChildAlignment;
+			layout.reverseArrangement = sc.ReverseArrangement;
 
-				layout.childAlignment = sc.ChildAlignment;
-				layout.reverseArrangement = sc.ReverseArrangement;
+			layout.childControlWidth = sc.ControlChildWidth;
+			layout.childControlHeight = sc.ControlChildHeight;
+			layout.childScaleWidth = sc.UseChildScaleWidth;
+			layout.childScaleHeight = sc.UseChildScaleHeight;
+			layout.childForceExpandWidth = sc.ChildForceExpandWidth;
+			layout.childForceExpandHeight = sc.ChildForceExpandHeight;
+	          }
+	          else
+	          {
+			HorizontalLayoutGroup layout = go.GetComponent<HorizontalLayoutGroup>();
+			if (layout == null)
+				layout = go.AddComponent<HorizontalLayoutGroup>();
 
-				layout.childControlWidth = sc.ControlChildWidth;
-				layout.childControlHeight = sc.ControlChildHeight;
-				layout.childScaleWidth = sc.UseChildScaleWidth;
-				layout.childScaleHeight = sc.UseChildScaleHeight;
-				layout.childForceExpandWidth = sc.ChildForceExpandWidth;
-				layout.childForceExpandHeight = sc.ChildForceExpandHeight;
+			layout.padding = sc.Padding;
+			layout.spacing = sc.Spacing;
 
-				LayoutElement le = go.AddComponent<LayoutElement>();
-				le.minWidth = sc.MinimumSize.x;
-				le.minHeight = sc.MinimumSize.y;
-				le.preferredWidth = sc.PreferredSize.x;
-				le.preferredHeight = sc.PreferredSize.y;
-		          }
-		          else
-		          {
-				HorizontalLayoutGroup layout = go.AddComponent<HorizontalLayoutGroup>();
+			layout.childAlignment = sc.ChildAlignment;
+			layout.reverseArrangement = sc.ReverseArrangement;
 
-				layout.padding = sc.Padding;
-				layout.spacing = sc.Spacing;
+			layout.childControlWidth = sc.ControlChildWidth;
+			layout.childControlHeight = sc.ControlChildHeight;
+			layout.childScaleWidth = sc.UseChildScaleWidth;
+			layout.childScaleHeight = sc.UseChildScaleHeight;
+			layout.childForceExpandWidth = sc.ChildForceExpandWidth;
+			layout.childForceExpandHeight = sc.ChildForceExpandHeight;
+	          }
 
-				layout.childAlignment = sc.ChildAlignment;
-				layout.reverseArrangement = sc.ReverseArrangement;
-
-				layout.childControlWidth = sc.ControlChildWidth;
-				layout.childControlHeight = sc.ControlChildHeight;
-				layout.childScaleWidth = sc.UseChildScaleWidth;
-				layout.childScaleHeight = sc.UseChildScaleHeight;
-				layout.childForceExpandWidth = sc.ChildForceExpandWidth;
-				layout.childForceExpandHeight = sc.ChildForceExpandHeight;
-
-
-		          }
-
-		          ApplyLayoutElementData(go, sc);
+	          ApplyLayoutElementData(go, sc);
 	     }
 
 	     public static void ApplyLayoutElementData(GameObject go, UIComponentData cd)
 	     {
-		          LayoutElement le = go.AddComponent<LayoutElement>();
-		          le.minWidth = cd.MinimumSize.x;
-		          le.minHeight = cd.MinimumSize.y;
-		          le.preferredWidth = cd.PreferredSize.x;
-		          le.preferredHeight = cd.PreferredSize.y;
-	     }
+	          if (go == null || cd == null)
+			return;
 
+	          LayoutElement le = go.GetComponent<LayoutElement>();
+	          if (le == null)
+			le = go.AddComponent<LayoutElement>();
+
+	          float minWidth = cd.MinimumSize.x > 0f ? cd.MinimumSize.x : 20f;
+	          float minHeight = cd.MinimumSize.y > 0f ? cd.MinimumSize.y : 20f;
+	          float preferredWidth = cd.PreferredSize.x > 0f ? cd.PreferredSize.x : minWidth;
+	          float preferredHeight = cd.PreferredSize.y > 0f ? cd.PreferredSize.y : minHeight;
+
+	          le.minWidth = minWidth;
+	          le.minHeight = minHeight;
+	          le.preferredWidth = preferredWidth;
+	          le.preferredHeight = preferredHeight;
+	          le.flexibleWidth = 0f;
+	          le.flexibleHeight = 0f;
+
+	     }
 
 	     public static Graph GraphFloats(List<float> values, float max, GraphType type = GraphType.radar, float radius = 1f)
 	     {

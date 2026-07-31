@@ -5,6 +5,27 @@ using UnityEngine.UI;
 
 public class UIFactory
 {
+	     private static Color ResolveColor(UITheme theme, Color fallback)
+	     {
+	          return theme != null ? fallback : fallback;
+	     }
+
+	     private static float ResolveFloat(UITheme theme, float themeValue, float fallback)
+	     {
+	          return theme != null ? themeValue : fallback;
+	     }
+
+	     private static Vector2 ResolvePanelSize(Transform parent, UITheme theme, float fallbackWidth, float fallbackHeight)
+	     {
+	          if (parent != null)
+	          {
+			RectTransform rt = parent.GetComponent<RectTransform>();
+			if (rt != null && rt.rect.size.x > 0f && rt.rect.size.y > 0f)
+				return rt.rect.size;
+	          }
+
+	          return new Vector2(ResolveFloat(theme, theme != null ? theme.DefaultWindowMinWidth : 0f, fallbackWidth), ResolveFloat(theme, theme != null ? theme.DefaultWindowMinHeight : 0f, fallbackHeight));
+	     }
 
 	     // --- Public API -------------------------------------------------
 	     // In UIFactory.cs — replace CreateWindow and CreateTabs
@@ -72,73 +93,61 @@ public class UIFactory
 		          windowGO.transform.SetParent(parent, false);
 
 		          Image bg = windowGO.AddComponent<Image>();
-		          bg.color = new Color(0.15f, 0.15f, 0.2f, 0.95f);
-		          bg.raycastTarget = false;
+	          bg.color = uim.theme != null ? uim.theme.WindowBG : new Color(0.15f, 0.15f, 0.2f, 0.95f);
 
-		          UIUtilities.ApplyLayoutGroupData(windowGO, windowDef);
+	          UIUtilities.ApplyLayoutGroupData(windowGO, windowDef);
 
-		          UIWindowController controller = windowGO.AddComponent<UIWindowController>();
+	          UIWindowController controller = windowGO.AddComponent<UIWindowController>();
 
-		          List<GameObject> tabGOs = new List<GameObject>();
-		          List<GameObject> buttonGOs = new List<GameObject>();
-		          UISection buttonStripSection = null;
+	          List<GameObject> tabGOs = new List<GameObject>();
+	          List<GameObject> buttonGOs = new List<GameObject>();
+	          UISection buttonStripSection = null;
 
-		          // ---- Create button strip if more than one tab ----
-		          if (windowDef.Tabs != null && windowDef.Tabs.Count > 1)
-		          {
-				buttonStripSection = UILibrary.BuildSectionDataIndexTabs(uim, windowDef.Tabs, windowDef);
+	          if (windowDef.Tabs != null && windowDef.Tabs.Count > 1)
+	          {
+			buttonStripSection = UILibrary.BuildSectionDataIndexTabs(uim, windowDef.Tabs, windowDef);
+			CreateSection(buttonStripSection, windowGO.transform, uim.theme);
 
-				// Create the section (this builds all buttons as children of windowGO)
-				CreateSection(buttonStripSection, windowGO.transform);
+			foreach (var comp in buttonStripSection.Components)
+			{
+				     if (comp is ButtonField bf && bf.ComponentObject != null)
+					          buttonGOs.Add(bf.ComponentObject);
+			}
+	          }
 
-				// Collect the button GameObjects
-				foreach (var comp in buttonStripSection.Components)
-				{
-					     if (comp is ButtonField bf && bf.ComponentObject != null)
-						          buttonGOs.Add(bf.ComponentObject);
-				}
-		          }
+	          foreach (UITab tabDef in windowDef.Tabs)
+	          {
+			GameObject tabGO = CreateTab(tabDef, windowGO.transform, uim.theme);
+			tabGOs.Add(tabGO);
+	          }
 
-		          // ---- Create tabs ----
-		          foreach (UITab tabDef in windowDef.Tabs)
-		          {
-				GameObject tabGO = CreateTab(tabDef, windowGO.transform);
-				tabGOs.Add(tabGO);
-		          }
+	          controller.Register(windowDef, tabGOs, buttonGOs);
 
-		          // ---- Register with controller ----
-		          controller.Register(windowDef, tabGOs, buttonGOs);
+	          if (buttonStripSection != null)
+	          {
+			for (int i = 0; i < buttonStripSection.Components.Count; i++)
+			{
+				     var comp = buttonStripSection.Components[i];
+				     if (comp is ButtonField bf)
+				     {
+					          int index = i;
+					          bf.OnClick = () => controller.SwitchTab(index);
+					          if (bf.UnityButton != null)
+					          {
+						    bf.UnityButton.onClick.RemoveAllListeners();
+						    bf.UnityButton.onClick.AddListener(() => bf.OnClick?.Invoke());
+					          }
+				     }
+			}
+	          }
 
-		          // ---- Wire button clicks (now that controller exists) ----
-		          if (buttonStripSection != null)
-		          {
-				for (int i = 0; i < buttonStripSection.Components.Count; i++)
-				{
-					     var comp = buttonStripSection.Components[i];
-					     if (comp is ButtonField bf)
-					     {
-						          int index = i;
-						          bf.OnClick = () => controller.SwitchTab(index);
-						          // Update the Unity Button listener
-						          if (bf.UnityButton != null)
-						          {
-								bf.UnityButton.onClick.RemoveAllListeners();
-								bf.UnityButton.onClick.AddListener(() => bf.OnClick?.Invoke());
-						          }
-					     }
-				}
-		          }
-
-		          windowDef.ComponentObject = windowGO;
-		          return windowGO;
+	          RectTransform parentRect = parent != null ? parent.GetComponent<RectTransform>() : null;
+	          Vector2 derivedWindowSize = UIUtilities.ResolveAndApplySize(windowDef, uim.theme, parentRect);
+	          UIUtilities.ApplyLayoutElementData(windowGO, windowDef);
+	          windowDef.ComponentObject = windowGO;
+	          return windowGO;
 	     }
 
-	     //  private GameObject CreateButtonStrip(UIWindow windowDef, Transform parent, List<GameObject> buttonGOs)
-	     //  {
-	     //        GameObject stripGO = new GameObject("ButtonStrip");
-	     //        stripGO.transform.SetParent(parent, false);
-
-	     //        // Flip the layout axis relative to the window
 	     //        UISection stripLayout = new UISection("ButtonStrip", !windowDef.VerticalLayout)
 	     //        {
 	     //Padding = new RectOffset(2, 2, 2, 2),
@@ -168,24 +177,25 @@ public class UIFactory
 	     //        return stripGO;
 	     //  }
 
-	     private GameObject CreateTab(UITab tabDef, Transform parent)
+private GameObject CreateTab(UITab tabDef, Transform parent, UITheme theme)
 	     {
-		          GameObject tabGO = new GameObject($"Tab_{tabDef.ComponentName}");
-		          tabGO.transform.SetParent(parent, false);
+	          GameObject tabGO = new GameObject($"Tab_{tabDef.ComponentName}");
+	          tabGO.transform.SetParent(parent, false);
 
+	          foreach (UISection sectionDef in tabDef.Sections)
+	          {
+			CreateSection(sectionDef, tabGO.transform, theme);
+	          }
 
-		          foreach (UISection sectionDef in tabDef.Sections)
-		          {
-				CreateSection(sectionDef, tabGO.transform);
-		          }
-		          tabDef.MinimumSize = UIUtilities.GetTabMinimumSize(tabDef);
-		          UIUtilities.ApplyLayoutGroupData(tabGO, tabDef);
-		          tabGO.SetActive(false); // controller.Register handles initial activation
+	          RectTransform parentRect = parent != null ? parent.GetComponent<RectTransform>() : null;
+	          UIUtilities.ResolveAndApplySize(tabDef, theme, parentRect);
+	          UIUtilities.ApplyLayoutGroupData(tabGO, tabDef);
+	          tabGO.SetActive(false);
 		          return tabGO;
 	     }
 
 	     // --- Section Creation -------------------------------------------
-	     private void CreateSection(UISection sectionDef, Transform parent)
+	     private void CreateSection(UISection sectionDef, Transform parent, UITheme theme)
 	     {
 		          // Create a container for the section
 		          GameObject sectionGO = new GameObject(sectionDef.ComponentName);
@@ -199,8 +209,7 @@ public class UIFactory
 
 		          // Add a background image (optional)
 		          Image bg = sectionGO.AddComponent<Image>();
-		          bg.color = new Color(0.2f, 0.2f, 0.3f, 0.5f);
-		          bg.raycastTarget = false;
+	          bg.color = theme != null ? theme.SectionBG : new Color(0.2f, 0.2f, 0.3f, 0.5f);
 
 		          // Store reference
 		          sectionDef.ComponentObject = sectionGO;
@@ -210,19 +219,19 @@ public class UIFactory
 		          {
 				if (comp is UISection subSection)
 				{
-					     CreateSection(subSection, sectionGO.transform);
+					     CreateSection(subSection, sectionGO.transform, theme);
 				}
 				else if (comp is UIField field)
 				{
-					     CreateField(field, sectionGO.transform);
+					     CreateField(field, sectionGO.transform, theme);
 				}
 		          }
-		          sectionDef.MinimumSize = UIUtilities.GetSectionMinimumSize(sectionDef);
-		          UIUtilities.ApplyLayoutGroupData(sectionGO, sectionDef);
+			          RectTransform parentRect = sectionGO.transform.parent != null ? sectionGO.transform.parent.GetComponent<RectTransform>() : null;
+			          UIUtilities.ResolveAndApplySize(sectionDef, theme, parentRect);
+			          UIUtilities.ApplyLayoutGroupData(sectionGO, sectionDef);
 	     }
 
-	     // --- Field Creation ---------------------------------------------
-	     private void CreateField(UIField fieldDef, Transform parent)
+	     private void CreateField(UIField fieldDef, Transform parent, UITheme theme)
 	     {
 		          // Base container for the field (label + control)
 		          GameObject fieldGO = new GameObject(fieldDef.ComponentName);
@@ -239,17 +248,19 @@ public class UIFactory
 				labelGO.transform.SetParent(fieldGO.transform, false);
 				TextMeshProUGUI tmp = labelGO.AddComponent<TextMeshProUGUI>();
 				tmp.text = fieldDef.LabelText;
-				tmp.fontSize = fieldDef.FontSize;
+				tmp.fontSize = theme != null ? Mathf.RoundToInt(theme.BodyFontSize) : fieldDef.FontSize;
 				tmp.alignment = TextAlignmentOptions.MidlineLeft;
 				tmp.color = Color.white;
 
 				// Add LayoutElement to label
 				LayoutElement labelLE = labelGO.AddComponent<LayoutElement>();
-				Vector2 labelSize = UIUtilities.GetLabelSize(fieldDef.LabelText, fieldDef.FontSize);
-				labelLE.minWidth = labelSize.x;
-				labelLE.preferredWidth = labelSize.x;
-				labelLE.minHeight = labelSize.y;
-				labelLE.preferredHeight = labelSize.y;
+				Vector2 labelSize = UIUtilities.GetLabelSize(fieldDef.LabelText, theme != null ? Mathf.RoundToInt(theme.BodyFontSize) : fieldDef.FontSize);
+				float labelMinWidth = Mathf.Max(labelSize.x, theme != null ? theme.LabelMinWidth : 30f);
+				float labelMinHeight = Mathf.Max(labelSize.y, theme != null ? theme.ControlHeight : fieldDef.FontSize + 4f);
+				labelLE.minWidth = labelMinWidth;
+				labelLE.preferredWidth = labelMinWidth;
+				labelLE.minHeight = labelMinHeight;
+				labelLE.preferredHeight = labelMinHeight;
 				labelLE.flexibleWidth = 0; // prevents stretching
 
 				// Optionally set anchors so it stays left
@@ -266,31 +277,31 @@ public class UIFactory
 		          switch (fieldDef)
 		          {
 		          case TextInputField textField:
-		          controlGO = CreateTextInput(textField, fieldGO.transform);
+		          controlGO = CreateTextInput(textField, fieldGO.transform, theme);
 		          break;
 		          case ReadOnlyField readField:
-		          controlGO = CreateReadOnly(readField, fieldGO.transform);
+		          controlGO = CreateReadOnly(readField, fieldGO.transform, theme);
 		          break;
 		          case RangeField rangeField:
-		          controlGO = CreateRange(rangeField, fieldGO.transform);
+		          controlGO = CreateRange(rangeField, fieldGO.transform, theme);
 		          break;
 		          case ToggleField toggleField:
-		          controlGO = CreateToggle(toggleField, fieldGO.transform);
+		          controlGO = CreateToggle(toggleField, fieldGO.transform, theme);
 		          break;
 		          case DropdownField dropdownField:
-		          controlGO = CreateDropdown(dropdownField, fieldGO.transform);
+		          controlGO = CreateDropdown(dropdownField, fieldGO.transform, theme);
 		          break;
 		          case SpriteField imageField:
-		          controlGO = CreateImageDisplay(imageField, fieldGO.transform);
+		          controlGO = CreateImageDisplay(imageField, fieldGO.transform, theme);
 		          break;
 		          case GraphField graphField:
-		          controlGO = CreateGraph(graphField, fieldGO.transform);
+		          controlGO = CreateGraph(graphField, fieldGO.transform, theme);
 		          break;
 		          case ButtonField buttonField:
-		          controlGO = CreateButton(buttonField, fieldGO.transform);
+		          controlGO = CreateButton(buttonField, fieldGO.transform, theme);
 		          break;
 		          case PortraitField portraitField:
-		          controlGO = CreatePortrait(portraitField, fieldGO.transform);
+		          controlGO = CreatePortrait(portraitField, fieldGO.transform, theme);
 		          break;
 		          default:
 		          Debug.LogWarning($"Unknown field type: {fieldDef.GetType()}");
@@ -310,28 +321,29 @@ public class UIFactory
 				controlLE.preferredWidth = 0;
 		          }
 		          // Add a horizontal layout to place label and control side by side
-		          fieldDef.MinimumSize = UIUtilities.GetFieldMinimumSize(fieldDef);
+		          RectTransform parentRect = parent != null ? parent.GetComponent<RectTransform>() : null;
+		          UIUtilities.ResolveAndApplySize(fieldDef, theme, parentRect);
 		          UIUtilities.ApplyLayoutGroupData(fieldGO, fieldDef);
 		          // Store reference
 		          fieldDef.ComponentObject = fieldGO;
 	     }
 
 	     // --- Individual Control Creators ---------------------------------
-	     private GameObject CreatePortrait(PortraitField def, Transform parent)
+	     private GameObject CreatePortrait(PortraitField def, Transform parent, UITheme theme)
 	     {
 		          GameObject go = PepoUIUtilities.CreatePortrait(def.subject);
 		          go.transform.SetParent(parent, false);
 
 		          return go;
 	     }
-	     private GameObject CreateTextInput(TextInputField def, Transform parent)
+	     private GameObject CreateTextInput(TextInputField def, Transform parent, UITheme theme)
 	     {
 		          GameObject go = new GameObject("TextInput");
 		          go.transform.SetParent(parent, false);
 
 		          // Background image (so it's visible and clickable)
 		          Image bg = go.AddComponent<Image>();
-		          bg.color = new Color(0.1f, 0.1f, 0.1f, 0.5f);
+		          bg.color = theme != null ? theme.InputBackground : new Color(0.1f, 0.1f, 0.1f, 0.5f);
 		          bg.raycastTarget = true;
 
 		          TMP_InputField input = go.AddComponent<TMP_InputField>();
@@ -342,8 +354,8 @@ public class UIFactory
 		          GameObject textGO = new GameObject("Text");
 		          textGO.transform.SetParent(go.transform, false);
 		          TextMeshProUGUI tmp = textGO.AddComponent<TextMeshProUGUI>();
-		          tmp.fontSize = def.FontSize;
-		          tmp.color = Color.white;
+		          tmp.fontSize = theme != null ? Mathf.RoundToInt(theme.BodyFontSize) : def.FontSize;
+		          tmp.color = theme != null ? theme.InputTextColor : Color.white;
 		          tmp.alignment = TextAlignmentOptions.MidlineLeft;
 		          RectTransform textRT = textGO.GetComponent<RectTransform>();
 		          textRT.anchorMin = Vector2.zero;
@@ -357,8 +369,8 @@ public class UIFactory
 		          placeholderGO.transform.SetParent(go.transform, false);
 		          TextMeshProUGUI placeholderTmp = placeholderGO.AddComponent<TextMeshProUGUI>();
 		          placeholderTmp.text = "Enter text...";
-		          placeholderTmp.fontSize = def.FontSize;
-		          placeholderTmp.color = Color.gray;
+		          placeholderTmp.fontSize = theme != null ? Mathf.RoundToInt(theme.BodyFontSize) : def.FontSize;
+		          placeholderTmp.color = theme != null ? theme.InputPlaceholderColor : Color.gray;
 		          placeholderTmp.alignment = TextAlignmentOptions.MidlineLeft;
 		          RectTransform placeholderRT = placeholderGO.GetComponent<RectTransform>();
 		          placeholderRT.anchorMin = Vector2.zero;
@@ -378,21 +390,21 @@ public class UIFactory
 		          return go;
 	     }
 
-	     private GameObject CreateReadOnly(ReadOnlyField def, Transform parent)
+	     private GameObject CreateReadOnly(ReadOnlyField def, Transform parent, UITheme theme)
 	     {
 		          GameObject go = new GameObject("ReadOnly");
 		          go.transform.SetParent(parent, false);
 		          TextMeshProUGUI tmp = go.AddComponent<TextMeshProUGUI>();
 		          tmp.text = def.DefaultText;
-		          tmp.fontSize = def.FontSize;
-		          tmp.color = Color.white;
+		          tmp.fontSize = theme != null ? Mathf.RoundToInt(theme.BodyFontSize) : def.FontSize;
+		          tmp.color = theme != null ? theme.TextColor : Color.white;
 		          tmp.alignment = TextAlignmentOptions.MidlineLeft;
 		          // Set rect transform
 		          RectTransform rt = go.GetComponent<RectTransform>();
 		          rt.anchorMin = new Vector2(0, 0.5f);
 		          rt.anchorMax = new Vector2(1, 0.5f);
 		          rt.pivot = new Vector2(0.5f, 0.5f);
-		          rt.sizeDelta = new Vector2(0, 30);
+		          rt.sizeDelta = new Vector2(0, theme != null ? theme.ControlHeight : 30f);
 		          rt.anchoredPosition = Vector2.zero;
 
 		          // For binding, we'll update text via a timer or explicit call.
@@ -408,20 +420,21 @@ public class UIFactory
 		          return go;
 	     }
 
-	     private GameObject CreateRange(RangeField def, Transform parent)
+	     private GameObject CreateRange(RangeField def, Transform parent, UITheme theme)
 	     {
 		          GameObject go = new GameObject("Range");
 		          go.transform.SetParent(parent, false);
 
 		          // --- Layout Element: give the slider a minimum height ---
 		          LayoutElement mainLE = go.AddComponent<LayoutElement>();
-		          mainLE.minHeight = def.FontSize + 12;
-		          mainLE.preferredHeight = def.FontSize + 12;
+		          float rangeHeight = theme != null ? theme.ControlHeight : def.FontSize + 12f;
+		          mainLE.minHeight = rangeHeight;
+		          mainLE.preferredHeight = rangeHeight;
 		          mainLE.flexibleHeight = 0;
 
 		          // --- Background (the track) ---
 		          Image bg = go.AddComponent<Image>();
-		          bg.color = new Color(0.15f, 0.15f, 0.15f, 0.8f);
+		          bg.color = theme != null ? theme.SliderTrackColor : new Color(0.15f, 0.15f, 0.15f, 0.8f);
 		          bg.raycastTarget = true;
 
 		          Slider slider = go.AddComponent<Slider>();
@@ -448,7 +461,7 @@ public class UIFactory
 		          fillRT.pivot = new Vector2(0, 0.5f);
 		          fillRT.sizeDelta = new Vector2(0, 0);
 		          Image fillImage = fill.AddComponent<Image>();
-		          fillImage.color = new Color(0.2f, 0.5f, 0.8f);
+		          fillImage.color = theme != null ? theme.SliderFillColor : new Color(0.2f, 0.5f, 0.8f);
 		          slider.fillRect = fillRT;
 
 		          // --- HANDLE SLIDE AREA (the clickable zone) ---
@@ -468,24 +481,25 @@ public class UIFactory
 		          handleRT.anchorMin = new Vector2(0, 0.5f);
 		          handleRT.anchorMax = new Vector2(0, 0.5f);
 		          handleRT.pivot = new Vector2(0.5f, 0.5f);
-		          handleRT.sizeDelta = new Vector2(18, 18);
+		          float handleSize = theme != null ? theme.SliderHandleSize : 18f;
+		          handleRT.sizeDelta = new Vector2(handleSize, handleSize);
 		          handleRT.anchoredPosition = Vector2.zero;
 		          Image handleImage = handle.AddComponent<Image>();
-		          handleImage.color = Color.white;
+		          handleImage.color = theme != null ? theme.SliderHandleColor : Color.white;
 		          slider.handleRect = handleRT;
 
 		          // --- VALUE LABEL ---
 		          GameObject valueLabel = new GameObject("Value");
 		          valueLabel.transform.SetParent(go.transform, false);
 		          TextMeshProUGUI tmp = valueLabel.AddComponent<TextMeshProUGUI>();
-		          tmp.fontSize = def.FontSize - 2;
-		          tmp.color = Color.white;
+		          tmp.fontSize = theme != null ? Mathf.RoundToInt(theme.SmallFontSize) : def.FontSize - 2;
+		          tmp.color = theme != null ? theme.TextColor : Color.white;
 		          tmp.alignment = TextAlignmentOptions.MidlineRight;
 		          RectTransform valueRT = valueLabel.GetComponent<RectTransform>();
 		          valueRT.anchorMin = new Vector2(1, 0.5f);
 		          valueRT.anchorMax = new Vector2(1, 0.5f);
 		          valueRT.pivot = new Vector2(1, 0.5f);
-		          valueRT.sizeDelta = new Vector2(50, 30);
+		          valueRT.sizeDelta = new Vector2(theme != null ? theme.ControlMinWidth : 50f, theme != null ? theme.ControlHeight : 30f);
 		          valueRT.anchoredPosition = new Vector2(-8, 0);
 
 		          // --- Initial value ---
@@ -509,7 +523,7 @@ public class UIFactory
 
 		          return go;
 	     }
-	     private GameObject CreateToggle(ToggleField def, Transform parent)
+	     private GameObject CreateToggle(ToggleField def, Transform parent, UITheme theme)
 	     {
 		          GameObject go = new GameObject("Toggle");
 		          go.transform.SetParent(parent, false);
@@ -520,8 +534,8 @@ public class UIFactory
 		          labelGO.transform.SetParent(go.transform, false);
 		          TextMeshProUGUI tmp = labelGO.AddComponent<TextMeshProUGUI>();
 		          tmp.text = " "; // empty
-		          tmp.fontSize = def.FontSize;
-		          tmp.color = Color.white;
+		          tmp.fontSize = theme != null ? Mathf.RoundToInt(theme.BodyFontSize) : def.FontSize;
+		          tmp.color = theme != null ? theme.TextColor : Color.white;
 		          tmp.alignment = TextAlignmentOptions.MidlineLeft;
 		          // We already have a main label, so we might not need this; we can set toggle.isOn and add listener.
 
@@ -531,12 +545,12 @@ public class UIFactory
 
 		          // Layout: toggle should be small, maybe align left.
 		          LayoutElement le = go.AddComponent<LayoutElement>();
-		          le.preferredWidth = 30;
-		          le.minWidth = 30;
-
+	          float toggleSize = theme != null ? theme.MinToggleWidth : 30f;
+	          le.preferredWidth = toggleSize;
+	          le.minWidth = toggleSize;
 		          return go;
 	     }
-	     private GameObject CreateDropdown(DropdownField def, Transform parent)
+	     private GameObject CreateDropdown(DropdownField def, Transform parent, UITheme theme)
 	     {
 		          // 1. Main GameObject
 		          GameObject go = new GameObject("Dropdown", typeof(RectTransform));
@@ -546,7 +560,8 @@ public class UIFactory
 		          mainRT.anchorMin = new Vector2(0, 0.5f);
 		          mainRT.anchorMax = new Vector2(1, 0.5f);
 		          mainRT.pivot = new Vector2(0.5f, 0.5f);
-		          mainRT.sizeDelta = new Vector2(100, def.FontSize + 8);
+		          float dropdownHeight = theme != null ? theme.ControlHeight : def.FontSize + 8f;
+	          mainRT.sizeDelta = new Vector2(theme != null ? theme.MinDropdownWidth : 100f, dropdownHeight);
 
 		          TMP_Dropdown dropdown = go.AddComponent<TMP_Dropdown>();
 		          def.dropdown = dropdown;
@@ -560,8 +575,8 @@ public class UIFactory
 		          captionRT.offsetMin = new Vector2(5, 2);
 		          captionRT.offsetMax = new Vector2(-5, -2);
 		          TextMeshProUGUI captionText = captionGO.AddComponent<TextMeshProUGUI>();
-		          captionText.fontSize = def.FontSize;
-		          captionText.color = Color.white;
+		          captionText.fontSize = theme != null ? Mathf.RoundToInt(theme.BodyFontSize) : def.FontSize;
+		          captionText.color = theme != null ? theme.TextColor : Color.white;
 		          captionText.alignment = TextAlignmentOptions.MidlineLeft;
 		          dropdown.captionText = captionText;
 
@@ -573,11 +588,11 @@ public class UIFactory
 		          templateRT.anchorMin = new Vector2(0, 1);
 		          templateRT.anchorMax = new Vector2(1, 1);
 		          templateRT.pivot = new Vector2(0.5f, 1);
-		          templateRT.sizeDelta = new Vector2(0, 150); // Height will auto-size
+		          templateRT.sizeDelta = new Vector2(0, theme != null ? theme.DropdownListMaxHeight : 150f); // Height will auto-size
 
 		          // Background image for the list
 		          Image templateBg = templateGO.AddComponent<Image>();
-		          templateBg.color = new Color(0.15f, 0.15f, 0.2f, 0.95f);
+		          templateBg.color = theme != null ? theme.DropdownBackgroundColor : new Color(0.15f, 0.15f, 0.2f, 0.95f);
 		          templateBg.raycastTarget = true; // Block clicks behind list
 
 		          // Prevent parent layout from affecting template
@@ -600,7 +615,7 @@ public class UIFactory
 		          viewportRT.offsetMax = Vector2.zero;
 		          viewportGO.AddComponent<Mask>().showMaskGraphic = false;
 		          Image viewportImage = viewportGO.AddComponent<Image>();
-		          viewportImage.color = new Color(0.1f, 0.1f, 0.1f, 0.95f);
+		          viewportImage.color = theme != null ? theme.InputBackground : new Color(0.1f, 0.1f, 0.1f, 0.95f);
 
 		          // 6. Content
 		          GameObject contentGO = new GameObject("Content", typeof(RectTransform));
@@ -630,11 +645,12 @@ public class UIFactory
 		          itemRT.anchorMin = new Vector2(0, 1);
 		          itemRT.anchorMax = new Vector2(1, 1);
 		          itemRT.pivot = new Vector2(0.5f, 1);
-		          itemRT.sizeDelta = new Vector2(0, def.FontSize + 8); // height will be set by layout group
+		          float itemHeight = theme != null ? theme.ControlHeight : def.FontSize + 8f;
+	          itemRT.sizeDelta = new Vector2(0, itemHeight); // height will be set by layout group
 
 		          LayoutElement itemLE = itemGO.AddComponent<LayoutElement>();
-		          itemLE.minHeight = def.FontSize + 8;
-		          itemLE.preferredHeight = def.FontSize + 8;
+		          itemLE.minHeight = itemHeight;
+		          itemLE.preferredHeight = itemHeight;
 		          itemLE.flexibleHeight = 0;
 		          itemLE.flexibleWidth = 1;
 
@@ -643,7 +659,7 @@ public class UIFactory
 		          toggle.group = null;
 
 		          Image itemImage = itemGO.AddComponent<Image>();
-		          itemImage.color = new Color(0.2f, 0.2f, 0.2f);
+		          itemImage.color = theme != null ? theme.DropdownItemNormal : new Color(0.2f, 0.2f, 0.2f);
 		          itemImage.raycastTarget = true; // allow clicking
 		          toggle.targetGraphic = itemImage;
 
@@ -656,8 +672,8 @@ public class UIFactory
 		          itemLabelRT.offsetMin = new Vector2(5, 0);
 		          itemLabelRT.offsetMax = new Vector2(-5, 0);
 		          TextMeshProUGUI itemText = itemLabelGO.AddComponent<TextMeshProUGUI>();
-		          itemText.fontSize = def.FontSize;
-		          itemText.color = Color.white;
+		          itemText.fontSize = theme != null ? Mathf.RoundToInt(theme.BodyFontSize) : def.FontSize;
+		          itemText.color = theme != null ? theme.TextColor : Color.white;
 		          itemText.alignment = TextAlignmentOptions.MidlineLeft;
 
 		          // 8. Link everything
@@ -690,7 +706,7 @@ public class UIFactory
 
 		          return go;
 	     }
-	     private GameObject CreateImageDisplay(SpriteField sprite, Transform parent)
+	     private GameObject CreateImageDisplay(SpriteField sprite, Transform parent, UITheme theme)
 	     {
 		          GameObject go = new GameObject("ImageDisplay");
 		          go.transform.SetParent(parent, false);
@@ -698,12 +714,15 @@ public class UIFactory
 		          img.sprite = sprite.Image;
 		          img.preserveAspect = true;
 		          LayoutElement le = go.AddComponent<LayoutElement>();
-		          le.preferredWidth = 100;
-		          le.preferredHeight = 100;
+		          float imageSize = theme != null ? theme.MinImageSize : 100f;
+		          le.preferredWidth = imageSize;
+		          le.preferredHeight = imageSize;
+		          le.minWidth = imageSize;
+		          le.minHeight = imageSize;
 		          return go;
 	     }
 
-	     private GameObject CreateGraph(GraphField def, Transform parent)
+	     private GameObject CreateGraph(GraphField def, Transform parent, UITheme theme)
 	     {
 		          if (def.Getter == null)
 				return new GameObject("EmptyGraph");
@@ -711,28 +730,29 @@ public class UIFactory
 		          if (graphData == null)
 				return new GameObject("EmptyGraph");
 
+		          float graphSize = theme != null ? Mathf.Max(def.Size, theme.MinGraphSize) : def.Size;
 		          GameObject graphGO = null;
 		          switch (def.GraphType)
 		          {
 		          case GraphType.radar:
-		          graphGO = GraphFactory.CreateRadarGraph(graphData, parent, def.Size, def.ComponentName);
+		          graphGO = GraphFactory.CreateRadarGraph(graphData, parent, graphSize, def.ComponentName);
 		          break;
 		          case GraphType.bar:
-		          graphGO = GraphFactory.CreateBarGraph(graphData, parent, def.Size, def.ComponentName);
+		          graphGO = GraphFactory.CreateBarGraph(graphData, parent, graphSize, def.ComponentName);
 		          break;
 		          // add line, pie later if needed
 		          default:
-		          graphGO = GraphFactory.CreateRadarGraph(graphData, parent, def.Size, def.ComponentName);
+		          graphGO = GraphFactory.CreateRadarGraph(graphData, parent, graphSize, def.ComponentName);
 		          break;
 		          }
 
 		          if (graphGO != null)
 		          {
 				LayoutElement le = graphGO.AddComponent<LayoutElement>();
-				le.preferredWidth = def.Size;
-				le.preferredHeight = def.Size;
-				le.minWidth = def.Size;
-				le.minHeight = def.Size;
+				le.preferredWidth = graphSize;
+				le.preferredHeight = graphSize;
+				le.minWidth = graphSize;
+				le.minHeight = graphSize;
 				// Ensure anchors
 				RectTransform rt = graphGO.GetComponent<RectTransform>();
 				if (rt != null)
@@ -740,14 +760,14 @@ public class UIFactory
 					     rt.anchorMin = new Vector2(0.5f, 0.5f);
 					     rt.anchorMax = new Vector2(0.5f, 0.5f);
 					     rt.pivot = new Vector2(0.5f, 0.5f);
-					     rt.sizeDelta = new Vector2(def.Size, def.Size);
+					     rt.sizeDelta = new Vector2(graphSize, graphSize);
 					     rt.anchoredPosition = Vector2.zero;
 				}
 		          }
 		          return graphGO ?? new GameObject("NullGraph");
 	     }
 
-	     private GameObject CreateButton(ButtonField def, Transform parent)
+	     private GameObject CreateButton(ButtonField def, Transform parent, UITheme theme)
 	     {
 		          GameObject go = new GameObject($"Button_{def.LabelText}");
 		          go.transform.SetParent(parent, false);
@@ -757,9 +777,9 @@ public class UIFactory
 		          // Label
 		          TextMeshProUGUI tmp = go.AddComponent<TextMeshProUGUI>();
 		          tmp.text = def.LabelText;
-		          tmp.fontSize = def.FontSize;
+		          tmp.fontSize = theme != null ? Mathf.RoundToInt(theme.BodyFontSize) : def.FontSize;
 		          tmp.alignment = TextAlignmentOptions.Center;
-		          tmp.color = Color.white;
+		          tmp.color = theme != null ? theme.ButtonTextColor : Color.white;
 		          RectTransform labelRT = go.GetComponent<RectTransform>();
 		          labelRT.anchorMin = Vector2.zero;
 		          labelRT.anchorMax = Vector2.one;
@@ -768,9 +788,9 @@ public class UIFactory
 
 		          // Colors
 		          ColorBlock colors = btn.colors;
-		          colors.normalColor = new Color(0.2f, 0.4f, 0.6f);
-		          colors.highlightedColor = new Color(0.3f, 0.5f, 0.7f);
-		          colors.pressedColor = new Color(0.1f, 0.2f, 0.3f);
+		          colors.normalColor = theme != null ? theme.ButtonNormalColor : new Color(0.2f, 0.4f, 0.6f);
+		          colors.highlightedColor = theme != null ? theme.ButtonHighlightedColor : new Color(0.3f, 0.5f, 0.7f);
+		          colors.pressedColor = theme != null ? theme.ButtonPressedColor : new Color(0.1f, 0.2f, 0.3f);
 		          btn.colors = colors;
 
 		          // Listener will be added later – keep it empty for now
@@ -778,10 +798,12 @@ public class UIFactory
 		          btn.onClick.AddListener(() => def.OnClick?.Invoke());
 		          // Layout
 		          LayoutElement le = go.AddComponent<LayoutElement>();
-		          le.minWidth = def.MinimumSize.x;
-		          le.minHeight = def.MinimumSize.y;
-		          le.preferredWidth = def.MinimumSize.x;
-		          le.preferredHeight = def.MinimumSize.y;
+		          float buttonMinWidth = def.MinimumSize.x > 0f ? def.MinimumSize.x : (theme != null ? theme.MinButtonWidth : 60f);
+		          float buttonMinHeight = def.MinimumSize.y > 0f ? def.MinimumSize.y : (theme != null ? theme.ButtonHeight : 24f);
+		          le.minWidth = buttonMinWidth;
+		          le.minHeight = buttonMinHeight;
+		          le.preferredWidth = buttonMinWidth;
+		          le.preferredHeight = buttonMinHeight;
 		          le.flexibleWidth = 1; // Stretch in a strip
 		          le.flexibleHeight = 0;
 

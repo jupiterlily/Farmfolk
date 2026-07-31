@@ -16,8 +16,10 @@ public class UIManager : MonoBehaviour
 	     TileManager tm;
 	     bool worldWindowsCreated = false;
 	     bool pepoWindowsCreated = false;
-	     public int HeadingFontSize = 10;
-	     public int BodyFontSize = 8;
+	    // public int HeadingFontSize = 10;
+	   //  public int BodyFontSize = 8;
+
+		 public UITheme theme;
 
 	     private List<GameObject> currentPanels = new List<GameObject>();
 
@@ -69,8 +71,14 @@ public class UIManager : MonoBehaviour
 	     //public GameObject[] UIWindows; //array of windows that can be dragged around and resized. they can also be closed or minimized.
 	     public List<UIWindow> UIWindows = new List<UIWindow>();
 
+		 
+
 	     void Start()
 	     {
+			//if there's no theme
+if(theme != null){
+			SetPanelSizes();}
+			
 		          // Ensure we have a reference to PepoUIManager
 		          if (pepoUI == null)
 		          {
@@ -79,7 +87,6 @@ public class UIManager : MonoBehaviour
 		          if (simulationMaster == null)
 		          {
 				//simulation master lives on the world gameObject.
-
 				simulationMaster = world.GetComponent<SimulationMaster>();
 		          }
 		          if (pepoPopManager == null)
@@ -127,10 +134,10 @@ public class UIManager : MonoBehaviour
 		          //UpdateClock(Clock);
 		          if (!worldWindowsCreated)
 		          {
-				UIWindow tileWindow = UILibrary.BuildWindowTileComposition(tm.worldsise, tm, this);
-				UIWindows.Add(tileWindow);
-				uiFactory.CreateWindow(tileWindow, LeftSidebar.transform, this);
-				worldWindowsCreated = true;
+					UIWindow tileWindow = UILibrary.BuildWindowTileComposition(tm.worldsise, tm, this);
+					UIWindows.Add(tileWindow);
+					uiFactory.CreateWindow(tileWindow, LeftSidebar.transform, this);
+					worldWindowsCreated = true;
 
 
 		          }
@@ -148,7 +155,20 @@ public class UIManager : MonoBehaviour
 				UIUtilities.RefreshAllFields(window);
 		          }
 	     }
+public void SetPanelSizes()
+	{
+		Header.GetComponent<LayoutElement>().minHeight = theme.screenHeight * theme.HeaderPercentage;
+		Header.GetComponent<LayoutElement>().preferredHeight = theme.screenHeight * theme.HeaderPercentage;
 
+		Footer.GetComponent<LayoutElement>().minHeight = theme.screenHeight * theme.FooterPercentage;
+		Footer.GetComponent<LayoutElement>().preferredHeight = theme.screenHeight * theme.FooterPercentage;
+
+		LeftSidebar.GetComponent<LayoutElement>().minWidth = theme.screenWidth * theme.LeftSidebarPercentage;
+		LeftSidebar.GetComponent<LayoutElement>().preferredWidth = theme.screenWidth * theme.LeftSidebarPercentage;
+
+		RightSidebar.GetComponent<LayoutElement>().preferredWidth = theme.screenWidth * theme.RightSidebarPercentage;
+		RightSidebar.GetComponent<LayoutElement>().minWidth = theme.screenWidth * theme.RightSidebarPercentage;
+	}
 	     // Update the on-screen readout with the current state of the simulation.
 	     public void UpdateClock(GameObject clock)
 	     {

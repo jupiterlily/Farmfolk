@@ -16,34 +16,34 @@ public class PepoUILibrary
 		          };
 
 		          // First name (editable)
-		          var firstNameField = new TextInputField("First Name", pepo.forename, (int)uim.BodyFontSize)
+		          var firstNameField = new TextInputField("First Name", pepo.forename, (int)uim.theme.BodyFontSize)
 		          {
 				Getter = () => pepo.forename,
 				Setter = (val) => pepo.pepoName[0].value = val?.ToString() ?? "Unknown",
 				VerticalLayout = false,
 				DisplayLabel = true,
-				FontSize = (int)uim.BodyFontSize
+				FontSize = (int)uim.theme.BodyFontSize
 		          };
 		          section.Components.Add(firstNameField);
 
 		          // Last name (editable)
-		          var lastNameField = new TextInputField("Last Name", pepo.surname, (int)uim.BodyFontSize)
+		          var lastNameField = new TextInputField("Last Name", pepo.surname, (int)uim.theme.BodyFontSize)
 		          {
 				Getter = () => pepo.surname,
 				Setter = (val) => pepo.pepoName[1].value = val?.ToString() ?? "Unknown",
 				VerticalLayout = false,
 				DisplayLabel = true,
-				FontSize = (int)uim.BodyFontSize
+				FontSize = (int)uim.theme.BodyFontSize
 		          };
 		          section.Components.Add(lastNameField);
 
 		          //        // Nicknames (read‑only)
-		          //        var nicknamesField = new ReadOnlyField("Nicknames", "", (int)uim.BodyFontSize)
+		          //        var nicknamesField = new ReadOnlyField("Nicknames", "", (int)uim.theme.BodyFontSize)
 		          //        {
 		          //Getter = () => string.Join(", ", GetNicknames(pepo)),
 		          //VerticalLayout = false,
 		          //DisplayLabel = true,
-		          //FontSize = (int)uim.BodyFontSize
+		          //FontSize = (int)uim.theme.BodyFontSize
 		          //        };
 		          //section.Components.Add(nicknamesField);
 
@@ -55,7 +55,7 @@ public class PepoUILibrary
 		          var section = new UISection($"{pepo.fullname} portrait", true, new List<UIComponentData>())
 		          {
 		          };
-		          section.Components.Add(new PortraitField("Portrait", uim.BodyFontSize));
+		          section.Components.Add(new PortraitField("Portrait",  (int)uim.theme.BodyFontSize));
 		          return section;
 	     }
 	     public static UISection BuildSectionPepoPanel(PepoData pepo, UIManager uim, UIStructuralComponent sc)
@@ -82,7 +82,7 @@ public class PepoUILibrary
 		          };
 
 		          // Age (read‑only)
-		          var ageField = new ReadOnlyField("Age", "", (int)uim.BodyFontSize)
+		          var ageField = new ReadOnlyField("Age", "", (int)uim.theme.BodyFontSize)
 		          {
 				Getter = () => Mathf.Floor(pepo.age).ToString(),
 				VerticalLayout = false,
@@ -91,7 +91,7 @@ public class PepoUILibrary
 		          section.Components.Add(ageField);
 
 		          // Mother
-		          var motherField = new ReadOnlyField("Mother", "", (int)uim.BodyFontSize)
+		          var motherField = new ReadOnlyField("Mother", "", (int)uim.theme.BodyFontSize)
 		          {
 				Getter = () => pepo.mother != null ? pepo.mother.fullname : "Unknown",
 				VerticalLayout = false
@@ -99,7 +99,7 @@ public class PepoUILibrary
 		          section.Components.Add(motherField);
 
 		          // Father
-		          var fatherField = new ReadOnlyField("Father", "", (int)uim.BodyFontSize)
+		          var fatherField = new ReadOnlyField("Father", "", (int)uim.theme.BodyFontSize)
 		          {
 				Getter = () => pepo.father != null ? pepo.father.fullname : "Unknown",
 				VerticalLayout = false
@@ -153,7 +153,7 @@ public class PepoUILibrary
 		          section.Components.Add(siblingsField);
 
 		          //        // Roles
-		          //        var rolesField = new ReadOnlyField("Roles", "", (int)uim.BodyFontSize)
+		          //        var rolesField = new ReadOnlyField("Roles", "", (int)uim.theme.BodyFontSize)
 		          //        {
 		          //Getter = () => pepo.,
 		          //VerticalLayout = false,
@@ -231,7 +231,7 @@ public class PepoUILibrary
 		          {
 				int index = i; // capture for lambda
 				var trait = traits[index];
-				var rangeField = new RangeField(traitNames[index], 1, trait.maxValue, true, (int)uim.BodyFontSize)
+				var rangeField = new RangeField(traitNames[index], 1, trait.maxValue, true, (int)uim.theme.BodyFontSize)
 				{
 					     Getter = () => trait.value,
 					     Setter = (val) => trait.value = (float)val,
@@ -269,7 +269,7 @@ public class PepoUILibrary
 
 		          foreach (var t in hexacoTraits)
 		          {
-				var field = new RangeField(t.name, 0, 10, true, (int)uim.BodyFontSize)
+				var field = new RangeField(t.name, 0, 10, true, (int)uim.theme.BodyFontSize)
 				{
 					     Getter = () => t.aspect.value,
 					     Setter = (val) => t.aspect.value = (float)val,
@@ -301,7 +301,7 @@ public class PepoUILibrary
 				if (relList == null || relList.Count == 0)
 					     continue;
 
-				var label = new ReadOnlyField(relType.ToString(), "", (int)uim.BodyFontSize)
+				var label = new ReadOnlyField(relType.ToString(), "", (int)uim.theme.BodyFontSize)
 				{
 					     Getter = () => $"{relList.Count} relationships",
 					     VerticalLayout = false,

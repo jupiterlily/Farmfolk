@@ -17,6 +17,8 @@ public abstract class UIComponentData
 	     }
 	     public Vector2 MinimumSize = new Vector2(20, 20); //
 	     public Vector2 PreferredSize = new Vector2(50, 30);
+	     public bool AutoSize = true;
+	     public bool ConstrainToParent = true;
 	     public bool VerticalLayout = true;
 	     public RectOffset Padding = new RectOffset(5, 5, 5, 5);
 	     public int Spacing = 5;
@@ -178,7 +180,7 @@ public class TextInputField : UIField
 		          IsReadOnly = false;
 		          //MinimumSize = new Vector2(FontSize * defaultText.Length * 0.5f, fontSize + 4);
 		          VerticalLayout = false;
-		          MinimumSize = UIUtilities.GetFieldMinimumSize(this, defaultText.Length);
+			          MinimumSize = UIUtilities.GetFieldMinimumSize(this, null, defaultText.Length);
 	     }
 }
 
@@ -194,7 +196,7 @@ public class ReadOnlyField : UIField
 		          DefaultText = defaultText;
 		          FontSize = fontSize;
 		          IsReadOnly = true;
-		          MinimumSize = UIUtilities.GetFieldMinimumSize(this, defaultText.Length);
+			          MinimumSize = UIUtilities.GetFieldMinimumSize(this, null, defaultText.Length);
 		          VerticalLayout = false;
 	     }
 	     public override void Refresh()
@@ -217,7 +219,7 @@ public class RangeField : UIField
 		          MaxValue = max;
 		          UseIntStep = intStep;
 		          FontSize = fontSize;
-		          MinimumSize = UIUtilities.GetFieldMinimumSize(this, 50);
+			          MinimumSize = UIUtilities.GetFieldMinimumSize(this, null, 50);
 		          VerticalLayout = false;
 	     }
 }
@@ -233,7 +235,7 @@ public class ToggleField : UIField
 	     {
 		          DefaultValue = defaultValue;
 		          FontSize = fontSize;
-		          MinimumSize = UIUtilities.GetFieldMinimumSize(this, fontSize);
+			          MinimumSize = UIUtilities.GetFieldMinimumSize(this, null, fontSize);
 		          VerticalLayout = false;
 	     }
 }
@@ -257,7 +259,7 @@ public class DropdownField : UIField
 				if (option.Length > longestString)
 					     longestString = option.Length;
 		          }
-		          MinimumSize = UIUtilities.GetFieldMinimumSize(this, longestString);
+			          MinimumSize = UIUtilities.GetFieldMinimumSize(this, null, longestString);
 		          VerticalLayout = true;
 	     }
 	     public override void Refresh()
@@ -345,7 +347,7 @@ public class ButtonField : UIField
 		          OnClick = onClick;
 		          FontSize = fontSize;
 		          VerticalLayout = false;
-		          MinimumSize = UIUtilities.GetFieldMinimumSize(this, buttonText.Length);
+			          MinimumSize = UIUtilities.GetFieldMinimumSize(this, null, buttonText.Length);
 		          // Sizing will be set via UIUtilities.GetFieldMinimumSize later
 	     }
 }
