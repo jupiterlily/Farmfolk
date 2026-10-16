@@ -121,30 +121,292 @@ public static class PepoUtilitiesPopulation
 		          return lilGuys;
 	     }
 	     //take a list of pepos and return the partnered pepos
-	     public static List<PepoData> GetWillingParentPepos(List<PepoData> pepos)
-	     {
-		          var lilGuys = new List<PepoData>();
-		          foreach (var pepo in pepos)
-		          {
-				if (pepo == null || pepo.ssd.isPrepubescent || pepo.ssd.wantsChildren[1] < 1)
-					     continue;
-				lilGuys.Add(pepo);
-		          }
-		          return lilGuys;
-	     }
-	     //take a list of pepos and return the partnered pepos
-	     public static List<PepoData> GetPartneredPepos(List<PepoData> pepos)
-	     {
-		          var lilGuys = new List<PepoData>();
-		          foreach (var pepo in pepos)
-		          {
-				if (pepo == null || pepo.ssd.isPrepubescent || pepo.RelationshipLibrary[RelationshipType.lover].Count < 1)
-					     continue;
-				lilGuys.Add(pepo);
-		          }
-		          return lilGuys;
-	     }
+	     //  public static List<PepoData> GetWillingParentPepos(List<PepoData> pepos)
+	     //  {
+	     //        var lilGuys = new List<PepoData>();
+	     //        foreach (var pepo in pepos)
+	     //        {
+	     //if (pepo == null || pepo.ssd.isPrepubescent || pepo.ssd.numberOfChildren.maxValue - pepo.ssd.numberOfChildren.value < 1)
+	     //	     continue;
+	     //lilGuys.Add(pepo);
+	     //        }
+	     //        return lilGuys;
+	     //  }
+	     //  //take a list of pepos and return the partnered pepos
+	     //  public static List<PepoData> GetPartneredPepos(List<PepoData> pepos)
+	     //  {
+	     //        var lilGuys = new List<PepoData>();
+	     //        foreach (var pepo in pepos)
+	     //        {
+	     //if (pepo == null || pepo.ssd.isPrepubescent || pepo.RelationshipLibrary[RelationshipType.lover].Count < 1)
+	     //	     continue;
+	     //lilGuys.Add(pepo);
+	     //        }
+	     //        return lilGuys;
+	     //  }
+	     //get pepos that match sociosexual orientation. identifies as masc/femme, presents masc/femme, likes masc/femme, platonic with masc/femme, romances masc/femme, is monogamous, is asexual 
 
+	     //if these are inverted its because we want pepos who dont identify as masc/femme.
+	     public static List<PepoData> GetMascIdentifiedPepos(List<PepoData> pepos, bool invert)
+	     {
+		          var lilGuys = new List<PepoData>();
+		          foreach (var pepo in pepos)
+		          {
+				if (pepo == null)
+					     continue;
+				if (pepo.ssd.isMasc && !invert)
+					     lilGuys.Add(pepo);
+				else if (!pepo.ssd.isMasc && invert)
+					     lilGuys.Add(pepo);
+		          }
+		          return lilGuys;
+	     }
+	     public static List<PepoData> GetFemmeIdentifiedPepos(List<PepoData> pepos, bool invert)
+	     {
+		          var lilGuys = new List<PepoData>();
+		          foreach (var pepo in pepos)
+		          {
+				if (pepo == null)
+					     continue;
+				if (pepo.ssd.isFemme && !invert)
+					     lilGuys.Add(pepo);
+				else if (!pepo.ssd.isFemme && invert)
+					     lilGuys.Add(pepo);
+		          }
+		          return lilGuys;
+	     }
+	     public static List<PepoData> GetMascPresentingPepos(List<PepoData> pepos, bool invert)
+	     {
+		          var lilGuys = new List<PepoData>();
+		          foreach (var pepo in pepos)
+		          {
+				if (pepo == null)
+					     continue;
+				if (pepo.ssd.presentsMasc && !invert)
+					     lilGuys.Add(pepo);
+				else if (!pepo.ssd.presentsMasc && invert)
+					     lilGuys.Add(pepo);
+		          }
+		          return lilGuys;
+	     }
+	     public static List<PepoData> GetFemmePresentingPepos(List<PepoData> pepos, bool invert)
+	     {
+		          var lilGuys = new List<PepoData>();
+		          foreach (var pepo in pepos)
+		          {
+				if (pepo == null)
+					     continue;
+				if (pepo.ssd.presentsFemme && !invert)
+					     lilGuys.Add(pepo);
+				else if (!pepo.ssd.presentsFemme && invert)
+					     lilGuys.Add(pepo);
+		          }
+		          return lilGuys;
+	     }
+	     public static List<PepoData> GetMascAttractedPepos(List<PepoData> pepos, bool invert)
+	     {
+		          var lilGuys = new List<PepoData>();
+		          foreach (var pepo in pepos)
+		          {
+				if (pepo == null || pepo.ssd.isPrepubescent)
+					     continue;
+				if (pepo.ssd.likesMasc && !invert)
+					     lilGuys.Add(pepo);
+				else if (!pepo.ssd.likesMasc && invert)
+					     lilGuys.Add(pepo);
+		          }
+		          return lilGuys;
+	     }
+	     public static List<PepoData> GetFemmeAttractedPepos(List<PepoData> pepos, bool invert)
+	     {
+		          var lilGuys = new List<PepoData>();
+		          foreach (var pepo in pepos)
+		          {
+				if (pepo == null || pepo.ssd.isPrepubescent)
+					     continue;
+				if (pepo.ssd.likesFemme && !invert)
+					     lilGuys.Add(pepo);
+				else if (!pepo.ssd.likesFemme && invert)
+					     lilGuys.Add(pepo);
+		          }
+		          return lilGuys;
+	     }
+	     public static List<PepoData> GetMascBefriendingPepos(List<PepoData> pepos, bool invert)
+	     {
+		          var lilGuys = new List<PepoData>();
+		          foreach (var pepo in pepos)
+		          {
+				if (pepo == null)
+					     continue;
+				if (pepo.ssd.platonicMasc && !invert)
+					     lilGuys.Add(pepo);
+				else if (!pepo.ssd.platonicMasc && invert)
+					     lilGuys.Add(pepo);
+		          }
+		          return lilGuys;
+	     }
+	     public static List<PepoData> GetFemmeBefriendingPepos(List<PepoData> pepos, bool invert)
+	     {
+		          var lilGuys = new List<PepoData>();
+		          foreach (var pepo in pepos)
+		          {
+				if (pepo == null)
+					     continue;
+				if (pepo.ssd.platonicFemme && !invert)
+					     lilGuys.Add(pepo);
+				else if (!pepo.ssd.platonicFemme && invert)
+					     lilGuys.Add(pepo);
+		          }
+		          return lilGuys;
+	     }
+	     public static List<PepoData> GetMascRomancingPepos(List<PepoData> pepos, bool invert)
+	     {
+		          var lilGuys = new List<PepoData>();
+		          foreach (var pepo in pepos)
+		          {
+				if (pepo == null)
+					     continue;
+				if (pepo.ssd.romanceMasc && !invert)
+					     lilGuys.Add(pepo);
+				else if (!pepo.ssd.romanceMasc && invert)
+					     lilGuys.Add(pepo);
+		          }
+		          return lilGuys;
+	     }
+	     public static List<PepoData> GetFemmeRomancingPepos(List<PepoData> pepos, bool invert)
+	     {
+		          var lilGuys = new List<PepoData>();
+		          foreach (var pepo in pepos)
+		          {
+				if (pepo == null)
+					     continue;
+				if (pepo.ssd.romanceFemme && !invert)
+					     lilGuys.Add(pepo);
+				else if (!pepo.ssd.romanceFemme && invert)
+					     lilGuys.Add(pepo);
+		          }
+		          return lilGuys;
+	     }
+	     public static List<PepoData> GetPeposWhoWantChildren(List<PepoData> pepos, float min = 0f, float max = 0f)
+	     {
+		          var lilGuys = new List<PepoData>();
+		          foreach (var pepo in pepos)
+		          {
+				if (pepo == null || pepo.ssd.isPrepubescent)
+					     continue;
+				if (pepo.ssd.numberOfChildren.minValue - pepo.ssd.numberOfChildren.value >= min && pepo.ssd.numberOfChildren.maxValue - pepo.ssd.numberOfChildren.value <= max)
+				{
+					     lilGuys.Add(pepo);
+				}
+		          }
+
+		          return lilGuys;
+	     }
+	     public static List<PepoData> GetPeposWhoHaveChildren(List<PepoData> pepos, float min = 0f, float max = 0f)
+	     {
+		          var lilGuys = new List<PepoData>();
+		          foreach (var pepo in pepos)
+		          {
+				if (pepo == null || pepo.ssd.isPrepubescent)
+					     continue;
+				if (pepo.ssd.numberOfChildren.value >= min && pepo.ssd.numberOfChildren.value <= max)
+				{
+					     lilGuys.Add(pepo);
+				}
+		          }
+
+		          return lilGuys;
+	     }
+	     public static List<PepoData> GetPeposWhoWantFriends(List<PepoData> pepos, float min = 0f, float max = 0f)
+	     {
+		          var lilGuys = new List<PepoData>();
+		          foreach (var pepo in pepos)
+		          {
+				if (pepo == null)
+					     continue;
+				if (pepo.ssd.numberOfFriends.minValue - pepo.ssd.numberOfFriends.value >= min && pepo.ssd.numberOfFriends.maxValue - pepo.ssd.numberOfFriends.value <= max)
+				{
+					     lilGuys.Add(pepo);
+				}
+		          }
+
+		          return lilGuys;
+	     }
+	     public static List<PepoData> GetPeposWhoHaveFriends(List<PepoData> pepos, float min = 0f, float max = 0f)
+	     {
+		          var lilGuys = new List<PepoData>();
+		          foreach (var pepo in pepos)
+		          {
+				if (pepo == null)
+					     continue;
+				if (pepo.ssd.numberOfFriends.value >= min && pepo.ssd.numberOfFriends.value <= max)
+				{
+					     lilGuys.Add(pepo);
+				}
+		          }
+
+		          return lilGuys;
+	     }
+	     public static List<PepoData> GetPeposWhoWantLovers(List<PepoData> pepos, float min = 0f, float max = 0f)
+	     {
+		          var lilGuys = new List<PepoData>();
+		          foreach (var pepo in pepos)
+		          {
+				if (pepo == null || pepo.ssd.isPrepubescent)
+					     continue;
+				if (pepo.ssd.numberOfSexualPartners.minValue - pepo.ssd.numberOfSexualPartners.value >= min && pepo.ssd.numberOfSexualPartners.maxValue - pepo.ssd.numberOfSexualPartners.value <= max)
+				{
+					     lilGuys.Add(pepo);
+				}
+		          }
+
+		          return lilGuys;
+	     }
+	     public static List<PepoData> GetPeposWhoHaveLovers(List<PepoData> pepos, float min = 0f, float max = 0f)
+	     {
+		          var lilGuys = new List<PepoData>();
+		          foreach (var pepo in pepos)
+		          {
+				if (pepo == null || pepo.ssd.isPrepubescent)
+					     continue;
+				if (pepo.ssd.numberOfSexualPartners.value >= min && pepo.ssd.numberOfSexualPartners.value <= max)
+				{
+					     lilGuys.Add(pepo);
+				}
+		          }
+
+		          return lilGuys;
+	     }
+	     public static List<PepoData> GetPeposWhoWantPartners(List<PepoData> pepos, float min = 0f, float max = 0f)
+	     {
+		          var lilGuys = new List<PepoData>();
+		          foreach (var pepo in pepos)
+		          {
+				if (pepo == null || pepo.ssd.isPrepubescent)
+					     continue;
+				if (pepo.ssd.numberOfRomanticPartners.minValue - pepo.ssd.numberOfRomanticPartners.value >= min && pepo.ssd.numberOfRomanticPartners.maxValue - pepo.ssd.numberOfRomanticPartners.value <= max)
+				{
+					     lilGuys.Add(pepo);
+				}
+		          }
+
+		          return lilGuys;
+	     }
+	     public static List<PepoData> GetPeposWhoHavePartners(List<PepoData> pepos, float min = 0f, float max = 0f)
+	     {
+		          var lilGuys = new List<PepoData>();
+		          foreach (var pepo in pepos)
+		          {
+				if (pepo == null || pepo.ssd.isPrepubescent)
+					     continue;
+				if (pepo.ssd.numberOfRomanticPartners.value >= min && pepo.ssd.numberOfRomanticPartners.value <= max)
+				{
+					     lilGuys.Add(pepo);
+				}
+		          }
+
+		          return lilGuys;
+	     }
 	     //take a list of pepos and two floats and return a list of pepos that fall between those ages
 	     public static List<PepoData> GetPeposAtAge(List<PepoData> dudes, float minAge = 0f, float maxAge = 0f)
 	     {
@@ -371,6 +633,8 @@ public static class PepoUtilitiesPopulation
 													     if (PepoSystemMatchmaking.AmIAttracted(pringle, single, (int)pringle.personality.Conscientiousness.value))
 													     {
 														          PepoFactoryBonds.MutualRelationship(single, pringle, type);
+														          single.ssd.numberOfRomanticPartners.value++;
+														          pringle.ssd.numberOfRomanticPartners.value++;
 														          match = true;
 														          break;
 													     }
@@ -379,6 +643,8 @@ public static class PepoUtilitiesPopulation
 												{
 													     //he likes me back automatically
 													     PepoFactoryBonds.MutualRelationship(single, pringle, type);
+													     single.ssd.numberOfRomanticPartners.value++;
+													     pringle.ssd.numberOfRomanticPartners.value++;
 													     match = true;
 													     break;
 												}

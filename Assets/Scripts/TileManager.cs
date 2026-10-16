@@ -39,7 +39,7 @@ public class TileManager : MonoBehaviour
 	     public bool drawPressure = true;
 	     public int displayedAtmoLayer = 0; // 0 = surface layer
 			          // Start is called before the first frame update
-					  
+
 	     void Start()
 	     {
 		          grid = new TileGrid(worldsise.x, worldsise.y, tilesize);
@@ -223,9 +223,9 @@ public class TileManager : MonoBehaviour
 		          }
 		          return plantPositions;
 	     }
-		 
+
 	     /// <summary>
-	     /// Main update method - called from SimulationMaster
+	     /// Main update method - called from SimulationMaster. although part of the problem is that we want different methods for when we are running at different speeds.
 	     /// </summary>
 	     public void TileUpdate(float hours)
 	     {
@@ -233,11 +233,7 @@ public class TileManager : MonoBehaviour
 		          {
 				ApplySoilProcesses(tile, hours);
 		          }
-
-		          // Fifth: Update each tile's soil and hydrosphere
 		          UpdateAllTiles(hours);
-
-		          // Sixth: Validate conservation
 		          UpdateTotals();
 	     }
 	     public void AtmosphereStep(float hours)
@@ -245,6 +241,9 @@ public class TileManager : MonoBehaviour
 		          int atmLayers = atmosphereTiles.GetLength(0);
 		          int atmGridX = atmosphereTiles.GetLength(1);
 		          int atmGridY = atmosphereTiles.GetLength(2);
+
+		          RadiativeEnergy incoming = new RadiativeEnergy(SimulationConstants.SunlightWavelength, 0);
+		          RadiativeEnergy upStream = new RadiativeEnergy(SimulationConstants.SunlightWavelength, 0);
 
 		          AtmosphereUtilities.UpdateAtmosphericPressure(atmosphereTiles);
 		          AtmosphereUtilities.UpdateAtmosphericWind(atmosphereTiles, hours);
@@ -274,12 +273,13 @@ public class TileManager : MonoBehaviour
 					     float zenithAngle = Vector3.Angle(Vector3.up, lightDir);
 
 					     // Downwelling
-					     RadiativeEnergy incoming = new RadiativeEnergy(SimulationConstants.SunlightWavelength, totalEnergy);
+					     incoming.RemoveEnergy(incoming.StoredEnergy); // Reset incoming energy
+					     incoming.AddEnergy(totalEnergy);
 					     AtmosphereUtilities.ProcessDownwelling(top, under, hours, incoming, zenithAngle);
 
 
 					     // Combine them (or process separately)
-					     RadiativeEnergy upStream = new RadiativeEnergy(SimulationConstants.SunlightWavelength, 0);
+
 					     AtmosphereUtilities.ProcessUpwelling(bottom, under, hours, upStream, 0f, true);
 				}
 		          }
@@ -303,21 +303,10 @@ public class TileManager : MonoBehaviour
 				tile.CollectGases();
 
 		          }
-		          // --- Phase 2: Global atmospheric dynamics (ONCE per timestep) ---
-		          // Advection (moves air, vapor, clouds) vertical advection should be more simple.
-
-
 
 		          // Latent heat release (condensation) – you need to implement this
 		          //ProcessLatentHeat(atmosphereTiles, hours);
 		          AtmosphereUtilities.FinalizePressurePatterns(atmosphereTiles);
-		          // Precipitation (from clouds to surface)
-
-		          // --- Phase 3: Surface processes (ONCE per timestep) ---
-		          //TileUpdate(hours);
-
-		          // --- Phase 4: Diagnostics (ONCE per timestep) ---
-		          //UpdateTotals();
 	     }
 	     public void HydrosphereStep(float hours)
 	     {
@@ -331,7 +320,7 @@ public class TileManager : MonoBehaviour
 
 				CryosphereUtilities.RedistributeSurfaceWaterAndIce(tiles[tile.tileGridRef.x, tile.tileGridRef.y], hours);
 				HydrosphereUtilities.UpdateSurfaceHydrosphere(tile.atmosphereTile, tile, tile.incomingSolarEnergy.RemoveEnergy(tile.incomingSolarEnergy.StoredEnergy), hours);
-				//HydrosphereUtilities.RedistributeWaterLateral(tiles[tile.tileGridRef.x, tile.tileGridRef.y], hours);
+				HydrosphereUtilities.RedistributeWaterLateral(tiles[tile.tileGridRef.x, tile.tileGridRef.y], hours);
 				tile.CollectGases(atmoRatio * atmoRatio);
 		          }
 	     }
@@ -659,7 +648,7 @@ public class TileManager : MonoBehaviour
 		          SoilUtilities.CalculateDerivedProperties(data.composition);
 
 		          // Water redistribution
-		          //CryosphereUtilities.RedistributeSurfaceWaterAndIce(tile, hours);
+		          CryosphereUtilities.RedistributeSurfaceWaterAndIce(tile, hours);
 
 		          // 3. Surface‑atmosphere conduction (already in UpdateSoilTemperature, but we can keep it)
 		          //    We'll keep the call to SoilUtilities.UpdateSoilTemperature which handles surface‑air conduction.
@@ -851,7 +840,8 @@ public class TileManager : MonoBehaviour
 	     public void UpdateTotals()
 	     {
 		          float waterSum = 0f;
-		          SoilComposition soilSum = new SoilComposition();
+		          //SoilComposition soilSum = new SoilComposition();
+		          atmosphericMoisture = 0f;
 		          totalSand = 0f;
 		          totalSilt = 0f;
 		          totalClay = 0f;
@@ -862,7 +852,10 @@ public class TileManager : MonoBehaviour
 				for (int j = 0; j < worldsise.y; j++)
 				{
 					     var comp = tiles[i, j].tileData.composition;
-					     waterSum += comp.water.Mass + tiles[i, j].tileData.surfaceLiquid.Mass + tiles[i, j].tileData.surfaceIce.Mass + comp.ice.Mass;
+					     waterSum += comp.water.Mass +
+						          tiles[i, j].tileData.surfaceLiquid.Mass +
+						          tiles[i, j].tileData.surfaceIce.Mass +
+						          comp.ice.Mass;
 
 					     totalSand += comp.sand.Mass;
 					     totalSilt += comp.silt.Mass;
@@ -875,18 +868,22 @@ public class TileManager : MonoBehaviour
 		          int atmLayers = atmosphereTiles.GetLength(0);
 		          int atmGridX = atmosphereTiles.GetLength(1);
 		          int atmGridY = atmosphereTiles.GetLength(2);
+
+		          float atmoh20;
 		          for (int layer = 0; layer < atmLayers; layer++)
 		          {
 				for (int i = 0; i < atmGridX; i++)
 				{
 					     for (int j = 0; j < atmGridY; j++)
 					     {
-						          waterSum += atmosphereTiles[layer, i, j].waterVapor.Mass;
-						          waterSum += atmosphereTiles[layer, i, j].cloudWaterContent.Mass;
-						          waterSum += atmosphereTiles[layer, i, j].iceParticles.Mass;
+						          atmoh20 = 0;
+						          atmoh20 += atmosphereTiles[layer, i, j].waterVapor.Mass;
+						          atmoh20 += atmosphereTiles[layer, i, j].cloudWaterContent.Mass;
+						          atmoh20 += atmosphereTiles[layer, i, j].iceParticles.Mass;
+						          atmosphericMoisture += atmoh20;
+						          waterSum += atmoh20;
 						          totalSand += atmosphereTiles[layer, i, j].sand.Mass;
-						          totalSilt
-								+= atmosphereTiles[layer, i, j].silt.Mass;
+						          totalSilt += atmosphereTiles[layer, i, j].silt.Mass;
 						          totalClay += atmosphereTiles[layer, i, j].clay.Mass;
 						          totalOrganicMaterial += atmosphereTiles[layer, i, j].organicMaterial.Mass;
 					     }
@@ -946,7 +943,7 @@ public class TileManager : MonoBehaviour
 		          if (!drawAtmosphereGizmos)
 				return;
 
-		          int layer = Mathf.Clamp(displayedAtmoLayer, 0, atmLayers - 1);
+		          int layer = Mathf.Clamp(0, 0, displayedAtmoLayer + 1);
 
 		          for (int x = 0; x < atmGridX; x++)
 		          {

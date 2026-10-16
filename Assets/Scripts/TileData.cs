@@ -147,7 +147,11 @@ public class TileData
 		          }
 		          if (surfaceIce.CurrentPhase == Phase.Gas)
 		          {
-				composition.water.TransferMassTo(atmosphereTile.waterVapor, composition.water.Mass);
+				surfaceIce.TransferMassTo(atmosphereTile.waterVapor, surfaceIce.Mass);
+		          }
+		          if (composition.ice.CurrentPhase == Phase.Gas)
+		          {
+				composition.ice.TransferMassTo(atmosphereTile.waterVapor, composition.ice.Mass);
 		          }
 
 		          //transfer solid water from atmosphere and suface and to surface ice
@@ -155,19 +159,12 @@ public class TileData
 		          {
 				surfaceLiquid.TransferMassTo(surfaceIce, surfaceLiquid.Mass);
 		          }
-		          if (atmosphereTile.waterVapor.CurrentPhase == Phase.Solid)
-		          {
-				atmosphereTile.waterVapor.TransferMassTo(surfaceIce, atmosphereTile.waterVapor.Mass / tilesPerAtmoTile);
-		          }
-		          if (atmosphereTile.cloudWaterContent.CurrentPhase == Phase.Solid)
-		          {
-				atmosphereTile.cloudWaterContent.TransferMassTo(surfaceIce, atmosphereTile.cloudWaterContent.Mass / tilesPerAtmoTile);
-		          }
 		          //transfer solid water from soil liquid to soil ice
 		          if (composition.water.CurrentPhase == Phase.Solid)
 		          {
 				composition.water.TransferMassTo(composition.ice, composition.water.Mass);
 		          }
+
 		          //transger liquid water from soil ice to soil water
 		          if (composition.ice.CurrentPhase == Phase.Liquid)
 		          {
@@ -178,20 +175,12 @@ public class TileData
 		          {
 				surfaceIce.TransferMassTo(surfaceLiquid, surfaceIce.Mass);
 		          }
-		          if (atmosphereTile.waterVapor.CurrentPhase == Phase.Liquid)
-		          {
-				atmosphereTile.waterVapor.TransferMassTo(surfaceLiquid, atmosphereTile.waterVapor.Mass / tilesPerAtmoTile);
-		          }
-		          if (atmosphereTile.iceParticles.CurrentPhase == Phase.Liquid)
-		          {
-				atmosphereTile.iceParticles.TransferMassTo(surfaceLiquid, atmosphereTile.iceParticles.Mass / tilesPerAtmoTile);
-		          }
 
-		          //if we have no surface water we should also move all the surface ice to the soil ice.
-		          if (surfaceLiquid.Mass < 5f && surfaceIce.Mass < 10)
-		          {
-				surfaceIce.TransferMassTo(composition.ice, surfaceIce.Mass);
-		          }
+		          //        //if we have no surface water we should also move all the surface ice to the soil ice.
+		          //        if (surfaceLiquid.Mass < 5f && surfaceIce.Mass < 10)
+		          //        {
+		          //surfaceIce.TransferMassTo(composition.ice, surfaceIce.Mass);
+		          //        }
 	     }
 
 	     public void DetermineAlbedo()
@@ -457,28 +446,28 @@ public class AtmosphereTile
 
 		          if (cloudWaterContent.CurrentPhase == Phase.Gas)
 		          {
-				waterVapor.TransferMassTo(this.waterVapor, waterVapor.Mass * .99f);
+				cloudWaterContent.TransferMassTo(waterVapor, cloudWaterContent.Mass);
 		          }
 		          if (iceParticles.CurrentPhase == Phase.Gas)
 		          {
-				waterVapor.TransferMassTo(this.waterVapor, waterVapor.Mass * .99f);
+				iceParticles.TransferMassTo(waterVapor, iceParticles.Mass);
 		          }
 
 		          if (waterVapor.CurrentPhase == Phase.Liquid)
 		          {
-				cloudWaterContent.TransferMassTo(this.cloudWaterContent, cloudWaterContent.Mass * .99f);
+				waterVapor.TransferMassTo(cloudWaterContent, waterVapor.Mass);
 		          }
 		          if (iceParticles.CurrentPhase == Phase.Liquid)
 		          {
-				cloudWaterContent.TransferMassTo(this.cloudWaterContent, cloudWaterContent.Mass * .99f);
+				iceParticles.TransferMassTo(cloudWaterContent, iceParticles.Mass);
 		          }
 		          if (waterVapor.CurrentPhase == Phase.Solid)
 		          {
-				iceParticles.TransferMassTo(this.iceParticles, iceParticles.Mass * .99f);
+				waterVapor.TransferMassTo(iceParticles, waterVapor.Mass);
 		          }
 		          if (cloudWaterContent.CurrentPhase == Phase.Solid)
 		          {
-				iceParticles.TransferMassTo(this.iceParticles, iceParticles.Mass * .99f);
+				cloudWaterContent.TransferMassTo(iceParticles, cloudWaterContent.Mass);
 		          }
 
 

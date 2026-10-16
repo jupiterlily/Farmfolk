@@ -153,7 +153,7 @@ public class StatusResource : ResourceData
 public class PepoResources
 {
 	     public Dictionary<string, ResourceData> Inventory = new();  // ResourceId -> ResourceData
-	     public Dictionary<string, float> ResourcePreferences = new(); // ResourceId -> desire strength (0-1)
+	     public Dictionary<string, float> ResourcePreferences = new(); // ResourceId -> desire strength -1 - +1)
 
 	     // Storage locations with access rights
 	     public class StorageAccess

@@ -91,6 +91,7 @@ public class Demeter : MonoBehaviour
 		          AllPlants.Add(newPlant);
 		          PlantCurrentStage.Add(newPlant, "Seedling");
 		          newPlant.OriginTile = tile;
+		          newPlant.OriginTile.composition.water.TransferMassTo(newPlant.storedWater, newPlant.OriginTile.composition.water.Mass * 0.1f); // Transfer 10% of tile water to plant
 		          ActivatePlant(newPlant, plantPosition, index);
 	     }
 

@@ -1,6 +1,5 @@
 ﻿using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 [CreateAssetMenu(fileName = "UITheme", menuName = "UI/Theme")]
 public class UITheme : ScriptableObject
@@ -12,9 +11,9 @@ public class UITheme : ScriptableObject
 	     public float BaseUnit = 4;              // The atomic unit (padding, spacing)
 	     public float ControlHeight = 6f;        // Height of all interactive controls
 	     public float LabelWidth = 30f;           // Default label width
-	     public int FontSize = 8;               // Base font size
+	     public int FontSize = 12;               // Base font size
 
-	     
+
 	     public float DefaultContainerMinWidth => Mathf.Max(ControlHeight * 2f, MinTextFieldWidth);
 	     public float DefaultContainerMinHeight => Mathf.Max(ControlHeight * 2f, MinTextFieldWidth);
 	     public float DefaultSectionMinWidth => Mathf.Max(ControlHeight * 2f, MinTextFieldWidth);
@@ -24,14 +23,16 @@ public class UITheme : ScriptableObject
 	     public float DefaultWindowMinWidth => Mathf.Max(ControlHeight * 4f, MinTextFieldWidth);
 	     public float DefaultWindowMinHeight => Mathf.Max(ControlHeight * 4f, MinTextFieldWidth);
 
-		 //sizes for headers, footers and sidebars. I think these should be a percentage of screen width though maybe.
-		 public int screenWidth =1920;
-		 public int screenHeight = 1200;
-		 public float HeaderPercentage = 1f/15f;
-		 public float FooterPercentage = 1f/8f;
-		 public float LeftSidebarPercentage = 1f/5f;
-		 public float RightSidebarPercentage = 1f/8f;
-		
+	     //sizes for headers, footers and sidebars. I think these should be a percentage of screen width though maybe.
+	     public int screenWidth = 1920;
+	     public int screenHeight = 1200;
+	     public float HeaderPercentage = 1f / 15f;
+	     public float FooterPercentage = 1f / 8f;
+	     public float LeftSidebarPercentage = 1f / 5f;
+	     public float RightSidebarPercentage = 1f / 8f;
+	     public float BodyWidth => screenWidth - (screenWidth * LeftSidebarPercentage) - (screenWidth * RightSidebarPercentage);
+	     public float BodyHeight => screenHeight - (screenHeight * HeaderPercentage) - (screenHeight * FooterPercentage);
+
 	     // ─── DERIVED SIZING (Auto-calculated) ──────────────────────
 	     public float FieldHeight => ControlHeight;
 	     public float InputFieldHeight => ControlHeight;
@@ -45,7 +46,7 @@ public class UITheme : ScriptableObject
 	     public float MinRangeWidth => LabelWidth;
 	     public float MinToggleWidth => LabelWidth;
 	     public float MinButtonWidth => LabelWidth * 2f;
-		 public float MinGraphSize => 80f;
+	     public float MinGraphSize => 80f;
 	     public float MinImageSize => 48f;
 
 	     public float SmallPadding => BaseUnit * 0.5f;

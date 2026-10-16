@@ -102,6 +102,8 @@ public class ThermalEnergy : EnergyData
 		          temperature = initialTemperature;
 		          cachedTemperatureForCp = initialTemperature;
 		          cachedSpecificHeat = cp;
+
+		          //  Debug.Log($"[ThermalEnergy] Created {mass}kg of {materialRef} at {initialTemperature}K with {sensibleEnergy}J sensible energy and {latentEnergy}J latent energy.");
 	     }
 
 	     // --- Energy manipulation ---
@@ -152,6 +154,7 @@ public class ThermalEnergy : EnergyData
 		              MeltingPoint, BoilingPoint,
 		              ThermalConductivity, temperatureKelvin, cachedSpecificHeat);
 		          tempMass.TransferMassTo(this, kg);
+		          //  Debug.Log($"[ThermalEnergy] Added {kg}kg of {materialName} at {temperatureKelvin}K to existing mass. New mass: {Mass}kg, Temperature: {Temperature}K.");
 	     }
 
 	     public void RemoveMass(float kg)
@@ -178,6 +181,7 @@ public class ThermalEnergy : EnergyData
 	     {
 		          if (target == null || kg <= 0f)
 				return;
+		          //if 
 		          if (kg > Mass)
 				kg = Mass;
 		          float ratio = kg / Mass;
@@ -196,6 +200,7 @@ public class ThermalEnergy : EnergyData
 		          target.UpdateTemperature();
 		          ProcessPhaseChanges();
 		          target.ProcessPhaseChanges();
+		          // Debug.Log($"[ThermalEnergy] Transferred {kg}kg of {materialName} to {target.materialName}. Source mass: {Mass}kg, Target mass: {target.Mass}kg.");
 	     }
 
 	     // --- Phase Change Logic (uses energy, updates temperature) ---
@@ -216,67 +221,58 @@ public class ThermalEnergy : EnergyData
 				changed = false;
 				float cp = SpecificHeat;
 
-				// Melting (solid → liquid)
-				if (CurrentPhase == Phase.Solid && temperature >= MeltingPoint && sensibleEnergy > 0f)
+				// ===== MELTING (solid → liquid) =====
+				if (CurrentPhase == Phase.Solid && temperature >= MeltingPoint)
 				{
-					     float needed = Mass * LatentHeatFusion;
-					     // Check if we have enough sensible energy above the melting point energy
-					     float energyAtMelt = Mass * cp * MeltingPoint;
-					     if (sensibleEnergy >= energyAtMelt + needed)
-					     {
-						          sensibleEnergy -= needed;
-						          latentEnergy += needed;
-						          changed = true;
-						          UpdateTemperature();
-					     }
-					     else
-					     {
-						          // Not enough to fully melt; we can't partially melt, so we just stay solid.
-						          // But we might be above melting point due to rounding; we'll ensure temperature doesn't exceed melting point.
-						          if (temperature > MeltingPoint)
-						          {
-								// Cap temperature to melting point by converting excess sensible to latent? That's not physical.
-								// Actually, if we're above melting point but don't have enough latent heat, we should still melt? 
-								// That's a problem. We'll just let it be; the next iteration will try again.
-						          }
-					     }
-				}
+					     float latentNeeded = Mass * LatentHeatFusion;
+					     // If we have excess sensible energy above melting point, use it to melt
+					     float currentSensible = sensibleEnergy;
 
-				// Freezing (liquid → solid)
-				if (CurrentPhase == Phase.Liquid && temperature < MeltingPoint && latentEnergy > 0f)
-				{
-					     float released = Mass * LatentHeatFusion;
-					     if (latentEnergy >= released)
+					     if (currentSensible >= latentNeeded)
 					     {
-						          latentEnergy -= released;
-						          sensibleEnergy += released;
+						          // Enough energy to melt: convert latent heat to sensible
+						          sensibleEnergy -= latentNeeded;
+						          latentEnergy += latentNeeded;
 						          changed = true;
 						          UpdateTemperature();
 					     }
 				}
 
-				// Vaporization (liquid → gas)
-				if (CurrentPhase == Phase.Liquid && temperature >= BoilingPoint && sensibleEnergy > 0f)
+				// ===== FREEZING (liquid → solid) =====
+				if (CurrentPhase == Phase.Liquid && temperature < MeltingPoint)
 				{
-					     float needed = Mass * LatentHeatVaporization;
-					     float energyAtBoil = Mass * cp * BoilingPoint;
-					     if (sensibleEnergy >= energyAtBoil + needed)
+					     float latentReleased = Mass * LatentHeatFusion;
+					     if (latentEnergy >= latentReleased)
 					     {
-						          sensibleEnergy -= needed;
-						          latentEnergy += needed;
+						          latentEnergy -= latentReleased;
+						          sensibleEnergy += latentReleased;
 						          changed = true;
 						          UpdateTemperature();
 					     }
 				}
 
-				// Condensation (gas → liquid)
-				if (CurrentPhase == Phase.Gas && temperature < BoilingPoint && latentEnergy > 0f)
+				// ===== VAPORIZATION (liquid → gas) =====
+				if (CurrentPhase == Phase.Liquid && temperature >= BoilingPoint)
 				{
-					     float released = Mass * LatentHeatVaporization;
-					     if (latentEnergy >= released)
+					     float latentNeeded = Mass * LatentHeatVaporization;
+
+					     if (sensibleEnergy >= latentNeeded)
 					     {
-						          latentEnergy -= released;
-						          sensibleEnergy += released;
+						          sensibleEnergy -= latentNeeded;
+						          latentEnergy += latentNeeded;
+						          changed = true;
+						          UpdateTemperature();
+					     }
+				}
+
+				// ===== CONDENSATION (gas → liquid) =====
+				if (CurrentPhase == Phase.Gas && temperature < BoilingPoint)
+				{
+					     float latentReleased = Mass * LatentHeatVaporization;
+					     if (latentEnergy >= latentReleased)
+					     {
+						          latentEnergy -= latentReleased;
+						          sensibleEnergy += latentReleased;
 						          changed = true;
 						          UpdateTemperature();
 					     }

@@ -195,22 +195,22 @@ public static class TileUtilities
 				newMass += tile.composition.energy[0].Mass;
 				tile.composition.energy[0].AddMass(kg, temp);
 		          }
-		          if (mat == "sand" || mat == "Sand")
+		          if (mat == "silt" || mat == "Silt")
 		          {
 				newMass += tile.composition.energy[1].Mass;
 				tile.composition.energy[1].AddMass(kg, temp);
 		          }
-		          if (mat == "sand" || mat == "Sand")
+		          if (mat == "clay" || mat == "Clay")
 		          {
 				newMass += tile.composition.energy[2].Mass;
 				tile.composition.energy[2].AddMass(kg, temp);
 		          }
-		          if (mat == "sand" || mat == "Sand")
+		          if (mat == "organic matter" || mat == "Organic Matter")
 		          {
 				newMass += tile.composition.energy[3].Mass;
 				tile.composition.energy[3].AddMass(kg, temp);
 		          }
-		          if (mat == "sand" || mat == "Sand")
+		          if (mat == "water" || mat == "Water")
 		          {
 				newMass += tile.composition.energy[4].Mass;
 				tile.composition.energy[4].AddMass(kg, temp);

@@ -7,24 +7,24 @@ public class UIFactory
 {
 	     private static Color ResolveColor(UITheme theme, Color fallback)
 	     {
-	          return theme != null ? fallback : fallback;
+		          return theme != null ? fallback : fallback;
 	     }
 
 	     private static float ResolveFloat(UITheme theme, float themeValue, float fallback)
 	     {
-	          return theme != null ? themeValue : fallback;
+		          return theme != null ? themeValue : fallback;
 	     }
 
 	     private static Vector2 ResolvePanelSize(Transform parent, UITheme theme, float fallbackWidth, float fallbackHeight)
 	     {
-	          if (parent != null)
-	          {
-			RectTransform rt = parent.GetComponent<RectTransform>();
-			if (rt != null && rt.rect.size.x > 0f && rt.rect.size.y > 0f)
-				return rt.rect.size;
-	          }
+		          if (parent != null)
+		          {
+				RectTransform rt = parent.GetComponent<RectTransform>();
+				if (rt != null && rt.rect.size.x > 0f && rt.rect.size.y > 0f)
+					     return rt.rect.size;
+		          }
 
-	          return new Vector2(ResolveFloat(theme, theme != null ? theme.DefaultWindowMinWidth : 0f, fallbackWidth), ResolveFloat(theme, theme != null ? theme.DefaultWindowMinHeight : 0f, fallbackHeight));
+		          return new Vector2(ResolveFloat(theme, theme != null ? theme.DefaultWindowMinWidth : 0f, fallbackWidth), ResolveFloat(theme, theme != null ? theme.DefaultWindowMinHeight : 0f, fallbackHeight));
 	     }
 
 	     // --- Public API -------------------------------------------------
@@ -93,59 +93,62 @@ public class UIFactory
 		          windowGO.transform.SetParent(parent, false);
 
 		          Image bg = windowGO.AddComponent<Image>();
-	          bg.color = uim.theme != null ? uim.theme.WindowBG : new Color(0.15f, 0.15f, 0.2f, 0.95f);
+		          bg.color = uim.theme != null ? uim.theme.WindowBG : new Color(0.15f, 0.15f, 0.2f, 0.95f);
 
-	          UIUtilities.ApplyLayoutGroupData(windowGO, windowDef);
+		          UIUtilities.ApplyLayoutGroupData(windowGO, windowDef);
+		          //windowGO.AddComponent<ContentSizeFitter>();
+		          UIWindowController controller = windowGO.AddComponent<UIWindowController>();
 
-	          UIWindowController controller = windowGO.AddComponent<UIWindowController>();
+		          List<GameObject> tabGOs = new List<GameObject>();
+		          List<GameObject> buttonGOs = new List<GameObject>();
+		          UISection buttonStripSection = null;
 
-	          List<GameObject> tabGOs = new List<GameObject>();
-	          List<GameObject> buttonGOs = new List<GameObject>();
-	          UISection buttonStripSection = null;
+		          if (windowDef.Tabs != null && windowDef.Tabs.Count > 1)
+		          {
+				buttonStripSection = UILibrary.BuildSectionDataIndexTabs(uim, windowDef.Tabs, windowDef);
+				CreateSection(buttonStripSection, windowGO.transform, uim.theme);
 
-	          if (windowDef.Tabs != null && windowDef.Tabs.Count > 1)
-	          {
-			buttonStripSection = UILibrary.BuildSectionDataIndexTabs(uim, windowDef.Tabs, windowDef);
-			CreateSection(buttonStripSection, windowGO.transform, uim.theme);
+				foreach (var comp in buttonStripSection.Components)
+				{
+					     if (comp is ButtonField bf && bf.ComponentObject != null)
+						          buttonGOs.Add(bf.ComponentObject);
+				}
+		          }
 
-			foreach (var comp in buttonStripSection.Components)
-			{
-				     if (comp is ButtonField bf && bf.ComponentObject != null)
-					          buttonGOs.Add(bf.ComponentObject);
-			}
-	          }
+		          foreach (UITab tabDef in windowDef.Tabs)
+		          {
+				GameObject tabGO = CreateTab(tabDef, windowGO.transform, uim.theme);
+				//tabGO.AddComponent<ContentSizeFitter>();
+				tabGOs.Add(tabGO);
+		          }
 
-	          foreach (UITab tabDef in windowDef.Tabs)
-	          {
-			GameObject tabGO = CreateTab(tabDef, windowGO.transform, uim.theme);
-			tabGOs.Add(tabGO);
-	          }
+		          controller.Register(windowDef, tabGOs, buttonGOs);
 
-	          controller.Register(windowDef, tabGOs, buttonGOs);
+		          if (buttonStripSection != null)
+		          {
+				for (int i = 0; i < buttonStripSection.Components.Count; i++)
+				{
+					     var comp = buttonStripSection.Components[i];
+					     if (comp is ButtonField bf)
+					     {
+						          int index = i;
+						          bf.OnClick = () => controller.SwitchTab(index);
+						          if (bf.UnityButton != null)
+						          {
+								bf.UnityButton.onClick.RemoveAllListeners();
+								bf.UnityButton.onClick.AddListener(() => bf.OnClick?.Invoke());
+						          }
+					     }
+				}
+		          }
 
-	          if (buttonStripSection != null)
-	          {
-			for (int i = 0; i < buttonStripSection.Components.Count; i++)
-			{
-				     var comp = buttonStripSection.Components[i];
-				     if (comp is ButtonField bf)
-				     {
-					          int index = i;
-					          bf.OnClick = () => controller.SwitchTab(index);
-					          if (bf.UnityButton != null)
-					          {
-						    bf.UnityButton.onClick.RemoveAllListeners();
-						    bf.UnityButton.onClick.AddListener(() => bf.OnClick?.Invoke());
-					          }
-				     }
-			}
-	          }
-
-	          RectTransform parentRect = parent != null ? parent.GetComponent<RectTransform>() : null;
-	          Vector2 derivedWindowSize = UIUtilities.ResolveAndApplySize(windowDef, uim.theme, parentRect);
-	          UIUtilities.ApplyLayoutElementData(windowGO, windowDef);
-	          windowDef.ComponentObject = windowGO;
-	          return windowGO;
+		          RectTransform parentRect = parent != null ? parent.GetComponent<RectTransform>() : null;
+		          Vector2 derivedWindowSize = UIUtilities.ResolveAndApplySize(windowDef, uim.theme, parentRect);
+		          //  bg.minWidth = derivedWindowSize.x;
+		          //   bg.minHeight = derivedWindowSize.y;
+		          UIUtilities.ApplyLayoutElementData(windowGO, windowDef);
+		          windowDef.ComponentObject = windowGO;
+		          return windowGO;
 	     }
 
 	     //        UISection stripLayout = new UISection("ButtonStrip", !windowDef.VerticalLayout)
@@ -177,20 +180,20 @@ public class UIFactory
 	     //        return stripGO;
 	     //  }
 
-private GameObject CreateTab(UITab tabDef, Transform parent, UITheme theme)
+	     private GameObject CreateTab(UITab tabDef, Transform parent, UITheme theme)
 	     {
-	          GameObject tabGO = new GameObject($"Tab_{tabDef.ComponentName}");
-	          tabGO.transform.SetParent(parent, false);
+		          GameObject tabGO = new GameObject($"Tab_{tabDef.ComponentName}");
+		          tabGO.transform.SetParent(parent, false);
 
-	          foreach (UISection sectionDef in tabDef.Sections)
-	          {
-			CreateSection(sectionDef, tabGO.transform, theme);
-	          }
+		          foreach (UISection sectionDef in tabDef.Sections)
+		          {
+				CreateSection(sectionDef, tabGO.transform, theme);
+		          }
 
-	          RectTransform parentRect = parent != null ? parent.GetComponent<RectTransform>() : null;
-	          UIUtilities.ResolveAndApplySize(tabDef, theme, parentRect);
-	          UIUtilities.ApplyLayoutGroupData(tabGO, tabDef);
-	          tabGO.SetActive(false);
+		          RectTransform parentRect = parent != null ? parent.GetComponent<RectTransform>() : null;
+		          UIUtilities.ResolveAndApplySize(tabDef, theme, parentRect);
+		          UIUtilities.ApplyLayoutGroupData(tabGO, tabDef);
+		          tabGO.SetActive(false);
 		          return tabGO;
 	     }
 
@@ -205,11 +208,9 @@ private GameObject CreateTab(UITab tabDef, Transform parent, UITheme theme)
 		          RectTransform sectionRT = sectionGO.AddComponent<RectTransform>();
 		          sectionRT.sizeDelta = new Vector2(0, 0); // will be controlled by layout
 
-
-
 		          // Add a background image (optional)
 		          Image bg = sectionGO.AddComponent<Image>();
-	          bg.color = theme != null ? theme.SectionBG : new Color(0.2f, 0.2f, 0.3f, 0.5f);
+		          bg.color = theme != null ? theme.SectionBG : new Color(0.2f, 0.2f, 0.3f, 0.5f);
 
 		          // Store reference
 		          sectionDef.ComponentObject = sectionGO;
@@ -226,9 +227,10 @@ private GameObject CreateTab(UITab tabDef, Transform parent, UITheme theme)
 					     CreateField(field, sectionGO.transform, theme);
 				}
 		          }
-			          RectTransform parentRect = sectionGO.transform.parent != null ? sectionGO.transform.parent.GetComponent<RectTransform>() : null;
-			          UIUtilities.ResolveAndApplySize(sectionDef, theme, parentRect);
-			          UIUtilities.ApplyLayoutGroupData(sectionGO, sectionDef);
+		          RectTransform parentRect = sectionGO.transform.parent != null ? sectionGO.transform.parent.GetComponent<RectTransform>() : null;
+		          UIUtilities.ResolveAndApplySize(sectionDef, theme, parentRect);
+		          UIUtilities.ApplyLayoutGroupData(sectionGO, sectionDef);
+		          //  sectionGO.AddComponent<ContentSizeFitter>();
 	     }
 
 	     private void CreateField(UIField fieldDef, Transform parent, UITheme theme)
@@ -258,7 +260,7 @@ private GameObject CreateTab(UITab tabDef, Transform parent, UITheme theme)
 				float labelMinWidth = Mathf.Max(labelSize.x, theme != null ? theme.LabelMinWidth : 30f);
 				float labelMinHeight = Mathf.Max(labelSize.y, theme != null ? theme.ControlHeight : fieldDef.FontSize + 4f);
 				labelLE.minWidth = labelMinWidth;
-				labelLE.preferredWidth = labelMinWidth;
+				//labelLE.preferredWidth = labelMinWidth;
 				labelLE.minHeight = labelMinHeight;
 				labelLE.preferredHeight = labelMinHeight;
 				labelLE.flexibleWidth = 0; // prevents stretching
@@ -311,7 +313,7 @@ private GameObject CreateTab(UITab tabDef, Transform parent, UITheme theme)
 
 		          }
 
-		          // Make control flexible width
+		          // Make control flexible width. this is probably wrong but also where we should set our layout properties, probably. 
 		          if (controlGO != null)
 		          {
 				LayoutElement controlLE = controlGO.GetComponent<LayoutElement>();
@@ -545,9 +547,9 @@ private GameObject CreateTab(UITab tabDef, Transform parent, UITheme theme)
 
 		          // Layout: toggle should be small, maybe align left.
 		          LayoutElement le = go.AddComponent<LayoutElement>();
-	          float toggleSize = theme != null ? theme.MinToggleWidth : 30f;
-	          le.preferredWidth = toggleSize;
-	          le.minWidth = toggleSize;
+		          float toggleSize = theme != null ? theme.MinToggleWidth : 30f;
+		          le.preferredWidth = toggleSize;
+		          le.minWidth = toggleSize;
 		          return go;
 	     }
 	     private GameObject CreateDropdown(DropdownField def, Transform parent, UITheme theme)
@@ -561,7 +563,7 @@ private GameObject CreateTab(UITab tabDef, Transform parent, UITheme theme)
 		          mainRT.anchorMax = new Vector2(1, 0.5f);
 		          mainRT.pivot = new Vector2(0.5f, 0.5f);
 		          float dropdownHeight = theme != null ? theme.ControlHeight : def.FontSize + 8f;
-	          mainRT.sizeDelta = new Vector2(theme != null ? theme.MinDropdownWidth : 100f, dropdownHeight);
+		          mainRT.sizeDelta = new Vector2(theme != null ? theme.MinDropdownWidth : 100f, dropdownHeight);
 
 		          TMP_Dropdown dropdown = go.AddComponent<TMP_Dropdown>();
 		          def.dropdown = dropdown;
@@ -646,7 +648,7 @@ private GameObject CreateTab(UITab tabDef, Transform parent, UITheme theme)
 		          itemRT.anchorMax = new Vector2(1, 1);
 		          itemRT.pivot = new Vector2(0.5f, 1);
 		          float itemHeight = theme != null ? theme.ControlHeight : def.FontSize + 8f;
-	          itemRT.sizeDelta = new Vector2(0, itemHeight); // height will be set by layout group
+		          itemRT.sizeDelta = new Vector2(0, itemHeight); // height will be set by layout group
 
 		          LayoutElement itemLE = itemGO.AddComponent<LayoutElement>();
 		          itemLE.minHeight = itemHeight;

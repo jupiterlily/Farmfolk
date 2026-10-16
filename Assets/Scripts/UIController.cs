@@ -4,7 +4,7 @@ using UnityEngine;
 public class UIWindowController : MonoBehaviour
 {
 	     private UIWindow windowDef;
-	     private List<GameObject> tabs;
+	     public List<GameObject> tabs;
 	     private List<GameObject> buttons;
 	     private int activeTab = 0;
 

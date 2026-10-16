@@ -131,7 +131,7 @@ public static class ThermalEnergyUtilities
 		          if (actualTransfer <= 0)
 				return;
 
-		          source.TransferMassTo(sink, actualTransfer);
+		          source.TransferMassTo(sink, actualTransfer);		          
 	     }
 
 	     /// <summary>Convective heat transfer to/from a surface</summary>

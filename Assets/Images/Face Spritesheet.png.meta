@@ -3,7 +3,7 @@ guid: 98d399df727d10044b10d814e4c1cbb3
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 12
+  serializedVersion: 13
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -485,7 +485,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Face Spritesheet_16
+      name: nose_01
       rect:
         serializedVersion: 2
         x: 512
@@ -682,7 +682,7 @@ TextureImporter:
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -997,7 +997,7 @@ TextureImporter:
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0, y: 0}
+      pivot: {x: 0.5, y: 0.5}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -2060,7 +2060,7 @@ TextureImporter:
       edges: []
       weights: []
     - serializedVersion: 2
-      name: Face_7
+      name: nose_0
       rect:
         serializedVersion: 2
         x: 448
@@ -2068,7 +2068,7 @@ TextureImporter:
         width: 64
         height: 64
       alignment: 0
-      pivot: {x: 0.5, y: 0.5}
+      pivot: {x: 0, y: 0}
       border: {x: 0, y: 0, z: 0, w: 0}
       outline: []
       physicsShape: []
@@ -2185,6 +2185,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: nose_02
+      rect:
+        serializedVersion: 2
+        x: 576
+        y: 320
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3c6fd095d96b3c240abee0332e45e89d
+      internalID: 922293512
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -2215,7 +2236,6 @@ TextureImporter:
       Face Spritesheet_12: 1722400851
       Face Spritesheet_14: -1381113118
       Face Spritesheet_15: 2120986030
-      Face Spritesheet_16: -846515700
       Face Spritesheet_17: 1773885130
       Face Spritesheet_18: 954670397
       Face Spritesheet_2: -643580552
@@ -2229,7 +2249,6 @@ TextureImporter:
       Face_4: -1936632090
       Face_5: 238460307
       Face_6: 131162077
-      Face_7: -2048641380
       Face_8: -1282039445
       Face_9: 589515743
       Freckles_0: -1205659632
@@ -2293,6 +2312,9 @@ TextureImporter:
       Nose_7: 778620724
       Nose_8: 1696345204
       Nose_9: 164180993
+      nose_0: -2048641380
+      nose_01: -846515700
+      nose_02: 922293512
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

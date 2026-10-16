@@ -200,7 +200,6 @@ public class SimulationMaster : MonoBehaviour
 				if (currentHourOfDay >= 24)
 				{
 					     currentHourOfDay = 0;
-					     gameObject.GetComponent<PepoPopManager>().uiManager.RefreshPepoPanels();
 					     DayPasses(1);
 				}
 		          }

@@ -2,10 +2,19 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-
+//public NumericalAspect(string Name, float MaxValue, float MinValue = 0f, bool Polar = false, float PolarPoint = 0f, string Descriptor = "")
+//{
+//	     name = Name;
+//	     value = minValue;
+//	     maxValue = MaxValue;
+//	     minValue = MinValue;
+//	     polar = Polar;
+//	     polarPoint = PolarPoint;
+//	     descriptor = Descriptor;
+//} (char n, float max, List<string> high, List<string> low, float v = -1, string hardname = null)
 public class PersonalityAspect : NumericalAspect
-{//exists on a scale of 0-10 with 5 being the mid point
-	     public PersonalityAspect(char n, float max, List<string> high, List<string> low, float v = -1, string hardname = null)
+{//exists on a scale of 0-10 with 5 being the mid point	     	     
+	     public PersonalityAspect(char n, List<string> high, List<string> low, float v = -1, string hardname = null) : base("Undefined", 10, 0f, true, 5, "Undefined")
 	     {
 		          if (hardname != null)
 		          {
@@ -42,8 +51,12 @@ public class PersonalityAspect : NumericalAspect
 				name = "Openness";
 				value = v;
 		          }
+		          else
+		          {
+				name = "Undefined";
+		          }
 
-		          if (value > max / 2)
+		          if (value > maxValue / 2)
 		          {
 				descriptor = high[UnityEngine.Random.Range(0, high.Count)];
 		          }
@@ -51,7 +64,6 @@ public class PersonalityAspect : NumericalAspect
 		          {
 				descriptor = low[UnityEngine.Random.Range(0, low.Count)];
 		          }
-		          maxValue = max;
 
 	     }
 
@@ -77,37 +89,107 @@ public class HEXACO
 
 	     public HEXACO(float H = -1, float E = -1, float X = -1, float A = -1, float C = -1, float O = -1)
 	     {
+
 		          if (H < 0)
 		          {
-				Honesty.value = Random.Range(0, maximumValue);
-				Honesty.descriptor = (Honesty.value > maximumValue / 2) ? "honest" : "manipulative";
+				Honesty.value = UnityEngine.Random.Range(0, maximumValue);
+				Honesty.descriptor = (Honesty.value > maximumValue / 2) ? "honest" : "selfish";
 		          }
 		          if (E < 0)
 		          {
-				Emotionality.value = Random.Range(0, maximumValue);
+				Emotionality.value = UnityEngine.Random.Range(0, maximumValue);
 				Emotionality.descriptor = (Emotionality.value > maximumValue / 2) ? "emotional" : "detatched";
 		          }
 		          if (X < 0)
 		          {
-				Extraversion.value = Random.Range(0, maximumValue);
+				Extraversion.value = UnityEngine.Random.Range(0, maximumValue);
 				Extraversion.descriptor = (Extraversion.value > maximumValue / 2) ? "extraverted" : "introverted";
 		          }
 		          if (A < 0)
 		          {
-				Agreeableness.value = Random.Range(0, maximumValue);
-				Agreeableness.descriptor = (Agreeableness.value > maximumValue / 2) ? "forgiving" : "resentful";
+				Agreeableness.value = UnityEngine.Random.Range(0, maximumValue);
+				Agreeableness.descriptor = (Agreeableness.value > maximumValue / 2) ? "agreeable" : "argumentative";
 		          }
 		          if (C < 0)
 		          {
-				Conscientiousness.value = Random.Range(0, maximumValue);
-				Conscientiousness.descriptor = (Conscientiousness.value > maximumValue / 2) ? "careful" : "reckless";
+				Conscientiousness.value = UnityEngine.Random.Range(0, maximumValue);
+				Conscientiousness.descriptor = (Conscientiousness.value > maximumValue / 2) ? "conscientious" : "carefree";
 		          }
 		          if (O < 0)
 		          {
-				Openness.value = Random.Range(0, maximumValue);
-				Openness.descriptor = (Openness.value > maximumValue / 2) ? "open" : "stubborn";
+				Openness.value = UnityEngine.Random.Range(0, maximumValue);
+				Openness.descriptor = (Openness.value > maximumValue / 2) ? "open" : "closed off";
 		          }
-
+		          //use the min and the max to determine the range from which we populate the facets with the average 
+		          float min = Mathf.Min(Honesty.value, Emotionality.value, Extraversion.value, Agreeableness.value, Conscientiousness.value, Openness.value);
+		          float max = Mathf.Max(Honesty.value, Emotionality.value, Extraversion.value, Agreeableness.value, Conscientiousness.value, Openness.value);
+		          float avg = (Honesty.value + Emotionality.value + Extraversion.value + Agreeableness.value + Conscientiousness.value + Openness.value) / 6f;
+		          foreach (var facet in HonestyFacets)
+		          {
+				if (UnityEngine.Random.value > ((Honesty.value / 10) + (avg / 10)) / 2)
+				{
+					     facet.value = UnityEngine.Random.Range(min, Honesty.value);
+				}
+				else
+				{
+					     facet.value = UnityEngine.Random.Range(Honesty.value, max);
+				}
+		          }
+		          foreach (var facet in EmotionalityFacets)
+		          {
+				if (UnityEngine.Random.value > ((Emotionality.value / 10) + (avg / 10)) / 2)
+				{
+					     facet.value = UnityEngine.Random.Range(min, Emotionality.value);
+				}
+				else
+				{
+					     facet.value = UnityEngine.Random.Range(Emotionality.value, max);
+				}
+		          }
+		          foreach (var facet in ExtraversionFacets)
+		          {
+				if (UnityEngine.Random.value > ((Extraversion.value / 10) + (avg / 10)) / 2)
+				{
+					     facet.value = UnityEngine.Random.Range(min, Extraversion.value);
+				}
+				else
+				{
+					     facet.value = UnityEngine.Random.Range(Extraversion.value, max);
+				}
+		          }
+		          foreach (var facet in AgreeablenessFacets)
+		          {
+				if (UnityEngine.Random.value > ((Agreeableness.value / 10) + (avg / 10)) / 2)
+				{
+					     facet.value = UnityEngine.Random.Range(min, Agreeableness.value);
+				}
+				else
+				{
+					     facet.value = UnityEngine.Random.Range(Agreeableness.value, max);
+				}
+		          }
+		          foreach (var facet in ConscientiousnessFacets)
+		          {
+				if (UnityEngine.Random.value > ((Conscientiousness.value / 10) + (avg / 10)) / 2)
+				{
+					     facet.value = UnityEngine.Random.Range(min, Conscientiousness.value);
+				}
+				else
+				{
+					     facet.value = UnityEngine.Random.Range(Conscientiousness.value, max);
+				}
+		          }
+		          foreach (var facet in OpennessFacets)
+		          {
+				if (UnityEngine.Random.value > ((Openness.value / 10) + (avg / 10)) / 2)
+				{
+					     facet.value = UnityEngine.Random.Range(min, Openness.value);
+				}
+				else
+				{
+					     facet.value = UnityEngine.Random.Range(Openness.value, max);
+				}
+		          }
 	     }
 	     public PersonalityAspect[] FullHexRange()
 	     {
@@ -118,6 +200,18 @@ public class HEXACO
 		          r[3] = Agreeableness;
 		          r[4] = Conscientiousness;
 		          r[5] = Openness;
+		          return r;
+	     }
+
+	     public PersonalityAspect[] FullFacetRange()
+	     {
+		          PersonalityAspect[] r = new PersonalityAspect[6 * 4];
+		          HonestyFacets.CopyTo(r, 0);
+		          EmotionalityFacets.CopyTo(r, 4);
+		          ExtraversionFacets.CopyTo(r, 8);
+		          AgreeablenessFacets.CopyTo(r, 12);
+		          ConscientiousnessFacets.CopyTo(r, 16);
+		          OpennessFacets.CopyTo(r, 20);
 		          return r;
 	     }
 }
@@ -193,7 +287,7 @@ public class EmotionAspect : NumericalAspect
 {
 	     public string mild;
 	     public string intense;
-	     public EmotionAspect(char n, float max, List<string> high, List<string> low, float v = 5, string hardname = null)
+	     public EmotionAspect(char n, float max, List<string> high, List<string> low, float v = 5, string hardname = null) : base("Undefined", max, 0f, false, 0f, "Undefined")
 	     {
 		          maxValue = max;
 		          if (n == 's' || n == 'S')
@@ -277,7 +371,7 @@ public class Feeling : NumericalAspect
 	     public List<EmotionAspect> aspects;
 
 	     public float timeLeft;
-	     public Feeling(List<EmotionAspect> emotions)
+	     public Feeling(List<EmotionAspect> emotions) : base("Feeling", 10f, 0f, false, 0f, "Feeling")
 	     {
 		          int i;
 		          if (emotions == null)

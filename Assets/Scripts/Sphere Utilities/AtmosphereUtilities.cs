@@ -11,9 +11,6 @@ public static class AtmosphereUtilities
 
 		          AtmosphereTile current = topTile;
 
-
-
-
 		          while (current != null) //while there isn't a tile below us
 		          {
 				// Transfer stored downwelling and reflected energy (if any)
@@ -130,7 +127,7 @@ public static class AtmosphereUtilities
 
 					     EnergyTransferUtilities.TransferEnergy(incident, tile.incomingSolarEnergy, perTile);
 
-					     //     ProcessSurfaceEnergyBalance(tile, hours);
+					     ProcessSurfaceEnergyBalance(tile, hours);
 				}
 		          }
 		          //        if (current.above != null)
@@ -1163,7 +1160,7 @@ public static class AtmosphereUtilities
 
 		          // --- Step 3: Global conservation fix ---
 		          // Interpolation has a tiny mass/energy drift. Correct it globally.
-		          FixGlobalConservation(atmosphereTiles);
+		          //FixGlobalConservation(atmosphereTiles);
 	     }
 
 	     private static Vector3 CalculateDeparturePoint3D(
@@ -1438,83 +1435,83 @@ public static class AtmosphereUtilities
 	     private static float globalInitialMass = -1f;
 	     private static float globalInitialEnergy = -1f;
 
-	     public static void FixGlobalConservation(AtmosphereTile[,,] tiles)
-	     {
-		          int layers = tiles.GetLength(0);
-		          int width = tiles.GetLength(1);
-		          int height = tiles.GetLength(2);
+	     //  public static void FixGlobalConservation(AtmosphereTile[,,] tiles)
+	     //  {
+	     //        int layers = tiles.GetLength(0);
+	     //        int width = tiles.GetLength(1);
+	     //        int height = tiles.GetLength(2);
 
-		          // Calculate current totals
-		          float totalMass = 0f;
-		          float totalEnergy = 0f;
+	     //        // Calculate current totals
+	     //        float totalMass = 0f;
+	     //        float totalEnergy = 0f;
 
-		          for (int layer = 0; layer < layers; layer++)
-		          {
-				for (int x = 0; x < width; x++)
-				{
-					     for (int y = 0; y < height; y++)
-					     {
-						          AtmosphereTile tile = tiles[layer, x, y];
-						          if (tile == null)
-								continue;
+	     //        for (int layer = 0; layer < layers; layer++)
+	     //        {
+	     //for (int x = 0; x < width; x++)
+	     //{
+	     //	     for (int y = 0; y < height; y++)
+	     //	     {
+	     //		          AtmosphereTile tile = tiles[layer, x, y];
+	     //		          if (tile == null)
+	     //				continue;
 
-						          foreach (var comp in tile.energies)
-						          {
-								if (comp == null)
-									     continue;
-								totalMass += comp.Mass;
-								totalEnergy += comp.StoredEnergy;
-						          }
-					     }
-				}
-		          }
+	     //		          foreach (var comp in tile.energies)
+	     //		          {
+	     //				if (comp == null)
+	     //					     continue;
+	     //				totalMass += comp.Mass;
+	     //				totalEnergy += comp.StoredEnergy;
+	     //		          }
+	     //	     }
+	     //}
+	     //        }
 
-		          // Store initial values on first call
-		          if (globalInitialMass < 0f)
-		          {
-				globalInitialMass = totalMass;
-				globalInitialEnergy = totalEnergy;
-				return;
-		          }
+	     //        // Store initial values on first call
+	     //        if (globalInitialMass < 0f)
+	     //        {
+	     //globalInitialMass = totalMass;
+	     //globalInitialEnergy = totalEnergy;
+	     //return;
+	     //        }
 
-		          // Prevent division by zero
-		          if (totalMass <= 0f || totalEnergy <= 0f)
-				return;
+	     //        // Prevent division by zero
+	     //        if (totalMass <= 0f || totalEnergy <= 0f)
+	     //return;
 
-		          // Calculate correction factors
-		          float massCorrection = globalInitialMass / totalMass;
-		          float energyCorrection = globalInitialEnergy / totalEnergy;
+	     //        // Calculate correction factors
+	     //        float massCorrection = globalInitialMass / totalMass;
+	     //        float energyCorrection = globalInitialEnergy / totalEnergy;
 
-		          // Only apply if drift is significant (>0.001%)
-		          if (Mathf.Abs(massCorrection - 1f) < 0.00001f &&
-		              Mathf.Abs(energyCorrection - 1f) < 0.00001f)
-				return;
+	     //        // Only apply if drift is significant (>0.001%)
+	     //        if (Mathf.Abs(massCorrection - 1f) < 0.00001f &&
+	     //            Mathf.Abs(energyCorrection - 1f) < 0.00001f)
+	     //return;
 
-		          // Apply correction to all components
-		          for (int layer = 0; layer < layers; layer++)
-		          {
-				for (int x = 0; x < width; x++)
-				{
-					     for (int y = 0; y < height; y++)
-					     {
-						          AtmosphereTile tile = tiles[layer, x, y];
-						          if (tile == null)
-								continue;
+	     //        // Apply correction to all components
+	     //        for (int layer = 0; layer < layers; layer++)
+	     //        {
+	     //for (int x = 0; x < width; x++)
+	     //{
+	     //	     for (int y = 0; y < height; y++)
+	     //	     {
+	     //		          AtmosphereTile tile = tiles[layer, x, y];
+	     //		          if (tile == null)
+	     //				continue;
 
-						          foreach (var comp in tile.energies)
-						          {
-								if (comp == null || comp.Mass <= 0f)
-									     continue;
+	     //		          foreach (var comp in tile.energies)
+	     //		          {
+	     //				if (comp == null || comp.Mass <= 0f)
+	     //					     continue;
 
-								float newMass = comp.Mass * massCorrection;
-								float newEnergy = comp.StoredEnergy * energyCorrection;
+	     //				float newMass = comp.Mass * massCorrection;
+	     //				float newEnergy = comp.StoredEnergy * energyCorrection;
 
-								// Set the corrected values
-								comp.SetMassAndEnergy(newMass, newEnergy, 0f);
-						          }
-					     }
-				}
-		          }
-	     }
+	     //				// Set the corrected values
+	     //				comp.SetMassAndEnergy(newMass, newEnergy, 0f);
+	     //		          }
+	     //	     }
+	     //}
+	     //        }
+	     //  }
 }
 

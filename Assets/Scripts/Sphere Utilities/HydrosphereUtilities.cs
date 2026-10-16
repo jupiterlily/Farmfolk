@@ -13,14 +13,16 @@ public static class HydrosphereUtilities
 		          {
 				total += atmosphereTile.waterVapor.Mass;
 				total += atmosphereTile.cloudWaterContent.Mass;
-				//total += atmosphereTile.liquidWater.Mass;
+				total += atmosphereTile.iceParticles.Mass;
 		          }
 
 
 		          if (surfaceTile != null)
 		          {
 				total += surfaceTile.surfaceLiquid.Mass;
+				total += surfaceTile.surfaceIce.Mass;
 				total += surfaceTile.composition.water.Mass;
+				total += surfaceTile.composition.ice.Mass;
 		          }
 
 		          return total;
@@ -183,22 +185,22 @@ public static class HydrosphereUtilities
 		          // 6. Precipitation (commented out in original – can be re‑enabled)
 		          SensibleHeatExchange(atmosphereTile, surfaceTile, hours);
 		          // 7. Validate water conservation
-		          //ValidateWaterConservation(...);
+
 	     }
 
 	     public static void RedistributeWaterLateral(WorldTile tile, float hours)
 	     {//this is water movement within the soil.
 	      // Helper to calculate total water for a tile + neighbors
-		          float GetTotalWater(WorldTile t)
-		          {
-				float total = t.tileData.composition.water.Mass;
-				foreach (var n in t.GetNeighbors())
-				{
-					     if (n != null)
-						          total += n.tileData.composition.water.Mass;
-				}
-				return total;
-		          }
+	      //        float GetTotalWater(WorldTile t)
+	      //        {
+	      //float total = t.tileData.composition.water.Mass;
+	      //foreach (var n in t.GetNeighbors())
+	      //{
+	      //	     if (n != null)
+	      //		          total += n.tileData.composition.water.Mass;
+	      //}
+	      //return total;
+	      //        }
 
 		          // Debug.Log($"[LateralWater] Before redistribution: Total water = {GetTotalWater(tile)} kg");
 
@@ -530,28 +532,16 @@ public static class HydrosphereUtilities
 				return;
 
 		          float surfaceEvaporation = Mathf.Min(actualEvaporation, tile.surfaceLiquid.Mass);
-		          float soilEvaporation = Mathf.Min(actualEvaporation - surfaceEvaporation, tile.composition.water.Mass * 0.05f);
 
 		          if (surfaceEvaporation > 0)
 		          {
-				float latentRequired = surfaceEvaporation * tile.surfaceLiquid.LatentHeatVaporization;
-
-				// 1. Cool the surface water
-				tile.surfaceLiquid.RemoveEnergy(latentRequired);
-
-				// 2. Move mass
+				// IMPORTANT: TransferMassTo handles the energy removal automatically
+				// Do NOT call RemoveEnergy separately!
 				ThermalEnergyUtilities.TransferMassAndEnergy(tile.surfaceLiquid, atmotile.waterVapor, surfaceEvaporation);
 
-				//// 3. Warm the atmosphere
-				//float totalAirMass = 0f;
-				//foreach (var nrg in atmotile.energies)
-				//	     totalAirMass += nrg.Mass;
-				//if (totalAirMass > 0f)
-				//{
-				//	     float perKg = latentRequired / totalAirMass;
-				//	     foreach (var nrg in atmotile.energies)
-				//		          nrg.AddEnergy(perKg * nrg.Mass);
-				//}
+				// The latent heat is already accounted for in the phase change logic
+				// Just mark the atmosphere as dirty to recalculate temperature
+				atmotile.MarkTemperatureDirty();
 		          }
 	     }
 

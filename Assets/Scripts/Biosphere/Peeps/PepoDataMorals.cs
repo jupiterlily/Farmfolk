@@ -8,7 +8,7 @@ public class MoralFoundation : NumericalAspect
 	     public float Sensitivity;
 	     public List<string> Virtues;
 	     public List<string> Vices;
-	     public MoralFoundation(string name, string pos, string neg, float sensitivity)
+	     public MoralFoundation(string name, string pos, string neg, float sensitivity) : base(name, 10, 0, true, 5, "")
 	     {
 
 	     }

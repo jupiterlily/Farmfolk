@@ -51,8 +51,8 @@ public static class PepoUtilitiesMatchmaking
 	     {
 		          if (degree >= 9)
 		          {
-				int iWant = me.ssd.wantsChildren[1] - (me.knownOffspring?.Count(o => o != null && o.isAlive) ?? 0);
-				int theyWant = target.ssd.wantsChildren[0] - (target.knownOffspring?.Count(o => o != null && o.isAlive) ?? 0);
+				int iWant = (int)me.ssd.numberOfChildren.maxValue - (me.knownOffspring?.Count(o => o != null && o.isAlive) ?? 0);
+				int theyWant = (int)target.ssd.numberOfChildren.maxValue - (target.knownOffspring?.Count(o => o != null && o.isAlive) ?? 0);
 				// Check if both want children to similar degree
 				if (iWant > theyWant && !PepoUtilitiesPersonality.IsLying(target))
 				{

@@ -42,8 +42,8 @@ public class Plant
 	     public LSystem lSystem; //gets added and  instantiated with the plant
 	     public TileData OriginTile; //gets assigned when the plant is placed
 			   //dictionary of tiles that the plant is in, with the tile as the key and the amount of roots in that tile as the value
-	     public Dictionary<TileData, float> RootTiles = new Dictionary<TileData, float>();
-	     public ThermalEnergy storedWater = new ThermalEnergy(100, "liquid water"); //water in the plant in liters
+	     public Dictionary<TileData, float> RootTiles = new Dictionary<TileData, float>(); //this lets plants keep the landscape hydrated and move water through the soil.
+	     public ThermalEnergy storedWater = new ThermalEnergy(0, "liquid water"); //water in the plant in liters
 	     public GameObject PlantObject; //gets added and instantiated with the plant
 	     public Plant()
 	     {

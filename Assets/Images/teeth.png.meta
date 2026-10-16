@@ -3,7 +3,7 @@ guid: 7dd718c5cfb1e6b49b4d9e81704015dd
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
-  serializedVersion: 12
+  serializedVersion: 13
   mipmaps:
     mipMapMode: 0
     enableMipMap: 0
@@ -152,7 +152,7 @@ TextureImporter:
       name: teeth_0
       rect:
         serializedVersion: 2
-        x: 192
+        x: 0
         y: 64
         width: 64
         height: 64
@@ -173,7 +173,7 @@ TextureImporter:
       name: teeth_1
       rect:
         serializedVersion: 2
-        x: 256
+        x: 64
         y: 64
         width: 64
         height: 64
@@ -194,7 +194,7 @@ TextureImporter:
       name: teeth_2
       rect:
         serializedVersion: 2
-        x: 320
+        x: 128
         y: 64
         width: 64
         height: 64
@@ -215,7 +215,7 @@ TextureImporter:
       name: teeth_3
       rect:
         serializedVersion: 2
-        x: 384
+        x: 192
         y: 64
         width: 64
         height: 64
@@ -228,6 +228,216 @@ TextureImporter:
       bones: []
       spriteID: e97ffe22b8f553b409a4725fd807e1b9
       internalID: 1051681768
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: teeth_4
+      rect:
+        serializedVersion: 2
+        x: 256
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a7c536463f7a4cd49a98312a078bce99
+      internalID: -1131884060
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: teeth_5
+      rect:
+        serializedVersion: 2
+        x: 320
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4756bd213c0cecb42b563516a25a194f
+      internalID: 1574747551
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: teeth_6
+      rect:
+        serializedVersion: 2
+        x: 384
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2b988ef17f43ef5438453ef629370c29
+      internalID: 1337143424
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: teeth_7
+      rect:
+        serializedVersion: 2
+        x: 448
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 89354a6c062fd6b429c6cc0e8a30f51a
+      internalID: -1102303798
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: teeth_8
+      rect:
+        serializedVersion: 2
+        x: 512
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 28477527780e21347b6bcdc5c2db1f81
+      internalID: -722271526
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: teeth_9
+      rect:
+        serializedVersion: 2
+        x: 640
+        y: 64
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7d746d63daefbb3429b06cf953776646
+      internalID: 1399223513
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: teeth_10
+      rect:
+        serializedVersion: 2
+        x: 0
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 1b1fdd70d273881458ab2cc8cd4c5dfe
+      internalID: 1851881933
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: teeth_11
+      rect:
+        serializedVersion: 2
+        x: 64
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5a8ba441c625c4943aca9213e5d5d3fe
+      internalID: 333645788
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: teeth_12
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 5163acdbda8e20f468f08cfaa6a4e120
+      internalID: -168521624
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: teeth_13
+      rect:
+        serializedVersion: 2
+        x: 192
+        y: 0
+        width: 64
+        height: 64
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3c84eeacd48266649a060cafe4ae17f5
+      internalID: 1407260865
       vertices: []
       indices: 
       edges: []
@@ -245,8 +455,18 @@ TextureImporter:
     nameFileIdTable:
       teeth_0: 2090718470
       teeth_1: 2093635138
+      teeth_10: 1851881933
+      teeth_11: 333645788
+      teeth_12: -168521624
+      teeth_13: 1407260865
       teeth_2: -740436584
       teeth_3: 1051681768
+      teeth_4: -1131884060
+      teeth_5: 1574747551
+      teeth_6: 1337143424
+      teeth_7: -1102303798
+      teeth_8: -722271526
+      teeth_9: 1399223513
   mipmapLimitGroupName: 
   pSDRemoveMatte: 0
   userData: 

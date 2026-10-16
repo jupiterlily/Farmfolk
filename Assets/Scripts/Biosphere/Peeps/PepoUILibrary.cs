@@ -9,36 +9,38 @@ public class PepoUILibrary
 		          {
 				Padding = sc.Padding,
 				Spacing = sc.Spacing,
-				VerticalLayout = !sc.VerticalLayout,
-				ChildForceExpandWidth = sc.VerticalLayout,  // horizontal strip: expand width
-				ChildForceExpandHeight = !sc.VerticalLayout, // vertical strip: expand height
+				//if layout is horizontal, set child force expands, if layout is vertical, set child force expands the other way.
+
+				//VerticalLayout = !sc.VerticalLayout,
+				//ChildForceExpandWidth = sc.VerticalLayout,  // horizontal strip: expand width
+				//ChildForceExpandHeight = !sc.VerticalLayout, // vertical strip: expand height
 				DisplayLabel = false
 		          };
 
 		          // First name (editable)
-		          var firstNameField = new TextInputField("First Name", pepo.forename, (int)uim.theme.BodyFontSize)
+		          var firstNameField = new TextInputField("First Name", pepo.forename)
 		          {
 				Getter = () => pepo.forename,
 				Setter = (val) => pepo.pepoName[0].value = val?.ToString() ?? "Unknown",
-				VerticalLayout = false,
+				//VerticalLayout = false,
 				DisplayLabel = true,
 				FontSize = (int)uim.theme.BodyFontSize
 		          };
 		          section.Components.Add(firstNameField);
 
 		          // Last name (editable)
-		          var lastNameField = new TextInputField("Last Name", pepo.surname, (int)uim.theme.BodyFontSize)
+		          var lastNameField = new TextInputField("Last Name", pepo.surname)
 		          {
 				Getter = () => pepo.surname,
 				Setter = (val) => pepo.pepoName[1].value = val?.ToString() ?? "Unknown",
-				VerticalLayout = false,
+				//VerticalLayout = false,
 				DisplayLabel = true,
 				FontSize = (int)uim.theme.BodyFontSize
 		          };
 		          section.Components.Add(lastNameField);
 
 		          //        // Nicknames (read‑only)
-		          //        var nicknamesField = new ReadOnlyField("Nicknames", "", (int)uim.theme.BodyFontSize)
+		          //        var nicknamesField = new ReadOnlyField("Nicknames", "")
 		          //        {
 		          //Getter = () => string.Join(", ", GetNicknames(pepo)),
 		          //VerticalLayout = false,
@@ -55,7 +57,8 @@ public class PepoUILibrary
 		          var section = new UISection($"{pepo.fullname} portrait", true, new List<UIComponentData>())
 		          {
 		          };
-		          section.Components.Add(new PortraitField("Portrait",  (int)uim.theme.BodyFontSize));
+		          section.Components.Add(new PortraitField("Portrait"));
+		          section.MinimumSize = new Vector2(128, 128);
 		          return section;
 	     }
 	     public static UISection BuildSectionPepoPanel(PepoData pepo, UIManager uim, UIStructuralComponent sc)
@@ -75,34 +78,34 @@ public class PepoUILibrary
 		          {
 				Padding = sc.Padding,
 				Spacing = sc.Spacing,
-				VerticalLayout = !sc.VerticalLayout,
-				ChildForceExpandWidth = sc.VerticalLayout,  // horizontal strip: expand width
-				ChildForceExpandHeight = !sc.VerticalLayout, // vertical strip: expand height
+				//VerticalLayout = !sc.VerticalLayout,
+				//ChildForceExpandWidth = sc.VerticalLayout,  // horizontal strip: expand width
+				//ChildForceExpandHeight = !sc.VerticalLayout, // vertical strip: expand height
 				DisplayLabel = false
 		          };
 
 		          // Age (read‑only)
-		          var ageField = new ReadOnlyField("Age", "", (int)uim.theme.BodyFontSize)
+		          var ageField = new ReadOnlyField("Age", "")
 		          {
 				Getter = () => Mathf.Floor(pepo.age).ToString(),
-				VerticalLayout = false,
+				//VerticalLayout = false,
 				DisplayLabel = true
 		          };
 		          section.Components.Add(ageField);
 
 		          // Mother
-		          var motherField = new ReadOnlyField("Mother", "", (int)uim.theme.BodyFontSize)
+		          var motherField = new ReadOnlyField("Mother", "")
 		          {
 				Getter = () => pepo.mother != null ? pepo.mother.fullname : "Unknown",
-				VerticalLayout = false
+				//VerticalLayout = false
 		          };
 		          section.Components.Add(motherField);
 
 		          // Father
-		          var fatherField = new ReadOnlyField("Father", "", (int)uim.theme.BodyFontSize)
+		          var fatherField = new ReadOnlyField("Father", "")
 		          {
 				Getter = () => pepo.father != null ? pepo.father.fullname : "Unknown",
-				VerticalLayout = false
+				//VerticalLayout = false
 		          };
 		          section.Components.Add(fatherField);
 
@@ -111,7 +114,7 @@ public class PepoUILibrary
 		              pepo.knownOffspring ?? new List<PepoData>(),
 		             100, 100)
 		          {
-				VerticalLayout = false,
+				//VerticalLayout = false,
 				DisplayLabel = true
 		          };
 		          section.Components.Add(childrenField);
@@ -147,13 +150,13 @@ public class PepoUILibrary
 	         GetSiblings(pepo),
 	         200, 100)
 		          {
-				VerticalLayout = false,
+				//VerticalLayout = false,
 				DisplayLabel = true
 		          };
 		          section.Components.Add(siblingsField);
 
 		          //        // Roles
-		          //        var rolesField = new ReadOnlyField("Roles", "", (int)uim.theme.BodyFontSize)
+		          //        var rolesField = new ReadOnlyField("Roles", "")
 		          //        {
 		          //Getter = () => pepo.,
 		          //VerticalLayout = false,
@@ -169,9 +172,9 @@ public class PepoUILibrary
 		          {
 				Padding = sc.Padding,
 				Spacing = sc.Spacing,
-				VerticalLayout = !sc.VerticalLayout,
-				ChildForceExpandWidth = sc.VerticalLayout,  // horizontal strip: expand width
-				ChildForceExpandHeight = !sc.VerticalLayout, // vertical strip: expand height
+				//VerticalLayout = !sc.VerticalLayout,
+				//ChildForceExpandWidth = sc.VerticalLayout,  // horizontal strip: expand width
+				//ChildForceExpandHeight = !sc.VerticalLayout, // vertical strip: expand height
 				DisplayLabel = false
 		          };
 
@@ -179,7 +182,7 @@ public class PepoUILibrary
 		          var hexacoField = new GraphField("HEXACO", GraphType.radar, 50f, 100)
 		          {
 				Getter = () => UIUtilities.CreateHexacoGraph(pepo.personality),
-				VerticalLayout = false,
+				//VerticalLayout = false,
 				DisplayLabel = true
 		          };
 		          section.Components.Add(hexacoField);
@@ -197,7 +200,7 @@ public class PepoUILibrary
 		          var valuesField = new GraphField("Values", GraphType.radar, 50f, 100)
 		          {
 				Getter = () => UIUtilities.CreateValuesGraph(pepo.values),
-				VerticalLayout = false,
+				//VerticalLayout = false,
 				DisplayLabel = true
 		          };
 		          section.Components.Add(valuesField);
@@ -211,9 +214,9 @@ public class PepoUILibrary
 		          {
 				Padding = sc.Padding,
 				Spacing = sc.Spacing,
-				VerticalLayout = !sc.VerticalLayout,
-				ChildForceExpandWidth = sc.VerticalLayout,  // horizontal strip: expand width
-				ChildForceExpandHeight = !sc.VerticalLayout, // vertical strip: expand height
+				//VerticalLayout = !sc.VerticalLayout,
+				//ChildForceExpandWidth = sc.VerticalLayout,  // horizontal strip: expand width
+				//ChildForceExpandHeight = !sc.VerticalLayout, // vertical strip: expand height
 				DisplayLabel = false
 		          };
 
@@ -222,7 +225,7 @@ public class PepoUILibrary
         "Head Shape", "Hair Redness", "Hair Darkness", "Eye Shape", "Eye Color",
         "Eye Darkness", "Eye Height", "Nose Shape", "Nose Height", "Top Lip Shape",
         "Bottom Lip Shape", "Mouth Height", "Skin Depth", "Skin Saturation",
-        "Skin Hue", "Freckles", "Invert Freckles", "Express Double Freckles",
+        "Skin Hue", "Primary Freckles", "Invert Freckles", "Express Secondary Freckles", "Invert Secondary Freckles",
         "Hair Texture", "Height", "Mass Genetics", "Brows", "Brow Height"
     };
 
@@ -231,11 +234,11 @@ public class PepoUILibrary
 		          {
 				int index = i; // capture for lambda
 				var trait = traits[index];
-				var rangeField = new RangeField(traitNames[index], 1, trait.maxValue, true, (int)uim.theme.BodyFontSize)
+				var rangeField = new RangeField(traitNames[index], 1, trait.maxValue, true)
 				{
 					     Getter = () => trait.value,
 					     Setter = (val) => trait.value = (float)val,
-					     VerticalLayout = false,
+					     // VerticalLayout = false,
 					     DisplayLabel = true
 				};
 				section.Components.Add(rangeField);
@@ -250,9 +253,9 @@ public class PepoUILibrary
 		          {
 				Padding = sc.Padding,
 				Spacing = sc.Spacing,
-				VerticalLayout = !sc.VerticalLayout,
-				ChildForceExpandWidth = sc.VerticalLayout,  // horizontal strip: expand width
-				ChildForceExpandHeight = !sc.VerticalLayout, // vertical strip: expand height
+				//VerticalLayout = !sc.VerticalLayout,
+				//ChildForceExpandWidth = sc.VerticalLayout,  // horizontal strip: expand width
+				//ChildForceExpandHeight = !sc.VerticalLayout, // vertical strip: expand height
 				DisplayLabel = false
 		          };
 
@@ -269,11 +272,11 @@ public class PepoUILibrary
 
 		          foreach (var t in hexacoTraits)
 		          {
-				var field = new RangeField(t.name, 0, 10, true, (int)uim.theme.BodyFontSize)
+				var field = new RangeField(t.name, 0, 10, true)
 				{
 					     Getter = () => t.aspect.value,
 					     Setter = (val) => t.aspect.value = (float)val,
-					     VerticalLayout = false,
+					     // VerticalLayout = false,
 					     DisplayLabel = true
 				};
 				section.Components.Add(field);
@@ -287,9 +290,9 @@ public class PepoUILibrary
 		          {
 				Padding = sc.Padding,
 				Spacing = sc.Spacing,
-				VerticalLayout = !sc.VerticalLayout,
-				ChildForceExpandWidth = sc.VerticalLayout,  // horizontal strip: expand width
-				ChildForceExpandHeight = !sc.VerticalLayout, // vertical strip: expand height
+				//VerticalLayout = !sc.VerticalLayout,
+				//ChildForceExpandWidth = sc.VerticalLayout,  // horizontal strip: expand width
+				//ChildForceExpandHeight = !sc.VerticalLayout, // vertical strip: expand height
 				DisplayLabel = false
 		          };
 
@@ -301,10 +304,10 @@ public class PepoUILibrary
 				if (relList == null || relList.Count == 0)
 					     continue;
 
-				var label = new ReadOnlyField(relType.ToString(), "", (int)uim.theme.BodyFontSize)
+				var label = new ReadOnlyField(relType.ToString(), "")
 				{
 					     Getter = () => $"{relList.Count} relationships",
-					     VerticalLayout = false,
+					     //  VerticalLayout = false,
 					     DisplayLabel = true
 				};
 				section.Components.Add(label);

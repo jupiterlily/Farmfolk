@@ -3,7 +3,12 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UIElements;
-
+public enum LayoutType
+{
+	     Grid,
+	     Vertical,
+	     Horizontal
+}
 // ─── Base ──────────────────────────────────────────────────────────
 public abstract class UIComponentData
 {
@@ -19,10 +24,13 @@ public abstract class UIComponentData
 	     public Vector2 PreferredSize = new Vector2(50, 30);
 	     public bool AutoSize = true;
 	     public bool ConstrainToParent = true;
-	     public bool VerticalLayout = true;
+	     // public bool VerticalLayout = true;
+	     public LayoutType Layout = LayoutType.Vertical;
 	     public RectOffset Padding = new RectOffset(5, 5, 5, 5);
 	     public int Spacing = 5;
 	     public TextAnchor ChildAlignment = TextAnchor.UpperLeft;
+
+
 
 	     public bool DisplayLabel = true;
 
@@ -59,6 +67,15 @@ public class UIWindow : UIStructuralComponent
 	     {
 		          if (tabs != null)
 				Tabs = tabs;
+
+		          //get the selected theme from the ui manager and apply padding and spacing to the window from the theme.
+		          UIManager uiManager = GameObject.FindObjectOfType<UIManager>();
+		          UITheme theme = uiManager.theme;
+		          Spacing = (int)theme.LargeSpacing;
+		          Padding.left = (int)theme.LargePadding;
+		          Padding.right = (int)theme.LargePadding;
+		          Padding.top = (int)theme.LargePadding;
+		          Padding.bottom = (int)theme.LargePadding;
 	     }
 }
 
@@ -71,6 +88,15 @@ public class UITab : UIStructuralComponent
 	     {
 		          if (sections != null)
 				Sections = sections;
+
+		          UIManager uiManager = GameObject.FindObjectOfType<UIManager>();
+		          UITheme theme = uiManager.theme;
+		          Spacing = (int)theme.MediumSpacing;
+		          Padding.left = (int)theme.MediumPadding;
+		          Padding.right = (int)theme.MediumPadding;
+		          Padding.top = (int)theme.MediumPadding;
+		          Padding.bottom = (int)theme.MediumPadding;
+
 	     }
 }
 
@@ -100,6 +126,13 @@ public class UISection : UIStructuralComponent
 				}
 				// here a section should size itself according to the components within it.
 		          }
+		          UIManager uiManager = GameObject.FindObjectOfType<UIManager>();
+		          UITheme theme = uiManager.theme;
+		          Spacing = (int)theme.SectionSpacing;
+		          Padding.left = (int)theme.SectionPadding;
+		          Padding.right = (int)theme.SectionPadding;
+		          Padding.top = (int)theme.SectionPadding;
+		          Padding.bottom = (int)theme.SectionPadding;
 	     }
 }
 //sections for pepos, tileData , PopulationData, etc. can be derived from this base class to add specific data binding and functionality.
@@ -109,6 +142,13 @@ public class UISection_Pepo : UISection
 	     public UISection_Pepo(string name, PepoData pepo, bool Vertical, List<UIComponentData> components = null) : base(name, Vertical, components)
 	     {
 		          this.pepo = pepo;
+		          UIManager uiManager = GameObject.FindObjectOfType<UIManager>();
+		          UITheme theme = uiManager.theme;
+		          Spacing = (int)theme.SmallSpacing;
+		          Padding.left = (int)theme.SmallPadding;
+		          Padding.right = (int)theme.SmallPadding;
+		          Padding.top = (int)theme.SmallPadding;
+		          Padding.bottom = (int)theme.SmallPadding;
 	     }
 }
 
@@ -118,6 +158,13 @@ public class UISection_Tile : UISection
 	     public UISection_Tile(string name, TileData tileData, bool Vertical, List<UIComponentData> components = null) : base(name, Vertical, components)
 	     {
 		          this.tileData = tileData;
+		          UIManager uiManager = GameObject.FindObjectOfType<UIManager>();
+		          UITheme theme = uiManager.theme;
+		          Spacing = (int)theme.SmallSpacing;
+		          Padding.left = (int)theme.SmallPadding;
+		          Padding.right = (int)theme.SmallPadding;
+		          Padding.top = (int)theme.SmallPadding;
+		          Padding.bottom = (int)theme.SmallPadding;
 	     }
 }
 
@@ -127,6 +174,13 @@ public class UISection_Population : UISection
 	     public UISection_Population(string name, PepoPopulation populationData, bool Vertical, List<UIComponentData> components = null) : base(name, Vertical, components)
 	     {
 		          this.population = populationData;
+		          UIManager uiManager = GameObject.FindObjectOfType<UIManager>();
+		          UITheme theme = uiManager.theme;
+		          Spacing = (int)theme.SmallSpacing;
+		          Padding.left = (int)theme.SmallPadding;
+		          Padding.right = (int)theme.SmallPadding;
+		          Padding.top = (int)theme.SmallPadding;
+		          Padding.bottom = (int)theme.SmallPadding;
 	     }
 }
 
@@ -172,15 +226,23 @@ public class TextInputField : UIField
 	     public int MaxLength = 50;
 	     public string DefaultText = "";
 	     public TMP_Text Text;
-	     public TextInputField(string label, string defaultText = "", int fontSize = 14)
+	     public TextInputField(string label, string defaultText = "")
 	         : base("Field_TextInput", label)
 	     {
 		          DefaultText = defaultText;
-		          FontSize = fontSize;
 		          IsReadOnly = false;
 		          //MinimumSize = new Vector2(FontSize * defaultText.Length * 0.5f, fontSize + 4);
-		          VerticalLayout = false;
-			          MinimumSize = UIUtilities.GetFieldMinimumSize(this, null, defaultText.Length);
+		          //VerticalLayout = false;
+		          Layout = LayoutType.Horizontal;
+		          MinimumSize = UIUtilities.GetFieldMinimumSize(this, null, defaultText.Length);
+		          UIManager uiManager = GameObject.FindObjectOfType<UIManager>();
+		          UITheme theme = uiManager.theme;
+		          Spacing = (int)theme.SmallSpacing;
+		          Padding.left = (int)theme.SmallPadding;
+		          Padding.right = (int)theme.SmallPadding;
+		          Padding.top = (int)theme.SmallPadding;
+		          Padding.bottom = (int)theme.SmallPadding;
+		          FontSize = (int)theme.SmallFontSize;
 	     }
 }
 
@@ -190,14 +252,22 @@ public class ReadOnlyField : UIField
 {
 	     public string DefaultText = "";
 	     public TMP_Text Text;
-	     public ReadOnlyField(string label, string defaultText = "", int fontSize = 14)
+	     public ReadOnlyField(string label, string defaultText = "")
 	         : base("Field_ReadOnly", label)
 	     {
 		          DefaultText = defaultText;
-		          FontSize = fontSize;
 		          IsReadOnly = true;
-			          MinimumSize = UIUtilities.GetFieldMinimumSize(this, null, defaultText.Length);
-		          VerticalLayout = false;
+		          MinimumSize = UIUtilities.GetFieldMinimumSize(this, null, defaultText.Length);
+		          //  VerticalLayout = false;
+		          Layout = LayoutType.Horizontal;
+		          UIManager uiManager = GameObject.FindObjectOfType<UIManager>();
+		          UITheme theme = uiManager.theme;
+		          Spacing = (int)theme.SmallSpacing;
+		          Padding.left = (int)theme.SmallPadding;
+		          Padding.right = (int)theme.SmallPadding;
+		          Padding.top = (int)theme.SmallPadding;
+		          Padding.bottom = (int)theme.SmallPadding;
+		          FontSize = (int)theme.SmallFontSize;
 	     }
 	     public override void Refresh()
 	     {
@@ -212,15 +282,24 @@ public class RangeField : UIField
 	     public float MaxValue = 100f;
 	     public bool UseIntStep = false;
 	     public UnityEngine.UI.Slider Slider;
-	     public RangeField(string label, float min = 0f, float max = 100f, bool intStep = false, int fontSize = 14)
+	     public RangeField(string label, float min = 0f, float max = 100f, bool intStep = false)
 	         : base("Field_Range", label)
 	     {
 		          MinValue = min;
 		          MaxValue = max;
 		          UseIntStep = intStep;
-		          FontSize = fontSize;
-			          MinimumSize = UIUtilities.GetFieldMinimumSize(this, null, 50);
-		          VerticalLayout = false;
+		          //  FontSize = fontSize;
+		          MinimumSize = UIUtilities.GetFieldMinimumSize(this, null, 50);
+		          //VerticalLayout = false;
+		          Layout = LayoutType.Horizontal;
+		          UIManager uiManager = GameObject.FindObjectOfType<UIManager>();
+		          UITheme theme = uiManager.theme;
+		          Spacing = (int)theme.SmallSpacing;
+		          Padding.left = (int)theme.SmallPadding;
+		          Padding.right = (int)theme.SmallPadding;
+		          Padding.top = (int)theme.SmallPadding;
+		          Padding.bottom = (int)theme.SmallPadding;
+		          FontSize = (int)theme.SmallFontSize;
 	     }
 }
 
@@ -230,13 +309,21 @@ public class ToggleField : UIField
 	     public RadioButton button;
 
 
-	     public ToggleField(string label, bool defaultValue = false, int fontSize = 14)
+	     public ToggleField(string label, bool defaultValue = false)
 	         : base("Field_Toggle", label)
 	     {
 		          DefaultValue = defaultValue;
-		          FontSize = fontSize;
-			          MinimumSize = UIUtilities.GetFieldMinimumSize(this, null, fontSize);
-		          VerticalLayout = false;
+
+		          Layout = LayoutType.Horizontal;
+		          UIManager uiManager = GameObject.FindObjectOfType<UIManager>();
+		          UITheme theme = uiManager.theme;
+		          Spacing = (int)theme.SmallSpacing;
+		          Padding.left = (int)theme.SmallPadding;
+		          Padding.right = (int)theme.SmallPadding;
+		          Padding.top = (int)theme.SmallPadding;
+		          Padding.bottom = (int)theme.SmallPadding;
+		          FontSize = (int)theme.SmallFontSize;
+		          MinimumSize = UIUtilities.GetFieldMinimumSize(this, null, FontSize);
 	     }
 }
 
@@ -246,21 +333,29 @@ public class DropdownField : UIField
 	     public Func<List<string>> OptionsGetter;                   // dynamic provider
 	     public int SelectedIndex = 0;
 	     public TMP_Dropdown dropdown;
-	     public DropdownField(string label, List<string> options = null, int selectedIndex = 0, int fontSize = 14)
+	     public DropdownField(string label, List<string> options = null, int selectedIndex = 0)
 	         : base("Field_Dropdown", label)
 	     {
 		          if (options != null)
 				Options = options;
 		          SelectedIndex = selectedIndex;
-		          FontSize = fontSize;
 		          int longestString = 0;
 		          foreach (string option in Options)
 		          {
 				if (option.Length > longestString)
 					     longestString = option.Length;
 		          }
-			          MinimumSize = UIUtilities.GetFieldMinimumSize(this, null, longestString);
-		          VerticalLayout = true;
+		          MinimumSize = UIUtilities.GetFieldMinimumSize(this, null, longestString);
+		          //VerticalLayout = true;
+		          Layout = LayoutType.Vertical;
+		          UIManager uiManager = GameObject.FindObjectOfType<UIManager>();
+		          UITheme theme = uiManager.theme;
+		          Spacing = (int)theme.SmallSpacing;
+		          Padding.left = (int)theme.SmallPadding;
+		          Padding.right = (int)theme.SmallPadding;
+		          Padding.top = (int)theme.SmallPadding;
+		          Padding.bottom = (int)theme.SmallPadding;
+		          FontSize = (int)theme.SmallFontSize;
 	     }
 	     public override void Refresh()
 	     {
@@ -288,7 +383,15 @@ public class SpriteField : UIField
 		          Image = image;
 		          FontSize = fontSize;
 		          MinimumSize = new Vector2(image.rect.width, image.rect.height);
-		          VerticalLayout = false;
+		          Layout = LayoutType.Horizontal;
+		          UIManager uiManager = GameObject.FindObjectOfType<UIManager>();
+		          UITheme theme = uiManager.theme;
+		          Spacing = (int)theme.SmallSpacing;
+		          Padding.left = (int)theme.SmallPadding;
+		          Padding.right = (int)theme.SmallPadding;
+		          Padding.top = (int)theme.SmallPadding;
+		          Padding.bottom = (int)theme.SmallPadding;
+		          FontSize = (int)theme.SmallFontSize;
 	     }
 }
 
@@ -305,7 +408,15 @@ public class GraphField : UIField
 		          Radius = radius;
 		          Size = size;
 		          MinimumSize = new Vector2(size, size);
-		          VerticalLayout = false;
+		          Layout = LayoutType.Horizontal;
+		          UIManager uiManager = GameObject.FindObjectOfType<UIManager>();
+		          UITheme theme = uiManager.theme;
+		          Spacing = (int)theme.SmallSpacing;
+		          Padding.left = (int)theme.SmallPadding;
+		          Padding.right = (int)theme.SmallPadding;
+		          Padding.top = (int)theme.SmallPadding;
+		          Padding.bottom = (int)theme.SmallPadding;
+		          FontSize = (int)theme.SmallFontSize;
 	     }
 }
 public class PortraitField : UIField
@@ -315,7 +426,14 @@ public class PortraitField : UIField
 	     public PortraitField(string label, int fontSize = 14)
 	         : base("Field_Portrait", label)
 	     {
-
+		          UIManager uiManager = GameObject.FindObjectOfType<UIManager>();
+		          UITheme theme = uiManager.theme;
+		          Spacing = (int)theme.SmallSpacing;
+		          Padding.left = (int)theme.SmallPadding;
+		          Padding.right = (int)theme.SmallPadding;
+		          Padding.top = (int)theme.SmallPadding;
+		          Padding.bottom = (int)theme.SmallPadding;
+		          FontSize = (int)theme.SmallFontSize;
 	     }
 }
 
@@ -330,7 +448,15 @@ public class PortraitScrollerField : UIField
 		          if (subjects != null)
 				Subjects = subjects;
 		          MinimumSize = new Vector2(cardWidth, cardHeight);
-		          VerticalLayout = false;
+		          Layout = LayoutType.Horizontal;
+		          UIManager uiManager = GameObject.FindObjectOfType<UIManager>();
+		          UITheme theme = uiManager.theme;
+		          Spacing = (int)theme.SmallSpacing;
+		          Padding.left = (int)theme.SmallPadding;
+		          Padding.right = (int)theme.SmallPadding;
+		          Padding.top = (int)theme.SmallPadding;
+		          Padding.bottom = (int)theme.SmallPadding;
+		          FontSize = (int)theme.SmallFontSize;
 	     }
 }
 
@@ -340,15 +466,23 @@ public class ButtonField : UIField
 	     public Action OnClick;
 	     public UnityEngine.UI.Button UnityButton; // <-- NEW
 
-	     public ButtonField(string label, string buttonText = "Click", Action onClick = null, int fontSize = 14)
+	     public ButtonField(string label, string buttonText = "Click", Action onClick = null)
 	         : base("Field_Button", label)
 	     {
 		          LabelText = buttonText;
 		          OnClick = onClick;
-		          FontSize = fontSize;
-		          VerticalLayout = false;
-			          MinimumSize = UIUtilities.GetFieldMinimumSize(this, null, buttonText.Length);
+
+		          Layout = LayoutType.Horizontal;
+		          MinimumSize = UIUtilities.GetFieldMinimumSize(this, null, buttonText.Length);
 		          // Sizing will be set via UIUtilities.GetFieldMinimumSize later
+		          UIManager uiManager = GameObject.FindObjectOfType<UIManager>();
+		          UITheme theme = uiManager.theme;
+		          Spacing = (int)theme.SmallSpacing;
+		          Padding.left = (int)theme.SmallPadding;
+		          Padding.right = (int)theme.SmallPadding;
+		          Padding.top = (int)theme.SmallPadding;
+		          Padding.bottom = (int)theme.SmallPadding;
+		          FontSize = (int)theme.SmallFontSize;
 	     }
 }
 

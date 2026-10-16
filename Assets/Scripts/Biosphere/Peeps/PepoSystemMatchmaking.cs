@@ -104,8 +104,8 @@ public static class PepoSystemMatchmaking
 				PepoFactoryBonds.ParasocialRelationship(me, target, RelationshipType.incompatible, "strictly platonic acquaintence");
 				return false;
 		          }
-		          int iWant = me.ssd.wantsChildren[1] - me.knownOffspring?.Count(o => o != null && o.isAlive) ?? 0;
-		          int theyWant = target.ssd.wantsChildren[0] - target.knownOffspring?.Count(o => o != null && o.isAlive) ?? 0;
+		          int iWant = (int)me.ssd.numberOfChildren.maxValue - me.knownOffspring?.Count(o => o != null && o.isAlive) ?? 0;
+		          int theyWant = (int)target.ssd.numberOfChildren.maxValue - target.knownOffspring?.Count(o => o != null && o.isAlive) ?? 0;
 		          int diff = iWant - theyWant;
 		          if (degree >= 9 && (iWant > theyWant || (iWant > theyWant && !PepoUtilitiesPersonality.IsLying(target))))
 		          {
@@ -371,12 +371,12 @@ public static class PepoSystemMatchmaking
 		          private static bool CheckFertilityPreferences(PepoData me, PepoData target)
 		          {
 				// Check if both want children to similar degree
-				if (me.ssd.wantsChildren[1] >= target.ssd.wantsChildren[0])
+				if (me.ssd.numberOfChildren.maxValue - me.ssd.numberOfChildren.value >= target.ssd.numberOfChildren.maxValue - target.ssd.numberOfChildren.value)
 				{//if my max wanted kids is above their minimum we match
 					     return true;
 				}
 
-				Debug.Log($"[Biological] Fertility preference mismatch: {me.ssd.wantsChildren} vs {target.ssd.wantsChildren}");
+				Debug.Log($"[Biological] Fertility preference mismatch: {me.ssd.numberOfChildren.maxValue - me.ssd.numberOfChildren.value} vs {target.ssd.numberOfChildren.maxValue - target.ssd.numberOfChildren.value}");
 				return false;
 		          }
 	     }

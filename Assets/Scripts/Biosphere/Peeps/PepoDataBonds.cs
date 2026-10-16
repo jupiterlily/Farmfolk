@@ -10,10 +10,11 @@ public class PepoRelationshipData
 	     public List<RelationshipType> relationshipTypes = new List<RelationshipType>();
 	     public List<PepoSecretData> secrets = new List<PepoSecretData>(); //list of secrets we have told them
 
-	     public float Confidence = 0; //how much we trust them. Increased by them being reliable, honest, keeping promises, being competent. can be influenced by reputation. you can be confident in someone and still not like them.
+	     public float Confidence = 0; //how much we trust them. Increased by them being reliable, honest, keeping promises, being competent. can be influenced by reputation. you can be confident in someone and still not like them.//how likely we are to respond positively to them persuadiong or decieving us.
+	     public float Esteem = 0;    //how much we think they trust/like us. increased by us being reliable, honest, keeping promises, being competent. can be influenced by reputation. we can think someone trusts us and still not like them. how often we have persuaded or decieved them and had them respond positively.
 
-	     public float Authority = 0; //how much authority they have over us, increased  by them having power over us (e.g. controlling resources we need, being able to punish us)
-	     public float Influence = 0; //how much influence we think we have over them, gained by having them take advice, be persuaded, do you a favour or introducing them to people.
+	     public float Authority = 0; //how much authority they have over us, increased  by them having power over us (e.g. controlling resources we need, being able to punish us) how much they have persuaded or intimidated us. how likely we are to do as they say.
+	     public float Influence = 0; //how much influence we think we have over them, gained by having them take advice, be persuaded, do you a favour or introducing them to people. how much we think we can/have successfully persuaded, intimidated or decieved them.
 
 	     public float Obligation = 0; //how much we feel obliged to help them. increased by them doing us favours, giving us gifts, helping us in the past
 	     public float Reciprocity = 0; //how much we expect them to help us. Increased by us doing them favours, giving them gifts or helping them in some way

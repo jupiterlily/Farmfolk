@@ -21,7 +21,7 @@ public class Need : NumericalAspect
 	     public string aboveCritical; //ie hungry, parched, exhausted	   	     
 	     public string belowCritical; //ie starving, dehydrated, fatigued
 	     public string increasing; //ie eating, drinking, resting
-	     public Need(string noun, string sourceNoun, string verb, string excess, string sated, string falling, string urgent, string critical, float maxValue, bool vital = false, float value = -1, float decayRate = 0, float increaseRate = 0, float safeThreshold = 0.75f, float lowThreshold = 0.25f)
+	     public Need(string noun, string sourceNoun, string verb, string excess, string sated, string falling, string urgent, string critical, float maxValue, bool vital = false, float value = -1, float decayRate = 0, float increaseRate = 0, float safeThreshold = 0.75f, float lowThreshold = 0.25f) : base(noun, maxValue, 0, false, 0, "")
 	     {
 		          isVital = vital;
 		          name = noun;

@@ -5,7 +5,7 @@ public class PepoPopManager : MonoBehaviour
 {
 	     [Header("Population Settings")]
 	     public int initialPepos = 12;
-	     public int generationSteps = 15;
+	     public int generationSteps = 15; //years to pass each step
 	     public int maxPepos = 50;
 	     public int minPopulationThreshold = 10;
 	     public int immigrantCount = 5;
@@ -24,7 +24,7 @@ public class PepoPopManager : MonoBehaviour
 	     public float gestationalPeriod = 0.77f;
 
 	     public int amountOfPeopleToHaveExisted = 0;
-	     public int generations = 0;
+	     public int generations = 0; //amount of generation steps to process
 
 	     public PepoPopulation Pepos;
 	     public List<PlaceData> placeDatas;
@@ -241,8 +241,8 @@ public class PepoPopManager : MonoBehaviour
 		          List<PepoData> maybeMoms = PepoUtilitiesPopulation.RemoveDuplicatePepos(Pepos.childbearing, Pepos.pregnancies);
 		          List<PepoData> maybeDads = PepoUtilitiesPopulation.RemoveDuplicatePepos(Pepos.adults, Pepos.childbearing);
 
-		          mamas.AddRange(PepoUtilitiesPopulation.GetWillingParentPepos(maybeMoms));
-		          papas.AddRange(PepoUtilitiesPopulation.GetWillingParentPepos(maybeDads));
+		          mamas.AddRange(PepoUtilitiesPopulation.GetPeposWhoWantChildren(maybeMoms, 1, 50));
+		          papas.AddRange(PepoUtilitiesPopulation.GetPeposWhoWantChildren(maybeDads, 1, 50));
 
 
 
@@ -292,7 +292,7 @@ public class PepoPopManager : MonoBehaviour
 		          if (Pepos.population.Count < minPopulationThreshold)
 		          {
 				Debug.LogWarning("[PepoManager] Population critically low! Adding new Pepos.");
-				for (int i = 0; i < minPopulationThreshold - Pepos.population.Count; i++)
+				for (int i = 0; i < immigrantCount; i++)
 				{
 					     Pepos.population.Add(PepoFactory.InitialiseRandom());
 					     amountOfPeopleToHaveExisted++;

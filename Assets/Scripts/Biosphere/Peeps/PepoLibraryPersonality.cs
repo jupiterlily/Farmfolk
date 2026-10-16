@@ -209,12 +209,12 @@ public static class PepoLibraryPersonality
 
 	     public static class HEXACODimension
 	     {
-		          public static PersonalityAspect H => new PersonalityAspect('h', 10f, new List<string> { "honest" }, new List<string> { "manipulative" });
-		          public static PersonalityAspect E => new PersonalityAspect('e', 10f, new List<string> { "emotional" }, new List<string> { "detatched" });
-		          public static PersonalityAspect X => new PersonalityAspect('x', 10f, new List<string> { "extraverted" }, new List<string> { "introverted" });
-		          public static PersonalityAspect A => new PersonalityAspect('a', 10f, new List<string> { "forgiving" }, new List<string> { "resentful" });
-		          public static PersonalityAspect C => new PersonalityAspect('c', 10f, new List<string> { "careful" }, new List<string> { "reckless" });
-		          public static PersonalityAspect O => new PersonalityAspect('o', 10f, new List<string> { "open" }, new List<string> { "nonchalant" });
+		          public static PersonalityAspect H => new PersonalityAspect('h', new List<string> { "honest" }, new List<string> { "manipulative" });
+		          public static PersonalityAspect E => new PersonalityAspect('e', new List<string> { "emotional" }, new List<string> { "detatched" });
+		          public static PersonalityAspect X => new PersonalityAspect('x', new List<string> { "extraverted" }, new List<string> { "introverted" });
+		          public static PersonalityAspect A => new PersonalityAspect('a', new List<string> { "forgiving" }, new List<string> { "resentful" });
+		          public static PersonalityAspect C => new PersonalityAspect('c', new List<string> { "careful" }, new List<string> { "reckless" });
+		          public static PersonalityAspect O => new PersonalityAspect('o', new List<string> { "open" }, new List<string> { "nonchalant" });
 		          public static List<string> HFacets(bool invert)
 		          {
 				if (!invert)
@@ -299,46 +299,48 @@ public static class PepoLibraryPersonality
 
 	     //openness to experience domain contains facets of aesthetic appreciation, inquisitiveness, creativity, and unconventionality.
 
+	     //we need arrays of strings instead od hardcoding the dictionary entries. what happens if personalities change?
+
 	     public static readonly Dictionary<string, PersonalityAspect> HFacets = new Dictionary<string, PersonalityAspect>
 	     {
-		          { "Sincerity", new PersonalityAspect('.', 10, new List<string> {"sincere", "genuine", "honest"}, new List<string> {"deceptive", "insincere", "dishonest", "manipulative"}, 5,"Sincerity") },
-		          { "Fairness", new PersonalityAspect('.', 10, new List<string> {"fair", "just", "equitable"}, new List<string> {"unfair", "biased", "unjust"}, 5,"Fairness") },
-		          { "Greed Aversion", new PersonalityAspect('.', 10, new List<string> {"selfless", "generous", "altruistic"}, new List<string> {"greedy", "selfish", "avaricious"}, 5,"Greed Aversion") },
-		          { "Modesty", new PersonalityAspect('.', 10, new List<string> {"humble", "unassuming", "modest"}, new List<string> {"boastful", "conceited", "egotistical"}, 5,"Modesty") }
+		          { "Sincerity", new PersonalityAspect('.',  new List<string> {"sincere", "genuine", "truthful"}, new List<string> {"deceptive", "insincere", "dishonest", "manipulative"}, 5,"Sincerity") },
+		          { "Fairness", new PersonalityAspect('.',  new List<string> {"fair", "just", "equitable"}, new List<string> {"unfair", "biased", "unjust"}, 5,"Fairness") },
+		          { "Greed Aversion", new PersonalityAspect('.',  new List<string> {"selfless", "generous", "altruistic"}, new List<string> {"greedy", "selfish", "avaricious"}, 5,"Greed Aversion") },
+		          { "Modesty", new PersonalityAspect('.',  new List<string> {"humble", "unassuming", "modest"}, new List<string> {"boastful", "conceited", "egotistical"}, 5,"Modesty") }
 	     };
 	     public static readonly Dictionary<string, PersonalityAspect> EFacets = new Dictionary<string, PersonalityAspect>
 	     {
-		          { "Fearfulness", new PersonalityAspect('.', 10, new List<string> {"cautious", "vigilant", "alert"}, new List<string> {"fearless", "reckless", "courageous"}, 5,"Fearfulness") },
-		          { "Anxiety", new PersonalityAspect('.', 10, new List<string> {"nervous", "tense", "worried"}, new List<string> {"unflappable", "relaxed", "untroubled"}, 5,"Anxiety") },
-		          { "Dependence", new PersonalityAspect('.', 10, new List<string> {"reliant", "trusting", "faithful"}, new List<string> {"independent", "self-reliant", "autonomous"}, 5,"Dependence") },
-		          { "Sentimentality", new PersonalityAspect('.', 10, new List<string> {"compassionate", "empathetic", "tender-hearted"}, new List<string> {"unfeeling", "cold-hearted", "unsympathetic"}, 5,"Sentimentality") }
+		          { "Fearfulness", new PersonalityAspect('.',  new List<string> {"cautious", "vigilant", "alert"}, new List<string> {"fearless", "reckless", "courageous"}, 5,"Fearfulness") },
+		          { "Anxiety", new PersonalityAspect('.',  new List<string> {"nervous", "tense", "worried"}, new List<string> {"unflappable", "relaxed", "untroubled"}, 5,"Anxiety") },
+		          { "Dependence", new PersonalityAspect('.',  new List<string> {"reliant", "trusting", "faithful"}, new List<string> {"independent", "self-reliant", "autonomous"}, 5,"Dependence") },
+		          { "Sentimentality", new PersonalityAspect('.',  new List<string> {"compassionate", "empathetic", "tender-hearted"}, new List<string> {"unfeeling", "cold-hearted", "unsympathetic"}, 5,"Sentimentality") }
 	     };
 	     public static readonly Dictionary<string, PersonalityAspect> XFacets = new Dictionary<string, PersonalityAspect>
 	     {
-		          { "Social Self-Esteem", new PersonalityAspect('.', 10, new List<string> {"secure", "self-assured"}, new List<string> {"insecure", "self-doubting" }, 5,"Social Self-Esteem") },
-		          { "Social Boldness", new PersonalityAspect('.', 10, new List<string> {"outgoing", "bold", "confident"}, new List<string> {"shy", "reserved", "timid"}, 5,"Social Boldness") },
-		          { "Sociability", new PersonalityAspect('.', 10, new List<string> {"friendly", "socoiable", "gregarious"}, new List<string> {"solitary", "introverted", "antisocial"}, 5,"Sociability") },
-		          { "Liveliness", new PersonalityAspect('.', 10, new List<string> {"energetic", "enthusiastic", "vibrant"}, new List<string> {"lethargic", "apathetic", "listless"}, 5,"Liveliness") }
+		          { "Social Self-Esteem", new PersonalityAspect('.',  new List<string> {"secure", "self-assured"}, new List<string> {"insecure", "self-doubting" }, 5,"Social Self-Esteem") },
+		          { "Social Boldness", new PersonalityAspect('.',  new List<string> {"outgoing", "bold", "confident"}, new List<string> {"shy", "reserved", "timid"}, 5,"Social Boldness") },
+		          { "Sociability", new PersonalityAspect('.',  new List<string> {"friendly", "socoiable", "gregarious"}, new List<string> {"solitary", "introverted", "antisocial"}, 5,"Sociability") },
+		          { "Liveliness", new PersonalityAspect('.',  new List<string> {"energetic", "enthusiastic", "vibrant"}, new List<string> {"lethargic", "apathetic", "listless"}, 5,"Liveliness") }
 	     };
 	     public static readonly Dictionary<string, PersonalityAspect> AFacets = new Dictionary<string, PersonalityAspect>
 	     {
-		          { "Forgiveness", new PersonalityAspect('.', 10, new List<string> {"forgiving", "tolerant", "understanding"}, new List<string> {"resentful", "vindictive", "unforgiving"}, 5,"Forgiveness") },
-		          { "Gentleness", new PersonalityAspect('.', 10, new List<string> {"gentle", "kind", "compassionate"}, new List<string> {"critical", "blunt", "abrasive"}, 5,"Gentleness") },
-		          { "Flexibility", new PersonalityAspect('.', 10, new List<string> {"adaptable", "open-minded", "versatile"}, new List<string> {"rigid", "inflexible", "stubborn"}, 5,"Flexibility") },
-		          { "Patience", new PersonalityAspect('.', 10, new List<string> {"patient", "calm", "tolerant"}, new List<string> {"impatient", "restless", "irritable"}, 5,"Patience") }
+		          { "Forgiveness", new PersonalityAspect('.',  new List<string> {"forgiving", "tolerant", "understanding"}, new List<string> {"resentful", "vindictive", "unforgiving"}, 5,"Forgiveness") },
+		          { "Gentleness", new PersonalityAspect('.',  new List<string> {"gentle", "kind", "compassionate"}, new List<string> {"critical", "blunt", "abrasive"}, 5,"Gentleness") },
+		          { "Flexibility", new PersonalityAspect('.',  new List<string> {"adaptable", "open-minded", "versatile"}, new List<string> {"rigid", "inflexible", "stubborn"}, 5,"Flexibility") },
+		          { "Patience", new PersonalityAspect('.',  new List<string> {"patient", "calm", "tolerant"}, new List<string> {"impatient", "restless", "irritable"}, 5,"Patience") }
 	     };
 	     public static readonly Dictionary<string, PersonalityAspect> CFacets = new Dictionary<string, PersonalityAspect>
 	     {
-		          { "Organization", new PersonalityAspect('.', 10, new List<string> {"organized", "systematic", "methodical"}, new List<string> {"disorganized", "chaotic", "haphazard"}, 5,"Organization") },
-		          { "Diligence", new PersonalityAspect('.', 10, new List<string> {"diligent", "industrious", "hardworking"}, new List<string> {"unmotivated", "negligent", "relaxed"}, 5,"Diligence") },
-		          { "Perfectionism", new PersonalityAspect('.', 10, new List<string> {"meticulous", "precise", "thorough"}, new List<string> {"careless", "sloppy", "hasty"}, 5,"Perfectionism") },
-		          { "Prudence", new PersonalityAspect('.', 10, new List<string> {"prudent", "cautious", "judicious"}, new List<string> {"reckless", "impulsive", "rash"}, 5,"Prudence") }
+		          { "Organization", new PersonalityAspect('.',  new List<string> {"organized", "systematic", "methodical"}, new List<string> {"disorganized", "chaotic", "haphazard"}, 5,"Organization") },
+		          { "Diligence", new PersonalityAspect('.',  new List<string> {"diligent", "industrious", "hardworking"}, new List<string> {"unmotivated", "negligent", "relaxed"}, 5,"Diligence") },
+		          { "Perfectionism", new PersonalityAspect('.',  new List<string> {"meticulous", "precise", "thorough"}, new List<string> {"careless", "sloppy", "hasty"}, 5,"Perfectionism") },
+		          { "Prudence", new PersonalityAspect('.',  new List<string> {"prudent", "cautious", "judicious"}, new List<string> {"reckless", "impulsive", "rash"}, 5,"Prudence") }
 	     };
 	     public static readonly Dictionary<string, PersonalityAspect> OFacets = new Dictionary<string, PersonalityAspect>
 	     {
-		          { "Aesthetic Appreciation", new PersonalityAspect('.', 10, new List<string> {"artistic", "sensitive", "perceptive"}, new List<string> {"unimaginative", "uncreative", "insensitive"}, 5,"Aesthetic Appreciation") },
-		          { "Inquisitiveness", new PersonalityAspect('.', 10, new List<string> {"curious", "inquisitive", "exploratory"}, new List<string> {"uninterested", "apathetic", "indifferent"}, 5,"Inquisitiveness") },
-		          { "Creativity", new PersonalityAspect('.', 10, new List<string> {"innovative", "original", "inventive"}, new List<string> {"conventional", "unimaginative", "derivative"}, 5,"Creativity") },
-		          { "Unconventionality", new PersonalityAspect('.', 10, new List<string> {"nonconformist", "individualistic", "rebellious"}, new List<string> {"conformist", "traditionalist", "orthodox"}, 5,"Unconventionality") }
+		          { "Aesthetic Appreciation", new PersonalityAspect('.',  new List<string> {"artistic", "sensitive", "perceptive"}, new List<string> {"unimaginative", "uncreative", "insensitive"}, 5,"Aesthetic Appreciation") },
+		          { "Inquisitiveness", new PersonalityAspect('.',  new List<string> {"curious", "inquisitive", "exploratory"}, new List<string> {"uninterested", "apathetic", "indifferent"}, 5,"Inquisitiveness") },
+		          { "Creativity", new PersonalityAspect('.',  new List<string> {"innovative", "original", "inventive"}, new List<string> {"conventional", "unimaginative", "derivative"}, 5,"Creativity") },
+		          { "Unconventionality", new PersonalityAspect('.',  new List<string> {"nonconformist", "individualistic", "rebellious"}, new List<string> {"conformist", "traditionalist", "orthodox"}, 5,"Unconventionality") }
 	     };
 }

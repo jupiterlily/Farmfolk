@@ -15,34 +15,53 @@ public static class UILibrary
 					     buttons.Add(button);
 				}
 		          }
-
-		          UISection section = new UISection("TabIndex", !sc.VerticalLayout, buttons)
+		          if (sc.Layout == LayoutType.Horizontal)
 		          {
-				Padding = sc.Padding,
-				Spacing = sc.Spacing,
-				VerticalLayout = !sc.VerticalLayout,
-				ChildForceExpandWidth = sc.VerticalLayout,  // horizontal strip: expand width
-				ChildForceExpandHeight = !sc.VerticalLayout, // vertical strip: expand height
-				DisplayLabel = false
 
-		          };
-		          return section;
+				UISection section = new UISection("TabIndex", false, buttons)
+				{
+					     Padding = sc.Padding,
+					     Spacing = sc.Spacing,
+					     //VerticalLayout = !sc.VerticalLayout,
+					     //ChildForceExpandWidth = sc.VerticalLayout,  // horizontal strip: expand width
+					     // ChildForceExpandHeight = !sc.VerticalLayout, // vertical strip: expand height
+					     DisplayLabel = false
+
+				};
+				return section;
+		          }
+		          else //although we should have an else if here because we can be vertical, horizontalOR grid.
+		          {
+				UISection section = new UISection("TabIndex", true, buttons)
+				{
+					     Padding = sc.Padding,
+					     Spacing = sc.Spacing,
+					     //VerticalLayout = !sc.VerticalLayout,
+					     //ChildForceExpandWidth = sc.VerticalLayout,  // horizontal strip: expand width
+					     // ChildForceExpandHeight = !sc.VerticalLayout, // vertical strip: expand height
+					     DisplayLabel = false
+				};
+				return section;
+		          }
+
 	     }
 	     public static UISection BuildSectionDataTime(SimulationMaster sm, UIManager manager)
 	     {//this is the clock readout
-		          var yearField = new ReadOnlyField("Year", "", (int)manager.theme.BodyFontSize)
+		          var yearField = new ReadOnlyField("Year", "")
 		          {
 				Getter = () => (sm.year + 1).ToString(),
-				VerticalLayout = false
+				//VerticalLayout = false
+				Layout = LayoutType.Horizontal
 		          };
 
-		          var dayField = new ReadOnlyField("Day", "", (int)manager.theme.BodyFontSize)
+		          var dayField = new ReadOnlyField("Day", "")
 		          {
 				Getter = () => (sm.dayOfYear + 1).ToString(),
-				VerticalLayout = false
+				//VerticalLayout = false
+				Layout = LayoutType.Horizontal
 		          };
 
-		          var timeField = new ReadOnlyField("Time", "", (int)manager.theme.BodyFontSize)
+		          var timeField = new ReadOnlyField("Time", "")
 		          {
 				Getter = () =>
 				{
@@ -51,7 +70,8 @@ public static class UILibrary
 					     return $"{hour:00}:{minute:00}";
 
 				},
-				VerticalLayout = false
+				//VerticalLayout = false
+				Layout = LayoutType.Horizontal
 		          };
 
 		          var section = new UISection("Year, Day, Time Panel", true, new List<UIComponentData> { yearField, dayField, timeField });
@@ -61,10 +81,11 @@ public static class UILibrary
 	     //next, a section that shows what game speed we are on.
 	     public static UISection BuildSectionDataGameSpeed(SimulationMaster sm, UIManager uim)
 	     {
-		          var gameSpeedField = new ReadOnlyField("Speed", "",  (int)uim.theme.BodyFontSize)
+		          var gameSpeedField = new ReadOnlyField("Speed", "")
 		          {
 				Getter = () => (SimulationConstants.SimulationSpeed).ToString(),
-				VerticalLayout = false
+				//VerticalLayout = false
+				Layout = LayoutType.Horizontal
 		          };
 		          var section = new UISection("Game Speed Section", true, new List<UIComponentData>() { gameSpeedField });
 
@@ -186,29 +207,32 @@ public static class UILibrary
 		          List<UIComponentData> components = new List<UIComponentData>();
 
 		          // Block Reference (X, Y) dropdown
-		          var blockRefField = new DropdownField("Block Reference (X,Y)", new List<string> { "Select block..." }, 0,  (int)uim.theme.BodyFontSize)
+		          var blockRefField = new DropdownField("Block Reference (X,Y)", new List<string> { "Select block..." }, 0)
 		          {
 				Getter = () => 0,
 
-				VerticalLayout = false
+				//VerticalLayout = false
+				Layout = LayoutType.Horizontal
 		          };
 
 		          // Block to alter dropdown
-		          var blockToAlterField = new DropdownField("Block to Alter", new List<string> { "Atmosphere", "Soil", "Water" }, 0,  (int)uim.theme.BodyFontSize)
+		          var blockToAlterField = new DropdownField("Block to Alter", new List<string> { "Atmosphere", "Soil", "Water" }, 0)
 		          {
 				Getter = () => 0,
-				VerticalLayout = false
+				//VerticalLayout = false
+				Layout = LayoutType.Horizontal
 		          };
 
 		          // Matter to alter dropdown (dynamically populated based on selected block)
-		          var matterToAlterField = new DropdownField("Matter to Alter", new List<string> { "Select block first..." }, 0,  (int)uim.theme.BodyFontSize)
+		          var matterToAlterField = new DropdownField("Matter to Alter", new List<string> { "Select block first..." }, 0)
 		          {
 				Getter = () => 0,
-				VerticalLayout = false
+				//VerticalLayout = false
+				Layout = LayoutType.Horizontal
 		          };
 
 		          // KG change input field
-		          var kgChangeField = new TextInputField("KG Change", "0",  (int)uim.theme.BodyFontSize)
+		          var kgChangeField = new TextInputField("KG Change", "0")
 		          {
 				Getter = () => "0",
 				Setter = (val) =>
@@ -219,18 +243,20 @@ public static class UILibrary
 						          // Implementation depends on BlockData structure
 					     }
 				},
-				VerticalLayout = false
+				//VerticalLayout = false
+				Layout = LayoutType.Horizontal
 		          };
 
 		          // Amount to add/remove (convenience field)
-		          var amountField = new RangeField("Amount to Add/Remove (kg)", -100f, 100f, true, (int)(int)uim.theme.BodyFontSize)
+		          var amountField = new RangeField("Amount to Add/Remove (kg)", -100f, 100f, true)
 		          {
 				Getter = () => 0f,
 				Setter = (val) =>
 				{
 					     // Link to KG change or apply directly
 				},
-				VerticalLayout = false
+				//VerticalLayout = false
+				Layout = LayoutType.Horizontal
 		          };
 
 		          // Apply button
@@ -239,10 +265,11 @@ public static class UILibrary
 				// Execute the block modification logic here
 
 				Debug.Log("Block composition modified");
-		          }, (int)(int)uim.theme.HeadingFontSize)
+		          })
 		          {
 				DisplayLabel = false,
-				VerticalLayout = false
+				//VerticalLayout = false
+				Layout = LayoutType.Horizontal
 		          };
 
 		          components.Add(blockRefField);
@@ -256,7 +283,8 @@ public static class UILibrary
 		          {
 				Padding = new RectOffset(5, 5, 5, 5),
 				Spacing = 5,
-				VerticalLayout = true,
+				//VerticalLayout = true,
+				Layout = LayoutType.Vertical,
 				ChildForceExpandWidth = true,
 				ChildForceExpandHeight = false,
 				DisplayLabel = true
@@ -307,7 +335,7 @@ public static class UILibrary
 				{
 					     return UIUtilities.CreateSoilGraph(rootSection.tileData.composition);
 				},
-				VerticalLayout = false
+				Layout = LayoutType.Horizontal
 		          };
 
 		          // ─── Surface Water Graph ───
@@ -317,7 +345,7 @@ public static class UILibrary
 				{
 					     return UIUtilities.CreateWaterGraph(rootSection.tileData);
 				},
-				VerticalLayout = false
+				Layout = LayoutType.Horizontal
 		          };
 
 		          // ─── Atmosphere Composition Graph ───
@@ -327,7 +355,7 @@ public static class UILibrary
 				{
 					     return UIUtilities.CreateAtmosphereGraph(rootSection.tileData.atmosphereTile);
 				},
-				VerticalLayout = false
+				Layout = LayoutType.Horizontal
 		          };
 
 		          components.Add(soilCompositionField);
@@ -337,7 +365,8 @@ public static class UILibrary
 		          {
 				Padding = new RectOffset(5, 5, 5, 5),
 				Spacing = 5,
-				VerticalLayout = true,
+				//VerticalLayout = true,
+				Layout = LayoutType.Vertical,
 				ChildForceExpandWidth = true,
 				ChildForceExpandHeight = false,
 				DisplayLabel = true
@@ -359,7 +388,8 @@ public static class UILibrary
 		          {
 				Padding = new RectOffset(5, 5, 5, 5),
 				Spacing = 5,
-				VerticalLayout = true,
+				//VerticalLayout = true,
+				Layout = LayoutType.Vertical,
 				DisplayLabel = true
 		          };
 
@@ -377,12 +407,13 @@ public static class UILibrary
 				DisplayLabel = false,
 				Spacing = 5,
 				Padding = new RectOffset(0, 0, 0, 0),
-				VerticalLayout = false,
+				//VerticalLayout = false,
+				Layout = LayoutType.Horizontal,
 				ChildForceExpandWidth = true
 		          };
 
 		          // ─── X Dropdown ───
-		          var tileRefFieldX = new DropdownField("X", xOptions, root.tileData.tileGridRef.x,  (int)uim.theme.BodyFontSize)
+		          var tileRefFieldX = new DropdownField("X", xOptions, root.tileData.tileGridRef.x)
 		          {
 				Getter = () => root.tileData.tileGridRef.x,
 				Setter = (val) =>
@@ -396,12 +427,13 @@ public static class UILibrary
 						          UIUtilities.RefreshAllFields(coordSection);
 					     }
 				},
-				VerticalLayout = false
+				//VerticalLayout = false
+				Layout = LayoutType.Horizontal
 		          };
 		          coordSection.Components.Add(tileRefFieldX);
 
 		          // ─── Y Dropdown ───
-		          var tileRefFieldY = new DropdownField("Y", yOptions, root.tileData.tileGridRef.y,  (int)uim.theme.BodyFontSize)
+		          var tileRefFieldY = new DropdownField("Y", yOptions, root.tileData.tileGridRef.y)
 		          {
 				Getter = () => root.tileData.tileGridRef.y,
 				Setter = (val) =>
@@ -415,7 +447,8 @@ public static class UILibrary
 						          UIUtilities.RefreshAllFields(coordSection);
 					     }
 				},
-				VerticalLayout = false
+				//VerticalLayout = false
+				Layout = LayoutType.Horizontal
 		          };
 		          coordSection.Components.Add(tileRefFieldY);
 
@@ -425,18 +458,20 @@ public static class UILibrary
 
 		          var matterTypeField = new DropdownField("Matter Type",
 		              new List<string> { "Sand", "Silt", "Clay", "Organic", "Water (Soil)", "Ice (Soil)" },
-		              0,  (int)uim.theme.BodyFontSize)
+		              0)
 		          {
 				Getter = () => selectedMatterType,
 				Setter = (val) => selectedMatterType = (int)val,
-				VerticalLayout = false
+				//VerticalLayout = false
+				Layout = LayoutType.Horizontal
 		          };
 
-		          var amountField = new RangeField("Amount (kg)", -500f, 500f, true,  (int)uim.theme.BodyFontSize)
+		          var amountField = new RangeField("Amount (kg)", -500f, 500f, true)
 		          {
 				Getter = () => kgAmount,
 				Setter = (val) => kgAmount = (float)val,
-				VerticalLayout = false
+				//VerticalLayout = false
+				Layout = LayoutType.Horizontal
 		          };
 
 		          var applyButton = new ButtonField("", "Apply Changes", () =>
@@ -477,10 +512,11 @@ public static class UILibrary
 					     UIUtilities.RefreshAllFields(section);
 				}
 
-		          }, (int)(int)uim.theme.HeadingFontSize)
+		          })
 		          {
 				DisplayLabel = false,
-				VerticalLayout = false
+				//VerticalLayout = false
+				Layout = LayoutType.Horizontal
 		          };
 
 		          // 8. Add all components to the section's list
@@ -515,8 +551,8 @@ public static class UILibrary
 				CanResize = true,
 				CanClose = true,
 				CanMinimize = false,
-				VerticalLayout = true
-
+				//VerticalLayout = true
+				Layout = LayoutType.Vertical
 		          };
 
 		          return window;

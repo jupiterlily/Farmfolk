@@ -18,13 +18,16 @@ public class PepoData
 	     public bool isAlive = true;
 	     public bool isActive = false;
 
-	     public SocioSexualData ssd;
+	     public SocioSexualData ssd; //maybe this is part of self concept?
 	     public BodyData body;
 	     public HEXACO personality;
 	     public Mood mood;
 	     public MaslowHeirachy needs;
 	     public List<Value> values = new List<Value>(PepoFactoryValues.RandomValues());
 	     public PepoResources resources; //the stuff we think we have and what we want.
+
+	     public Dictionary<string, NumericalAspect> FilterableAspects;
+	     //a pepo should be a list of numerical aspects, then our filters just run on the numerical aspects. because numerical aspeccts already have astring in the struct, we can just use that to filter. It should probably acctually be several collections of numerical aspects with a function that pulls them all together into one list or dictionary.
 
 	     public List<PregnancyData> womb;
 
@@ -44,6 +47,8 @@ public class PepoData
 	     public Dictionary<PepoData, float> exPatners = new Dictionary<PepoData, float>();
 
 	     public Dictionary<RelationshipType, List<PepoRelationshipData>> RelationshipLibrary = new Dictionary<RelationshipType, List<PepoRelationshipData>>();
+
+	     //dunbar layers. 5 support daily-weekly. 15 sympathy weekly to monthly. 50 affinity monthly, 150 network seasonally, 500 acquainances annually
 	     public PepoData()
 	     {
 
@@ -85,7 +90,43 @@ public class PepoData
 		          ssd.isFertile = true;
 	     }
 
+	     public void PopulateAspectDictionary()
+	     {
+		          FilterableAspects = new Dictionary<string, NumericalAspect>();
+		          NumericalAspect Age = new NumericalAspect("age", 100f, 0f, false, 0f, "years");
+		          Age.value = age;
+		          NumericalAspect Mass = new NumericalAspect("mass", 200f, 0f, false, 0f, "kg");
+		          NumericalAspect Height = new NumericalAspect("height", 2.5f, 0f, false, 0f, "m");
+		          Mass.value = mass;
+		          Height.value = height;
+		          FilterableAspects.Add(Age.name, Age);
+		          FilterableAspects.Add(Mass.name, Mass);
+		          FilterableAspects.Add(Height.name, Height);
+		          foreach (var aspect in body.expressedChromosomes)
+		          {
+				FilterableAspects.Add(aspect.name, aspect);
+		          }
+		          foreach (PersonalityAspect aspect in personality.FullHexRange())
+		          {
+				FilterableAspects.Add(aspect.name, (NumericalAspect)aspect);
+		          }
+		          foreach (PersonalityAspect aspect in personality.FullFacetRange())
+		          {
+				FilterableAspects.Add(aspect.name, (NumericalAspect)aspect);
+		          }
+		          foreach (var aspect in values)
+		          {
+				FilterableAspects.Add(aspect.name, (NumericalAspect)aspect);
+		          }
+
+	     }
+
+	     public void UpdateAspectDictionary()
+	     {
+		          //here we update age, height, mass and other variabel values that can change.
+	     }
 }
+
 public class Stat
 {
 	     public string name;
@@ -117,14 +158,23 @@ public class NumericalAspect : Aspect
 	     public float value;
 	     public float maxValue;
 	     public float minValue;
-	     public bool polar; //does the aspect have poles?
+	     public bool polar; //does the aspect have poles? or is it just anumber in arange?
 	     public float polarPoint; //ie 0 for values, 5 for personality.
 	     public string descriptor;
 	     public int timesIntegrated = 1;
 
 	     public float currentLevel => value / maxValue; //as a percentage of maxValue
-				       //normalises and averages
-				       // Normalizes and averages aspects
+
+	     public NumericalAspect(string Name, float MaxValue, float MinValue = 0f, bool Polar = false, float PolarPoint = 0f, string Descriptor = "")
+	     {
+		          name = Name;
+		          value = minValue;
+		          maxValue = MaxValue;
+		          minValue = MinValue;
+		          polar = Polar;
+		          polarPoint = PolarPoint;
+		          descriptor = Descriptor;
+	     }
 	     public void IntegrateAspect(NumericalAspect aspect, bool additive = true)
 	     {
 		          float scaledAspectValue = aspect.value;

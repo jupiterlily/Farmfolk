@@ -25,57 +25,73 @@ public class PortraitLayer
 		          {
 				sortingOrder = 1;
 		          }
-		          if (name == "Head")
+		          if (name == "Ears")
 		          {
 				sortingOrder = 2;
 		          }
-		          if (name == "Nose")
+		          if (name == "Head")
 		          {
 				sortingOrder = 3;
 		          }
-		          if (name == "Freckles")
+		          if (name == "Nasal Bridge")
 		          {
 				sortingOrder = 4;
 		          }
-		          if (name == "Stubble")
+		          if (name == "Freckles")
 		          {
 				sortingOrder = 5;
 		          }
-		          if (name == "Eyebrows")
+		          if (name == "SecondaryFreckles")
+		          {
+				sortingOrder = 5;
+		          }
+		          if (name == "Stubble")
 		          {
 				sortingOrder = 6;
 		          }
-		          if (name == "EyeColour")
+		          if (name == "Eyebrows" || name == "BrowInnerCorner" || name == "BrowOuterCorner")
 		          {
 				sortingOrder = 7;
 		          }
-		          if (name == "EyeShape")
+		          if (name == "EyeColour")
 		          {
 				sortingOrder = 8;
 		          }
-		          if (name == "Beard")
+		          if (name == "EyeShape" || name == "EyeInnerCorner" || name == "EyeOuterCorner")
 		          {
 				sortingOrder = 9;
 		          }
-		          if (name == "BottomLip")
+		          if (name == "Beard")
 		          {
 				sortingOrder = 10;
 		          }
-		          if (name == "TopLip")
+		          if (name == "BottomLip")
 		          {
 				sortingOrder = 11;
 		          }
-		          if (name == "Moustache")
+		          if (name == "TopLip")
 		          {
 				sortingOrder = 12;
 		          }
-		          if (name == "HairTendrils")
+		          if (name == "Teeth")
 		          {
 				sortingOrder = 13;
 		          }
-		          if (name == "HairFront")
+		          if (name == "Moustache")
 		          {
 				sortingOrder = 14;
+		          }
+		          if (name == "Nostrils")
+		          {
+				sortingOrder = 15;
+		          }
+		          if (name == "HairTendrils")
+		          {
+				sortingOrder = 16;
+		          }
+		          if (name == "HairFront")
+		          {
+				sortingOrder = 17;
 		          }
 	     }
 }

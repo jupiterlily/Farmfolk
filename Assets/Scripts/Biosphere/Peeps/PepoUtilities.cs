@@ -51,8 +51,8 @@ public class PepoUtilities
 				}
 				if (Pepo.age < 10f)
 				{
-					     Pepo.mother.ssd.wantsChildren[0]++;
-					     Pepo.mother.ssd.wantsChildren[1]++;
+					     Pepo.mother.ssd.numberOfChildren.value--;
+					     Pepo.mother.ssd.numberOfChildren.value--;
 				}
 		          }
 		          return losses;
@@ -110,18 +110,20 @@ public class PepoUtilities
 					     matches++;
 				total++;
 		          }
+		          //see if we both want more children than we have, then see if one of our minimmums is greater than the others maximum. we get amatch if we both want children, a match if we both don't want children. a match if 
+		          int aMax = (int)s1.numberOfChildren.maxValue - (int)s1.numberOfChildren.value;
+		          int aMin = (int)s1.numberOfChildren.minValue - (int)s1.numberOfChildren.value;
 
-		          if (s1.wantsChildren != null && s2.wantsChildren != null && s1.wantsChildren.Length >= 2 && s2.wantsChildren.Length >= 2)
-		          {
-				int aMin = s1.wantsChildren[0], aMax = s1.wantsChildren[1];
-				int bMin = s2.wantsChildren[0], bMax = s2.wantsChildren[1];
-				int overlapMin = Mathf.Max(aMin, bMin), overlapMax = Mathf.Min(aMax, bMax);
-				float overlap = Mathf.Max(0, overlapMax - overlapMin + 1);
-				float span = Mathf.Max(aMax - aMin + 1, bMax - bMin + 1);
-				// Normalize this single dimension into the match/total counts
-				matches += Mathf.RoundToInt(overlap);
-				total += Mathf.RoundToInt(span);
-		          }
+		          int bMax = (int)s2.numberOfChildren.maxValue - (int)s2.numberOfChildren.value;
+		          int bMin = (int)s2.numberOfChildren.minValue - (int)s2.numberOfChildren.value;
+
+		          int overlapMin = Mathf.Max(aMin, bMin), overlapMax = Mathf.Min(aMax, bMax);
+		          float overlap = Mathf.Max(0, overlapMax - overlapMin + 1);
+		          float span = Mathf.Max(aMax - aMin + 1, bMax - bMin + 1);
+		          // Normalize this single dimension into the match/total counts
+		          matches += Mathf.RoundToInt(overlap);
+		          total += Mathf.RoundToInt(span);
+
 
 		          if (total == 0)
 				return 0.5f;
@@ -183,6 +185,91 @@ public class PepoUtilities
 				sum += Mathf.Clamp01(sim);
 		          }
 		          return Mathf.Clamp01(sum / n);
+	     }
+
+
+	     private static List<List<PepoData>> CollectFamilyData(PepoData root, int maxGenerations)
+	     {
+		          var familyData = new List<List<PepoData>>();
+
+		          // First, collect all ancestors (from oldest to youngest)
+		          var ancestors = CollectAncestors(root, maxGenerations);
+
+		          // Then, collect all descendants (from oldest to youngest)  
+		          var descendants = CollectDescendants(root, maxGenerations);
+
+		          // Combine them: ancestors + root + descendants
+		          familyData.AddRange(ancestors);
+		          familyData.Add(new List<PepoData> { root }); // The root person and their mothers children
+		          familyData.AddRange(descendants);
+
+		          return familyData;
+	     }
+
+	     private static List<List<PepoData>> CollectAncestors(PepoData root, int maxGenerations)
+	     {
+		          var ancestors = new List<List<PepoData>>();
+		          var currentGeneration = new List<PepoData> { root };
+
+		          for (int gen = 1; gen <= maxGenerations; gen++)
+		          {
+				var parentGeneration = new List<PepoData>();
+
+				foreach (var person in currentGeneration)
+				{
+					     if (person?.mother != null && !parentGeneration.Contains(person.mother))
+						          parentGeneration.Add(person.mother);
+					     if (person?.father != null && !parentGeneration.Contains(person.father))
+						          parentGeneration.Add(person.father);
+				}
+
+				if (parentGeneration.Count > 0)
+				{
+					     ancestors.Insert(0, parentGeneration); // Insert at beginning to maintain chronological order
+					     currentGeneration = parentGeneration;
+				}
+				else
+				{
+					     break;
+				}
+		          }
+
+		          return ancestors;
+	     }
+
+	     private static List<List<PepoData>> CollectDescendants(PepoData root, int maxGenerations)
+	     {
+		          var descendants = new List<List<PepoData>>();
+		          var currentGeneration = new List<PepoData> { root };
+
+		          for (int gen = 1; gen <= maxGenerations; gen++)
+		          {
+				var childGeneration = new List<PepoData>();
+
+				foreach (var person in currentGeneration)
+				{
+					     if (person?.offspring != null)
+					     {
+						          foreach (var child in person.offspring)
+						          {
+								if (child != null && !childGeneration.Contains(child))
+									     childGeneration.Add(child);
+						          }
+					     }
+				}
+
+				if (childGeneration.Count > 0)
+				{
+					     descendants.Add(childGeneration);
+					     currentGeneration = childGeneration;
+				}
+				else
+				{
+					     break;
+				}
+		          }
+
+		          return descendants;
 	     }
 
 }

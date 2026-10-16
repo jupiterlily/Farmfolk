@@ -8,7 +8,7 @@ public class UIManager : MonoBehaviour
 {
 
 	     //these should all be elsewhere, but they are here for testing purposes.
-	     public GameObject pepoPanel;
+	     //   public GameObject pepoPanel;
 	     public GameObject world;
 	     public PepoPopManager pepoPopManager;
 	     public SimulationMaster simulationMaster;
@@ -16,45 +16,12 @@ public class UIManager : MonoBehaviour
 	     TileManager tm;
 	     bool worldWindowsCreated = false;
 	     bool pepoWindowsCreated = false;
-	    // public int HeadingFontSize = 10;
-	   //  public int BodyFontSize = 8;
+	     // public int HeadingFontSize = 10;
+	     //  public int BodyFontSize = 8;
 
-		 public UITheme theme;
+	     public UITheme theme;
 
 	     private List<GameObject> currentPanels = new List<GameObject>();
-
-	     //public List<Sprite> pepoEyes;
-	     //public List<Sprite> linerEyes;
-	     //public List<Sprite> eyeColor;
-	     //public List<Sprite> headShape;
-	     //public List<Sprite> freckles;
-	     //public List<Sprite> topLips;
-	     //public List<Sprite> bottomLips;
-	     //public List<Sprite> noseShape;
-	     ////straight hair
-	     //public List<Sprite> HairUp_1;
-	     //public List<Sprite> HairBack_1;
-	     //public List<Sprite> HairTendrils_1;
-	     //public List<Sprite> HairFringe_1;
-	     ////wavy hair
-	     //public List<Sprite> HairUp_2;
-	     //public List<Sprite> HairBack_2;
-	     //public List<Sprite> HairTendrils_2;
-	     //public List<Sprite> HairFringe_2;
-	     ////curly hair
-	     //public List<Sprite> HairUp_3;
-	     //public List<Sprite> HairBack_3;
-	     //public List<Sprite> HairTendrils_3;
-	     //public List<Sprite> HairFringe_3;
-	     ////coily hair
-	     //public List<Sprite> HairUp_4;
-	     //public List<Sprite> HairBack_4;
-	     //public List<Sprite> HairTendrils_4;
-	     //public List<Sprite> HairFringe_4;
-
-	     //public List<Sprite> brows;
-	     //public List<Sprite> stubble;
-	     //public List<Sprite> moustaches;
 
 	     //here I'm going to start the non testing code. This will be the code that actually runs the UI, and it will be the code that is used in the final product.
 
@@ -71,14 +38,16 @@ public class UIManager : MonoBehaviour
 	     //public GameObject[] UIWindows; //array of windows that can be dragged around and resized. they can also be closed or minimized.
 	     public List<UIWindow> UIWindows = new List<UIWindow>();
 
-		 
+
 
 	     void Start()
 	     {
-			//if there's no theme
-if(theme != null){
-			SetPanelSizes();}
-			
+		          //if there's no theme
+		          if (theme != null)
+		          {
+				SetPanelSizes();
+		          }
+
 		          // Ensure we have a reference to PepoUIManager
 		          if (pepoUI == null)
 		          {
@@ -112,8 +81,6 @@ if(theme != null){
 				}
 				UIUtilities.RefreshAllFields(window);
 		          }
-
-		          RefreshPepoPanels();
 	     }
 
 
@@ -134,18 +101,25 @@ if(theme != null){
 		          //UpdateClock(Clock);
 		          if (!worldWindowsCreated)
 		          {
-					UIWindow tileWindow = UILibrary.BuildWindowTileComposition(tm.worldsise, tm, this);
-					UIWindows.Add(tileWindow);
-					uiFactory.CreateWindow(tileWindow, LeftSidebar.transform, this);
-					worldWindowsCreated = true;
+				UIWindow tileWindow = UILibrary.BuildWindowTileComposition(tm.worldsise, tm, this);
+				UIWindows.Add(tileWindow);
+				uiFactory.CreateWindow(tileWindow, LeftSidebar.transform, this);
+				worldWindowsCreated = true;
 
 
 		          }
 		          if (!pepoWindowsCreated)
 		          {
-				UIWindow pepoWindow = PepoUILibrary.BuildWindowPepoData(pepoPopManager.Pepos.totalPop[Random.RandomRange(0, pepoPopManager.Pepos.totalPop.Count)], this);
-				UIWindows.Add(pepoWindow);
-				uiFactory.CreateWindow(pepoWindow, Body.transform, this);
+				// Create new panels - ordered by surname then age
+				foreach (PepoData pepo in pepoPopManager.Pepos.totalPop
+				    .OrderBy(p => p.surname)
+				    .ThenBy(p => p.age))
+				{
+
+					     UIWindow pepoWindow = PepoUILibrary.BuildWindowPepoData(pepo, this);
+					     UIWindows.Add(pepoWindow);
+					     uiFactory.CreateWindow(pepoWindow, Body.transform, this);
+				}
 				pepoWindowsCreated = true;
 
 		          }
@@ -155,20 +129,20 @@ if(theme != null){
 				UIUtilities.RefreshAllFields(window);
 		          }
 	     }
-public void SetPanelSizes()
-	{
-		Header.GetComponent<LayoutElement>().minHeight = theme.screenHeight * theme.HeaderPercentage;
-		Header.GetComponent<LayoutElement>().preferredHeight = theme.screenHeight * theme.HeaderPercentage;
+	     public void SetPanelSizes()
+	     {
+		          Header.GetComponent<LayoutElement>().minHeight = theme.screenHeight * theme.HeaderPercentage;
+		          Header.GetComponent<LayoutElement>().preferredHeight = theme.screenHeight * theme.HeaderPercentage;
 
-		Footer.GetComponent<LayoutElement>().minHeight = theme.screenHeight * theme.FooterPercentage;
-		Footer.GetComponent<LayoutElement>().preferredHeight = theme.screenHeight * theme.FooterPercentage;
+		          Footer.GetComponent<LayoutElement>().minHeight = theme.screenHeight * theme.FooterPercentage;
+		          Footer.GetComponent<LayoutElement>().preferredHeight = theme.screenHeight * theme.FooterPercentage;
 
-		LeftSidebar.GetComponent<LayoutElement>().minWidth = theme.screenWidth * theme.LeftSidebarPercentage;
-		LeftSidebar.GetComponent<LayoutElement>().preferredWidth = theme.screenWidth * theme.LeftSidebarPercentage;
+		          LeftSidebar.GetComponent<LayoutElement>().minWidth = theme.screenWidth * theme.LeftSidebarPercentage;
+		          LeftSidebar.GetComponent<LayoutElement>().preferredWidth = theme.screenWidth * theme.LeftSidebarPercentage;
 
-		RightSidebar.GetComponent<LayoutElement>().preferredWidth = theme.screenWidth * theme.RightSidebarPercentage;
-		RightSidebar.GetComponent<LayoutElement>().minWidth = theme.screenWidth * theme.RightSidebarPercentage;
-	}
+		          RightSidebar.GetComponent<LayoutElement>().preferredWidth = theme.screenWidth * theme.RightSidebarPercentage;
+		          RightSidebar.GetComponent<LayoutElement>().minWidth = theme.screenWidth * theme.RightSidebarPercentage;
+	     }
 	     // Update the on-screen readout with the current state of the simulation.
 	     public void UpdateClock(GameObject clock)
 	     {
@@ -219,54 +193,6 @@ public void SetPanelSizes()
 		          yearReadout.text = $"{simulationMaster.year + 1}\n";
 		          dayReadout.text = $"{simulationMaster.dayOfYear + 1}\n";
 		          timeReadout.text = $"{currentHourOfDay:00}:{currentMinuteOfHour:00}\n";
-	     }
-	     public void RefreshPepoPanels()
-	     {
-		          // Clear existing panels
-		          foreach (GameObject panel in currentPanels)
-		          {
-				if (panel != null)
-					     Destroy(panel);
-		          }
-		          currentPanels.Clear();
-
-		          // Check if we have the necessary references
-		          if (pepoPopManager == null || pepoPopManager.Pepos == null || pepoPopManager.Pepos.totalPop == null)
-		          {
-				Debug.LogWarning("PepoPopManager or population data is missing");
-				return;
-		          }
-
-		          if (pepoPanel == null)
-		          {
-				Debug.LogWarning("Pepo panel reference is missing");
-				return;
-		          }
-
-		          // Create new panels - ordered by surname then age
-		          foreach (PepoData pepo in pepoPopManager.Pepos.totalPop
-		              .OrderBy(p => p.surname)
-		              .ThenBy(p => p.age))
-		          {
-				GameObject panel = pepoUI.CreateStatusPanel(pepo, pepoPanel.transform);
-				if (panel != null)
-				{
-					     currentPanels.Add(panel);
-
-					     // Add Layout Element to control card sizing
-					     var layoutElement = panel.AddComponent<LayoutElement>();
-					     layoutElement.preferredWidth = 180f;
-					     layoutElement.preferredHeight = 120f;
-					     layoutElement.flexibleWidth = 0f;
-					     layoutElement.flexibleHeight = 0f;
-				}
-		          }
-	     }
-
-	     // Call this method when you know the population has changed
-	     public void ForceRefreshUI()
-	     {
-		          RefreshPepoPanels();
 	     }
 
 	     void OnDestroy()
