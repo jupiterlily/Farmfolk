@@ -5,8 +5,25 @@ using UnityEngine;
 using UnityEngine.UI;
 
 public static class UIUtilities
-{
+{// Pale "empty" bases — the colour each part looks like with zero pigment.
+	     private static readonly Color Keratin = Color.HSVToRGB(0.11f, 0.10f, 0.92f);  // pale cream
+	     private static readonly Color PaleSkin = Color.HSVToRGB(0.06f, 0.25f, 0.95f);  // pale peach
+	     private static readonly Color Sclera = new Color(0.95f, 0.94f, 0.92f);       // off-white
+	     public static UISection NewSection(string name, UIStructuralComponent sc) =>
+    new UISection(name, true, new List<UIComponentData>())
+    {
+	         Padding = sc.Padding,
+	         Spacing = sc.Spacing,
+	         DisplayLabel = false,
+    };
 
+	     public static RangeField TraitRange(string label, NumericalAspect aspect, float min, float max) =>
+	         new RangeField(label, min, max, true)
+	         {
+		              Getter = () => aspect.value,
+		              Setter = v => aspect.value = (float)v,
+		              DisplayLabel = true,
+	         };
 	     public static Vector2 GetVector2FromString(string text)
 	     {
 		          if (string.IsNullOrWhiteSpace(text))
@@ -896,35 +913,171 @@ public static class UIUtilities
 		          Color.RGBToHSV(baseColor, out float h, out float s, out float v);
 		          return Color.HSVToRGB(h, saturation, v);
 	     }
-
 	     public static Color[] GetPepoColors(BodyData body)
 	     {
 		          if (body == null)
-				return new Color[4]; // Return empty array if no body data
+				return new Color[4];
 
-		          // Get expressed traits
-		          int skinHue = (int)body.expressedChromosomes[14].value;
-		          int skinSaturation = (int)body.expressedChromosomes[13].value;
-		          int skinDepth = (int)body.expressedChromosomes[12].value;
-		          int eyeColor = (int)body.expressedChromosomes[4].value;
-		          int eyeDarkness = (int)body.expressedChromosomes[5].value;
-		          int hairEumelanin = (int)body.expressedChromosomes[2].value;
-		          int hairPheomelanin = (int)body.expressedChromosomes[1].value;
+		          var hairAspects = new List<KeyValuePair<string, NumericalAspect>>();
+		          var skinAspects = new List<KeyValuePair<string, NumericalAspect>>();
+		          var eyeAspects = new List<KeyValuePair<string, NumericalAspect>>();
 
-		          return new Color[4]
+		          foreach (var kvp in body.physicalAttributes)
 		          {
-        GetHairColor(hairEumelanin, hairPheomelanin),    // Index 0
-        GetEyeColor(eyeColor, eyeDarkness),              // Index 1
-        GetSkinColor(skinHue, skinSaturation, skinDepth), // Index 2
-        GetMouthColor(skinHue, skinSaturation, skinDepth) // Index 3
-		          };
+				if (kvp.Key.StartsWith("Hair"))
+					     hairAspects.Add(kvp);
+				else if (kvp.Key.StartsWith("Skin"))
+					     skinAspects.Add(kvp);
+				else if (kvp.Key.StartsWith("Eye"))
+					     eyeAspects.Add(kvp);
+		          }
+
+		          Color hair = GetBodyColour(hairAspects, Keratin);
+		          Color eye = GetBodyColour(eyeAspects, Sclera);
+		          Color skin = GetBodyColour(skinAspects, PaleSkin);
+		          Color mouth = GetMouthColor(skin);
+
+		          return new[] { hair, eye, skin, mouth };
+	     }
+
+	     private static Color GetMouthColor(Color skinColor)
+	     {
+		          Color.RGBToHSV(skinColor, out float h, out float s, out float v);
+		          h = Mathf.Repeat(h - 0.04f, 1f);                 // nudge toward red
+		          s = Mathf.Clamp(s + 0.15f, 0.25f, 0.60f);
+		          v = Mathf.Clamp(v * 0.85f, 0.35f, 0.80f);
+		          return Color.HSVToRGB(h, s, v);
+	     }
+	     public static Color GetBodyColour(
+	         IEnumerable<KeyValuePair<string, NumericalAspect>> aspects,
+	         Color baseColour)
+	     {
+		          var list = aspects as IList<KeyValuePair<string, NumericalAspect>>
+		              ?? aspects.ToList();
+
+		          // The presence of EyeIrisStructure marks this as the eye set.
+		          if (list.Any(kvp => kvp.Key == "EyeIrisStructure"))
+				return GetEyeColour(list, baseColour);
+
+		          return GetGenericBodyColour(list, baseColour);
+	     }
+
+	     // Hair and skin: unchanged in spirit, but pigment overlays now route
+	     // through WorldColourData.Apply so Screen / Add / Overlay actually work
+	     // (the old BlendColour silently fell back to Lerp for anything that
+	     // wasn't Multiply).
+	     private static Color GetGenericBodyColour(
+	         IList<KeyValuePair<string, NumericalAspect>> list,
+	         Color baseColour)
+	     {
+		          int? eyeDensity = null;
+		          foreach (var kvp in list)
+				if (kvp.Key == "EyePigmentDensity")
+				{
+					     eyeDensity = (int)kvp.Value.value;
+					     break;
+				}
+
+		          Color result = baseColour;
+
+		          // Pass 1 — structural (full replace at a fixed sample point).
+		          foreach (var kvp in list)
+		          {
+				var wcd = ResolveStructuralColour(kvp.Key, (int)kvp.Value.value);
+				if (wcd == null)
+					     continue;
+				Color structural = SampleColour(wcd.Colours[0], 0.5f);
+				result = BlendColour(result, structural, wcd.Blend, 1f);
+		          }
+
+		          // Pass 2 — biological pigments.
+		          foreach (var kvp in list)
+		          {
+				var res = ResolvePigment(kvp.Key, (int)kvp.Value.value, eyeDensity);
+				if (res == null)
+					     continue;
+				var (wcd, weight) = res.Value;
+				if (weight <= 0f)
+					     continue;
+				result = wcd.Apply(result, weight);
+		          }
+
+		          return result;
+	     }
+
+	     // Eyes: dedicated pipeline.
+	     private static Color GetEyeColour(
+	         IList<KeyValuePair<string, NumericalAspect>> list,
+	         Color baseColour)
+	     {
+		          Color iris = baseColour;
+
+		          float? structure = FindAspect(list, "EyeIrisStructure");
+		          float? saturation = FindAspect(list, "EyeIrisSaturation");
+		          float? pigmentType = FindAspect(list, "EyePigmentType");
+		          float? pigmentDensity = FindAspect(list, "EyePigmentDensity");
+
+		          // Pass 1 — structural base. Sample at a per-pepo t so two pepos with
+		          // the same iris structure differ, then modulate S/V by the saturation
+		          // allele so "pale" vs "intense" is visible.
+		          if (structure.HasValue)
+		          {
+				var wcd = ResolveStructuralColour("EyeIrisStructure", (int)structure.Value);
+				if (wcd != null)
+				{
+					     float t = Mathf.Repeat(
+					         structure.Value * 0.37f + (saturation ?? 0f) * 0.63f, 1f);
+
+					     Color structural = SampleColour(wcd.Colours[0], t);
+
+					     if (saturation.HasValue)
+					     {
+						          int n = GeneLibrary.Descriptions["EyeIrisSaturation"].Count;
+						          float s01 = (saturation.Value - 1f) / (n - 1f);
+						          Color.RGBToHSV(structural, out float h, out float s, out float v);
+						          structural = Color.HSVToRGB(
+						              h,
+						              Mathf.Clamp01(s * Mathf.Lerp(0.4f, 1.3f, s01)),
+						              Mathf.Clamp01(v * Mathf.Lerp(0.75f, 1.10f, s01)));
+					     }
+
+					     iris = BlendColour(iris, structural, wcd.Blend, 1f);
+				}
+		          }
+
+		          // Pass 2 — pigment overlay. Density 1 = no pigment, 7 = opaque.
+		          if (pigmentType.HasValue && pigmentDensity.HasValue)
+		          {
+				float weight = Mathf.Clamp01((pigmentDensity.Value - 1f) / 6f);
+				if (weight > 0f)
+				{
+					     var names = GeneticsLibrary.BiologicalPigmentNames();
+					     int idx = (int)pigmentType.Value - 1;
+					     if (idx >= 0 && idx < names.Length &&
+					         ColourLibrary.Raw.TryGetValue(names[idx], out var wcd))
+					     {
+						          iris = wcd.Apply(iris, weight);
+					     }
+				}
+		          }
+
+		          return iris;
+	     }
+
+	     private static float? FindAspect(
+	         IList<KeyValuePair<string, NumericalAspect>> list, string key)
+	     {
+		          foreach (var kvp in list)
+				if (kvp.Key == key)
+					     return kvp.Value.value;
+		          return null;
 	     }
 	     private static Color GetSkinColor(int hue, int saturation, int depth)
 	     {
 		          // Convert trait values (1-6) to HSV ranges
-		          float h = MapRange(hue, 1, 6, 25f / 360, 40f / 360); // Full hue spectrum
-		          float s = MapRange(saturation, 1, 6, 0.25f, 0.6f); // Moderate to high saturation
-		          float v = MapRange(depth, 1, 6, 0.95f, 0.25f); // Dark to light
+		          float h = MapRange(hue, 1, GeneLibrary.Descriptions["SkinHue"].Count, 25f / 360, 40f / 360); // Full hue spectrum
+		          float s = MapRange(saturation, 1, GeneLibrary.Descriptions["SkinSaturation"].Count, 0.25f, 0.6f); // Moderate to high saturation
+		          float v = MapRange(depth, 1, GeneLibrary.Descriptions["SkinDepth"].Count, 0.95f, 0.25f); // Dark to light
 
 		          Color skinColor = Color.HSVToRGB(h, s, v);
 		          return skinColor;
@@ -980,7 +1133,7 @@ public static class UIUtilities
 		          vMin = 0.20f;
 		          vMax = 0.6f;
 		          break;
-		          default:
+		          case 7:
 		          h = 0f; //albino red
 		          sMin = 0.5f;
 		          sMax = 0.8f;
@@ -1003,9 +1156,10 @@ public static class UIUtilities
 	     private static Color GetHairColor(int eumelanin, int pheomelanin)
 	     {
 		          // Eumelanin controls darkness (black/brown), Pheomelanin controls redness
-		          float baseHue = MapRange(pheomelanin, 1, 6, 0.15f, 0.02f); // Slight yellow to orange-red
-		          float saturation = MapRange(eumelanin, 1, 9, 0.3f, 0.75f); // More pheomelanin = more saturation
-		          float value = MapRange(eumelanin + pheomelanin, 2, 15, 0.1f, 0.8f); // more eumelanin = darker
+
+		          float baseHue = MapRange(pheomelanin, 1, GeneLibrary.Descriptions["HairPigmentPheomelanin"].Count, 0.02f, 0.15f); // Slight yellow to orange-red
+		          float saturation = MapRange(eumelanin, 1, GeneLibrary.Descriptions["HairPigmentEumelanin"].Count, 0.75f, 0.3f); // More pheomelanin = more saturation
+		          float value = MapRange(eumelanin, 1, GeneLibrary.Descriptions["HairPigmentEumelanin"].Count, 0.1f, 0.8f); // more eumelanin = darker
 
 
 		          Color hairColor = Color.HSVToRGB(baseHue, saturation, value);
@@ -1031,6 +1185,92 @@ public static class UIUtilities
 	     private static float MapRange(float value, float fromMin, float fromMax, float toMin, float toMax)
 	     {
 		          return (value - fromMin) / (fromMax - fromMin) * (toMax - toMin) + toMin;
+	     }
+
+	     // "HairPigmentEumelanin" → WorldColourData("eumelanin"); "SkinPigmentCarotenoid" → ("carotenoid")
+	     // "EyePigmentType" + eyeDensity → the selected biological pigment with the sibling's density.
+	     private static (WorldColourData wcd, float weight)? ResolvePigment(
+	         string key, int value, int? eyeDensity)
+	     {
+		          const string Marker = "Pigment";
+
+		          // EyePigmentType is special — its allele is the pigment name, its density lives in a sibling.
+		          if (key == "EyePigmentType")
+		          {
+				if (!eyeDensity.HasValue)
+					     return null;
+				var names = GeneticsLibrary.BiologicalPigmentNames();
+				int idx = value - 1;
+				if (idx < 0 || idx >= names.Length)
+					     return null;
+				if (!ColourLibrary.Raw.TryGetValue(names[idx], out var eyeWcd))
+					     return null;
+
+				// EyePigmentDensity descriptors are 1..7 ("clear".."black")
+				float eyeWeight = Mathf.Clamp01((eyeDensity.Value - 1) / 6f);
+				return (eyeWcd, eyeWeight);
+		          }
+		          if (key == "EyePigmentDensity")
+				return null;           // consumed by its sibling
+
+		          // "HairPigment*" / "SkinPigment*" — suffix is the pigment name.
+		          int mi = key.IndexOf(Marker, System.StringComparison.Ordinal);
+		          if (mi < 0)
+				return null;
+		          string suffix = key.Substring(mi + Marker.Length);    // "Eumelanin" / "Carotenoid" / ...
+		          if (suffix.Length == 0)
+				return null;
+
+		          string pigmentName = char.ToLowerInvariant(suffix[0]) + suffix.Substring(1);
+		          if (!ColourLibrary.Raw.TryGetValue(pigmentName, out var wcd))
+				return null;
+
+		          // Every density gene uses the same 1..6 descriptors (no X → saturated X)
+		          float weight = Mathf.Clamp01((value - 1) / 5f);
+		          return (wcd, weight);
+	     }
+
+	     // "EyeIrisStructure" → WorldColourData registered as "blue iris" / "green iris" / etc.
+	     private static WorldColourData ResolveStructuralColour(string key, int value)
+	     {
+		          if (key != "EyeIrisStructure")
+				return null;
+
+		          var names = GeneticsLibrary.StructuralColourNames();  // "grey", "violet", "blue", ...
+		          int idx = value - 1;
+		          if (idx < 0 || idx >= names.Length)
+				return null;
+		          string allele = names[idx];
+
+		          foreach (var wcd in GeneticsLibrary.StructuralColours)
+				if (wcd.Name.Replace(" iris", "") == allele)
+					     return wcd;
+		          return null;
+	     }
+
+	     private static Color SampleColour(ColourData cd, float t)
+	     {
+		          float h = Mathf.Lerp(cd.hue.x, cd.hue.y, t);
+		          float s = Mathf.Lerp(cd.saturation.x, cd.saturation.y, t);
+		          float v = Mathf.Lerp(cd.value.x, cd.value.y, t);
+		          return Color.HSVToRGB(h, s, v);
+	     }
+
+	     private static Color BlendColour(Color baseColour, Color pigmentColour, ColourBlend blend, float weight)
+	     {
+		          switch (blend)
+		          {
+		          case ColourBlend.Multiply:
+		          var mult = new Color(baseColour.r * pigmentColour.r,
+				 baseColour.g * pigmentColour.g,
+				 baseColour.b * pigmentColour.b,
+				 baseColour.a);
+		          return Color.Lerp(baseColour, mult, weight);
+
+		          case ColourBlend.Lerp:
+		          default:
+		          return Color.Lerp(baseColour, pigmentColour, weight);
+		          }
 	     }
 }
 

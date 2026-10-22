@@ -540,7 +540,7 @@ public class TileManager : MonoBehaviour
 		          );
 
 		          // Precipitation intensity depends on temperature below dew point
-		          float temperatureBelowDewPoint = dewPoint - atmosphereTile.temperature;
+		          float temperatureBelowDewPoint = dewPoint + SimulationConstants.Kelvin - atmosphereTile.temperature; //maybe remove the kelvin thing again
 
 		          if (temperatureBelowDewPoint <= 0)
 				return 0f;

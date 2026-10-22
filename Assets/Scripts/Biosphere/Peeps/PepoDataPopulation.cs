@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 
 public class PepoPopulation
 {
@@ -25,11 +26,45 @@ public class PepoPopulation
 
 
 
-	     public PepoPopulation(int size)
+	     public PepoPopulation(int cohortSize, int cohortSeeds = 2)
 	     {
-		          for (int i = 0; i < size; i++)
+		          ChromosomeData[] adamData = BodyFactory.CreateChromosomesFromAlleles(BodyLibrary.Default.Alleles.ToList());
+		          ChromosomeData[] eveData = GeneticsUtilities.RandomiseGeneticValues(adamData);
+		          if (cohortSize >= 1)
 		          {
-				population.Add(PepoFactory.InitialiseRandom());
+				for (int i = 0; i <= cohortSeeds; i++)
+				{
+
+					     //we want to create our adam and eve. we intialise a random pepo, then we clone it and flip the gender, then we mutate them both a whole bunch to have two distinct people that share the same genetic structure.					     
+					     adamData = GeneticsUtilities.RandomiseGeneticRange(adamData);
+					     adamData = GeneticsUtilities.RandomiseGeneticValues(adamData);
+					     eveData = GeneticsUtilities.RandomiseGeneticRange(eveData);
+					     eveData = GeneticsUtilities.RandomiseGeneticValues(eveData);
+
+					     for (int j = 0; j < cohortSize; j++)
+					     {
+						          //int mutations = 5;
+						          float mutationRate = .999f;
+						          //   PepoData Adam = PepoFactory.CreateRandom(adamData);
+						          //   PepoData Eve = PepoFactory.CreateRandom(eveData);
+
+						          PepoData pepo = PepoFactory.CreateRandom(GeneticsUtilities.ExpressChromosomes(eveData, adamData));
+
+						          //each pepo is a child of adam and eve that we mutate. after we generate apepo, we also randomise adam and eves genetic values.
+						          //mutate the clone between 1 and 5 times
+						          //    adamData = GeneticsUtilities.Mutate(adamData, mutationRate);
+						          //  Adam.body.patChromosomes = GeneticsUtilities.Mutate(Adam.body.patChromosomes, mutationRate);
+						          GeneticsUtilities.RandomiseGeneticRange(adamData);
+						          GeneticsUtilities.RandomiseGeneticValues(adamData);
+
+						          // Eve.body.matChromosomes = GeneticsUtilities.Mutate(Eve.body.matChromosomes, mutationRate);
+						          // Eve.body.patChromosomes = GeneticsUtilities.Mutate(Eve.body.patChromosomes, mutationRate);
+						          GeneticsUtilities.RandomiseGeneticRange(eveData);
+						          GeneticsUtilities.RandomiseGeneticValues(eveData);
+
+						          population.Add(pepo);
+					     }
+				}
 		          }
 	     }
 

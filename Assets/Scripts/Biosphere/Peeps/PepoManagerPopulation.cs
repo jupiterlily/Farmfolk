@@ -5,6 +5,7 @@ public class PepoPopManager : MonoBehaviour
 {
 	     [Header("Population Settings")]
 	     public int initialPepos = 12;
+	     public int seedPairs = 5;
 	     public int generationSteps = 15; //years to pass each step
 	     public int maxPepos = 50;
 	     public int minPopulationThreshold = 10;
@@ -46,7 +47,7 @@ public class PepoPopManager : MonoBehaviour
 
 	     private void InitialisePopulation()
 	     {
-		          Pepos = new PepoPopulation(initialPepos);
+		          Pepos = new PepoPopulation(initialPepos / seedPairs, seedPairs);
 		          //        foreach (var pepo in Pepos.population)
 		          //        {
 		          //int number = Random.Range(1, 5);
@@ -149,7 +150,7 @@ public class PepoPopManager : MonoBehaviour
 				{
 					     for (int i = 0; i < immigrantCount; i++)
 					     {
-						          Pepos.population.Add(PepoFactory.InitialiseRandom());
+						          Pepos.population.Add(PepoFactory.CreateRandom(mamas[Random.Range(0, mamas.Count)].body.expChromosomes));
 						          amountOfPeopleToHaveExisted++;
 					     }
 				}
@@ -161,7 +162,7 @@ public class PepoPopManager : MonoBehaviour
 				Debug.LogWarning($"[PepoManager] Not enough mamas ({mamas.Count}) or papas ({papas.Count}) for breeding");
 				for (int i = 0; i < immigrantCount; i++)
 				{
-					     Pepos.population.Add(PepoFactory.InitialiseRandom());
+					     Pepos.population.Add(PepoFactory.CreateRandom(Pepos.population[Random.Range(0, Pepos.population.Count)].body.expChromosomes));
 					     amountOfPeopleToHaveExisted++;
 				}
 		          }
@@ -294,7 +295,7 @@ public class PepoPopManager : MonoBehaviour
 				Debug.LogWarning("[PepoManager] Population critically low! Adding new Pepos.");
 				for (int i = 0; i < immigrantCount; i++)
 				{
-					     Pepos.population.Add(PepoFactory.InitialiseRandom());
+					     Pepos.population.Add(PepoFactory.CreateRandom(Pepos.population[Random.Range(0, Pepos.population.Count)].body.expChromosomes));
 					     amountOfPeopleToHaveExisted++;
 				}
 		          }

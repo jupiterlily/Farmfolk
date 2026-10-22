@@ -236,7 +236,7 @@ public class SimulationMaster : MonoBehaviour
 				}
 		          }
 		          Debug.Log("tiles updated");
-		          ProgressPepoPopulation(days / SimulationConstants.YearLength);
+		          //ProgressPepoPopulation(days / SimulationConstants.YearLength);
 
 		          SimulationConstants.UpdateTimeConstants(0, 0, 0, days, 0);
 		          SimulationConstants.UpdateDay(Mathf.FloorToInt(dayOfYear));
@@ -256,11 +256,16 @@ public class SimulationMaster : MonoBehaviour
 		          SimulationConstants.UpdateTimeConstants(0, 0, 0, 0, years);
 		          //    UpdateReadout();
 	     }
-
 	     void ProgressPepoPopulation(float years = 0)
 	     {
+		          //this should have different dhit depending on the amount of time being passed.
 		          gameObject.GetComponent<PepoPopManager>().agingIncrement = years;
+
+
+
 		          gameObject.GetComponent<PepoPopManager>().SimulateGenerations();
+
+
 	     }
 }
 

@@ -54,7 +54,7 @@ public static class MoralFoundations
 	     {
 		          MoralFoundation SanctityDegradation = new MoralFoundation("Sanctity/Degradation", "sanctify", "degrade", 0.5f);
 		          SanctityDegradation.Vices = new List<string> { "degraded", "impure", "defiled", "unclean", "profane" };
-		          SanctityDegradation.Virtues = new List<string> { "pure", "clean", "reverent", "devout", "chaste" };
+		          SanctityDegradation.Virtues = new List<string> { "pure", "clean", "reverent", "devout", "blessed" };
 		          return SanctityDegradation;
 
 	     }

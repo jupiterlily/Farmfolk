@@ -1490,15 +1490,6 @@ MonoBehaviour:
   - {fileID: 0}
   HairBack_1:
   - {fileID: 0}
-  - {fileID: -1859613765, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -1260325299, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 941907320, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -1933541254, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -1404669461, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 1899289427, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 1854432033, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -1277698380, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -174396715, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   - {fileID: 2017609975, guid: e08ca32bf120d724aa63310acf7e3039, type: 3}
   - {fileID: -34438881, guid: e08ca32bf120d724aa63310acf7e3039, type: 3}
   - {fileID: 497105224, guid: e08ca32bf120d724aa63310acf7e3039, type: 3}
@@ -1631,18 +1622,6 @@ MonoBehaviour:
   HairBack_2:
   - {fileID: 0}
   - {fileID: -1859613765, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 1947212241, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 941907320, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -1846124770, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -856819415, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -1404669461, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 1392598302, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -1688553149, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -472164713, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -1682469732, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 1509135685, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -1096450053, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: 815552826, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   - {fileID: 1808813404, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
   - {fileID: -434282151, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
   - {fileID: 261835023, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
@@ -1661,15 +1640,6 @@ MonoBehaviour:
   - {fileID: 169002747, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
   - {fileID: 472303333, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
   - {fileID: 122391570, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
-  - {fileID: -2106417332, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
-  - {fileID: 722413073, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
-  - {fileID: -413565086, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
-  - {fileID: -681154702, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
-  - {fileID: 1845796451, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
-  - {fileID: -586083844, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
-  - {fileID: 1960999404, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
-  - {fileID: 1206365358, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
-  - {fileID: 283106234, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
   - {fileID: -500489379, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
   - {fileID: -983160650, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
   - {fileID: 77069722, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
@@ -1679,6 +1649,44 @@ MonoBehaviour:
   - {fileID: -1791923710, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
   - {fileID: -1075008405, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
   - {fileID: 276515765, guid: e5ea11cd927f37b4f81490b1c23dacd1, type: 3}
+  - {fileID: 1856704154, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: 510869504, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: -1012561735, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: -14676478, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: -272333517, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: -1224461445, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: 634132869, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: 742847223, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: -1731055744, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: 1769668210, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: -2096495826, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: 1368702512, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: -1126693417, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: 2004774229, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: -1189243255, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: 1683871595, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: -1783183260, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: 514240322, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: -1491065967, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: -64299568, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: 1705497242, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: 1537356318, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: 816835719, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: 1689597322, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: -1493724527, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: -1894694282, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: 656691001, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: 571121860, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: -1913746694, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: 353722493, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: 1820845951, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: -2090902272, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: -663940284, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: -457358037, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: 1477566355, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: 307003904, guid: 4e4c478f249d55641bbf060a0a5a079b, type: 3}
+  - {fileID: -13168062, guid: e53acb1b0efd7e446a8658d5d926cb89, type: 3}
+  - {fileID: -1822944673, guid: e53acb1b0efd7e446a8658d5d926cb89, type: 3}
   HairTendrils_2:
   - {fileID: 0}
   - {fileID: -755084195, guid: b80296da6eba05f4590e34624c58be69, type: 3}
@@ -1863,11 +1871,9 @@ MonoBehaviour:
   - {fileID: -1750985337, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   - {fileID: 693304752, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   - {fileID: 2078946726, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -1682469732, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   - {fileID: -1848797287, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   - {fileID: 1379248351, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   - {fileID: -803982488, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
-  - {fileID: -421529693, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   - {fileID: -518255893, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   - {fileID: 1887230387, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
   - {fileID: 1190741220, guid: 084b03be07c881f4482bd8e65a72af4e, type: 3}
@@ -2727,7 +2733,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce010db710ee9f949b8eeb00988dc2e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  worldsise: {x: 60, y: 24}
+  worldsise: {x: 36, y: 15}
   grid:
     tileWidth: 1
     XGrid: 1
@@ -2831,11 +2837,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fa2202a81ca9dc4eb5b2fc7d684a014, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialPepos: 250
-  generationSteps: 15
+  initialPepos: 40
+  seedPairs: 15
+  generationSteps: 5
   maxPepos: 400
-  minPopulationThreshold: 1
-  immigrantCount: 0
+  minPopulationThreshold: 50
+  immigrantCount: 3
   multipleBirthChance: 0.02
   identicalTwinsChance: 0.004
   maternalMortalityChance: 0.005
@@ -3202,7 +3209,7 @@ MonoBehaviour:
     m_Bottom: 5
   m_ChildAlignment: 0
   m_StartCorner: 0
-  m_StartAxis: 1
+  m_StartAxis: 0
   m_CellSize: {x: 420, y: 500}
   m_Spacing: {x: 5, y: 5}
   m_Constraint: 0

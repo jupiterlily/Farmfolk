@@ -64,30 +64,6 @@ public static class PepoUtilitiesMatchmaking
 		          return true;
 	     }
 
-	     //take two pepos and compare their bodies to see how similar their physical appearance is
-	     public static float ComparePhysicalAppearance(PepoData p1, PepoData p2)
-	     {
-		          float similarityScore = 0f;
-		          // Compare body size
-		          float heightDifference = Mathf.Abs(p1.height / 180 - p2.height / 180);
-		          float massGeneticsDifference = Mathf.Abs(p1.massGenetics / 70 - p2.massGenetics / 70);
-
-		          //go through the expressed chromosome traits and compare them. return 1 if they are the same, 0 if they are completely different
-		          int i = 0;
-		          while (i < p1.body.expressedChromosomes.Count && i < p2.body.expressedChromosomes.Count)
-		          {
-
-				if (p1.body.expressedChromosomes[i] == p2.body.expressedChromosomes[i])
-				{
-					     similarityScore += 1f;
-				}
-				i++;
-
-		          }
-
-		          return similarityScore / p1.body.expressedChromosomes.Count;
-	     }
-
 	     // Compare two Pepos for an overall similarity score (0..1)
 	     public static float CompareSimilarity(PepoData a, PepoData b)
 	     {

@@ -111,7 +111,7 @@ public static class PepoUtilitiesPopulation
 		          var lilGuys = new List<PepoData>();
 		          foreach (var pepo in pepos)
 		          {
-				if (pepo == null || pepo.ssd.isPrepubescent)
+				if (pepo == null || pepo.ssd.isPrepubescent || !pepo.isAlive)
 					     continue;
 				if (pepo.womb == null && pepo.ssd.isFertile)
 				{
@@ -518,21 +518,29 @@ public static class PepoUtilitiesPopulation
 	     public static List<PepoData> FindMaternalSiblings(PepoData me)
 	     {
 		          List<PepoData> siblings = new List<PepoData>();
-		          foreach (var child in me.mother.offspring)
+		          //null check
+		          if (me != null && me.mother != null && me.mother.offspring != null)
 		          {
-				siblings.Add(child);
+				foreach (var child in me.mother.offspring)
+				{
+					     siblings.Add(child);
+				}
+				siblings.Remove(me);
 		          }
-		          siblings.Remove(me);
 		          return siblings;
+
 	     }
 	     public static List<PepoData> FindPaternalSiblings(PepoData me)
 	     {
 		          List<PepoData> siblings = new List<PepoData>();
-		          foreach (var child in me.father.offspring)
+		          if (me != null && me.mother != null && me.mother.offspring != null)
 		          {
-				siblings.Add(child);
+				foreach (var child in me.father.offspring)
+				{
+					     siblings.Add(child);
+				}
+				siblings.Remove(me);
 		          }
-		          siblings.Remove(me);
 		          return siblings;
 	     }
 	     public static List<PepoData> FindOffspring(List<PepoData> lilGuys)

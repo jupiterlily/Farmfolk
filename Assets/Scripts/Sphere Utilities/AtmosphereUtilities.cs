@@ -367,6 +367,7 @@ public static class AtmosphereUtilities
 
 	     public static void AtmosphericConduction(AtmosphereTile tile, float hours)
 	     {
+		          tempList.Clear();
 		          float seconds = hours * 3600;
 
 		          tempList.AddRange(tile.energies);
@@ -638,7 +639,7 @@ public static class AtmosphereUtilities
 								continue;
 
 						          Vector3 pressureForce = CalculatePressureGradientForce(atmosphereTiles, layer, x, y, width, height);
-						          float latitude = (y / (float)height * 180f) - 90f;
+						          float latitude = (x / (float)height * 180f) - 90f; //maybe change me back to y
 						          Vector3 coriolisForce = CalculateCoriolisEffect(current.windVelocity, latitude);
 
 						          float frictionCoefficient = (layer == 0) ? 0.05f : 0.01f;
@@ -681,7 +682,7 @@ public static class AtmosphereUtilities
 								continue;
 						          // Use total mass (dry air + water vapour) as an approximation
 						          float totalMass = 0;
-						          foreach (var gas in tile.AerosolisedEnergy)
+						          foreach (var gas in tile.energies)
 						          {
 								totalMass += gas.Mass;
 						          }
@@ -1151,8 +1152,8 @@ public static class AtmosphereUtilities
 
 								// Set the new mass and total energy directly.
 								// This preserves the component's material identity (materialName).
-								component.SetMassAndEnergy(mass, energy, 0f);
-
+								//component.SetMassAndEnergy(mass, energy, 0f);
+								//yeah, we can't do it this way. we have to use the matter preservation utilities and track our sources.
 						          }
 					     }
 				}

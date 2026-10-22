@@ -1,178 +1,190 @@
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
 public static class PepoFactory
 {
+	     // ---- Shared helpers ---------------------------------------------------
+
+	     /// <summary>
+	     /// Structural clone of a BodyData: shares the allele objects (immutable
+	     /// after mutation) but preserves the donor's expressed chromosomes and
+	     /// appearance so the clone looks identical to the source.
+	     /// </summary>
+	     private static BodyData CloneBody(BodyData src)
+	     {
+		          if (src == null)
+				return null;
+
+		          return new BodyData(src.matChromosomes, src.patChromosomes);
+
+	     }
+
+	     private static void RandomiseMood(Mood mood, float ceiling)
+	     {
+		          foreach (var emotion in mood.FullHexRange())
+				emotion.value = Random.Range(0f, ceiling);
+	     }
+
+	     /// <summary>
+	     /// Everything a PepoData needs before it can be safely observed by the rest
+	     /// of the game: an empty relationship library, needs, and a fresh mood.
+	     /// </summary>
+	     private static void WireUp(PepoData pepo)
+	     {
+		          InitialiseRelationshipLibrary(pepo);
+		          pepo.needs = new MaslowHeirachy(pepo);
+		          pepo.mood = new Mood();
+	     }
+
+	     // ---- Public constructors ---------------------------------------------
 
 	     public static PepoData ClonePepo(PepoData donor, bool newborn = false)
 	     {
-		          PepoData clone = new PepoData() { };
+		          var clone = new PepoData
+		          {
+				body = CloneBody(donor.body),
+				ssd = new SocioSexualData(donor.body),
+				personality = donor.personality,  // see note about HEXACO copy ctor
+				massGenetics = donor.massGenetics,
+				height = donor.height,
+				mass = donor.mass,
+				age = newborn ? 0.0001f : donor.age,
+		          };
 
-		          clone.pepoName = donor.pepoName;
-		          clone.massGenetics = donor.massGenetics;
-		          clone.height = donor.height;
-		          clone.ssd = donor.ssd;
-		          InitialiseRelationshipLibrary(clone);
-		          clone.ssd = donor.ssd;
-		          clone.personality = donor.personality;
-		          clone.needs = new MaslowHeirachy(clone);
-		          clone.age = donor.age;
-		          clone.mass = donor.mass;
-		          clone.mood = new Mood();
-		          clone.body = new BodyData(clone.body.maternalChromosome, clone.body.paternalChromosome);
-		          clone.body.expressedChromosomes = donor.body.expressedChromosomes;
-		          foreach (var emotion in clone.mood.FullHexRange())
-		          {
-				emotion.value = Random.Range(0, 10f);
-		          }
-		          if (newborn)
-		          {
-				clone.age = 0.0001f;
-		          }
+		          clone.pepoName[0].value = donor.forename;
+		          clone.pepoName[1].value = donor.surname;
+
+		          WireUp(clone);
+		          RandomiseMood(clone.mood, 10f);
 		          return clone;
 	     }
-	     public static PepoData InitialiseFixed(float ageYears, float weightKg, float htMeters, BodyData body = null, SocioSexualData sosex = null, PepoData donor = null)
+
+	     public static PepoData InitialiseFixed(
+	         float ageYears, float weightKg, float htMeters,
+	         BodyData body = null,
+	         SocioSexualData sosex = null,
+	         PepoData donor = null)
 	     {
-		          PepoData pepo = new PepoData();
+		          var pepo = new PepoData
+		          {
+				body = body != null ? CloneBody(body) : new BodyData(donor.body.matChromosomes, donor.body.patChromosomes)
+		          };
 
-		          if (donor == null)
-		          {
-				//here we copy the values from the donor to our own pepodata
+		          // donor hook is currently unused (was an empty TODO branch in the
+		          // original). Populate it if you want fixed init from a template.
+		          _ = donor;
 
-		          }
-		          if (sosex == null)
-		          {
-				sosex = new SocioSexualData(pepo.body);
-		          }
-		          if (body == null)
-		          {
-				body = BodyFactory.CreateRandomIndividual();
-		          }
-		          else
-		          {
-				pepo.body = new BodyData(body.maternalChromosome, body.paternalChromosome);
-		          }
+		          pepo.ssd = sosex ?? new SocioSexualData(pepo.body);
 		          pepo.age = ageYears;
 		          pepo.massGenetics = weightKg;
 		          pepo.height = htMeters;
-		          pepo.ssd = sosex;
-		          InitialiseRelationshipLibrary(pepo);
-		          pepo.needs = new MaslowHeirachy(pepo);
-		          pepo.mood = new Mood();
-		          foreach (var emotion in pepo.mood.FullHexRange())
-		          {
-				emotion.value = Random.Range(0, 10f);
-		          }
+
+		          WireUp(pepo);
+		          RandomiseMood(pepo.mood, 10f);
 		          return pepo;
 	     }
-	     public static PepoData InitialiseRandom()
+
+	     public static PepoData CreateRandom(ChromosomeData[] genome)
 	     {
-		          PepoData pepo = new PepoData();
+		          var pepo = new PepoData
+		          {
+				body = new(GeneticsUtilities.Mutate(genome, 0.55f),
+           GeneticsUtilities.Mutate(genome, 0.55f))
+		          };
+
+		          pepo.ssd = new SocioSexualData(pepo.body);
 		          pepo.age = Random.Range(16f, 50f);
 		          pepo.massGenetics = pepo.massGenetics * Random.Range(0.6f, 2f);
-		          pepo.mass = pepo.massGenetics;//
+		          pepo.mass = pepo.massGenetics;
 		          pepo.height = pepo.height * Random.Range(0.8f, 1.2f);
-		          pepo.body = BodyFactory.CreateRandomIndividual();
-		          pepo.ssd = new SocioSexualData(pepo.body);
-		          if (pepo.body.paternalChromosome.sexChromosome != "XY")
-		          {
+
+		          if (BodyUtilities.GetExpressedTrait("SexChromosome", pepo.body) == 1) // XX
 				pepo.womb = new List<PregnancyData>();
-		          }
+
+
 		          pepo.mother = pepo;
 		          pepo.father = pepo;
-		          pepo.homeLocation = new Vector3(Random.Range(0, (pepo.mass + pepo.age) / 2), Random.Range(0, (pepo.mass + pepo.age) / 2), 0);
+
+		          float footprint = Mathf.Max(1f, (pepo.mass + pepo.age) / 2f);
+		          pepo.homeLocation = new Vector3(Random.Range(0f, footprint), Random.Range(0f, footprint), 0f);
 		          pepo.currentLocation = pepo.homeLocation;
 
-		          InitialiseRelationshipLibrary(pepo);
-		          //
+		          WireUp(pepo);
+
 		          pepo.pepoName[0].value = PepoUtilitiesNames.InitialiseForname(pepo);
 		          pepo.pepoName[1].value = PepoUtilitiesNames.InitialiseSurname();
 		          pepo.personality = new HEXACO();
+
 		          if (pepo.age > 19)
-		          {
 				PepoSystemAgeing.InitialisePuberty(19, pepo);
-		          }
-		          pepo.needs = new MaslowHeirachy(pepo);
-		          pepo.mood = new Mood();
-		          foreach (var emotion in pepo.mood.FullHexRange())
-		          {
-				emotion.value = Random.Range(0, pepo.personality.Emotionality.value);
-		          }
+
+		          RandomiseMood(pepo.mood, pepo.personality.Emotionality.value);
 		          PepoLogUtilities.LogPepo(pepo);
 		          return pepo;
 	     }
+
 	     public static PepoData InitialiseFromParents(PepoData mat, PepoData pat)
 	     {
-		          PepoData bairn = new PepoData();
-		          //Inherit average of parents' traits with some variation
-		          bairn.age = 0.0001f; //newborn
-		          bairn.massGenetics = (mat.massGenetics + pat.massGenetics) / 2f * Random.Range(0.9f, 1.1f);
-		          bairn.mass = bairn.massGenetics * 0.03428f; //newborn mass is about 3.428% of adult mass
-		          bairn.height = (mat.height + pat.height) / 2f * Random.Range(0.95f, 1.05f);
-		          bairn.body = BodyFactory.CombineGeneticCode(mat.body, pat.body);
-		          bairn.ssd = new SocioSexualData(bairn.body);
-		          bairn.ssd.isPrepubescent = true;
-		          InitialiseRelationshipLibrary(bairn);
-		          bairn.personality = new HEXACO();
-		          bairn.mother = mat;
-		          bairn.father = pat;
-		          mat.offspring.Add(bairn);
-		          pat.offspring.Add(bairn);
-		          //create a list of names from me, my parents, my partner and my other children.
-		          List<string> excludedNames = new List<string>();
+		          var bairn = new PepoData
+		          {
+				age = 0.0001f,
+				massGenetics = (mat.massGenetics + pat.massGenetics) / 2f * Random.Range(0.9f, 1.1f),
+				height = (mat.height + pat.height) / 2f * Random.Range(0.95f, 1.05f),
+				body = BodyFactory.CombineGeneticCode(mat.body, pat.body),
+				personality = new HEXACO(),
+				mother = mat,
+				father = pat,
+		          };
+		          bairn.mass = bairn.massGenetics * 0.03428f; // newborn ≈ 3.43% of adult mass
+		          bairn.ssd = new SocioSexualData(bairn.body) { isPrepubescent = true };
 
-		          // Siblings
-		          excludedNames.AddRange(mat.offspring.Select(s => s.forename));
-		          excludedNames.AddRange(pat.offspring.Select(s => s.forename));
+		          WireUp(bairn);
 
-		          // Aunts/uncles (excluding parents)
-		          if (mat.mother != null)
-				excludedNames.AddRange(mat.mother.offspring.Where(a => a != mat).Select(a => a.forename));
+		          // Register as offspring of both parents. NOTE: field name here was
+		          // `offspring` in the original; UI code uses `knownOffspring`. Check
+		          // whether these are two different collections or a rename miss.
+		          mat.knownOffspring?.Add(bairn);
+		          pat.knownOffspring?.Add(bairn);
 
-		          if (pat.mother != null)
-				excludedNames.AddRange(pat.mother.offspring.Where(a => a != pat).Select(a => a.forename));
+		          // Name: exclude siblings and aunts/uncles.
+		          var excludedNames = new HashSet<string>();
+		          if (mat.knownOffspring != null)
+				foreach (var s in mat.knownOffspring)
+					     if (s != bairn)
+						          excludedNames.Add(s.forename);
+		          if (pat.knownOffspring != null)
+				foreach (var s in pat.knownOffspring)
+					     if (s != bairn)
+						          excludedNames.Add(s.forename);
+		          if (mat.mother?.knownOffspring != null)
+				foreach (var a in mat.mother.knownOffspring)
+					     if (a != mat)
+						          excludedNames.Add(a.forename);
+		          if (pat.mother?.knownOffspring != null)
+				foreach (var a in pat.mother.knownOffspring)
+					     if (a != pat)
+						          excludedNames.Add(a.forename);
 
-		          // Remove duplicates if needed
-		          excludedNames = excludedNames.Distinct().ToList();
-		          PepoUtilitiesNames.InitialiseForname(bairn, excludedNames);
-		          bairn.pepoName[1].value = mat.surname; //mothers surname. this should become a method that filters through a pepos values and cluture to return aname they wulod give to a child. default tohaving the mother choose for now but pepos should have cultural rules that determine who chooses the name.
+		          bairn.pepoName[0].value = PepoUtilitiesNames.InitialiseForname(bairn, excludedNames.ToList());
+		          bairn.pepoName[1].value = mat.surname;
+
 		          bairn.currentLocation = mat.currentLocation;
 		          bairn.homeLocation = mat.homeLocation;
-		          bairn.needs = new MaslowHeirachy(bairn);
-		          bairn.mood = new Mood();
+
 		          bairn.values = PepoFactoryValues.IntegrateValues(bairn.values, PepoFactoryValues.ValuesFromHexaco(bairn.personality));
 		          bairn.values = PepoFactoryValues.IntegrateValues(bairn.values, PepoFactoryValues.ValuesFromHexaco(bairn.mother.personality));
 		          bairn.values = PepoFactoryValues.IntegrateValues(bairn.values, bairn.mother.values);
-		          foreach (var emotion in bairn.mood.FullHexRange())
-		          {
-				emotion.value = Random.Range(0, bairn.personality.Emotionality.value);
-		          }
+
+		          RandomiseMood(bairn.mood, bairn.personality.Emotionality.value);
 		          return bairn;
 	     }
 
+	     // ---- Relationship scaffolding ----------------------------------------
+
 	     public static void InitialiseRelationshipLibrary(PepoData pepo)
 	     {
-		          pepo.RelationshipLibrary.Add(RelationshipType.lover, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.spouse, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.ex, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.offspring, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.parent, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.coparent, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.kin, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.incompatible, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.friend, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.bestie, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.acquaintence, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.enemy, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.rival, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.courting, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.mentor, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.mentee, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.leader, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.follower, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.rolemodel, new List<PepoRelationshipData>());
-		          pepo.RelationshipLibrary.Add(RelationshipType.peer, new List<PepoRelationshipData>());
+		          foreach (RelationshipType rt in System.Enum.GetValues(typeof(RelationshipType)))
+				pepo.RelationshipLibrary[rt] = new List<PepoRelationshipData>();
 	     }
 }

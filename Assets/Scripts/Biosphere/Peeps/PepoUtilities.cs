@@ -130,18 +130,47 @@ public class PepoUtilities
 		          return Mathf.Clamp01((float)matches / total);
 	     }
 
-	     // Body comparison by expressed chromosomes (0..1)
+	     // Body comparison by expressed chromosomes (0..1) although this should only be for appearance genes. it doesnt make sense that things like lifespan would be included in this
 	     public static float CompareBodyData(BodyData b1, BodyData b2)
 	     {
-		          if (b1 == null || b2 == null || b1.expressedChromosomes == null || b2.expressedChromosomes == null)
+		          if (b1 == null || b2 == null || b1.physicalAttributes == null || b2.physicalAttributes == null)
 				return 0.5f;
-		          int count = Mathf.Min(b1.expressedChromosomes.Count, b2.expressedChromosomes.Count);
-		          if (count == 0)
-				return 0.5f;
+		          int count = 0;
 		          int same = 0;
-		          for (int i = 0; i < count; i++)
-				if (b1.expressedChromosomes[i] == b2.expressedChromosomes[i])
-					     same++;
+		          //go through our dictionary of appearance attributes and compare them to the other bodydata's dictionary of appearance attributes. if they have the same key and the same value, we count it as a match. if they have the same key but different values, we count it as a mismatch. if they don't have the same key, we ignore it.
+		          foreach (var kvp in b1.physicalAttributes)
+		          {
+				if (b2.physicalAttributes.TryGetValue(kvp.Key, out var otherValue))
+				{
+					     count++;
+					     if (Mathf.Approximately(kvp.Value.value, otherValue.value))
+						          same++;
+				}
+		          }
+		          same++;
+		          return Mathf.Clamp01((float)same / count);
+	     }
+	     public static float ComparePepos(PepoData b1, PepoData b2, List<string> traits = null)
+	     {
+		          if (b1 == null || b2 == null || b1.FilterableAspects == null || b2.FilterableAspects == null || traits == null)
+				return 0.5f;
+		          int count = 0;
+		          int same = 0;
+		          //go through our dictionary of appearance attributes and compare them to the other bodydata's dictionary of appearance attributes. if they have the same key and the same value, we count it as a match. if they have the same key but different values, we count it as a mismatch. if they don't have the same key, we ignore it.
+		          //probably better to see if these are all on both lists first maybe? the key would be something like headshape, really i think we should be checking if the 
+		          foreach (var kvp in b1.FilterableAspects)
+		          {
+				if (b2.FilterableAspects.TryGetValue(kvp.Key, out var otherValue))
+				{
+					     if (traits.Contains(kvp.Key))
+					     {
+						          count++;
+						          if (Mathf.Approximately(kvp.Value.value, otherValue.value))
+								same++;
+					     }
+				}
+		          }
+		          same++;
 		          return Mathf.Clamp01((float)same / count);
 	     }
 

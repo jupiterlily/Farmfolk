@@ -89,42 +89,6 @@ public class PepoData
 		          womb.Remove(pregnancy);
 		          ssd.isFertile = true;
 	     }
-
-	     public void PopulateAspectDictionary()
-	     {
-		          FilterableAspects = new Dictionary<string, NumericalAspect>();
-		          NumericalAspect Age = new NumericalAspect("age", 100f, 0f, false, 0f, "years");
-		          Age.value = age;
-		          NumericalAspect Mass = new NumericalAspect("mass", 200f, 0f, false, 0f, "kg");
-		          NumericalAspect Height = new NumericalAspect("height", 2.5f, 0f, false, 0f, "m");
-		          Mass.value = mass;
-		          Height.value = height;
-		          FilterableAspects.Add(Age.name, Age);
-		          FilterableAspects.Add(Mass.name, Mass);
-		          FilterableAspects.Add(Height.name, Height);
-		          foreach (var aspect in body.expressedChromosomes)
-		          {
-				FilterableAspects.Add(aspect.name, aspect);
-		          }
-		          foreach (PersonalityAspect aspect in personality.FullHexRange())
-		          {
-				FilterableAspects.Add(aspect.name, (NumericalAspect)aspect);
-		          }
-		          foreach (PersonalityAspect aspect in personality.FullFacetRange())
-		          {
-				FilterableAspects.Add(aspect.name, (NumericalAspect)aspect);
-		          }
-		          foreach (var aspect in values)
-		          {
-				FilterableAspects.Add(aspect.name, (NumericalAspect)aspect);
-		          }
-
-	     }
-
-	     public void UpdateAspectDictionary()
-	     {
-		          //here we update age, height, mass and other variabel values that can change.
-	     }
 }
 
 public class Stat

@@ -67,59 +67,59 @@ public static class ThermalEnergyUtilities
 				return EnergyTransferUtilities.TransferEnergy(ThermB, ThermA, heatFlow);
 		          }
 	     }
-	     //  public static float TryEvaporate(ThermalEnergy sourceLiquid, ThermalEnergy destVapor, float requestedMass)
-	     //  {
-	     //        if (sourceLiquid.Mass <= 0 || requestedMass <= 0)
-	     //return 0;
+	     public static float TryEvaporate(ThermalEnergy sourceLiquid, ThermalEnergy destVapor, float requestedMass)
+	     {
+		          if (sourceLiquid.Mass <= 0 || requestedMass <= 0)
+				return 0;
 
-	     //        // We can only evaporate if we have enough sensible heat to supply the latent heat
-	     //        // without dropping below the freezing point (or a defined minimum temperature).
-	     //        float minAllowedTemp = sourceLiquid.MeltingPoint; // 273.15K for water
-	     //        float currentTemp = sourceLiquid.Temperature;
+		          // We can only evaporate if we have enough sensible heat to supply the latent heat
+		          // without dropping below the freezing point (or a defined minimum temperature).
+		          float minAllowedTemp = sourceLiquid.MeltingPoint; // 273.15K for water
+		          float currentTemp = sourceLiquid.Temperature;
 
-	     //        // Energy available for evaporation = sensible energy above the melting point
-	     //        float energyAboveMelt = sourceLiquid.Mass * sourceLiquid.SpecificHeat * (currentTemp - minAllowedTemp);
-	     //        float latentRequiredPerKg = sourceLiquid.LatentHeatVaporization;
+		          // Energy available for evaporation = sensible energy above the melting point
+		          float energyAboveMelt = sourceLiquid.Mass * sourceLiquid.SpecificHeat * (currentTemp - minAllowedTemp);
+		          float latentRequiredPerKg = sourceLiquid.LatentHeatVaporization;
 
-	     //        // Maximum mass we can evaporate with the available energy
-	     //        float maxEvapMass = energyAboveMelt / latentRequiredPerKg;
-	     //        float actualMass = Mathf.Min(requestedMass, maxEvapMass, sourceLiquid.Mass);
+		          // Maximum mass we can evaporate with the available energy
+		          float maxEvapMass = energyAboveMelt / latentRequiredPerKg;
+		          float actualMass = Mathf.Min(requestedMass, maxEvapMass, sourceLiquid.Mass);
 
-	     //        if (actualMass <= 0)
-	     //return 0;
+		          if (actualMass <= 0)
+				return 0;
 
-	     //        //    The vapor receives the mass but *not* the latent heat (that energy is spent).
-	     //        sourceLiquid.TransferMassTo(destVapor, actualMass);
-
-
-	     //        return actualMass;
-	     //  }
+		          //    The vapor receives the mass but *not* the latent heat (that energy is spent).
+		          sourceLiquid.TransferMassTo(destVapor, actualMass);
 
 
-	     //  public static float TryCondense(ThermalEnergy sourceVapor, ThermalEnergy destLiquid, float requestedMass)
-	     //  {
-	     //        if (sourceVapor.Mass <= 0 || requestedMass <= 0)
-	     //return 0;
+		          return actualMass;
+	     }
 
-	     //        // Vapor must have enough mass and latent heat to condense.
-	     //        // We can condense only if the vapor temperature is below boiling point? 
-	     //        // Actually condensation happens when saturated; we just take the requested mass.
-	     //        float actualMass = Mathf.Min(requestedMass, sourceVapor.Mass);
 
-	     //        // 1. Latent heat released = mass * latent heat of vaporization
-	     //        float latentReleased = actualMass * sourceVapor.LatentHeatVaporization;
+	     public static float TryCondense(ThermalEnergy sourceVapor, ThermalEnergy destLiquid, float requestedMass)
+	     {
+		          if (sourceVapor.Mass <= 0 || requestedMass <= 0)
+				return 0;
 
-	     //        // 2. Remove that latent heat from the vapor (cools it down)
-	     //        sourceVapor.RemoveEnergy(latentReleased);
+		          // Vapor must have enough mass and latent heat to condense.
+		          // We can condense only if the vapor temperature is below boiling point? 
+		          // Actually condensation happens when saturated; we just take the requested mass.
+		          float actualMass = Mathf.Min(requestedMass, sourceVapor.Mass);
 
-	     //        // 3. Move mass + remaining sensible energy to liquid
-	     //        sourceVapor.TransferMassTo(destLiquid, actualMass);
+		          // 1. Latent heat released = mass * latent heat of vaporization
+		          float latentReleased = actualMass * sourceVapor.LatentHeatVaporization;
 
-	     //        // 4. Add the released latent heat to the liquid (warms it)
-	     //        destLiquid.AddEnergy(latentReleased);
+		          // 2. Remove that latent heat from the vapor (cools it down)
+		          sourceVapor.RemoveEnergy(latentReleased);
 
-	     //        return actualMass;
-	     //  }
+		          // 3. Move mass + remaining sensible energy to liquid
+		          sourceVapor.TransferMassTo(destLiquid, actualMass);
+
+		          // 4. Add the released latent heat to the liquid (warms it)
+		          destLiquid.AddEnergy(latentReleased);
+
+		          return actualMass;
+	     }
 	     /// <summary>Transfer mass and associated thermal energy</summary>
 	     public static void TransferMassAndEnergy(ThermalEnergy source, ThermalEnergy sink,
 		 float massToTransfer)
@@ -131,7 +131,7 @@ public static class ThermalEnergyUtilities
 		          if (actualTransfer <= 0)
 				return;
 
-		          source.TransferMassTo(sink, actualTransfer);		          
+		          source.TransferMassTo(sink, actualTransfer);
 	     }
 
 	     /// <summary>Convective heat transfer to/from a surface</summary>

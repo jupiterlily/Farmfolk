@@ -170,7 +170,7 @@ public static class HydrosphereUtilities
 		          // (commented out in original – can be re‑enabled with updated calls)
 
 		          // 2. Atmospheric phase changes (cloud formation/precipitation)
-		          //ApplyAtmosphericPhaseChanges(atmosphereTile, hours);
+		          ApplyAtmosphericPhaseChanges(atmosphereTile, hours);
 
 		          // 3. Surface condensation (dew/frost formation)
 		          SurfaceCondensation(surfaceTile, hours);
@@ -328,50 +328,50 @@ public static class HydrosphereUtilities
 				}
 		          }
 	     }
-	     //  // ---------- Atmospheric Phase Changes (updated) ----------
-	     //  public static void ApplyAtmosphericPhaseChanges(AtmosphereTile atm, float hours)
-	     //  {
+	     // ---------- Atmospheric Phase Changes (updated) ----------
+	     public static void ApplyAtmosphericPhaseChanges(AtmosphereTile atm, float hours)
+	     {
 
-	     //        if (atm.waterVapor == null || atm.cloudWaterContent == null)
-	     //return;
+		          if (atm.waterVapor == null || atm.cloudWaterContent == null)
+				return;
 
-	     //        float relativeHumidity = CalculateRelativeHumidity(atm);
-	     //        float timeFactor = Mathf.Min(hours, 1.0f) * 0.1f; // prevents oscillation
+		          float relativeHumidity = CalculateRelativeHumidity(atm);
+		          float timeFactor = Mathf.Min(hours, 1.0f) * 0.1f; // prevents oscillation
 
-	     //        // 1. Condensation (vapor → cloud)
-	     //        if (relativeHumidity > 1.01f && atm.waterVapor.Mass > 0)
-	     //        {
-	     //float saturationMass = CalculateSaturationMass(atm);
-	     //float excessVapor = atm.waterVapor.Mass - saturationMass;
-	     //float massToCondense = Mathf.Min(excessVapor * timeFactor, atm.waterVapor.Mass);
-	     //if (massToCondense > 0)
-	     //	     ApplyCondensation(atm, massToCondense);
-	     //        }
+		          // 1. Condensation (vapor → cloud)
+		          if (relativeHumidity > 1.01f && atm.waterVapor.Mass > 0)
+		          {
+				float saturationMass = CalculateSaturationMass(atm);
+				float excessVapor = atm.waterVapor.Mass - saturationMass;
+				float massToCondense = Mathf.Min(excessVapor * timeFactor, atm.waterVapor.Mass);
+				if (massToCondense > 0)
+					     ApplyCondensation(atm, massToCondense);
+		          }
 
-	     //        // 2. Evaporation (cloud → vapor)
-	     //        else if (relativeHumidity < 0.98f && atm.cloudWaterContent.Mass > 0)
-	     //        {
-	     //float saturationMass = CalculateSaturationMass(atm);
-	     //float vaporDeficit = saturationMass - atm.waterVapor.Mass;
-	     //float massToEvaporate = Mathf.Min(vaporDeficit * timeFactor, atm.cloudWaterContent.Mass);
-	     //if (massToEvaporate > 0)
-	     //	     ApplyEvaporation(atm, massToEvaporate);
-	     //        }
-	     //  }
+		          // 2. Evaporation (cloud → vapor)
+		          else if (relativeHumidity < 0.98f && atm.cloudWaterContent.Mass > 0)
+		          {
+				float saturationMass = CalculateSaturationMass(atm);
+				float vaporDeficit = saturationMass - atm.waterVapor.Mass;
+				float massToEvaporate = Mathf.Min(vaporDeficit * timeFactor, atm.cloudWaterContent.Mass);
+				if (massToEvaporate > 0)
+					     ApplyEvaporation(atm, massToEvaporate);
+		          }
+	     }
 
-	     //private static void ApplyEvaporation(AtmosphereTile atm, float massToEvaporate)
-	     //{
-	     //      // Only call the utility; it handles all energy moves.
-	     //      ThermalEnergyUtilities.TryEvaporate(atm.cloudWaterContent, atm.waterVapor, massToEvaporate);
-	     //      // No extra steps!
-	     //}
+	     private static void ApplyEvaporation(AtmosphereTile atm, float massToEvaporate)
+	     {
+		          // Only call the utility; it handles all energy moves.
+		          ThermalEnergyUtilities.TryEvaporate(atm.cloudWaterContent, atm.waterVapor, massToEvaporate);
+		          // No extra steps!
+	     }
 
-	     //private static void ApplyCondensation(AtmosphereTile atm, float massToCondense)
-	     //{
-	     //      // Use the new TryCondense
-	     //      ThermalEnergyUtilities.TryCondense(atm.waterVapor, atm.cloudWaterContent, massToCondense);
-	     //      // No extra steps!
-	     //}
+	     private static void ApplyCondensation(AtmosphereTile atm, float massToCondense)
+	     {
+		          // Use the new TryCondense
+		          ThermalEnergyUtilities.TryCondense(atm.waterVapor, atm.cloudWaterContent, massToCondense);
+		          // No extra steps!
+	     }
 	     public static float TryEvaporate(ThermalEnergy sourceLiquid, ThermalEnergy destVapor, float requestedMass)
 	     {
 		          if (sourceLiquid.Mass <= 0 || requestedMass <= 0)
@@ -495,7 +495,7 @@ public static class HydrosphereUtilities
 
 				// 2. Move mass
 				ThermalEnergyUtilities.TransferMassAndEnergy(hydroTile.surfaceLiquid, atmotile.waterVapor, surfaceEvaporation);
-
+				ThermalEnergyUtilities.TransferMassAndEnergy(hydroTile.composition.water, atmotile.waterVapor, soilEvaporation);
 				//// 3. Warm the atmosphere
 				//float totalAirMass = 0f;
 				//foreach (var nrg in atmotile.energies)
@@ -517,7 +517,7 @@ public static class HydrosphereUtilities
 
 		          float solarEnergy = solarRadiation * 3600f * hours;
 		          float availableEnergy = solarEnergy * 0.6f;
-		          float maxEvaporation = availableEnergy / (tile.surfaceLiquid.LatentHeatVaporization * 1000f);
+		          float maxEvaporation = availableEnergy / (tile.surfaceLiquid.LatentHeatVaporization);
 
 		          float soilMoistureFactor = Mathf.Clamp01(tile.composition.saturation);
 		          maxEvaporation *= soilMoistureFactor;

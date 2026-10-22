@@ -14,12 +14,12 @@ public static class PepoSystemAgeing
 		          {
 				PepoSystemAgeing.InitialisePuberty(pubertyAge, pepo);
 		          }
-		          else if (pepo.body.paternalChromosome.sexChromosome == "XX" && pepo.ssd.isFertile && pepo.age > menopauseAge && Random.value > 0.1f * years)
+		          else if (pepo.body.physicalAttributes["SexChromosome"].descriptor == "XX" && pepo.ssd.isFertile && pepo.age > menopauseAge && Random.value > 0.1f * years)
 		          {
 				Debug.Log($"[PepoManager]{PepoUtilities.GetFullName(pepo)} has hit menopause");
 				pepo.ssd.isFertile = false;
 		          }
-		          else if (pepo.body.paternalChromosome.sexChromosome == "XY" && pepo.ssd.presentsMasc)
+		          else if (pepo.body.physicalAttributes["SexChromosome"].descriptor == "XY" && pepo.ssd.presentsMasc)
 		          {
 				pepo.body.cosmeticFeatures.UpdateFacialHair(pepo);
 		          }
@@ -31,11 +31,11 @@ public static class PepoSystemAgeing
 		          pepo.ssd.isFertile = true;
 		          pepo.ssd.isPrepubescent = false;
 
-		          if (pepo.body.paternalChromosome.sexChromosome == "XX")
+		          if (pepo.body.physicalAttributes["SexChromosome"].descriptor == "XX")
 		          {
 				pepo.womb = new List<PregnancyData>();
 		          }
-		          else if (pepo.body.paternalChromosome.sexChromosome == "XY")
+		          else if (pepo.body.physicalAttributes["SexChromosome"].descriptor == "XY")
 		          {
 				// Initialize facial hair for XY individuals at puberty
 				pepo.body.cosmeticFeatures.InitializeStubbleAndMoustache(pepo);

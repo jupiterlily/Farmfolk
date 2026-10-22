@@ -78,7 +78,7 @@ public class SocioSexualData
 				numberOfSexualPartners.maxValue = Random.Range(numberOfRomanticPartners.minValue, numberOfSexualPartners.maxValue);
 		          }
 
-		          if (body.paternalChromosome.sexChromosome == "XY")
+		          if (body.physicalAttributes["SexChromosome"].descriptor == "XY")
 		          {
 				isMasc = (Random.value > 0.02f) ? true : false;
 				isFemme = (Random.value > 0.9f) ? true : false;

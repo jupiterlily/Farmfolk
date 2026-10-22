@@ -79,7 +79,7 @@ public class MaslowHeirachy
 	     public List<Need> Safety = new List<Need>();
 	     public MaslowHeirachy(PepoData lilGuy)
 	     {
-		          float wattsPerSecond = PepoUtilities.BMR(lilGuy.mass, PepoUtilities.BodySurfaceArea(lilGuy.mass, lilGuy.height, lilGuy.body.paternalChromosome.sexChromosome == "XY"), 20, 37.5f);
+		          float wattsPerSecond = PepoUtilities.BMR(lilGuy.mass, PepoUtilities.BodySurfaceArea(lilGuy.mass, lilGuy.height, lilGuy.body.physicalAttributes["SexChromosome"].descriptor == "XY"), 20, 37.5f);
 		          float wattsPerHour = wattsPerSecond * 3600;
 		          float caloriesPerDay = wattsPerHour * 24 / 4.184f; //1 calorie = 4.184 joules
 		          Need hunger = new Need("hunger", "food", "eat", "stuffed", "full", "peckish", "hungry", "starving", (caloriesPerDay / 2000 * lilGuy.mass / 70f) * 2000, true, -1, caloriesPerDay / 24);

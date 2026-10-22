@@ -14,7 +14,6 @@ public static class PepoSystemMatchmaking
 		          }
 		          if (degree >= 1 && AreRelated(me, target, degree))
 		          {
-				PepoFactoryBonds.ParasocialRelationship(me, target, RelationshipType.kin);
 				return false;
 		          }
 		          //Am I sexually attracted to them?
@@ -27,11 +26,13 @@ public static class PepoSystemMatchmaking
 		          //what do we think of theri appearnace? people who value conformity or have low openness want people who look like them
 		          if (degree >= 2)
 		          {
-				float similarityscore = PepoUtilitiesMatchmaking.ComparePhysicalAppearance(me, target);
+
+				List<string> list = GeneLibrary.VisibleGenes;
+				float similarityscore = PepoUtilities.ComparePepos(me, target, list);
 				if (me.values[11].value > 1)
 				{
-					     float parentalsimilarityscore = PepoUtilitiesMatchmaking.ComparePhysicalAppearance(me.mother, target);
-					     parentalsimilarityscore += PepoUtilitiesMatchmaking.ComparePhysicalAppearance(me.father, target);
+					     float parentalsimilarityscore = PepoUtilities.ComparePepos(me.mother, target, list);
+					     parentalsimilarityscore += PepoUtilities.ComparePepos(me.father, target, list);
 					     parentalsimilarityscore /= 2f;
 					     //tradition
 					     parentalsimilarityscore *= (me.values[11].value / me.values[11].maxValue);
@@ -133,6 +134,7 @@ public static class PepoSystemMatchmaking
 				}
 		          }
 		          Debug.Log($"[Relationship Manager]{me.fullname} is attracted to {target.fullname}, a {PepoLogUtilities.GetGenderExpression(target)}. They value {PepoLogUtilities.Values(target, 3)} It seems like they are {PepoLogUtilities.Hexaco(target.personality, 2)}");
+		          PepoFactoryBonds.ParasocialRelationship(me, target, RelationshipType.Courting, "crush");
 		          return true;
 	     }
 
@@ -142,42 +144,51 @@ public static class PepoSystemMatchmaking
 		          if (degree >= 1 && (b.offspring.Contains(a) || a.offspring.Contains(b)))
 		          {
 				Debug.Log($"[Relationship Manager]{a.fullname} and {b.fullname} are very closely related");
+				PepoFactoryBonds.MutualRelationship(a, b, RelationshipType.kin);
 				return true;
 		          }
 		          //check if they share parents
 		          if (degree >= 2 && (PepoUtilitiesPopulation.HasSharedParent(a, b)))
 		          {
 				Debug.Log($"[Relationship Manager]{a.fullname} and {b.fullname} are very closely related");
+				PepoFactoryBonds.MutualRelationship(a, b, RelationshipType.kin);
+				PepoFactoryBonds.MutualRelationship(a, b, RelationshipType.Sibling);
 				return true;
 		          }
 		          //check if we are aunts or uncles
 		          if (degree >= 3 && (PepoUtilitiesPopulation.HasSharedParent(a.mother, b) || PepoUtilitiesPopulation.HasSharedParent(a.father, b) || PepoUtilitiesPopulation.HasSharedParent(a, b.mother) || PepoUtilitiesPopulation.HasSharedParent(a, b.father)))
 		          {
 				Debug.Log($"[Relationship Manager]{a.fullname} and {b.fullname} are closely related");
+				PepoFactoryBonds.MutualRelationship(a, b, RelationshipType.kin);
 				return true;
 		          }
 		          //check if they share grandparents
 		          if (degree >= 4 && (PepoUtilitiesPopulation.HasSharedParent(a.father, b.father) || PepoUtilitiesPopulation.HasSharedParent(a.mother, b.mother) || PepoUtilitiesPopulation.HasSharedParent(a.father, b.mother) || PepoUtilitiesPopulation.HasSharedParent(a.mother, b.father)))
 		          {
 				Debug.Log($"[Relationship Manager]{a.fullname} and {b.fullname} are related");
+				PepoFactoryBonds.MutualRelationship(a, b, RelationshipType.kin);
+				PepoFactoryBonds.MutualRelationship(a, b, RelationshipType.Cousin);
 				return true;
 		          }
 		          //check if we share any cousins
 		          if (degree >= 5 && (PepoUtilitiesPopulation.HasSharedCousins(a, b)))
 		          {
 				Debug.Log($"[Relationship Manager]{a.fullname} and {b.fullname} are indirectly related");
+				PepoFactoryBonds.MutualRelationship(a, b, RelationshipType.kin);
 				return true;
 		          }
 		          //check is we share cousins with each others parents
 		          if (degree >= 6 && (PepoUtilitiesPopulation.HasSharedCousins(a.mother, b) || PepoUtilitiesPopulation.HasSharedCousins(a.father, b) || PepoUtilitiesPopulation.HasSharedCousins(a, b.mother) || PepoUtilitiesPopulation.HasSharedCousins(a, b.father)))
 		          {
 				Debug.Log($"[Relationship Manager]{a.fullname} and {b.fullname} are distantly related");
+				PepoFactoryBonds.MutualRelationship(a, b, RelationshipType.kin);
 				return true;
 		          }
 		          //check if our parents share cousins
 		          if (degree >= 7 && (PepoUtilitiesPopulation.HasSharedCousins(a.father, b.father) || PepoUtilitiesPopulation.HasSharedCousins(a.mother, b.mother) || PepoUtilitiesPopulation.HasSharedCousins(a.father, b.mother) || PepoUtilitiesPopulation.HasSharedCousins(a.mother, b.father)))
 		          {
 				Debug.Log($"[Relationship Manager]{a.fullname} and {b.fullname} are very distantly related");
+				PepoFactoryBonds.MutualRelationship(a, b, RelationshipType.kin);
 				return true;
 		          }
 		          //take your list of kin and my list of kin and see if anyone on it is  the same
@@ -325,8 +336,10 @@ public static class PepoSystemMatchmaking
 
 				// Genetic compatibility (avoid incest)
 				if (AreRelated(me, target, strictness))
+				{
+					     PepoFactoryBonds.ParasocialRelationship(me, target, RelationshipType.kin);
 					     return false;
-
+				}
 				// Sexual orientation compatibility
 				if (!CheckSexualOrientation(me, target))
 					     return false;

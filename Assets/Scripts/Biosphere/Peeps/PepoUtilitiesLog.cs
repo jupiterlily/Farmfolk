@@ -74,8 +74,8 @@ public static class PepoLogUtilities
 		          }
 
 		          // Group children by gender
-		          var boys = children.Where(c => c.body.paternalChromosome.sexChromosome == "XY").ToList();
-		          var girls = children.Where(c => c.body.paternalChromosome.sexChromosome == "XX").ToList();
+		          var boys = children.Where(c => c.body.physicalAttributes["SexChromosome"].descriptor == "XY").ToList();
+		          var girls = children.Where(c => c.body.physicalAttributes["SexChromosome"].descriptor == "XX").ToList();
 
 		          List<string> descriptions = new List<string>();
 
@@ -115,7 +115,7 @@ public static class PepoLogUtilities
 	     private static string GetGenderTerm(PepoData pepo)
 	     {
 		          // More nuanced gender terms based on presentation and identity although this needs to be modified to account for trans, in and out the closet, intersex, geenderfluid, agender, man/woman, girl boy also need to account for age
-		          if (pepo.body.paternalChromosome.sexChromosome == "XY")
+		          if (pepo.body.physicalAttributes["SexChromosome"].descriptor == "XY")
 		          {
 				if (pepo.ssd.presentsFemme && !pepo.ssd.presentsMasc)
 					     return "trans girl";
@@ -280,7 +280,7 @@ public static class PepoLogUtilities
 	     public static string GetPregnancyStatus(PepoData pepo)
 	     {
 		          //at the moment this just gets if they have awomb or not.
-		          if (pepo.body.paternalChromosome.sexChromosome == "XX" && pepo.womb != null && pepo.womb.Count > 0)
+		          if (pepo.body.physicalAttributes["SexChromosome"].descriptor == "XX" && pepo.womb != null && pepo.womb.Count > 0)
 				return $"({pepo.womb[0].bairns.Count} pregnancies)";
 		          return "Not pregnant";
 	     }
@@ -304,9 +304,9 @@ public static class PepoLogUtilities
 		          {
 				genderIdentity = "a woman";
 		          }
-		          if ((pepo.body.paternalChromosome.sexChromosome == "XY" && !pepo.ssd.isMasc && pepo.ssd.isFemme) || (pepo.body.paternalChromosome.sexChromosome == "XX" && !pepo.ssd.isFemme && pepo.ssd.isMasc))
+		          if ((pepo.body.physicalAttributes["SexChromosome"].descriptor == "XY" && !pepo.ssd.isMasc && pepo.ssd.isFemme) || (pepo.body.physicalAttributes["SexChromosome"].descriptor == "XX" && !pepo.ssd.isFemme && pepo.ssd.isMasc))
 		          {
-				if (pepo.body.paternalChromosome.sexChromosome == "XY")
+				if (pepo.body.physicalAttributes["SexChromosome"].descriptor == "XY")
 				{
 					     genderIdentity = string.Concat("trans, ", genderIdentity);
 				}
@@ -318,9 +318,9 @@ public static class PepoLogUtilities
 		          // Determine chromosomal sex first
 		          string chromosomalSex;
 		          bool intersex = false;
-		          if (pepo.body.paternalChromosome.sexChromosome == "XY" && pepo.body.maternalChromosome.sexChromosome == "XX")
+		          if (pepo.body.physicalAttributes["SexChromosome"].descriptor == "XY" && pepo.body.physicalAttributes["SexChromosome"].descriptor == "XX")
 				chromosomalSex = "male";
-		          else if (pepo.body.paternalChromosome.sexChromosome == "XX" && pepo.body.maternalChromosome.sexChromosome == "XX")
+		          else if (pepo.body.physicalAttributes["SexChromosome"].descriptor == "XX" && pepo.body.physicalAttributes["SexChromosome"].descriptor == "XX")
 				chromosomalSex = "female";
 		          else
 		          {
@@ -340,7 +340,7 @@ public static class PepoLogUtilities
 				identity = "woman";
 
 		          // Check if transgender (identity doesn't match chromosomal sex)
-		          bool isTrans = (pepo.body.paternalChromosome.sexChromosome == "XY" && pepo.ssd.isFemme) || (pepo.body.paternalChromosome.sexChromosome == "XX" && pepo.ssd.isMasc);
+		          bool isTrans = (pepo.body.physicalAttributes["SexChromosome"].descriptor == "XY" && pepo.ssd.isFemme) || (pepo.body.physicalAttributes["SexChromosome"].descriptor == "XX" && pepo.ssd.isMasc);
 
 		          // Determine openness about gender identity
 		          string openness = "openly";
@@ -530,9 +530,9 @@ public static class PepoLogUtilities
 					     elderly++;
 				//person.body.hasY
 				// Gender and identity
-				bool isTrans = (person.body.paternalChromosome.sexChromosome == "XY" && person.ssd.isFemme) || (person.body.paternalChromosome.sexChromosome == "XX" && person.ssd.isMasc);
+				bool isTrans = (person.body.physicalAttributes["SexChromosome"].descriptor == "XY" && person.ssd.isFemme) || (person.body.physicalAttributes["SexChromosome"].descriptor == "XX" && person.ssd.isMasc);
 				bool isNonBinary = (person.ssd.isMasc && person.ssd.isFemme) || (!person.ssd.isMasc && !person.ssd.isFemme);
-				bool isIntersex = (person.body.maternalChromosome.sexChromosome == "XY");
+				bool isIntersex = (person.body.physicalAttributes["SexChromosome"].descriptor == "XY");
 
 				if (isIntersex)
 					     intersex++;
@@ -551,9 +551,9 @@ public static class PepoLogUtilities
 						          closetedTrans++;
 				}
 
-				if (person.body.paternalChromosome.sexChromosome == "XY" && !isTrans && !isNonBinary)
+				if (person.body.physicalAttributes["SexChromosome"].descriptor == "XY" && !isTrans && !isNonBinary)
 					     men++;
-				else if (person.body.paternalChromosome.sexChromosome == "XX" && !isTrans && !isNonBinary)
+				else if (person.body.physicalAttributes["SexChromosome"].descriptor == "XX" && !isTrans && !isNonBinary)
 					     women++;
 
 				// Orientation
@@ -564,9 +564,9 @@ public static class PepoLogUtilities
 
 				if (person.ssd.likesMasc && person.ssd.likesFemme)
 					     bisexual++;
-				else if ((person.ssd.likesMasc && person.body.paternalChromosome.sexChromosome == "XY") || (person.ssd.likesFemme && person.body.paternalChromosome.sexChromosome == "XX"))
+				else if ((person.ssd.likesMasc && person.body.physicalAttributes["SexChromosome"].descriptor == "XY") || (person.ssd.likesFemme && person.body.physicalAttributes["SexChromosome"].descriptor == "XX"))
 					     gayLesbian++;
-				else if ((person.ssd.likesMasc && person.body.paternalChromosome.sexChromosome == "XX") || (person.ssd.likesFemme && person.body.paternalChromosome.sexChromosome == "XY"))
+				else if ((person.ssd.likesMasc && person.body.physicalAttributes["SexChromosome"].descriptor == "XX") || (person.ssd.likesFemme && person.body.physicalAttributes["SexChromosome"].descriptor == "XY"))
 					     straight++;
 				else
 					     questioning++;
@@ -697,7 +697,7 @@ public static class PepoLogUtilities
 				if (liveChildren >= 2)
 				{
 					     childrenWord += myChildren + " are";
-					     string parentWord = Pepo.body.paternalChromosome.sexChromosome == "XY" == true ? "father" : "mother";
+					     string parentWord = Pepo.body.physicalAttributes["SexChromosome"].descriptor == "XY" == true ? "father" : "mother";
 					     additionalMessages.Add($"{liveChildren} {childrenWord} now without a {parentWord}");
 				}
 		          }
@@ -757,7 +757,7 @@ public static class PepoLogUtilities
 		          {
 				if (guy.isAlive)
 				{
-					     if (guy.body.paternalChromosome.sexChromosome == "XY")
+					     if (guy.body.physicalAttributes["SexChromosome"].descriptor == "XY")
 					     {
 						          men++;
 					     }

@@ -15,10 +15,8 @@ public enum Phase
 /// </summary>
 public abstract class Matter
 {
-	     public float Mass
-	     {
-		          get; set;
-	     }               // kg
+	     public float Mass => ThermalEnergy.Mass;
+
 	     public float Density
 	     {
 		          get; set;

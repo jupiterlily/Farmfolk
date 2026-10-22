@@ -210,42 +210,61 @@ public class PepoUILibrary
 
 	     public static UISection BuildSectionPepoBodyAppearance(PepoData pepo, UIManager uim, UIStructuralComponent sc)
 	     {
-		          var section = new UISection("Appearance", true, new List<UIComponentData>())
-		          {
-				Padding = sc.Padding,
-				Spacing = sc.Spacing,
-				//VerticalLayout = !sc.VerticalLayout,
-				//ChildForceExpandWidth = sc.VerticalLayout,  // horizontal strip: expand width
-				//ChildForceExpandHeight = !sc.VerticalLayout, // vertical strip: expand height
-				DisplayLabel = false
-		          };
+		          var section = UIUtilities.NewSection("Appearance", sc);
 
-		          // Map trait index → name (from BodyData)
-		          string[] traitNames = {
-        "Head Shape", "Hair Redness", "Hair Darkness", "Eye Shape", "Eye Color",
-        "Eye Darkness", "Eye Height", "Nose Shape", "Nose Height", "Top Lip Shape",
-        "Bottom Lip Shape", "Mouth Height", "Skin Depth", "Skin Saturation",
-        "Skin Hue", "Primary Freckles", "Invert Freckles", "Express Secondary Freckles", "Invert Secondary Freckles",
-        "Hair Texture", "Height", "Mass Genetics", "Brows", "Brow Height"
-    };
-
-		          var traits = pepo.body.expressedChromosomes;
-		          for (int i = 0; i < traits.Count && i < traitNames.Length; i++)
+		          foreach (var part in BodyLibrary.Default.Parts)
 		          {
-				int index = i; // capture for lambda
-				var trait = traits[index];
-				var rangeField = new RangeField(traitNames[index], 1, trait.maxValue, true)
+				foreach (var allele in part.alleles)
 				{
-					     Getter = () => trait.value,
-					     Setter = (val) => trait.value = (float)val,
-					     // VerticalLayout = false,
-					     DisplayLabel = true
-				};
-				section.Components.Add(rangeField);
+					     string traitName = allele.range.name;
+					     if (!pepo.body.physicalAttributes.TryGetValue(traitName, out var aspect))
+						          continue;
+
+					     section.Components.Add(
+					         UIUtilities.TraitRange(traitName, aspect, aspect.minValue, aspect.maxValue));
+				}
 		          }
 
 		          return section;
 	     }
+	     //  public static UISection BuildSectionPepoBodyAppearance(PepoData pepo, UIManager uim, UIStructuralComponent sc)
+	     //  {
+	     //        var section = new UISection("Appearance", true, new List<UIComponentData>())
+	     //        {
+	     //Padding = sc.Padding,
+	     //Spacing = sc.Spacing,
+	     ////VerticalLayout = !sc.VerticalLayout,
+	     ////ChildForceExpandWidth = sc.VerticalLayout,  // horizontal strip: expand width
+	     ////ChildForceExpandHeight = !sc.VerticalLayout, // vertical strip: expand height
+	     //DisplayLabel = false
+	     //        };
+
+	     //        // Map trait index → name (from BodyData)
+	     //        string[] traitNames = {
+	     //    "Head Shape", "Hair Redness", "Hair Darkness", "Eye Shape", "Eye Color",
+	     //    "Eye Darkness", "Eye Height", "Nose Shape", "Nose Height", "Top Lip Shape",
+	     //    "Bottom Lip Shape", "Mouth Height", "Skin Depth", "Skin Saturation",
+	     //    "Skin Hue", "Primary Freckles", "Invert Freckles", "Express Secondary Freckles", "Invert Secondary Freckles",
+	     //    "Hair Texture", "Height", "Mass Genetics", "Brows", "Brow Height"
+	     //};
+
+	     //        var traits = pepo.body.expressedChromosomes;
+	     //        for (int i = 0; i < traits.Count && i < traitNames.Length; i++)
+	     //        {
+	     //int index = i; // capture for lambda
+	     //var trait = traits[index];
+	     //var rangeField = new RangeField(traitNames[index], 1, trait.maxValue, true)
+	     //{
+	     //	     Getter = () => trait.value,
+	     //	     Setter = (val) => trait.value = (float)val,
+	     //	     // VerticalLayout = false,
+	     //	     DisplayLabel = true
+	     //};
+	     //section.Components.Add(rangeField);
+	     //        }
+
+	     //        return section;
+	     //  }
 
 	     public static UISection BuildSectionPepoPersonalityHEXACO(PepoData pepo, UIManager uim, UIStructuralComponent sc)
 	     {
@@ -358,4 +377,6 @@ public class PepoUILibrary
 		          window.Tabs.Add(relationshipsTab);
 		          return window;
 	     }
+
+
 }

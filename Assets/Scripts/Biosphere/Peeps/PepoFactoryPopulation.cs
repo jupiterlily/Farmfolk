@@ -91,7 +91,7 @@ public static class PepoFactoryPopulation
 				PepoData twin = PepoFactory.ClonePepo(firstChild, true);
 
 
-				if (firstChild.body.paternalChromosome.sexChromosome == "XY")
+				if (firstChild.body.physicalAttributes["SexChromosome"].descriptor == "XY")
 
 					     PepoUtilitiesNames.InitialiseForname(twin, PepoUtilitiesNames.GetPepoNames(children));
 				children.Add(twin);
