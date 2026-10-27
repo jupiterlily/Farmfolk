@@ -956,8 +956,8 @@ public static class UIUtilities
 		              ?? aspects.ToList();
 
 		          // The presence of EyeIrisStructure marks this as the eye set.
-		          if (list.Any(kvp => kvp.Key == "EyeIrisStructure"))
-				return GetEyeColour(list, baseColour);
+		          //        if (list.Any(kvp => kvp.Key == "EyeIrisStructure"))
+		          //return GetEyeColour(list, baseColour);
 
 		          return GetGenericBodyColour(list, baseColour);
 	     }
@@ -1005,64 +1005,64 @@ public static class UIUtilities
 		          return result;
 	     }
 
-	     // Eyes: dedicated pipeline.
-	     private static Color GetEyeColour(
-	         IList<KeyValuePair<string, NumericalAspect>> list,
-	         Color baseColour)
-	     {
-		          Color iris = baseColour;
+	     //  // Eyes: dedicated pipeline.
+	     //  private static Color GetEyeColour(
+	     //      IList<KeyValuePair<string, NumericalAspect>> list,
+	     //      Color baseColour)
+	     //  {
+	     //        Color iris = baseColour;
 
-		          float? structure = FindAspect(list, "EyeIrisStructure");
-		          float? saturation = FindAspect(list, "EyeIrisSaturation");
-		          float? pigmentType = FindAspect(list, "EyePigmentType");
-		          float? pigmentDensity = FindAspect(list, "EyePigmentDensity");
+	     //        float? structure = FindAspect(list, "EyeIrisStructure");
+	     //        float? saturation = FindAspect(list, "EyeIrisSaturation");
+	     //        float? pigmentType = FindAspect(list, "EyePigmentType");
+	     //        float? pigmentDensity = FindAspect(list, "EyePigmentDensity");
 
-		          // Pass 1 — structural base. Sample at a per-pepo t so two pepos with
-		          // the same iris structure differ, then modulate S/V by the saturation
-		          // allele so "pale" vs "intense" is visible.
-		          if (structure.HasValue)
-		          {
-				var wcd = ResolveStructuralColour("EyeIrisStructure", (int)structure.Value);
-				if (wcd != null)
-				{
-					     float t = Mathf.Repeat(
-					         structure.Value * 0.37f + (saturation ?? 0f) * 0.63f, 1f);
+	     //        // Pass 1 — structural base. Sample at a per-pepo t so two pepos with
+	     //        // the same iris structure differ, then modulate S/V by the saturation
+	     //        // allele so "pale" vs "intense" is visible.
+	     //        if (structure.HasValue)
+	     //        {
+	     //var wcd = ResolveStructuralColour("EyeIrisStructure", (int)structure.Value);
+	     //if (wcd != null)
+	     //{
+	     //	     float t = Mathf.Repeat(
+	     //	         structure.Value * 0.37f + (saturation ?? 0f) * 0.63f, 1f);
 
-					     Color structural = SampleColour(wcd.Colours[0], t);
+	     //	     Color structural = SampleColour(wcd.Colours[0], t);
 
-					     if (saturation.HasValue)
-					     {
-						          int n = GeneLibrary.Descriptions["EyeIrisSaturation"].Count;
-						          float s01 = (saturation.Value - 1f) / (n - 1f);
-						          Color.RGBToHSV(structural, out float h, out float s, out float v);
-						          structural = Color.HSVToRGB(
-						              h,
-						              Mathf.Clamp01(s * Mathf.Lerp(0.4f, 1.3f, s01)),
-						              Mathf.Clamp01(v * Mathf.Lerp(0.75f, 1.10f, s01)));
-					     }
+	     //	     if (saturation.HasValue)
+	     //	     {
+	     //		          int n = GeneLibrary.Descriptions["EyeIrisSaturation"].Count;
+	     //		          float s01 = (saturation.Value - 1f) / (n - 1f);
+	     //		          Color.RGBToHSV(structural, out float h, out float s, out float v);
+	     //		          structural = Color.HSVToRGB(
+	     //		              h,
+	     //		              Mathf.Clamp01(s * Mathf.Lerp(0.4f, 1.3f, s01)),
+	     //		              Mathf.Clamp01(v * Mathf.Lerp(0.75f, 1.10f, s01)));
+	     //	     }
 
-					     iris = BlendColour(iris, structural, wcd.Blend, 1f);
-				}
-		          }
+	     //	     iris = BlendColour(iris, structural, wcd.Blend, 1f);
+	     //}
+	     //        }
 
-		          // Pass 2 — pigment overlay. Density 1 = no pigment, 7 = opaque.
-		          if (pigmentType.HasValue && pigmentDensity.HasValue)
-		          {
-				float weight = Mathf.Clamp01((pigmentDensity.Value - 1f) / 6f);
-				if (weight > 0f)
-				{
-					     var names = GeneticsLibrary.BiologicalPigmentNames();
-					     int idx = (int)pigmentType.Value - 1;
-					     if (idx >= 0 && idx < names.Length &&
-					         ColourLibrary.Raw.TryGetValue(names[idx], out var wcd))
-					     {
-						          iris = wcd.Apply(iris, weight);
-					     }
-				}
-		          }
+	     //        // Pass 2 — pigment overlay. Density 1 = no pigment, 7 = opaque.
+	     //        if (pigmentType.HasValue && pigmentDensity.HasValue)
+	     //        {
+	     //float weight = Mathf.Clamp01((pigmentDensity.Value - 1f) / 6f);
+	     //if (weight > 0f)
+	     //{
+	     //	     var names = GeneticsLibrary.BiologicalPigmentNames();
+	     //	     int idx = (int)pigmentType.Value - 1;
+	     //	     if (idx >= 0 && idx < names.Length &&
+	     //	         ColourLibrary.Raw.TryGetValue(names[idx], out var wcd))
+	     //	     {
+	     //		          iris = wcd.Apply(iris, weight);
+	     //	     }
+	     //}
+	     //        }
 
-		          return iris;
-	     }
+	     //        return iris;
+	     //  }
 
 	     private static float? FindAspect(
 	         IList<KeyValuePair<string, NumericalAspect>> list, string key)
@@ -1072,115 +1072,115 @@ public static class UIUtilities
 					     return kvp.Value.value;
 		          return null;
 	     }
-	     private static Color GetSkinColor(int hue, int saturation, int depth)
-	     {
-		          // Convert trait values (1-6) to HSV ranges
-		          float h = MapRange(hue, 1, GeneLibrary.Descriptions["SkinHue"].Count, 25f / 360, 40f / 360); // Full hue spectrum
-		          float s = MapRange(saturation, 1, GeneLibrary.Descriptions["SkinSaturation"].Count, 0.25f, 0.6f); // Moderate to high saturation
-		          float v = MapRange(depth, 1, GeneLibrary.Descriptions["SkinDepth"].Count, 0.95f, 0.25f); // Dark to light
+	     //private static Color GetSkinColor(int hue, int saturation, int depth)
+	     //{
+	     //      // Convert trait values (1-6) to HSV ranges
+	     //      float h = MapRange(hue, 1, GeneLibrary.Descriptions["SkinHue"].Count, 25f / 360, 40f / 360); // Full hue spectrum
+	     //      float s = MapRange(saturation, 1, GeneLibrary.Descriptions["SkinSaturation"].Count, 0.25f, 0.6f); // Moderate to high saturation
+	     //      float v = MapRange(depth, 1, GeneLibrary.Descriptions["SkinDepth"].Count, 0.95f, 0.25f); // Dark to light
 
-		          Color skinColor = Color.HSVToRGB(h, s, v);
-		          return skinColor;
-	     }
+	     //      Color skinColor = Color.HSVToRGB(h, s, v);
+	     //      return skinColor;
+	     //}
 
-	     private static Color GetEyeColor(int color, int darkness)
-	     {
-		          // Map eye color to specific hue ranges
-		          float h = 0f;
-		          float sMin = 0.35f, sMax = 0.8f;
-		          float vMin = 0.4f, vMax = 0.95f;
-		          switch (color)
-		          {
-		          case 1: // Violet
-		          h = 275f / 360f;
-		          sMin = 0.25f;
-		          sMax = 0.60f;
-		          vMin = 0.40f;
-		          vMax = 0.55f;
-		          break;
-		          case 2: // Blue
-		          h = 215f / 360f;
-		          sMin = 0.20f;
-		          sMax = 0.65f;
-		          vMin = 0.45f;
-		          vMax = 0.95f; // keep blues visibly bright
-		          break;
-		          case 3: // Blue-Green / teal
-		          h = 195f / 360f;
-		          sMin = 0.20f;
-		          sMax = 0.6f;
-		          vMin = 0.25f;
-		          vMax = 0.95f;
-		          break;
-		          case 4: // Green
-		          h = 120f / 360f;
-		          sMin = 0.35f;
-		          sMax = 0.7f;
-		          vMin = 0.45f;
-		          vMax = 0.65f;
-		          break;
-		          case 5: // Hazel (yellow-brown)
-		          h = 55f / 360f;
-		          sMin = 0.4f;
-		          sMax = 0.7f;
-		          vMin = 0.4f;
-		          vMax = 0.6f;
-		          break;
-		          case 6: // Brown
-		          h = 25f / 360f;
-		          sMin = 0.30f;
-		          sMax = 0.65f;
-		          vMin = 0.20f;
-		          vMax = 0.6f;
-		          break;
-		          case 7:
-		          h = 0f; //albino red
-		          sMin = 0.5f;
-		          sMax = 0.8f;
-		          vMin = 0.55f;
-		          vMax = 0.95f;
-		          break;
-		          }
+	     //private static Color GetEyeColor(int color, int darkness)
+	     //{
+	     //      // Map eye color to specific hue ranges
+	     //      float h = 0f;
+	     //      float sMin = 0.35f, sMax = 0.8f;
+	     //      float vMin = 0.4f, vMax = 0.95f;
+	     //      switch (color)
+	     //      {
+	     //      case 1: // Violet
+	     //      h = 275f / 360f;
+	     //      sMin = 0.25f;
+	     //      sMax = 0.60f;
+	     //      vMin = 0.40f;
+	     //      vMax = 0.55f;
+	     //      break;
+	     //      case 2: // Blue
+	     //      h = 215f / 360f;
+	     //      sMin = 0.20f;
+	     //      sMax = 0.65f;
+	     //      vMin = 0.45f;
+	     //      vMax = 0.95f; // keep blues visibly bright
+	     //      break;
+	     //      case 3: // Blue-Green / teal
+	     //      h = 195f / 360f;
+	     //      sMin = 0.20f;
+	     //      sMax = 0.6f;
+	     //      vMin = 0.25f;
+	     //      vMax = 0.95f;
+	     //      break;
+	     //      case 4: // Green
+	     //      h = 120f / 360f;
+	     //      sMin = 0.35f;
+	     //      sMax = 0.7f;
+	     //      vMin = 0.45f;
+	     //      vMax = 0.65f;
+	     //      break;
+	     //      case 5: // Hazel (yellow-brown)
+	     //      h = 55f / 360f;
+	     //      sMin = 0.4f;
+	     //      sMax = 0.7f;
+	     //      vMin = 0.4f;
+	     //      vMax = 0.6f;
+	     //      break;
+	     //      case 6: // Brown
+	     //      h = 25f / 360f;
+	     //      sMin = 0.30f;
+	     //      sMax = 0.65f;
+	     //      vMin = 0.20f;
+	     //      vMax = 0.6f;
+	     //      break;
+	     //      case 7:
+	     //      h = 0f; //albino red
+	     //      sMin = 0.5f;
+	     //      sMax = 0.8f;
+	     //      vMin = 0.55f;
+	     //      vMax = 0.95f;
+	     //      break;
+	     //      }
 
-		          // darkness is 1..4 (1 = lightest). Map so darker -> lower value
-		          float s = MapRange(darkness, 1, 4, sMax, sMin);
-		          float v = MapRange(darkness, 1, 4, vMax, vMin);
+	     //      // darkness is 1..4 (1 = lightest). Map so darker -> lower value
+	     //      float s = MapRange(darkness, 1, 4, sMax, sMin);
+	     //      float v = MapRange(darkness, 1, 4, vMax, vMin);
 
-		          Color eyeColor = Color.HSVToRGB(h, s, v);
-
-
-
-		          return eyeColor;
-	     }
-
-	     private static Color GetHairColor(int eumelanin, int pheomelanin)
-	     {
-		          // Eumelanin controls darkness (black/brown), Pheomelanin controls redness
-
-		          float baseHue = MapRange(pheomelanin, 1, GeneLibrary.Descriptions["HairPigmentPheomelanin"].Count, 0.02f, 0.15f); // Slight yellow to orange-red
-		          float saturation = MapRange(eumelanin, 1, GeneLibrary.Descriptions["HairPigmentEumelanin"].Count, 0.75f, 0.3f); // More pheomelanin = more saturation
-		          float value = MapRange(eumelanin, 1, GeneLibrary.Descriptions["HairPigmentEumelanin"].Count, 0.1f, 0.8f); // more eumelanin = darker
+	     //      Color eyeColor = Color.HSVToRGB(h, s, v);
 
 
-		          Color hairColor = Color.HSVToRGB(baseHue, saturation, value);
-		          return hairColor;
-	     }
 
-	     private static Color GetMouthColor(int skinHue, int skinSaturation, int skinDepth)
-	     {
-		          // Start with skin color but make it slightly more red/pink
-		          Color skinColor = GetSkinColor(skinHue, skinSaturation, skinDepth);
+	     //      return eyeColor;
+	     //}
 
-		          // Convert to HSV to adjust
-		          Color.RGBToHSV(skinColor, out float h, out float s, out float v);
+	     //private static Color GetHairColor(int eumelanin, int pheomelanin)
+	     //{
+	     //      // Eumelanin controls darkness (black/brown), Pheomelanin controls redness
 
-		          // Make slightly more red and saturated for lips
-		          h = Mathf.Clamp(h + 0.873f, 0.9f, 1f);
-		          s = Mathf.Clamp(s + 0.2f, 0.2f, 0.35f);
-		          v = Mathf.Clamp(v - 0.1f, 0.35f, .7f);
+	     //      float baseHue = MapRange(pheomelanin, 1, GeneLibrary.Descriptions["HairPigmentPheomelanin"].Count, 0.02f, 0.15f); // Slight yellow to orange-red
+	     //      float saturation = MapRange(eumelanin, 1, GeneLibrary.Descriptions["HairPigmentEumelanin"].Count, 0.75f, 0.3f); // More pheomelanin = more saturation
+	     //      float value = MapRange(eumelanin, 1, GeneLibrary.Descriptions["HairPigmentEumelanin"].Count, 0.1f, 0.8f); // more eumelanin = darker
 
-		          return Color.HSVToRGB(h, s, v);
-	     }
+
+	     //      Color hairColor = Color.HSVToRGB(baseHue, saturation, value);
+	     //      return hairColor;
+	     //}
+
+	     //private static Color GetMouthColor(int skinHue, int skinSaturation, int skinDepth)
+	     //{
+	     //      // Start with skin color but make it slightly more red/pink
+	     //      Color skinColor = GetSkinColor(skinHue, skinSaturation, skinDepth);
+
+	     //      // Convert to HSV to adjust
+	     //      Color.RGBToHSV(skinColor, out float h, out float s, out float v);
+
+	     //      // Make slightly more red and saturated for lips
+	     //      h = Mathf.Clamp(h + 0.873f, 0.9f, 1f);
+	     //      s = Mathf.Clamp(s + 0.2f, 0.2f, 0.35f);
+	     //      v = Mathf.Clamp(v - 0.1f, 0.35f, .7f);
+
+	     //      return Color.HSVToRGB(h, s, v);
+	     //}
 
 	     private static float MapRange(float value, float fromMin, float fromMax, float toMin, float toMax)
 	     {
@@ -1195,21 +1195,21 @@ public static class UIUtilities
 		          const string Marker = "Pigment";
 
 		          // EyePigmentType is special — its allele is the pigment name, its density lives in a sibling.
-		          if (key == "EyePigmentType")
-		          {
-				if (!eyeDensity.HasValue)
-					     return null;
-				var names = GeneticsLibrary.BiologicalPigmentNames();
-				int idx = value - 1;
-				if (idx < 0 || idx >= names.Length)
-					     return null;
-				if (!ColourLibrary.Raw.TryGetValue(names[idx], out var eyeWcd))
-					     return null;
+		          //        if (key == "EyePigment")
+		          //        {
+		          //if (!eyeDensity.HasValue)
+		          //	     return null;
+		          //var names = GeneticsLibrary.BiologicalPigmentNames();
+		          //int idx = value - 1;
+		          //if (idx < 0 || idx >= names.Length)
+		          //	     return null;
+		          //if (!ColourLibrary.Raw.TryGetValue(names[idx], out var eyeWcd))
+		          //	     return null;
 
-				// EyePigmentDensity descriptors are 1..7 ("clear".."black")
-				float eyeWeight = Mathf.Clamp01((eyeDensity.Value - 1) / 6f);
-				return (eyeWcd, eyeWeight);
-		          }
+		          //// EyePigmentDensity descriptors are 1..7 ("clear".."black")
+		          //float eyeWeight = Mathf.Clamp01((eyeDensity.Value - 1) / 6f);
+		          //return (eyeWcd, eyeWeight);
+		          //        }
 		          if (key == "EyePigmentDensity")
 				return null;           // consumed by its sibling
 

@@ -10,7 +10,7 @@ public class TileManager : MonoBehaviour
 	     public TileGrid grid;
 	     public int tilesize = 100;
 	     public GameObject tilePrefab;
-	     public WorldTile[,] tiles;
+
 	     public int atmoRatio = 10;
 	     int atmTileSise => (int)grid.tileWidth * atmoRatio;
 	     public float atmosphericMoisture; //in liters per m2
@@ -45,7 +45,7 @@ public class TileManager : MonoBehaviour
 		          grid = new TileGrid(worldsise.x, worldsise.y, tilesize);
 		          grid.XGrid = worldsise.x;
 		          grid.YGrid = worldsise.y;
-		          tiles = new WorldTile[worldsise.x, worldsise.y];
+		          grid.tiles = new WorldTile[worldsise.x, worldsise.y];
 
 		          tectonicPlates = new TectonicPlate[plates];
 		          // Atmosphere tile setup
@@ -133,7 +133,7 @@ public class TileManager : MonoBehaviour
 
 					     tile.GetComponent<WorldTile>().Setup(data);
 					     grid.Map.SetValue(data, i, j);
-					     tiles.SetValue(tile.GetComponent<WorldTile>(), i, j);
+					     grid.tiles.SetValue(tile.GetComponent<WorldTile>(), i, j);
 					     tile.transform.position = new Vector3(i, 0.5f, j);
 					     // tile.GetComponent<WorldTile>().tileData.Initialise(TileUtilities.GetValidNeighbour(data, grid), airTemp);
 					     //   tile.GetComponent<Renderer>().material.color = TileUtilities.GetSoilColor(tile.GetComponent<WorldTile>().tileData.composition);
@@ -213,7 +213,7 @@ public class TileManager : MonoBehaviour
 	     public List<TileData> FindPlantPositions()
 	     {
 		          List<TileData> plantPositions = new List<TileData>();
-		          foreach (var tile in tiles)
+		          foreach (var tile in grid.tiles)
 		          {
 				TileData data = tile.tileData;
 				if (data.composition.water.Mass > 5f && data.surfaceLiquid.Mass < 10f && (data.composition.organicMaterial.Mass > 1f || data.composition.clay.Mass > 1f || data.composition.silt.Mass > 1f || data.composition.sand.Mass > 1f))
@@ -229,11 +229,29 @@ public class TileManager : MonoBehaviour
 	     /// </summary>
 	     public void TileUpdate(float hours)
 	     {
-		          foreach (var tile in grid.Map)
+		          float longitude; // -180 to 180
+		          float localSolarTime;
+		          float currentEnergy;
+		          //instead iterate through all the tiles
+		          for (int i = 0; i < grid.XGrid; i++)
 		          {
-				ApplySoilProcesses(tile, hours);
+				for (int j = 0; j < grid.YGrid; j++)
+				{
+					     ApplySoilProcesses(grid.Map[i, j], hours);
+					     longitude = grid.Map[i, j].longitude; // -180 to 180
+					     localSolarTime = SimulationConstants.TimeOfDay + (longitude / 360f);
+					     localSolarTime = localSolarTime % 1f; // Ensure stays in [0,1]
+					     currentEnergy = SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(
+					        grid.Map[i, j].latitude, SimulationConstants.DayOfYear, localSolarTime);
+
+					     if (currentEnergy > 0)
+					     {
+						          grid.tiles[i, j].TileVisualUpdate(currentEnergy);
+	     				}
+				}
 		          }
-		          UpdateAllTiles(hours);
+
+		          //UpdateAllTiles(hours);
 		          UpdateTotals();
 	     }
 	     public void AtmosphereStep(float hours)
@@ -318,9 +336,9 @@ public class TileManager : MonoBehaviour
 				//  surface.CollectGases();
 
 
-				CryosphereUtilities.RedistributeSurfaceWaterAndIce(tiles[tile.tileGridRef.x, tile.tileGridRef.y], hours);
+				CryosphereUtilities.RedistributeSurfaceWaterAndIce(grid.tiles[tile.tileGridRef.x, tile.tileGridRef.y], hours);
 				HydrosphereUtilities.UpdateSurfaceHydrosphere(tile.atmosphereTile, tile, tile.incomingSolarEnergy.RemoveEnergy(tile.incomingSolarEnergy.StoredEnergy), hours);
-				HydrosphereUtilities.RedistributeWaterLateral(tiles[tile.tileGridRef.x, tile.tileGridRef.y], hours);
+				HydrosphereUtilities.RedistributeWaterLateral(grid.tiles[tile.tileGridRef.x, tile.tileGridRef.y], hours);
 				tile.CollectGases(atmoRatio * atmoRatio);
 		          }
 	     }
@@ -410,7 +428,7 @@ public class TileManager : MonoBehaviour
 					     if (owner[n.x, n.y] == -1)
 					     {
 						          owner[n.x, n.y] = plateIdx;
-						          WorldTile tile = tiles[n.x, n.y];
+						          WorldTile tile = grid.tiles[n.x, n.y];
 						          tile.Plate = tectonicPlates[plateIdx];
 						          tectonicPlates[plateIdx].tiles.Add(tile.tileData);
 						          queue.Enqueue(n);
@@ -444,7 +462,7 @@ public class TileManager : MonoBehaviour
 		          List<TileData> list = new List<TileData>();
 		          for (int x = startX; x < endX; x++)
 				for (int y = startY; y < endY; y++)
-					     list.Add(tiles[x, y].tileData);
+					     list.Add(grid.tiles[x, y].tileData);
 		          return list.ToArray();
 	     }
 	     private void ApplyPrecipitationToSurface(float hours)
@@ -590,7 +608,7 @@ public class TileManager : MonoBehaviour
 		          {
 				for (int y = startY; y < endY; y++)
 				{
-					     WorldTile tile = tiles[x, y];
+					     WorldTile tile = grid.tiles[x, y];
 					     if (tile == null)
 						          continue;
 					     TileData data = tile.tileData;
@@ -602,19 +620,19 @@ public class TileManager : MonoBehaviour
 
 	     }
 
-	     private void UpdateAllTiles(float hours)
-	     {
-		          for (int x = 0; x < worldsise.x; x++)
-		          {
-				for (int y = 0; y < worldsise.y; y++)
-				{
-					     WorldTile tile = tiles[x, y];
-					     if (tile == null)
-						          continue;
-					     tile.TileVisualUpdate();
-				}
-		          }
-	     }
+	     //  private void UpdateAllTiles(float hours)
+	     //  {
+	     //        for (int x = 0; x < worldsise.x; x++)
+	     //        {
+	     //for (int y = 0; y < worldsise.y; y++)
+	     //{
+	     //	     WorldTile tile = grid.tiles[x, y];
+	     //	     if (tile == null)
+	     //		          continue;
+	     //	     tile.TileVisualUpdate();
+	     //}
+	     //        }
+	     //  }
 
 	     //get latitude of a cell based on its grid position
 	     public float GetLatitude(float x, float y)
@@ -634,7 +652,7 @@ public class TileManager : MonoBehaviour
 		          if (data == null)
 				return;
 
-		          WorldTile tile = tiles[data.tileGridRef.x, data.tileGridRef.y];
+		          WorldTile tile = grid.tiles[data.tileGridRef.x, data.tileGridRef.y];
 		          if (tile == null)
 				return;
 		          //temperature redisttribution
@@ -667,7 +685,7 @@ public class TileManager : MonoBehaviour
 		          {
 				for (int y = 0; y < worldLongitude; y++)  // y = longitude index
 				{
-					     WorldTile current = tiles[x, y];
+					     WorldTile current = grid.tiles[x, y];
 
 					     // Longitude wraps (east-west)
 					     int yWest = (y - 1 + worldLongitude) % worldLongitude;
@@ -677,73 +695,73 @@ public class TileManager : MonoBehaviour
 					     if (x == 0)  // South Pole (latitude = -90°)
 					     {
 						          // North neighbor: go toward equator (increase latitude)
-						          current.NTile = tiles[x + 1, y];
+						          current.NTile = grid.tiles[x + 1, y];
 
 						          // South neighbor: doesn't exist at South Pole
 						          // We'll make it wrap to opposite longitude at same pole
 						          int oppositeY = (y + halfLongitude) % worldLongitude;
-						          current.STile = tiles[x, oppositeY];
+						          current.STile = grid.tiles[x, oppositeY];
 
 						          // East and West: along same latitude (South Pole)
-						          current.WTile = tiles[x, yWest];
-						          current.ETile = tiles[x, yEast];
+						          current.WTile = grid.tiles[x, yWest];
+						          current.ETile = grid.tiles[x, yEast];
 
 						          // Diagonals
 						          // NW and NE: combine north and horizontal movement
-						          current.NWTile = tiles[x + 1, yWest];
-						          current.NETile = tiles[x + 1, yEast];
+						          current.NWTile = grid.tiles[x + 1, yWest];
+						          current.NETile = grid.tiles[x + 1, yEast];
 
 						          // SW and SE: stay at South Pole but opposite longitude
 						          int swY = (int)(halfLongitude * 0.5f) % worldLongitude;
 						          int seY = (int)(halfLongitude * 1.5f) % worldLongitude;
-						          current.SWTile = tiles[x, swY];
-						          current.SETile = tiles[x, seY];
+						          current.SWTile = grid.tiles[x, swY];
+						          current.SETile = grid.tiles[x, seY];
 					     }
 					     else if (x == worldLatitude - 1)  // North Pole (latitude = +90°)
 					     {
 						          // North neighbor: doesn't exist at North Pole
 						          // Wrap to opposite longitude at same pole
 						          int oppositeY = (y + halfLongitude) % worldLongitude;
-						          current.NTile = tiles[x, oppositeY];
+						          current.NTile = grid.tiles[x, oppositeY];
 
 						          // South neighbor: go toward equator (decrease latitude)
-						          current.STile = tiles[x - 1, y];
+						          current.STile = grid.tiles[x - 1, y];
 
 						          // East and West: along same latitude (North Pole)
-						          current.WTile = tiles[x, yWest];
-						          current.ETile = tiles[x, yEast];
+						          current.WTile = grid.tiles[x, yWest];
+						          current.ETile = grid.tiles[x, yEast];
 
 						          // Diagonals
 						          // NW and NE: stay at North Pole but opposite longitude
 						          int nwY = (int)(halfLongitude * 0.5f) % worldLongitude;
 						          int neY = (int)(halfLongitude * 1.5f) % worldLongitude;
-						          current.NWTile = tiles[x, nwY];
-						          current.NETile = tiles[x, neY];
+						          current.NWTile = grid.tiles[x, nwY];
+						          current.NETile = grid.tiles[x, neY];
 
 						          // SW and SE: combine south and horizontal movement
-						          current.SWTile = tiles[x - 1, yWest];
-						          current.SETile = tiles[x - 1, yEast];
+						          current.SWTile = grid.tiles[x - 1, yWest];
+						          current.SETile = grid.tiles[x - 1, yEast];
 					     }
 					     else  // Normal tile (not at pole)
 					     {
 						          // Standard assignment
-						          current.NTile = tiles[x + 1, y];  // North = increase latitude
-						          current.STile = tiles[x - 1, y];  // South = decrease latitude
-						          current.WTile = tiles[x, yWest];  // West = decrease longitude (wrap)
-						          current.ETile = tiles[x, yEast];  // East = increase longitude (wrap)
+						          current.NTile = grid.tiles[x + 1, y];  // North = increase latitude
+						          current.STile = grid.tiles[x - 1, y];  // South = decrease latitude
+						          current.WTile = grid.tiles[x, yWest];  // West = decrease longitude (wrap)
+						          current.ETile = grid.tiles[x, yEast];  // East = increase longitude (wrap)
 
 						          // Diagonals
-						          current.NWTile = tiles[x + 1, yWest];
-						          current.NETile = tiles[x + 1, yEast];
-						          current.SWTile = tiles[x - 1, yWest];
-						          current.SETile = tiles[x - 1, yEast];
+						          current.NWTile = grid.tiles[x + 1, yWest];
+						          current.NETile = grid.tiles[x + 1, yEast];
+						          current.SWTile = grid.tiles[x - 1, yWest];
+						          current.SETile = grid.tiles[x - 1, yEast];
 					     }
 					     if (atmoCounter <= 0)
 					     {
-						          current.tileData.atmosphereTile.horizontalNeighbors[0] = tiles[x, (y - 1 + worldLongitude) % worldLongitude].tileData.atmosphereTile;
-						          current.tileData.atmosphereTile.horizontalNeighbors[1] = tiles[x, (y + 1) % worldLongitude].tileData.atmosphereTile;
-						          current.tileData.atmosphereTile.horizontalNeighbors[2] = tiles[Mathf.Max(0, x - 1), y].tileData.atmosphereTile;
-						          current.tileData.atmosphereTile.horizontalNeighbors[3] = tiles[Mathf.Min(worldLatitude - 1, x + 1), y].tileData.atmosphereTile;
+						          current.tileData.atmosphereTile.horizontalNeighbors[0] = grid.tiles[x, (y - 1 + worldLongitude) % worldLongitude].tileData.atmosphereTile;
+						          current.tileData.atmosphereTile.horizontalNeighbors[1] = grid.tiles[x, (y + 1) % worldLongitude].tileData.atmosphereTile;
+						          current.tileData.atmosphereTile.horizontalNeighbors[2] = grid.tiles[Mathf.Max(0, x - 1), y].tileData.atmosphereTile;
+						          current.tileData.atmosphereTile.horizontalNeighbors[3] = grid.tiles[Mathf.Min(worldLatitude - 1, x + 1), y].tileData.atmosphereTile;
 						          atmoCounter = atmoRatio;
 					     }
 					     else
@@ -821,7 +839,7 @@ public class TileManager : MonoBehaviour
 		              gridPos.y < 0 || gridPos.y >= worldsise.y)
 				return null;
 
-		          WorldTile tile = tiles[gridPos.x, gridPos.y];
+		          WorldTile tile = grid.tiles[gridPos.x, gridPos.y];
 		          return tile != null ? tile.tileData : null;
 	     }
 
@@ -851,10 +869,10 @@ public class TileManager : MonoBehaviour
 		          {
 				for (int j = 0; j < worldsise.y; j++)
 				{
-					     var comp = tiles[i, j].tileData.composition;
+					     var comp = grid.tiles[i, j].tileData.composition;
 					     waterSum += comp.water.Mass +
-						          tiles[i, j].tileData.surfaceLiquid.Mass +
-						          tiles[i, j].tileData.surfaceIce.Mass +
+						          grid.tiles[i, j].tileData.surfaceLiquid.Mass +
+						          grid.tiles[i, j].tileData.surfaceIce.Mass +
 						          comp.ice.Mass;
 
 					     totalSand += comp.sand.Mass;
@@ -1064,13 +1082,13 @@ public class TileManager : MonoBehaviour
 	     // Surface tiles Gizmos
 	     private void DrawSurfaceTilesGizmos()
 	     {
-		          if (tiles == null)
+		          if (grid.tiles == null)
 				return;
 		          for (int x = 0; x < worldsise.x; x++)
 		          {
 				for (int y = 0; y < worldsise.y; y++)
 				{
-					     WorldTile tile = tiles[x, y];
+					     WorldTile tile = grid.tiles[x, y];
 					     if (tile == null)
 						          continue;
 					     TileData data = tile.tileData;

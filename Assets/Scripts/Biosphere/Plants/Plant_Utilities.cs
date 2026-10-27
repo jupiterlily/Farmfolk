@@ -7,8 +7,6 @@ public static class Plant_Utilities
 	     {
 		          float mass = 0f;
 
-
-
 		          return mass;
 	     }
 

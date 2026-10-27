@@ -73,7 +73,7 @@ public static class PepoUIUtilities
 		          if (pepo == null)
 		          {
 				Debug.LogWarning("Pepo is null, creating a random pepo for portrait.");
-				pepo = PepoFactory.CreateRandom(BodyFactory.CreateChromosomesFromAlleles(BodyLibrary.Default.Alleles.ToList()));
+				pepo = PepoFactory.CreateRandom(BodyFactory.CreateChromosomesFromAlleles(BodyLibrary.Plans["human"].Alleles.ToList()));
 		          }
 
 		          GameObject portrait = new GameObject("Portrait");

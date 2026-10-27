@@ -34,7 +34,7 @@ public class WorldTile : MonoBehaviour
 		          }
 	     }
 
-	     public void TileVisualUpdate()
+	     public void TileVisualUpdate(float currentEnergy)
 	     {
 		          SoilUtilities.CalculateDerivedProperties(tileData.composition);
 		          float height = TileUtilities.CalculateSoilVolume(tileData.composition) + TileUtilities.CalculateSurfaceWaterVolume(tileData) + (tileData.bedrock.Mass / Constants.GRANITE_DENSITY);
@@ -71,11 +71,7 @@ public class WorldTile : MonoBehaviour
 				tileColor = Color.Lerp(tileColor, Constants.ICE_COLOR, tileData.composition.ice.Mass / Constants.ICE_DENSITY);
 		          }
 		          //convert longitude to a time of day (0-1) from -180 to 180 degrees
-		          float longitude = tileData.longitude; // -180 to 180
-		          float localSolarTime = SimulationConstants.TimeOfDay + (longitude / 360f);
-		          localSolarTime = localSolarTime % 1f; // Ensure stays in [0,1]
-		          float currentEnergy = SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(
-		              tileData.latitude, SimulationConstants.DayOfYear, localSolarTime);
+
 		          // Blend tile color based on solar energy
 		          float lightFactor = Mathf.Clamp01(currentEnergy / SimulationConstants.SolarConstant);
 		          tileColor = Color.Lerp(tileColor, Color.white, lightFactor * 0.3f); // Blend with white based on light factor

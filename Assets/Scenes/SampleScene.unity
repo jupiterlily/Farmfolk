@@ -2733,7 +2733,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ce010db710ee9f949b8eeb00988dc2e7, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  worldsise: {x: 36, y: 15}
+  worldsise: {x: 24, y: 12}
   grid:
     tileWidth: 1
     XGrid: 1
@@ -2837,8 +2837,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8fa2202a81ca9dc4eb5b2fc7d684a014, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  initialPepos: 40
-  seedPairs: 15
+  initialPepos: 25
+  seedPairs: 5
   generationSteps: 5
   maxPepos: 400
   minPopulationThreshold: 50

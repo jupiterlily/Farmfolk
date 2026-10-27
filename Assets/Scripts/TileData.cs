@@ -485,7 +485,7 @@ public class TileGrid
 	     public Vector3 originPoint;
 
 	     public TileData[,] Map;
-
+	     public WorldTile[,] tiles;
 
 	     //return neighbors.
 	     public TileGrid(int worldX, int worldY, int tileSize)

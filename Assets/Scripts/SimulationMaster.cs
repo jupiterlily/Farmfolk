@@ -39,7 +39,9 @@ public class SimulationMaster : MonoBehaviour
 
 	     public TileManager tileManager;
 	     public int initialPlantCount;
-
+	     float longitude; // -180 to 180
+	     float localSolarTime;
+	     float currentEnergy;
 	     void Start()
 	     {
 		          // Initialise the days per month array based on the year length.
@@ -169,11 +171,17 @@ public class SimulationMaster : MonoBehaviour
 
 				tileManager.AtmosphereStep((1f / 60) * 10);
 				tileManager.HydrosphereStep((1f / 60) * 10);
-				foreach (var tile in tileManager.tiles)
+				for (int i = 0; i < tileManager.grid.XGrid; i++)
 				{
-
-
-					     tile.TileVisualUpdate();
+					     for (int j = 0; j < tileManager.grid.YGrid; j++)
+					     {
+						          longitude = tileManager.grid.Map[i, j].longitude; // -180 to 180
+						          localSolarTime = SimulationConstants.TimeOfDay + (longitude / 360f);
+						          localSolarTime = localSolarTime % 1f; // Ensure stays in [0,1]
+						          currentEnergy = SolarEnergyCalculator.CalculateCurrentEnergyAtLatitude(
+						             tileManager.grid.Map[i, j].latitude, SimulationConstants.DayOfYear, localSolarTime);
+						          tileManager.grid.tiles[i, j].TileVisualUpdate(currentEnergy);
+					     }
 				}
 
 		          }

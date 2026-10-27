@@ -533,7 +533,7 @@ public static class UILibrary
 	     /// </summary>
 	     public static UIWindow BuildWindowTileComposition(Vector2 tileRef, TileManager tileManager, UIManager uim)
 	     {
-		          UISection_Tile rootTile = new UISection_Tile("Tile ref", tileManager.tiles[(int)tileRef.x - 1, (int)tileRef.y - 1].tileData, true);
+		          UISection_Tile rootTile = new UISection_Tile("Tile ref", tileManager.grid.tiles[(int)tileRef.x - 1, (int)tileRef.y - 1].tileData, true);
 		          var compositionTab = new UITab("Tile Information", new List<UISection>
 		          {
 				//rootTile,

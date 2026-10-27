@@ -51,7 +51,7 @@ public class Gardener
 				{
 
 					     Vector3 activationCenter = demeter.GetRandomPosition();
-					     demeter.CreateNewPlant(demeter.AllPlants.Count, demeter.tileManager.tiles[(int)activationCenter.x, (int)activationCenter.z].tileData);
+					     demeter.CreateNewPlant(demeter.AllPlants.Count, demeter.tileManager.grid.tiles[(int)activationCenter.x, (int)activationCenter.z].tileData);
 				}
 		          }
 	     }

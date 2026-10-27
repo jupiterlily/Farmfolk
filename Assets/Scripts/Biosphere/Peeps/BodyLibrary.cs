@@ -409,11 +409,37 @@ public static class BodyLibrary
 
 		          // Default humanlike plan.
 		          _plans["humanlike"] = BodyPlan.Build("humanlike")
-		              .Group("head", "head", "humanhair0", "eye", "brows", "nose", "mouth")
-		              .Group("skin", "skin")
+		              .Group("head", "head", "humanlikehair0", "humanlikeeye0", "brows", "nose", "mouth")
+		              .Group("skin", "humanlikeskin0")
 		              .Group("body", "height", "mass", "reproductive")
 		              .Finish();
 
+		          _plans["human"] = BodyPlan.Build("human")
+			.Group("head", "head", "humanhair", "humaneye", "brows", "nose", "mouth")
+			.Group("skin", "humanskin")
+			.Group("body", "height", "mass", "reproductive")
+			.Finish();
+
+		          //set the human variables. skin oxyhaemoglobin should be in aspecific range, not too high, as should deoxyhaemoglibin. pheomelanin should be lower and eumelanin should have basically its full range.
+		          var humanlist = _plans["human"].Alleles.ToList();
+		          foreach (var part in humanlist)
+		          {
+				if (part.range.name == "SkinPigmentOxyhaemoglobin")
+				{
+					     part.range.maxValue = 3;
+					     part.range.value = 2;
+				}
+				if (part.range.name == "SkinPigmentDeoxyhaemoglobin")
+				{
+					     part.range.maxValue = 3;
+					     part.range.value = 2;
+				}
+				if (part.range.name == "SkinPigmentPheomelanin")
+				{
+					     part.range.maxValue = 4;
+					     part.range.value = 2;
+				}
+		          }
 		          // Future plans — nothing else changes in the codebase:
 		          // _plans["canine"]  = BodyPlan.Build("canine")
 		          //     .Group("head", "snout", "ear", "coat", "eye")
@@ -424,6 +450,8 @@ public static class BodyLibrary
 		          //     .Group("body", "stalk", "leaf", "chlorophyll", "flower")
 		          //     .Finish();
 	     }
+
+	     //we should have a method to list the alleles of a given plan	     
 }
 // ---------------------------------------------------------------------------
 // BodyPartLibrary — every organ/part and the alleles that compose it
@@ -449,23 +477,25 @@ public static class BodyPartLibrary
 		          Register("head", "HeadShape", "Ears");
 		          Register("humanhair", "HairTexture", "HairPigmentPheomelanin", "HairPigmentEumelanin", "HairCanitiesOnset", "HairCanitiesComplete");
 		          //we want to generate one with 2 -4  random pigments		          
-		          RegisterHairVariants(1, 2, 4);
-		          Register("eye", "EyeDarkness", "EyeHeight", "EyeOpenness",
-				     "EyeInnerCorner", "EyeOuterCorner",
-				     "EyeIrisSaturation", "EyeIrisStructure",
-				     "EyePigmentType", "EyePigmentDensity");
+		          RegisterHairPigmentVariance(1, 2, 4);
+		          Register("humaneye", "EyeDarkness", "EyeHeight", "EyeOpenness",
+		       "EyeInnerCorner", "EyeOuterCorner",
+		       "EyeIrisSaturation", "EyeIrisStructure",
+		       "EyePigmentEumelanin", "EyePigmentDensity");
+		          RegisterEyePigmentVariance(1, 1, 2);
+		          RegisterSkinPigmentVariance(1, 1, 3);
 		          Register("brows", "BrowsThickness", "BrowHeight", "BrowInnerCorner", "BrowOuterCorner");
 		          Register("nose", "NoseHeight", "NostrilShape", "NasalBridge");
 		          Register("mouth", "MouthHeight", "TopLipShape", "TopLipThickness", "TopLipWidth",
 				     "BottomLipShape", "BottomLipThickness", "BottomLipWidth", "Teeth");
-		          Register("skin", "SkinDepth", "SkinSaturation", "SkinHue", "SkinOlive", "Freckles", "InvertFreckles", "SecondaryFreckles", "InvertSecondaryFreckles");
+		          Register("humanskin", "SkinDepth", "SkinSaturation", "SkinPigmentOxyhaemoglobin", "SkinPigmentEumelanin", "SkinPigmentPheomelanin", "SkinPigmentDeoxyhaemoglobin", "Freckles", "InvertFreckles", "SecondaryFreckles", "InvertSecondaryFreckles");
 		          Register("height", "Height");
 		          Register("mass", "MassGenetics");
 		          Register("reproductive", "SexChromosome", "Lifespan", "PubertyOnset", "PubertyComplete", "MenstrualCycleLength", "GestationalPeriod", "EggsReleasedMin", "EggsReleasedMax", "EggDivision", "Menopause", "Andropause");
 	     }
 	     // Registers `count` hair parts, each carrying a random number of pigments in [min, max].
 	     // Names are "humanhair0".."humanhair{count-1}".
-	     internal static void RegisterHairVariants(int count, int min, int max)
+	     internal static void RegisterHairPigmentVariance(int count, int min, int max)
 	     {
 		          var allPigmentGenes = GeneticsLibrary.BiologicalPigments
 		              .Select(p => "HairPigment" + GeneticsLibrary.PigmentKey(p.Name))
@@ -486,7 +516,57 @@ public static class BodyPartLibrary
 				var genes = new List<string> { "HairTexture", "HairCanitiesOnset", "HairCanitiesComplete" };
 				genes.AddRange(chosen);
 
-				Register("humanhair" + i, genes.ToArray());
+				Register("humanlikehair" + i, genes.ToArray());
+		          }
+	     }
+	     //register eye pigment genes
+	     internal static void RegisterEyePigmentVariance(int count, int min, int max)
+	     {
+		          var allPigmentGenes = GeneticsLibrary.BiologicalPigments
+		              .Select(p => "EyePigment" + GeneticsLibrary.PigmentKey(p.Name))
+		              .ToList();
+
+		          int lo = System.Math.Max(1, min);
+		          int hi = System.Math.Min(max, allPigmentGenes.Count);
+		          if (hi < lo)
+				hi = lo;
+
+		          var rng = new System.Random();   // seed if you want reproducibility
+
+		          for (int i = 0; i < count; i++)
+		          {
+				int n = rng.Next(lo, hi + 1);
+				var chosen = allPigmentGenes.OrderBy(_ => rng.Next()).Take(n).ToList();
+
+				var genes = new List<string> { "EyeDarkness", "EyeHeight", "EyeInnerCorner", "EyeOuterCorner", "EyeIrisStructure", "EyePigmentDensity" };
+				genes.AddRange(chosen);
+
+				Register("humanlikeeye" + i, genes.ToArray());
+		          }
+	     }
+	     //register eye pigment genes
+	     internal static void RegisterSkinPigmentVariance(int count, int min, int max)
+	     {
+		          var allPigmentGenes = GeneticsLibrary.BiologicalPigments
+		              .Select(p => "SkinPigment" + GeneticsLibrary.PigmentKey(p.Name))
+		              .ToList();
+
+		          int lo = System.Math.Max(1, min);
+		          int hi = System.Math.Min(max, allPigmentGenes.Count);
+		          if (hi < lo)
+				hi = lo;
+
+		          var rng = new System.Random();   // seed if you want reproducibility
+
+		          for (int i = 0; i < count; i++)
+		          {
+				int n = rng.Next(lo, hi + 1);
+				var chosen = allPigmentGenes.OrderBy(_ => rng.Next()).Take(n).ToList();
+
+				var genes = new List<string> { "SkinDepth", "SkinSaturation", "Freckles", "InvertFreckles", "SecondaryFreckles", "InvertSecondaryFreckles" };
+				genes.AddRange(chosen);
+
+				Register("humanlikeskin" + i, genes.ToArray());
 		          }
 	     }
 	     private static BodyPartData Register(string partName, params string[] geneNames)
@@ -631,12 +711,7 @@ public static class GeneLibrary
 		          //      "deep red", "red", "deep orange", "orange", "no pheomelanin"));
 		          Register(GeneData.Generated("HairCanitiesOnset", InheritanceRule.EitherOr, 75, "starts greying at ", 15));
 		          Register(GeneData.Generated("HairCanitiesComplete", InheritanceRule.EitherOr, 75, "finishes greying at ", 15));
-		          // ---- Hair pigments (auto-generated, replaces HairEumelanin / HairPheomelanin) ----
-		          foreach (var pigment in GeneticsLibrary.BiologicalPigments)
-				Register(GeneData.Explicit(
-				    "HairPigment" + GeneticsLibrary.PigmentKey(pigment.Name),
-				    InheritanceRule.WithinRange, true,
-				    GeneticsLibrary.PigmentDensityDescriptors(pigment.Name)));
+
 		          // ---- Eyes ----
 		          //      Register(GeneData.Explicit("EyeColor", InheritanceRule.ChooseDominant, true,
 		          //     "violet", "blue", "teal", "green", "yellow", "grey", "red"));
@@ -644,8 +719,7 @@ public static class GeneLibrary
 		          GeneticsLibrary.StructuralColourNames()));          // ← auto from StructuralColour entries
 		          Register(GeneData.Explicit("EyeIrisSaturation", InheritanceRule.EitherOr, true,
 		              "pale", "light", "medium", "bright", "intense"));
-		          Register(GeneData.Explicit("EyePigmentType", InheritanceRule.EitherOr, true,
-		              GeneticsLibrary.BiologicalPigmentNames()));
+
 		          //generate an eye pigment gene for each biological pigment in the colour library.
 		          Register(GeneData.Explicit("EyePigmentDensity", InheritanceRule.EitherOr, true,
 		              "clear", "honey", "amber", "hazel", "brown", "dark brown", "black"));
@@ -674,12 +748,7 @@ public static class GeneLibrary
 		          Register(GeneData.Explicit("SkinSaturation", InheritanceRule.EitherOr, true, "muted", "soft", "moderate", "saturated", "vivid", "rich"));
 		          Register(GeneData.Explicit("SkinHue", InheritanceRule.EitherOr, true, "very cool", "cool", "neutral-cool", "neutral", "neutral-warm", "warm", "very warm"));
 		          Register(GeneData.Explicit("SkinOlive", InheritanceRule.EitherOr, true, "very olive", "olive", "slightly olive"));
-		          // ---- Skin pigments (auto-generated, replaces SkinDepth/SkinSaturation/SkinHue/SkinOlive) ----
-		          foreach (var pigment in GeneticsLibrary.BiologicalPigments)
-				Register(GeneData.Explicit(
-				    "Skin" + GeneticsLibrary.PigmentKey(pigment.Name),
-				    InheritanceRule.WithinRange, true,
-				    GeneticsLibrary.PigmentDensityDescriptors(pigment.Name)));
+
 		          // ---- Freckles ----
 		          Register(GeneData.Count("Freckles", InheritanceRule.EitherOr, () => PepoUIUtilities.freckles.Length, "freckle pattern", true));
 		          Register(GeneData.Explicit("InvertFreckles", InheritanceRule.EitherOr, false, "not inverted", "inverted"));
@@ -701,6 +770,14 @@ public static class GeneLibrary
 		          Register(GeneData.Count("Teeth", InheritanceRule.EitherOr, () => PepoUIUtilities.teeth.Length, "teeth set", true));
 		          Register(GeneData.Count("Ears", InheritanceRule.EitherOr, () => PepoUIUtilities.ears.Length, "ear shape", true));
 
+		          RegisterBaseMetabolism();
+
+		          RegisterPigmentGenes();
+
+	     }
+
+	     private static void RegisterBaseMetabolism()
+	     {
 		          // ---- Metabolic ----
 		          Register(GeneData.Generated("Lifespan", InheritanceRule.EitherOr, 75, "reaches end of lifespan at ", 15));
 		          Register(GeneData.Generated("PubertyOnset", InheritanceRule.EitherOr, 15, "starts puberty at ", 8));
@@ -714,6 +791,32 @@ public static class GeneLibrary
 		          Register(GeneData.Generated("Andropause", InheritanceRule.EitherOr, 75, "reaches andropause at ", 15));
 	     }
 
+	     private static void RegisterPigmentGenes()
+	     {
+		          // ---- Skin pigments (auto-generated, replaces SkinDepth/SkinSaturation/SkinHue/SkinOlive) ----
+		          foreach (var pigment in GeneticsLibrary.BiologicalPigments)
+				Register(GeneData.Explicit(
+				    "SkinPigment" + GeneticsLibrary.PigmentKey(pigment.Name),
+				    InheritanceRule.WithinRange, true,
+				    GeneticsLibrary.PigmentDensityDescriptors(pigment.Name)));
+
+		          // ---- Hair pigments (auto-generated, replaces HairEumelanin / HairPheomelanin) ----
+		          foreach (var pigment in GeneticsLibrary.BiologicalPigments)
+				Register(GeneData.Explicit(
+				    "HairPigment" + GeneticsLibrary.PigmentKey(pigment.Name),
+				    InheritanceRule.WithinRange, true,
+				    GeneticsLibrary.PigmentDensityDescriptors(pigment.Name)));
+
+		          //eye pigment types are done differently because of how eye colour works but now I'm not so sure. 
+		          //Register(GeneData.Explicit("EyePigmentType", InheritanceRule.EitherOr, true,
+		          //    GeneticsLibrary.BiologicalPigmentNames()));
+
+		          foreach (var pigment in GeneticsLibrary.BiologicalPigments)
+				Register(GeneData.Explicit(
+				    "EyePigment" + GeneticsLibrary.PigmentKey(pigment.Name),
+				    InheritanceRule.WithinRange, true,
+				    GeneticsLibrary.PigmentDensityDescriptors(pigment.Name)));
+	     }
 	     private static AlleleData Register(GeneData def)
 	     {
 		          var a = new AlleleData(def.Name, def.Min, def.Max, def.Inheritance, def.Descriptors);

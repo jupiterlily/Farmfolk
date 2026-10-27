@@ -28,7 +28,7 @@ public class PepoPopulation
 
 	     public PepoPopulation(int cohortSize, int cohortSeeds = 2)
 	     {
-		          ChromosomeData[] adamData = BodyFactory.CreateChromosomesFromAlleles(BodyLibrary.Default.Alleles.ToList());
+		          ChromosomeData[] adamData = BodyFactory.CreateChromosomesFromAlleles(BodyLibrary.Plans["humanlike"].Alleles.ToList());
 		          ChromosomeData[] eveData = GeneticsUtilities.RandomiseGeneticValues(adamData);
 		          if (cohortSize >= 1)
 		          {
@@ -36,7 +36,7 @@ public class PepoPopulation
 				{
 
 					     //we want to create our adam and eve. we intialise a random pepo, then we clone it and flip the gender, then we mutate them both a whole bunch to have two distinct people that share the same genetic structure.					     
-					     adamData = GeneticsUtilities.RandomiseGeneticRange(adamData);
+					     //  adamData = GeneticsUtilities.RandomiseGeneticRange(adamData);
 					     adamData = GeneticsUtilities.RandomiseGeneticValues(adamData);
 					     eveData = GeneticsUtilities.RandomiseGeneticRange(eveData);
 					     eveData = GeneticsUtilities.RandomiseGeneticValues(eveData);
