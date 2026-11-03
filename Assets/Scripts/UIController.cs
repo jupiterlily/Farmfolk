@@ -25,5 +25,9 @@ public class UIWindowController : MonoBehaviour
 		          activeTab = index;
 	     }
 
+	     public void Refresh()
+	     {
+		          //this is what we do when we 
+	     }
 	     // Future: OnClose(), OnMinimise(), OnResize(), OnDrag() etc.
 }

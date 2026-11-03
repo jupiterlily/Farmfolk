@@ -83,7 +83,6 @@ public class UIManager : MonoBehaviour
 		          }
 	     }
 
-
 	     void Update()
 	     {
 		          // Only refresh UI occasionally or when population changes
@@ -98,7 +97,7 @@ public class UIManager : MonoBehaviour
 	     private void FixedUpdate()
 	     {
 		          // Update the clock every fixed update to reflect simulation time
-		          //UpdateClock(Clock);
+		          //  UpdateClock(Clock);
 		          if (!worldWindowsCreated)
 		          {
 				UIWindow tileWindow = UILibrary.BuildWindowTileComposition(tm.worldsise, tm, this);
@@ -106,10 +105,6 @@ public class UIManager : MonoBehaviour
 				uiFactory.CreateWindow(tileWindow, LeftSidebar.transform, this);
 				worldWindowsCreated = true;
 
-
-		          }
-		          if (!pepoWindowsCreated)
-		          {
 				// Create new panels - ordered by surname then age
 				foreach (PepoData pepo in pepoPopManager.Pepos.totalPop
 				    .OrderBy(p => p.surname)
@@ -120,14 +115,14 @@ public class UIManager : MonoBehaviour
 					     UIWindows.Add(pepoWindow);
 					     uiFactory.CreateWindow(pepoWindow, Body.transform, this);
 				}
-				pepoWindowsCreated = true;
+
 
 		          }
 
-		          foreach (UIWindow window in UIWindows)
-		          {
-				UIUtilities.RefreshAllFields(window);
-		          }
+		          //        foreach (UIWindow window in UIWindows)
+		          //        {
+		          //UIUtilities.RefreshAllFields(window);
+		          //        }
 	     }
 	     public void SetPanelSizes()
 	     {
